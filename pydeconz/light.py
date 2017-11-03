@@ -1,3 +1,5 @@
+"""Python library to connect Deconz and Home Assistant to work together."""
+
 import logging
 
 from pprint import pprint
@@ -6,10 +8,16 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DeconzLight(object):
+    """Deconz light representation.
+
+    Dresden Elektroniks documentation of lights in Deconz
+    http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
-    """
-    def __init__(self, light, set_state):
-        """
+
+    def __init__(self, light, set_state_callback):
+        """Set initial information about light.
+
+        Set callback to set state of device.
         """
         print(light)
         self.state = light['state']['on']
@@ -24,11 +32,25 @@ class DeconzLight(object):
         self.brightness = light['state']['bri']
         self.reachable = light['state']['reachable']
 
-        self.set_state = set_state
+        self.set_state = set_state_callback
         self.callback = None
 
     def update_state(self, state):
-        """
+        """Update state of light.
+
+        State may contain any of the following:
+        {
+            "alert": "none"
+            "bri": 111
+            "colormode": "ct"
+            "ct": 307
+            "effect": "none"
+            "hue": 7998
+            "on": false
+            "reachable": true
+            "sat": 172
+            "xy": [ 0.421253, 0.39921 ]
+        }
         """
         if 'on' in state:
             self.state = state['on']
@@ -36,7 +58,10 @@ class DeconzLight(object):
             self.brightness = state['bri']
 
     def update(self, event):
-        """
+        """New event for light.
+
+        Check that state is part of event.
+        Signal that light has updated state.
         """
         if 'state' in event:
             self.update_state(event['state'])
@@ -45,8 +70,7 @@ class DeconzLight(object):
         pprint(self.__dict__)
 
     def as_dict(self):
-        """Callback for __dict__.
-        """
+        """Callback for __dict__."""
         cdict = self.__dict__.copy()
         if 'set_state' in cdict:
             del cdict['set_state']

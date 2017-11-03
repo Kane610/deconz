@@ -1,15 +1,16 @@
+"""Python library to connect Deconz and Home Assistant to work together."""
+
+# http://lucumr.pocoo.org/2012/9/24/websockets-101/
+
 import asyncio
 import json
 
-import struct
 
 class WSClient(asyncio.Protocol):
-    """Websocket transport, session handling, message generation.
-    """
+    """Websocket transport, session handling, message generation."""
 
     def __init__(self, loop, host, port, callback):
-        """
-        """
+        """Create resources for websocket communication."""
         self.loop = loop
         self.transport = None
         self.host = host
@@ -17,18 +18,19 @@ class WSClient(asyncio.Protocol):
         self.callback = callback
         self.setup_response = True
         conn = loop.create_connection(lambda: self, host, port)
-        task = loop.create_task(conn)
+        loop.create_task(conn)
 
     def stop(self):
-        """
-        """
+        """Close websocket connection."""
         if self.transport:
             self.transport.close()
 
     def connection_made(self, transport):
+        """Do the websocket handshake.
+
+        According to https://tools.ietf.org/html/rfc6455
         """
-        """
-        import hashlib
+        #import hashlib
         import os
         from base64 import encodestring as base64encode
         randomness = os.urandom(16)
@@ -46,28 +48,30 @@ class WSClient(asyncio.Protocol):
         self.transport.write(message.encode())
 
     def data_received(self, data):
-        """
+        """Data received over websocket.
+
+        First received data will allways be handshake accepting connection.
+        We need to check how big the header is so we can send event data
+        as a proper json object.
         """
         if self.setup_response:
             self.setup_response = False
             return
-        print(data)
+
         head = ord(data[1:2])
         if head <= 125:
-            'No extra payload information.'
-            header_length = 2
+            # No extra payload information.
+            payload_start = 2
         elif head == 126:
-            'Payload information are an extra 2 bytes.'
-            header_length = 4
+            # Payload information are an extra 2 bytes.
+            payload_start = 4
         elif head == 127:
-            'Payload information are an extra 6 bytes.'
-            header_length = 8
-        event = json.loads(data[header_length:].decode())
+            # Payload information are an extra 6 bytes.
+            payload_start = 8
+
+        event = json.loads(data[payload_start:].decode())
         self.callback(event)
 
-
     def connection_lost(self, exc):
-        """
-        """
+        """Happen when device closes connection or stop() has been called."""
         print('connection_lost', exc)
-        pass

@@ -1,7 +1,9 @@
-import aiohttp
+"""Python library to connect Deconz and Home Assistant to work together."""
+
 import asyncio
 import json
 import logging
+import aiohttp
 
 from .light import DeconzLight
 from .sensor import (ZHASwitch, ZHAPresence)
@@ -14,43 +16,43 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DeconzSession:
-    """
-    """
+    """Deconz representation that handles."""
 
     def __init__(self, loop, host, port, api_key, **kwargs):
-        """
-        """
+        """Setup session and host information."""
         self.lights = {}
         self.sensors = {}
         self.loop = loop
         self.host = host
-        self.__session = aiohttp.ClientSession(loop=loop)
-        self.__api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
-        self.__websocket = None
-        self.__websocket_port = None
+        self.session = aiohttp.ClientSession(loop=loop)
+        self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
+        self.websocket = None
+        self.websocket_port = None
 
     def start(self):
-        self.__websocket = WSClient(
-            self.loop, self.host, self.__websocket_port, self.event_handler)
+        """Connect websocket to Deconz."""
+        self.websocket = WSClient(
+            self.loop, self.host, self.websocket_port, self.event_handler)
 
     @asyncio.coroutine
     def close(self):
-        """
-        """
-        yield from self.__session.close()
-        if self.__websocket:
-            yield from self.__websocket.stop()
+        """Close websession and websocket to Deconz."""
+        yield from self.session.close()
+        if self.websocket:
+            yield from self.websocket.stop()
 
     @asyncio.coroutine
     def populate_config(self):
+        """Load Deconz configuration parameters."""
         config = yield from self.get_state_async('/config')
-        self.__websocket_port = config['websocketport']
+        self.websocket_port = config['websocketport']
         pprint(config)
         # 'swversion': '2.4.82'
         # zigbeechannel
 
     @asyncio.coroutine
     def populate_lights(self):
+        """Create lights based on all lights registered in Deconz."""
         lights = yield from self.get_state_async('/lights')
         for light_id, light in lights.items():
             self.lights[light_id] = DeconzLight(light, self.put_state_async)
@@ -58,34 +60,57 @@ class DeconzSession:
 
     @asyncio.coroutine
     def populate_sensors(self):
+        """Create sensors based on all sensors registered in Deconz."""
         sensors = yield from self.get_state_async('/sensors')
         for sensor_id, sensor in sensors.items():
             if sensor['type'] == 'ZHASwitch':
-                self.sensors[sensor_id] = ZHASwitch(sensor) 
+                self.sensors[sensor_id] = ZHASwitch(sensor)
             elif sensor['type'] == 'ZHAPresence':
                 self.sensors[sensor_id] = ZHAPresence(sensor)
             _LOGGER.debug('Sensors: %s', self.sensors[sensor_id].__dict__)
 
     @asyncio.coroutine
     def put_state_async(self, field, data):
+        """Set state of object in Deconz.
+
+        Field is a string representing a specific device in Deconz
+        e.g. field='/lights/1/state'.
+        Data is a json object with what data you want to alter
+        e.g. data={'on': True}.
+        See Dresden Elektroniks REST API documentation for details:
+        http://dresden-elektronik.github.io/deconz-rest-doc/rest/
         """
-        """
-        session = self.__session.put
-        url = self.__api_url + field
+        session = self.session.put
+        url = self.api_url + field
         jsondata = json.dumps(data)
         response_dict = yield from request(session, url, data=jsondata)
         return response_dict
 
     @asyncio.coroutine
     def get_state_async(self, field):
+        """Get state of object in Deconz.
+
+        Field is a string representing an API endpoint or lower
+        e.g. field='/lights'.
+        See Dresden Elektroniks REST API documentation for details:
+        http://dresden-elektronik.github.io/deconz-rest-doc/rest/
         """
-        """
-        session = self.__session.get
-        url = self.__api_url + field
+        session = self.session.get
+        url = self.api_url + field
         response_dict = yield from request(session, url)
         return response_dict
-    
+
     def event_handler(self, event):
+        """Receive event from websocket and identifies where the event belong.
+
+        {
+            "t": "event",
+            "e": "changed",
+            "r": "sensors",
+            "id": "12",
+            "state": { "buttonevent": 2002 }
+        }
+        """
         if event['r'] == 'sensors' and event['id'] in self.sensors:
             self.sensors[event['id']].update(event)
         elif event['r'] == 'lights' and event['id'] in self.lights:
