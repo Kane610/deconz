@@ -5,6 +5,7 @@ import json
 import logging
 import aiohttp
 
+from .config import DeconzConfig
 from .light import DeconzLight
 from .sensor import (ZHASwitch, ZHAPresence)
 from .utils import request
@@ -22,17 +23,18 @@ class DeconzSession:
         """Setup session and host information."""
         self.lights = {}
         self.sensors = {}
+        self.config = None
         self.loop = loop
-        self.host = host
         self.session = aiohttp.ClientSession(loop=loop)
         self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
         self.websocket = None
-        self.websocket_port = None
 
     def start(self):
         """Connect websocket to Deconz."""
-        self.websocket = WSClient(
-            self.loop, self.host, self.websocket_port, self.event_handler)
+        self.websocket = WSClient(self.loop,
+                                  self.config.host,
+                                  self.config.websocketport,
+                                  self.event_handler)
 
     @asyncio.coroutine
     def close(self):
@@ -45,10 +47,8 @@ class DeconzSession:
     def populate_config(self):
         """Load Deconz configuration parameters."""
         config = yield from self.get_state_async('/config')
-        self.websocket_port = config['websocketport']
-        pprint(config)
-        # 'swversion': '2.4.82'
-        # zigbeechannel
+        self.config = DeconzConfig(config)
+
 
     @asyncio.coroutine
     def populate_lights(self):
@@ -111,10 +111,14 @@ class DeconzSession:
             "state": { "buttonevent": 2002 }
         }
         """
-        if event['r'] == 'sensors' and event['id'] in self.sensors:
-            self.sensors[event['id']].update(event)
-        elif event['r'] == 'lights' and event['id'] in self.lights:
-            self.lights[event['id']].update(event)
+        if event['e'] == 'changed':
+            if event['r'] == 'sensors' and event['id'] in self.sensors:
+                self.sensors[event['id']].update(event)
+            elif event['r'] == 'lights' and event['id'] in self.lights:
+                self.lights[event['id']].update(event)
+            else:
+                # new device, register
+                print('not accepted', event)
         else:
-            # new device, register
-            print('not accepted', event)
+            pprint(event)
+            
