@@ -112,7 +112,6 @@ class WSClient(asyncio.Protocol):
 
     def connection_lost(self, exc):
         """Happen when device closes connection or stop() has been called."""
-        print('connection_lost', exc)
         if self.state == STATE_RUNNING:
             _LOGGER.warning('Lost connection to Deconz')
             self.retry()
