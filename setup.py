@@ -10,7 +10,7 @@ from setuptools import setup
 setup(
   name='pydeconz',
   packages=['pydeconz'],
-  version='0',
+  version='1',
   description='A python library for communicating with deconz REST-API from dresden elektronik',
   author='Robert Svensson',
   author_email='Kane610@users.noreply.github.com',
