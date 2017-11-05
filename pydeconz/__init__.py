@@ -39,6 +39,7 @@ class DeconzSession:
     @asyncio.coroutine
     def close(self):
         """Close websession and websocket to Deconz."""
+        _LOGGER.info('Shutting down connections to Deconz.')
         yield from self.session.close()
         if self.websocket:
             yield from self.websocket.stop()
@@ -48,7 +49,6 @@ class DeconzSession:
         """Load Deconz configuration parameters."""
         config = yield from self.get_state_async('/config')
         self.config = DeconzConfig(config)
-
 
     @asyncio.coroutine
     def populate_lights(self):

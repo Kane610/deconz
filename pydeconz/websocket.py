@@ -4,6 +4,9 @@
 
 import asyncio
 import json
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class WSClient(asyncio.Protocol):
@@ -30,7 +33,6 @@ class WSClient(asyncio.Protocol):
 
         According to https://tools.ietf.org/html/rfc6455
         """
-        #import hashlib
         import os
         from base64 import encodestring as base64encode
         randomness = os.urandom(16)
@@ -44,7 +46,7 @@ class WSClient(asyncio.Protocol):
         message += "Sec-WebSocket-Key: " + key + "\r\n"
         message += "Sec-WebSocket-Version: 13\r\n"
         message += "\r\n"
-        print(message)
+        _LOGGER.debug('Websocket handshake: %s', message)
         self.transport.write(message.encode())
 
     def data_received(self, data):
@@ -54,22 +56,26 @@ class WSClient(asyncio.Protocol):
         We need to check how big the header is so we can send event data
         as a proper json object.
         """
+        _LOGGER.debug('Websocket received data: %s', data.decode())
         if self.setup_response:
             self.setup_response = False
             return
 
-        head = ord(data[1:2])
-        if head <= 125:
+        header = ord(data[1:2])
+        if header <= 125:
             # No extra payload information.
-            payload_start = 2
-        elif head == 126:
+            start = 2
+            end = header + start
+        elif header == 126:
             # Payload information are an extra 2 bytes.
-            payload_start = 4
-        elif head == 127:
+            start = 4
+            end = header + start
+        elif header == 127:
             # Payload information are an extra 6 bytes.
-            payload_start = 8
+            start = 8
+            end = header + start
 
-        event = json.loads(data[payload_start:].decode())
+        event = json.loads(data[start:end].decode())
         self.callback(event)
 
     def connection_lost(self, exc):
