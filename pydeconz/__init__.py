@@ -29,10 +29,14 @@ class DeconzSession:
 
     def start(self):
         """Connect websocket to Deconz."""
-        self.websocket = WSClient(self.loop,
-                                  self.config.host,
-                                  self.config.websocketport,
-                                  self.event_handler)
+        if self.config:
+            self.websocket = WSClient(self.loop,
+                                      self.config.host,
+                                      self.config.websocketport,
+                                      self.event_handler)
+            self.websocket.start()
+        else:
+            _LOGGER.error('No Deconz config available')
 
     @asyncio.coroutine
     def close(self):
@@ -46,24 +50,27 @@ class DeconzSession:
     def populate_config(self):
         """Load Deconz configuration parameters."""
         config = yield from self.get_state_async('/config')
-        self.config = DeconzConfig(config)
+        if config:
+            self.config = DeconzConfig(config)
 
     @asyncio.coroutine
     def populate_lights(self):
         """Create lights based on all lights registered in Deconz."""
         lights = yield from self.get_state_async('/lights')
-        for light_id, light in lights.items():
-            self.lights[light_id] = DeconzLight(light, self.put_state_async)
+        if lights:
+            for light_id, light in lights.items():
+                self.lights[light_id] = DeconzLight(light, self.put_state_async)
 
     @asyncio.coroutine
     def populate_sensors(self):
         """Create sensors based on all sensors registered in Deconz."""
         sensors = yield from self.get_state_async('/sensors')
-        for sensor_id, sensor in sensors.items():
-            if sensor['type'] == 'ZHASwitch':
-                self.sensors[sensor_id] = ZHASwitch(sensor)
-            elif sensor['type'] == 'ZHAPresence':
-                self.sensors[sensor_id] = ZHAPresence(sensor)
+        if sensors:
+            for sensor_id, sensor in sensors.items():
+                if sensor['type'] == 'ZHASwitch':
+                    self.sensors[sensor_id] = ZHASwitch(sensor)
+                elif sensor['type'] == 'ZHAPresence':
+                    self.sensors[sensor_id] = ZHAPresence(sensor)
 
     @asyncio.coroutine
     def put_state_async(self, field, data):
