@@ -35,12 +35,13 @@ class DeconzDevice(object):
         self.callback = callback
     
     def update_attr(self, attr):
-        """"""
+        """Update input attr in self."""
         _LOGGER.debug('Update %s', attr)
         for key, value in attr.items():
             self.__setattr__("_{0}".format(key), value)
     
     def update(self, event):
+        """Signal that a new event has been received."""
         if self.callback:
             self.callback()
     
