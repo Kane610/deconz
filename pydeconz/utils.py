@@ -63,7 +63,7 @@ def request(session, url, **kwargs):
         _LOGGER.error("Timeout getting DeConz data from %s.", url)
         return False
     except aiohttp.ClientError:
-        _LOGGER.exception("Error getting DeConz data from %s.", url)
+        _LOGGER.error("Error getting DeConz data from %s.", url)
         return False
-    finally:
+    else:
         return result
