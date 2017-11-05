@@ -11,13 +11,11 @@ from .sensor import (ZHASwitch, ZHAPresence)
 from .utils import request
 from .websocket import WSClient
 
-from pprint import pprint
-
 _LOGGER = logging.getLogger(__name__)
 
 
 class DeconzSession:
-    """Deconz representation that handles."""
+    """Deconz representation that handles lights and sensors."""
 
     def __init__(self, loop, host, port, api_key, **kwargs):
         """Setup session and host information."""
@@ -56,7 +54,6 @@ class DeconzSession:
         lights = yield from self.get_state_async('/lights')
         for light_id, light in lights.items():
             self.lights[light_id] = DeconzLight(light, self.put_state_async)
-            _LOGGER.debug('Sensors: %s', self.lights[light_id].__dict__)
 
     @asyncio.coroutine
     def populate_sensors(self):
@@ -67,7 +64,6 @@ class DeconzSession:
                 self.sensors[sensor_id] = ZHASwitch(sensor)
             elif sensor['type'] == 'ZHAPresence':
                 self.sensors[sensor_id] = ZHAPresence(sensor)
-            _LOGGER.debug('Sensors: %s', self.sensors[sensor_id].__dict__)
 
     @asyncio.coroutine
     def put_state_async(self, field, data):
@@ -117,8 +113,7 @@ class DeconzSession:
             elif event['r'] == 'lights' and event['id'] in self.lights:
                 self.lights[event['id']].update(event)
             else:
-                # new device, register
-                print('not accepted', event)
+                _LOGGER.debug('Not supported event %s', event)
         else:
-            pprint(event)
+            _LOGGER.debug('Not supported event %s', event)
             
