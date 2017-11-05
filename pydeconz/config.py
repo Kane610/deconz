@@ -16,16 +16,16 @@ class DeconzConfig:
         'UTC': '2017-11-04T12:01:19',
         'apiversion': '1.0.4',
         'backup': {'errorcode': 0, 'status': 'idle'},
-        'bridgeid': '00212EFFFF011015',
+        'bridgeid': '0123456789ABCDEF',
         'datastoreversion': '60',
         'dhcp': True,
         'factorynew': False,
-        'gateway': '10.0.1.1',
+        'gateway': '192.168.0.1',
         'internetservices': {'remoteaccess': 'disconnected'},
-        'ipaddress': '10.0.1.16',
+        'ipaddress': '192.168.0.90',
         'linkbutton': False,
         'localtime': '2017-11-04T13:01:19',
-        'mac': 'b8:27:eb:2c:eb:e2',
+        'mac': '00:11:22:33:44:55',
         'modelid': 'deCONZ',
         'name': 'deCONZ-GW',
         'netmask': '255.255.255.0',
@@ -50,7 +50,7 @@ class DeconzConfig:
         'swversion': '2.4.82',
         'timeformat': '24h',
         'timezone': 'Europe/Stockholm',
-        'uuid': '445d8b57-55ce-47ee-822f-5428e61d8073',
+        'uuid': '12345678-90AB-CDEF-1234-1234567890AB',
         'websocketnotifyall': True,
         'websocketport': 443,
         'whitelist': {'1234567890': {'create date': '2017-11-02T23:13:13',
@@ -62,7 +62,7 @@ class DeconzConfig:
         'wifiip': '192.168.8.1',
         'wifiname': 'Not set',
         'wifitype': 'accesspoint',
-        'zigbeechannel': 15
+        'zigbeechannel': 11
     }
     """
 
@@ -72,10 +72,18 @@ class DeconzConfig:
 
         Set callback to set state of device.
         """
-        pprint(config)
-        for key, value in config.items():
-            self.__setattr__("_{0}".format(key), value)
-        pprint(self.__dict__)
+        self._apiversion = config.get('apiversion')
+        self._ipaddress = config.get('ipaddress')
+        self._linkbutton = config.get('linkbutton')
+        self._modelid = config.get('modelid')
+        self._name = config.get('name')
+        self._networkopenduration = config.get('networkopenduration')
+        self._panid = config.get('panid')
+        self._swversion = config.get('swversion')
+        self._uuid = config.get('uuid')
+        self._websocketport = config.get('websocketport')
+        self._zigbeechannel = config.get('zigbeechannel')
+        _LOGGER.debug('Deconz config loaded %s', self.__dict__)
 
     @property
     def apiversion(self):
