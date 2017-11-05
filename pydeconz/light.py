@@ -2,60 +2,35 @@
 
 import logging
 
-from pprint import pprint
+from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzLight(object):
+class DeconzLight(DeconzDevice):
     """Deconz light representation.
 
     Dresden Elektroniks documentation of lights in Deconz
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, light, set_state_callback):
+    def __init__(self, device, set_state_callback):
         """Set initial information about light.
 
         Set callback to set state of device.
         """
-        print(light)
-        self.state = light['state']['on']
-        self.name = light['name']
-        self.type = light['type']
-        self.modelid = light['modelid']
-        self.swversion = light['swversion']
-        self.uniqueid = light['uniqueid']
-        self.manufacturer = light['manufacturername']
-
-        self.hascolor = light['hascolor']
-        self.brightness = light['state']['bri']
-        self.reachable = light['state']['reachable']
-
+        self._alert = device['state'].get('alert')
+        self._bri = device['state'].get('bri')
+        self._colormode = device['state'].get('colormode')
+        self._ct = device['state'].get('ct')
+        self._effect = device['state'].get('effect')
+        self._hue = device['state'].get('hue')
+        self._on = device['state'].get('on')
+        self._reachable = device['state'].get('reachable')
+        self._sat = device['state'].get('sat')
+        self._xy = device['state'].get('xy')
         self.set_state = set_state_callback
-        self.callback = None
-
-    def update_state(self, state):
-        """Update state of light.
-
-        State may contain any of the following:
-        {
-            "alert": "none"
-            "bri": 111
-            "colormode": "ct"
-            "ct": 307
-            "effect": "none"
-            "hue": 7998
-            "on": false
-            "reachable": true
-            "sat": 172
-            "xy": [ 0.421253, 0.39921 ]
-        }
-        """
-        if 'on' in state:
-            self.state = state['on']
-        if 'bri' in state:
-            self.brightness = state['bri']
+        super().__init__(device)
 
     def update(self, event):
         """New event for light.
@@ -63,17 +38,77 @@ class DeconzLight(object):
         Check that state is part of event.
         Signal that light has updated state.
         """
-        if 'state' in event:
-            self.update_state(event['state'])
-        if self.callback:
-            self.callback()
-        pprint(self.__dict__)
+        self.update_attr(event.get('state', {}))
+        super().update(event)
 
     def as_dict(self):
         """Callback for __dict__."""
-        cdict = self.__dict__.copy()
+        cdict = super().as_dict()
         if 'set_state' in cdict:
             del cdict['set_state']
-        if 'callback' in cdict:
-            del cdict['callback']
         return cdict
+
+    @property
+    def state(self):
+        """True if the light is on."""
+        return self._on
+
+    @property
+    def brightness(self):
+        """Brightness of the light. Depending on the light type 0 might not mean visible "off" but minimum brightness."""
+        return self._bri
+
+    @property
+    def hue(self):
+        """Color hue of the light. The hue parameter in the HSV color model is between 0Â°-360Â° and is mapped to 0..65535 to get 16-bit resolution."""
+        return self._hue
+
+    @property
+    def sat(self):
+        """Color saturation of the light. There 0 means no color at all and 255 is the greatest saturation of the color."""
+        return self._sat
+
+    @property
+    def ct(self):
+        """Mired color temperature of the light. (2000K - 6500K)"""
+        return self._ct
+
+    @property
+    def xy(self):
+        """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
+        return self._xy
+
+    @property
+    def alert(self):
+        """Temporary alert effect.
+        
+        Following values are possible:
+        none - light is not performing an alert
+        select - light is blinking a short time
+        lselect - light is blinking a longer time
+        """
+        return self._alert
+
+    @property
+    def colormode(self):
+        """The current color mode of the light:
+        
+        hs - hue and saturation
+        xy - CIE xy values
+        ct - color temperature
+        """
+        return self._colormode
+
+    @property
+    def effect(self):
+        """Effect of the light:
+        
+        none - no effect
+        colorloop
+        """
+        return self._effect
+
+    @property
+    def reachable(self):
+        """True if the light is reachable and accepts commands."""
+        return self._reachable

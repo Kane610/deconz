@@ -4,6 +4,8 @@ import logging
 
 from pprint import pprint
 
+from .deconzdevice import DeconzDevice
+
 _LOGGER = logging.getLogger(__name__)
 
 # Wireless dimmer
@@ -13,46 +15,23 @@ _LOGGER = logging.getLogger(__name__)
 # 4002 Move to level 0
 
 
-class DeconzSensor:
+class DeconzSensor(DeconzDevice):
     """Deconz sensor representation.
 
     Dresden Elektroniks documentation of sensors in Deconz
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
-    def __init__(self, sensor):
+    def __init__(self, device):
         """Set initial information about sensor.
 
         Set callback to set state of device.
         """
-        self.state = None
-        self.name = sensor['name']
-        self.type = sensor['type']
-        self.modelid = sensor['modelid']
-        self.swversion = sensor['swversion']
-        self.uniqueid = sensor['uniqueid']
-        self.manufacturer = sensor['manufacturername']
-
-        self.battery = sensor['config']['battery']
-        self.reachable = sensor['config']['reachable']
-
-        self.callback = None
-
-    def update_config(self, config):
-        """Update config with new values.
-
-        Config looks like this:
-        {
-            "on": true,
-            "reachable": true
-        }
-        """
-        self.battery = config['battery']
-        self.reachable = config['reachable']
-
-    def update_state(self, state):
-        """Implemented by each sensor type."""
-        raise NotImplementedError
+        self._battery = device['config'].get('battery')
+        self._ep = device.get('ep')
+        self._on = device['config'].get('on')
+        self._reachable = device['config'].get('reachable')
+        super().__init__(device)
 
     def update(self, event):
         """New event for sensor.
@@ -61,50 +40,70 @@ class DeconzSensor:
         Check if config is part of event.
         Signal that sensor has updated state.
         """
-        if 'state' in event:
-            self.update_state(event['state'])
-        if 'config' in event:
-            self.update_config(event['config'])
-        if self.callback:
-            self.callback()
-        pprint(self.__dict__)
+        for data in ['state', 'config']:
+            self.update_attr(event.get(data, {}))
+        super().update(event)
 
-    def as_dict(self):
-        """Callback for __dict__."""
-        cdict = self.__dict__.copy()
-        if 'callback' in cdict:
-            del cdict['callback']
-        return cdict
+    @property
+    def battery(self):
+        """The battery status of the sensor."""
+        return self._battery
+
+    @property
+    def ep(self):
+        """The Endpoint of the sensor."""
+        return self._ep
+
+    @property
+    def on(self):
+        """Specifies if the sensor is on or off."""
+        return self._on
+
+    @property
+    def reachable(self):
+        """Specifies if the sensor is reachable."""
+        return self._reachable
 
 
 class ZHAPresence(DeconzSensor):
     """Presence detector."""
 
-    def __init__(self, sensor):
+    def __init__(self, device):
         """Initialize presence detector."""
-        super().__init__(sensor)
-        self.state = False
-        self.dark = sensor.get('dark')
-
-    def update_state(self, state):
-        """Register presence and ."""
-        self.state = state['presence']
-        self.dark = state.get('dark')
+        self._dark = device['state'].get('dark')
+        self._presence = device['state'].get('presence')
+        super().__init__(device)
 
     @property
     def is_tripped(self):
-        """Event is tripped now."""
-        return self.state
+        """Sensor is tripped."""
+        return self.presence
+
+    @property
+    def dark(self):
+        """If the area near the sensor as light or not."""
+        return self._dark
+
+    @property
+    def presence(self):
+        """Motion detected."""
+        return self._presence
 
 
 class ZHASwitch(DeconzSensor):
     """Switch."""
 
-    def __init__(self, sensor):
+    def __init__(self, device):
         """Initalize switch."""
-        super().__init__(sensor)
-        self.state = None
+        self._buttonevent = device['state'].get('buttonevent')
+        super().__init__(device)
 
-    def update_state(self, state):
-        """Register the current button press."""
-        self.state = state['buttonevent']
+    @property
+    def state(self):
+        """Main state of switch."""
+        return self.buttonevent
+
+    @property
+    def buttonevent(self):
+        """Button press"""
+        return self._buttonevent
