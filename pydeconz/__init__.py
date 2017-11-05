@@ -38,13 +38,12 @@ class DeconzSession:
         else:
             _LOGGER.error('No Deconz config available')
 
-    @asyncio.coroutine
     def close(self):
         """Close websession and websocket to Deconz."""
         _LOGGER.info('Shutting down connections to Deconz.')
-        yield from self.session.close()
+        self.session.close()
         if self.websocket:
-            yield from self.websocket.stop()
+            self.websocket.stop()
 
     @asyncio.coroutine
     def populate_config(self):
