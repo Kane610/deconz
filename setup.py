@@ -10,14 +10,14 @@ from setuptools import setup
 setup(
   name='pydeconz',
   packages=['pydeconz'],
-  version='1',
+  version='2',
   description='A python library for communicating with deconz REST-API from dresden elektronik',
   author='Robert Svensson',
   author_email='Kane610@users.noreply.github.com',
   license='MIT',
   url='https://github.com/Kane610/pydeconz',
-  download_url='https://github.com/Kane610/pydeconz/archive/v1.tar.gz',
-  install_requires=['aiohttp==2.2.5'],
+  download_url='https://github.com/Kane610/pydeconz/archive/v2.tar.gz',
+  install_requires=['aiohttp'],
   keywords=['deconz', 'zigbee', 'homeassistant'],
   classifiers=[
     'Natural Language :: English',
