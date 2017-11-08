@@ -2,8 +2,6 @@
 
 import logging
 
-from pprint import pprint
-
 from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,31 +60,31 @@ class DeconzSensor(DeconzDevice):
 
     @property
     def on(self):
-        """Specifies if the sensor is on or off."""
+        """Declare if the sensor is on or off."""
         return self._on
 
     @property
     def reachable(self):
-        """Specifies if the sensor is reachable."""
+        """Declare if the sensor is reachable."""
         return self._reachable
 
 
 class ZHAHumidity(DeconzSensor):
-    """Light level sensor."""
+    """Humidity sensor."""
 
     def __init__(self, device):
-        """Initalize switch."""
+        """Initalize humidity sensor."""
         self._humidity = device['state'].get('humidity')
         super().__init__(device)
 
     @property
     def state(self):
-        """Main state of switch."""
+        """Main state of sensor."""
         return self.humidity
 
     @property
     def humidity(self):
-        """Button press"""
+        """Humidity level."""
         return self._humidity
 
 
@@ -94,18 +92,18 @@ class ZHALightLevel(DeconzSensor):
     """Light level sensor."""
 
     def __init__(self, device):
-        """Initalize switch."""
+        """Initalize light level sensor."""
         self._lightlevel = device['state'].get('lightlevel')
         super().__init__(device)
 
     @property
     def state(self):
-        """Main state of switch."""
+        """Main state of sensor."""
         return self.lightlevel
 
     @property
     def lightlevel(self):
-        """Button press"""
+        """Light level."""
         return self._lightlevel
 
 
@@ -113,7 +111,7 @@ class ZHAOpenClose(DeconzSensor):
     """Door/Window sensor."""
 
     def __init__(self, device):
-        """Initialize presence detector."""
+        """Initialize Door/Window sensor."""
         self._open = device['state'].get('open')
         super().__init__(device)
 
@@ -124,7 +122,7 @@ class ZHAOpenClose(DeconzSensor):
 
     @property
     def open(self):
-        """Motion detected."""
+        """Door open."""
         return self._open
 
 
@@ -157,7 +155,7 @@ class ZHASwitch(DeconzSensor):
     """Switch."""
 
     def __init__(self, device):
-        """Initalize switch."""
+        """Initalize switch sensor."""
         self._buttonevent = device['state'].get('buttonevent')
         super().__init__(device)
 
@@ -168,7 +166,7 @@ class ZHASwitch(DeconzSensor):
 
     @property
     def buttonevent(self):
-        """Button press"""
+        """Button press."""
         return self._buttonevent
 
 
@@ -176,16 +174,16 @@ class ZHATemperature(DeconzSensor):
     """Temperature sensor."""
 
     def __init__(self, device):
-        """Initalize switch."""
+        """Initalize temperature sensor."""
         self._temperature = device['state'].get('temperature')
         super().__init__(device)
 
     @property
     def state(self):
-        """Main state of switch."""
+        """Main state of sensor."""
         return self.temperature
 
     @property
     def temperature(self):
-        """Button press"""
+        """Temperature."""
         return self._temperature
