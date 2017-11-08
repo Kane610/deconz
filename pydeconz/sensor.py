@@ -8,6 +8,12 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
+DECONZ_BINARY_SENSOR = ['ZHAOpenClose', 'ZHAPresence']
+DECONZ_SENSOR = ['ZHAHumidity',
+                 'ZHALightLevel',
+                 'ZHASwitch',
+                 'ZHATemperature'
+                 ]
 # Wireless dimmer
 # 1002 Move to level 255
 # 2002 Move up
@@ -65,6 +71,63 @@ class DeconzSensor(DeconzDevice):
         return self._reachable
 
 
+class ZHAHumidity(DeconzSensor):
+    """Light level sensor."""
+
+    def __init__(self, device):
+        """Initalize switch."""
+        self._humidity = device['state'].get('humidity')
+        super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of switch."""
+        return self.humidity
+
+    @property
+    def humidity(self):
+        """Button press"""
+        return self._humidity
+
+
+class ZHALightLevel(DeconzSensor):
+    """Light level sensor."""
+
+    def __init__(self, device):
+        """Initalize switch."""
+        self._lightlevel = device['state'].get('lightlevel')
+        super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of switch."""
+        return self.lightlevel
+
+    @property
+    def lightlevel(self):
+        """Button press"""
+        return self._lightlevel
+
+
+class ZHAOpenClose(DeconzSensor):
+    """Door/Window sensor."""
+
+    def __init__(self, device):
+        """Initialize presence detector."""
+        self._open = device['state'].get('open')
+        super().__init__(device)
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.open
+
+    @property
+    def open(self):
+        """Motion detected."""
+        return self._open
+
+
 class ZHAPresence(DeconzSensor):
     """Presence detector."""
 
@@ -107,3 +170,22 @@ class ZHASwitch(DeconzSensor):
     def buttonevent(self):
         """Button press"""
         return self._buttonevent
+
+
+class ZHATemperature(DeconzSensor):
+    """Temperature sensor."""
+
+    def __init__(self, device):
+        """Initalize switch."""
+        self._temperature = device['state'].get('temperature')
+        super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of switch."""
+        return self.temperature
+
+    @property
+    def temperature(self):
+        """Button press"""
+        return self._temperature
