@@ -92,6 +92,20 @@ class WSClient(asyncio.Protocol):
             return
         _LOGGER.debug('Websocket data: %s', data)
 
+        while len(data) > 0:
+            payload, extra_data = self.get_payload(data)
+            print(payload)
+            self.callback(payload)
+            data = extra_data
+
+    def connection_lost(self, exc):
+        """Happen when device closes connection or stop() has been called."""
+        if self.state == STATE_RUNNING:
+            _LOGGER.warning('Lost connection to Deconz')
+            self.retry()
+
+    def get_payload(self, data):
+        """Parse length of payload and return it."""
         header = ord(data[1:2])
         if header <= 125:
             # No extra payload information.
@@ -106,12 +120,6 @@ class WSClient(asyncio.Protocol):
             start = 8
             end = header + start
             _LOGGER.error('Websocket received data: %s, %s', data, data[start:end])
-
-        event = json.loads(data[start:end].decode())
-        self.callback(event)
-
-    def connection_lost(self, exc):
-        """Happen when device closes connection or stop() has been called."""
-        if self.state == STATE_RUNNING:
-            _LOGGER.warning('Lost connection to Deconz')
-            self.retry()
+        payload = json.loads(data[start:end].decode())
+        extra_data = data[end:]
+        return payload, extra_data

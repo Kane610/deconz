@@ -6,6 +6,7 @@ import logging
 import aiohttp
 
 from .config import DeconzConfig
+from .group import DeconzGroup
 from .light import DeconzLight
 from .sensor import (ZHASwitch, ZHAPresence)
 from .utils import request
@@ -19,6 +20,7 @@ class DeconzSession:
 
     def __init__(self, loop, host, port, api_key, **kwargs):
         """Setup session and host information."""
+        self.groups = {}
         self.lights = {}
         self.sensors = {}
         self.config = None
@@ -51,6 +53,14 @@ class DeconzSession:
         config = yield from self.get_state_async('/config')
         if config:
             self.config = DeconzConfig(config)
+
+    @asyncio.coroutine
+    def populate_groups(self):
+        """Create lights based on all lights registered in Deconz."""
+        groups = yield from self.get_state_async('/groups')
+        if groups:
+            for group_id, group in groups.items():
+                self.groups[group_id] = DeconzGroup(group, self.put_state_async)
 
     @asyncio.coroutine
     def populate_lights(self):
@@ -114,10 +124,12 @@ class DeconzSession:
         }
         """
         if event['e'] == 'changed':
-            if event['r'] == 'sensors' and event['id'] in self.sensors:
-                self.sensors[event['id']].update(event)
+            if event['r'] == 'groups' and event['id'] in self.groups:
+                self.groups[event['id']].update(event)
             elif event['r'] == 'lights' and event['id'] in self.lights:
                 self.lights[event['id']].update(event)
+            elif event['r'] == 'sensors' and event['id'] in self.sensors:
+                self.sensors[event['id']].update(event)
             else:
                 _LOGGER.debug('Not supported event %s', event)
         else:
