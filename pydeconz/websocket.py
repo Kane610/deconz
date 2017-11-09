@@ -94,7 +94,6 @@ class WSClient(asyncio.Protocol):
 
         while len(data) > 0:
             payload, extra_data = self.get_payload(data)
-            print(payload)
             self.callback(payload)
             data = extra_data
 
