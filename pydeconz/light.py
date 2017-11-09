@@ -1,5 +1,6 @@
 """Python library to connect Deconz and Home Assistant to work together."""
 
+import asyncio
 import logging
 
 from .deconzdevice import DeconzDevice
@@ -14,11 +15,12 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, device, set_state_callback):
+    def __init__(self, device_id, device, set_state_callback):
         """Set initial information about light.
 
         Set callback to set state of device.
         """
+        self._device_id = device_id
         self._alert = device['state'].get('alert')
         self._bri = device['state'].get('bri')
         self._colormode = device['state'].get('colormode')
@@ -29,7 +31,7 @@ class DeconzLight(DeconzDevice):
         self._reachable = device['state'].get('reachable')
         self._sat = device['state'].get('sat')
         self._xy = device['state'].get('xy')
-        self.set_state = set_state_callback
+        self._set_state_callback = set_state_callback
         super().__init__(device)
 
     def update(self, event):
@@ -40,6 +42,21 @@ class DeconzLight(DeconzDevice):
         """
         self.update_attr(event.get('state', {}))
         super().update(event)
+    
+    @asyncio.coroutine
+    def set_state(self, data):
+        """Set state of light.
+        
+        {
+            "on": true,
+            "bri": 180,
+            "hue": 43680,
+            "sat": 255,
+            "transitiontime": 10
+        }
+        """
+        field = '/lights/' + self._device_id + '/state'
+        yield from self._set_state_callback(field, data)
 
     def as_dict(self):
         """Callback for __dict__."""

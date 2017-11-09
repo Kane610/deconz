@@ -59,7 +59,7 @@ class DeconzSession:
         groups = yield from self.get_state_async('/groups')
         if groups:
             for group_id, group in groups.items():
-                self.groups[group_id] = DeconzGroup(group, self.put_state_async)
+                self.groups[group_id] = DeconzGroup(group_id, group, self.put_state_async)
 
     @asyncio.coroutine
     def populate_lights(self):
@@ -67,7 +67,7 @@ class DeconzSession:
         lights = yield from self.get_state_async('/lights')
         if lights:
             for light_id, light in lights.items():
-                self.lights[light_id] = DeconzLight(light, self.put_state_async)
+                self.lights[light_id] = DeconzLight(light_id, light, self.put_state_async)
 
     @asyncio.coroutine
     def populate_sensors(self):
