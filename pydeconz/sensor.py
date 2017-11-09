@@ -7,11 +7,8 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 DECONZ_BINARY_SENSOR = ['ZHAOpenClose', 'ZHAPresence']
-DECONZ_SENSOR = ['ZHAHumidity',
-                 'ZHALightLevel',
-                 'ZHASwitch',
-                 'ZHATemperature'
-                 ]
+DECONZ_SENSOR = ['ZHAHumidity', 'ZHALightLevel', 'ZHASwitch', 'ZHATemperature']
+
 # Wireless dimmer
 # 1002 Move to level 255
 # 2002 Move up
@@ -187,3 +184,22 @@ class ZHATemperature(DeconzSensor):
     def temperature(self):
         """Temperature."""
         return self._temperature
+
+def create_sensor(sensor):
+    """"""
+    print(sensor)
+    if sensor['type'] == 'ZHAHumidity':
+        new_sensor = ZHAHumidity(sensor)
+    elif sensor['type'] == 'ZHALightLevel':
+        new_sensor = ZHALightLevel(sensor)
+    elif sensor['type'] == 'ZHAOpenClose':
+        new_sensor = ZHAOpenClose(sensor)
+    elif sensor['type'] == 'ZHAPresence':
+        new_sensor = ZHAPresence(sensor)
+    elif sensor['type'] == 'ZHASwitch':
+        new_sensor = ZHASwitch(sensor)
+    elif sensor['type'] == 'ZHATemperature':
+        new_sensor = ZHATemperature(sensor)
+    else:
+        new_sensor = None
+    return new_sensor

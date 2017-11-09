@@ -8,12 +8,11 @@ import aiohttp
 from .config import DeconzConfig
 from .group import DeconzGroup
 from .light import DeconzLight
-from .sensor import (ZHASwitch, ZHAPresence)
+from .sensor import create_sensor
 from .utils import request
 from .websocket import WSClient
 
 _LOGGER = logging.getLogger(__name__)
-
 
 class DeconzSession:
     """Deconz representation that handles lights and sensors."""
@@ -76,10 +75,7 @@ class DeconzSession:
         sensors = yield from self.get_state_async('/sensors')
         if sensors:
             for sensor_id, sensor in sensors.items():
-                if sensor['type'] == 'ZHASwitch':
-                    self.sensors[sensor_id] = ZHASwitch(sensor)
-                elif sensor['type'] == 'ZHAPresence':
-                    self.sensors[sensor_id] = ZHAPresence(sensor)
+                self.sensors[sensor_id] = create_sensor(sensor)
 
     @asyncio.coroutine
     def put_state_async(self, field, data):
