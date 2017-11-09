@@ -10,8 +10,8 @@ _LOGGER = logging.getLogger(__name__)
 class DeconzGroup(DeconzDevice):
     """Deconz light group representation.
 
-    Dresden Elektroniks documentation of lights in Deconz
-    http://dresden-elektronik.github.io/deconz-rest-doc/lights/
+    Dresden Elektroniks documentation of light groupss in Deconz
+    http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
     def __init__(self, device, set_state_callback):
@@ -57,12 +57,16 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def state(self):
-        """True if the light is on."""
+        """True if any light in light group is on."""
         return self._any_on
 
     @property
     def brightness(self):
-        """Brightness of the light. Depending on the light type 0 might not mean visible "off" but minimum brightness."""
+        """Brightness of the light group.
+        
+        Depending on the light type 0 might not mean visible "off"
+        but minimum brightness.
+        """
         return self._bri
     
     @property
@@ -72,7 +76,7 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def devicemembership(self):
-        """"""
+        """A list of device ids (sensors) if this group was created by a device."""
         return self._devicemembership
     
     @property
@@ -82,42 +86,62 @@ class DeconzGroup(DeconzDevice):
     
     @property
     def hidden(self):
-        """"""
+        """Indicates the hidden status of the group.
+        
+        Has no effect at the gateway but apps can uses this to hide groups.
+        """
         return self._hidden
 
     @property
     def hue(self):
-        """Color hue of the light. The hue parameter in the HSV color model is between 0Â°-360Â° and is mapped to 0..65535 to get 16-bit resolution."""
+        """Color hue of the light group.
+        
+        The hue parameter in the HSV color model is between 0°-360°
+        and is mapped to 0..65535 to get 16-bit resolution.
+        """
         return self._hue
 
     @property
     def id(self):
-        """"""
+        """The id of the group."""
         return self._id
     
     @property
     def lights(self):
-        """"""
+        """A list of all light ids of this group.
+        
+        Sequence is defined by the gateway.
+        """
         return self._lights
 
     @property
     def lightsequence(self):
-        """"""
+        """A list of light ids of this group that can be sorted by the user.
+        
+        Need not to contain all light ids of this group.
+        """
         return self._lightsequence
 
     @property
     def multideviceids(self):
-        """"""
+        """A list of light ids of this group.
+        
+        Subsequent ids from multidevices with multiple endpoints like the FLS-PP.
+        """
         return self._multideviceids
 
     @property
     def sat(self):
-        """Color saturation of the light. There 0 means no color at all and 255 is the greatest saturation of the color."""
+        """Color saturation of the light.
+        
+        There 0 means no color at all and 255 is the greatest saturation
+         of the color.
+         """
         return self._sat
 
     @property
     def scenes(self):
-        """"""
+        """A list of scenes of the group."""
         return self._scenes
 
     @property
