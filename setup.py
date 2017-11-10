@@ -13,13 +13,13 @@ from setuptools import setup
 setup(
   name='pydeconz',
   packages=['pydeconz'],
-  version='6',
+  version='7',
   description='A python library for communicating with deconz REST-API from dresden elektronik',
   author='Robert Svensson',
   author_email='Kane610@users.noreply.github.com',
   license='MIT',
   url='https://github.com/Kane610/pydeconz',
-  download_url='https://github.com/Kane610/pydeconz/archive/v6.tar.gz',
+  download_url='https://github.com/Kane610/pydeconz/archive/v7.tar.gz',
   install_requires=['aiohttp'],
   keywords=['deconz', 'zigbee', 'homeassistant'],
   classifiers=[
