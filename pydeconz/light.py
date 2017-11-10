@@ -30,7 +30,7 @@ class DeconzLight(DeconzDevice):
         self._on = device['state'].get('on')
         self._reachable = device['state'].get('reachable')
         self._sat = device['state'].get('sat')
-        self._x, self._y = device['state'].get('xy')
+        self._x, self._y = device['state'].get('xy', (None, None))
         self._set_state_callback = set_state_callback
         super().__init__(device)
 
