@@ -30,7 +30,7 @@ class DeconzLight(DeconzDevice):
         self._on = device['state'].get('on')
         self._reachable = device['state'].get('reachable')
         self._sat = device['state'].get('sat')
-        self._xy = device['state'].get('xy')
+        self._x, self._y = device['state'].get('xy')
         self._set_state_callback = set_state_callback
         super().__init__(device)
 
@@ -42,7 +42,7 @@ class DeconzLight(DeconzDevice):
         """
         self.update_attr(event.get('state', {}))
         super().update(event)
-    
+
     @asyncio.coroutine
     def set_state(self, data):
         """Set state of light.
@@ -72,17 +72,29 @@ class DeconzLight(DeconzDevice):
 
     @property
     def brightness(self):
-        """Brightness of the light. Depending on the light type 0 might not mean visible "off" but minimum brightness."""
+        """Brightness of the light.
+        
+        Depending on the light type 0 might not mean visible "off"
+        but minimum brightness.
+        """
         return self._bri
 
     @property
     def hue(self):
-        """Color hue of the light. The hue parameter in the HSV color model is between 0Â°-360Â° and is mapped to 0..65535 to get 16-bit resolution."""
+        """Color hue of the light.
+        
+        The hue parameter in the HSV color model is between 0°-360°
+         and is mapped to 0..65535 to get 16-bit resolution.
+         """
         return self._hue
 
     @property
     def sat(self):
-        """Color saturation of the light. There 0 means no color at all and 255 is the greatest saturation of the color."""
+        """Color saturation of the light.
+        
+        There 0 means no color at all and 255 is the greatest saturation
+        of the color.
+        """
         return self._sat
 
     @property
@@ -93,7 +105,7 @@ class DeconzLight(DeconzDevice):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        return self._xy
+        return (self._x, self._y)
 
     @property
     def alert(self):
