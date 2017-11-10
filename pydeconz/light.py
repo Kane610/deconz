@@ -105,7 +105,10 @@ class DeconzLight(DeconzDevice):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        return (self._x, self._y)
+        if self._x and self._y:
+            return (self._x, self._y)
+        else:
+            return None
 
     @property
     def alert(self):
