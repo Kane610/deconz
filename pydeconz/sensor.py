@@ -7,7 +7,7 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 DECONZ_BINARY_SENSOR = ['ZHAOpenClose', 'ZHAPresence']
-DECONZ_SENSOR = ['ZHAHumidity', 'ZHALightLevel', 'ZHASwitch', 'ZHATemperature']
+DECONZ_SENSOR = ['ZHAHumidity', 'ZHALightLevel', 'ZHASwitch', 'ZHATemperature', 'ZHAPressure']
 
 # Wireless dimmer
 # 1002 Move to level 255
@@ -185,6 +185,25 @@ class ZHATemperature(DeconzSensor):
         """Temperature."""
         return self._temperature
 
+
+class ZHAPressure(DeconzSensor):
+    """Pressure sensor."""
+
+    def __init__(self, device):
+        """Initalize pressure sensor."""
+        self._pressure = device['state'].get('pressure')
+        super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.pressure
+
+    @property
+    def pressure(self):
+        """Pressure."""
+        return self._pressure
+
 def create_sensor(sensor):
     """"""
     print(sensor)
@@ -200,6 +219,8 @@ def create_sensor(sensor):
         new_sensor = ZHASwitch(sensor)
     elif sensor['type'] == 'ZHATemperature':
         new_sensor = ZHATemperature(sensor)
+    elif sensor['type'] == 'ZHAPressure':
+        new_sensor = ZHAPressure(sensor)
     else:
         new_sensor = None
     return new_sensor
