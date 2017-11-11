@@ -6,8 +6,15 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-DECONZ_BINARY_SENSOR = ['ZHAOpenClose', 'ZHAPresence']
-DECONZ_SENSOR = ['ZHAHumidity', 'ZHALightLevel', 'ZHASwitch', 'ZHATemperature']
+HUMIDITY = 'ZHAHumidity'
+LIGHTLEVEL = 'ZHALightLevel'
+OPENCLOSE = 'ZHAOpenClose'
+PRESENCE = 'ZHAPresence'
+SWITCH = 'ZHASwitch'
+TEMPERATURE = 'ZHATemperature'
+
+DECONZ_BINARY_SENSOR = [OPENCLOSE, PRESENCE]
+DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, SWITCH, TEMPERATURE]
 
 # Wireless dimmer
 # 1002 Move to level 255
@@ -185,20 +192,20 @@ class ZHATemperature(DeconzSensor):
         """Temperature."""
         return self._temperature
 
+
 def create_sensor(sensor):
-    """"""
-    print(sensor)
-    if sensor['type'] == 'ZHAHumidity':
+    """Simplify creating sensor by not needing to know type."""
+    if sensor['type'] == HUMIDITY:
         new_sensor = ZHAHumidity(sensor)
-    elif sensor['type'] == 'ZHALightLevel':
+    elif sensor['type'] == LIGHTLEVEL:
         new_sensor = ZHALightLevel(sensor)
-    elif sensor['type'] == 'ZHAOpenClose':
+    elif sensor['type'] == OPENCLOSE:
         new_sensor = ZHAOpenClose(sensor)
-    elif sensor['type'] == 'ZHAPresence':
+    elif sensor['type'] == PRESENCE:
         new_sensor = ZHAPresence(sensor)
-    elif sensor['type'] == 'ZHASwitch':
+    elif sensor['type'] == SWITCH:
         new_sensor = ZHASwitch(sensor)
-    elif sensor['type'] == 'ZHATemperature':
+    elif sensor['type'] == TEMPERATURE:
         new_sensor = ZHATemperature(sensor)
     else:
         new_sensor = None
