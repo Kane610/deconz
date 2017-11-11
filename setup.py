@@ -18,8 +18,8 @@ setup(
   author='Robert Svensson',
   author_email='Kane610@users.noreply.github.com',
   license='MIT',
-  url='https://github.com/Kane610/pydeconz',
-  download_url='https://github.com/Kane610/pydeconz/archive/v7.tar.gz',
+  url='https://github.com/Kane610/deconz',
+  download_url='https://github.com/Kane610/deconz/archive/v7.tar.gz',
   install_requires=['aiohttp'],
   keywords=['deconz', 'zigbee', 'homeassistant'],
   classifiers=[

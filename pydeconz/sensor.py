@@ -6,8 +6,16 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-DECONZ_BINARY_SENSOR = ['ZHAOpenClose', 'ZHAPresence']
-DECONZ_SENSOR = ['ZHAHumidity', 'ZHALightLevel', 'ZHASwitch', 'ZHATemperature', 'ZHAPressure']
+HUMIDITY = 'ZHAHumidity'
+LIGHTLEVEL = 'ZHALightLevel'
+OPENCLOSE = 'ZHAOpenClose'
+PRESENCE = 'ZHAPresence'
+PRESSURE = 'ZHAPressure'
+SWITCH = 'ZHASwitch'
+TEMPERATURE = 'ZHATemperature'
+
+DECONZ_BINARY_SENSOR = [OPENCLOSE, PRESENCE]
+DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, PRESSURE, SWITCH, TEMPERATURE]
 
 # Wireless dimmer
 # 1002 Move to level 255
@@ -148,6 +156,25 @@ class ZHAPresence(DeconzSensor):
         return self._presence
 
 
+class ZHAPressure(DeconzSensor):
+    """Pressure sensor."""
+
+    def __init__(self, device):
+        """Initalize pressure sensor."""
+        self._pressure = device['state'].get('pressure')
+        super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.pressure
+
+    @property
+    def pressure(self):
+        """Pressure."""
+        return self._pressure
+
+
 class ZHASwitch(DeconzSensor):
     """Switch."""
 
@@ -186,41 +213,23 @@ class ZHATemperature(DeconzSensor):
         return self._temperature
 
 
-class ZHAPressure(DeconzSensor):
-    """Pressure sensor."""
-
-    def __init__(self, device):
-        """Initalize pressure sensor."""
-        self._pressure = device['state'].get('pressure')
-        super().__init__(device)
-
-    @property
-    def state(self):
-        """Main state of sensor."""
-        return self.pressure
-
-    @property
-    def pressure(self):
-        """Pressure."""
-        return self._pressure
 
 def create_sensor(sensor):
-    """"""
-    print(sensor)
-    if sensor['type'] == 'ZHAHumidity':
+    """Simplify creating sensor by not needing to know type."""
+    if sensor['type'] == HUMIDITY:
         new_sensor = ZHAHumidity(sensor)
-    elif sensor['type'] == 'ZHALightLevel':
+    elif sensor['type'] == LIGHTLEVEL:
         new_sensor = ZHALightLevel(sensor)
-    elif sensor['type'] == 'ZHAOpenClose':
+    elif sensor['type'] == OPENCLOSE:
         new_sensor = ZHAOpenClose(sensor)
-    elif sensor['type'] == 'ZHAPresence':
+    elif sensor['type'] == PRESENCE:
         new_sensor = ZHAPresence(sensor)
-    elif sensor['type'] == 'ZHASwitch':
-        new_sensor = ZHASwitch(sensor)
-    elif sensor['type'] == 'ZHATemperature':
-        new_sensor = ZHATemperature(sensor)
-    elif sensor['type'] == 'ZHAPressure':
+    elif sensor['type'] == PRESSURE:
         new_sensor = ZHAPressure(sensor)
+    elif sensor['type'] == SWITCH:
+        new_sensor = ZHASwitch(sensor)
+    elif sensor['type'] == TEMPERATURE:
+        new_sensor = ZHATemperature(sensor)
     else:
         new_sensor = None
     return new_sensor
