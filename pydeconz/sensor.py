@@ -94,7 +94,10 @@ class ZHAHumidity(DeconzSensor):
 
 
 class ZHALightLevel(DeconzSensor):
-    """Light level sensor."""
+    """Light level sensor.
+    
+    State parameter is a string named lightlevel.
+    """
 
     def __init__(self, device):
         """Initalize light level sensor."""
@@ -113,7 +116,10 @@ class ZHALightLevel(DeconzSensor):
 
 
 class ZHAOpenClose(DeconzSensor):
-    """Door/Window sensor."""
+    """Door/Window sensor.
+    
+    State parameter is a boolean named 'open'.
+    """
 
     def __init__(self, device):
         """Initialize Door/Window sensor."""
@@ -132,7 +138,11 @@ class ZHAOpenClose(DeconzSensor):
 
 
 class ZHAPresence(DeconzSensor):
-    """Presence detector."""
+    """Presence detector.
+    
+    State parameter is a boolean named 'presence'.
+    Also has a boolean 'dark' representing lighting in area of placement.
+    """
 
     def __init__(self, device):
         """Initialize presence detector."""
@@ -157,7 +167,10 @@ class ZHAPresence(DeconzSensor):
 
 
 class ZHAPressure(DeconzSensor):
-    """Pressure sensor."""
+    """Pressure sensor.
+    
+    State parameter is a string named 'pressure'.
+    """
 
     def __init__(self, device):
         """Initalize pressure sensor."""
@@ -176,7 +189,10 @@ class ZHAPressure(DeconzSensor):
 
 
 class ZHASwitch(DeconzSensor):
-    """Switch."""
+    """Switch.
+    
+    State parameter is a string named 'buttonevent'.
+    """
 
     def __init__(self, device):
         """Initalize switch sensor."""
@@ -195,7 +211,10 @@ class ZHASwitch(DeconzSensor):
 
 
 class ZHATemperature(DeconzSensor):
-    """Temperature sensor."""
+    """Temperature sensor.
+    
+    State parameter is a string named 'temperature'.
+    """
 
     def __init__(self, device):
         """Initalize temperature sensor."""
@@ -211,7 +230,6 @@ class ZHATemperature(DeconzSensor):
     def temperature(self):
         """Temperature."""
         return self._temperature
-
 
 
 def create_sensor(sensor):
