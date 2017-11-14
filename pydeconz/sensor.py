@@ -242,19 +242,18 @@ class ZHATemperature(DeconzSensor):
 def create_sensor(sensor):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] == HUMIDITY:
-        new_sensor = ZHAHumidity(sensor)
+        return ZHAHumidity(sensor)
     elif sensor['type'] == LIGHTLEVEL:
-        new_sensor = ZHALightLevel(sensor)
+        return ZHALightLevel(sensor)
     elif sensor['type'] == OPENCLOSE:
-        new_sensor = ZHAOpenClose(sensor)
+        return ZHAOpenClose(sensor)
     elif sensor['type'] == PRESENCE:
-        new_sensor = ZHAPresence(sensor)
+        return ZHAPresence(sensor)
     elif sensor['type'] == PRESSURE:
-        new_sensor = ZHAPressure(sensor)
+        return ZHAPressure(sensor)
     elif sensor['type'] == SWITCH:
-        new_sensor = ZHASwitch(sensor)
+        return ZHASwitch(sensor)
     elif sensor['type'] == TEMPERATURE:
-        new_sensor = ZHATemperature(sensor)
+        return ZHATemperature(sensor)
     else:
-        new_sensor = None
-    return new_sensor
+        return None
