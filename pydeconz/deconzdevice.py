@@ -24,7 +24,7 @@ class DeconzDevice(object):
         self._swversion = device.get('swversion')
         self._type = device.get('type')
         self._uniqueid = device.get('uniqueid')
-        self.callback = None
+        self._callback = []
         _LOGGER.debug('New device created %s', self.__dict__)
     
     def register_callback(self, callback):
@@ -32,7 +32,7 @@ class DeconzDevice(object):
         
         Will be called at the end of updating device information in self.update.
         """
-        self.callback = callback
+        self._callback.append(callback)
     
     def update_attr(self, attr):
         """Update input attr in self."""
@@ -42,14 +42,14 @@ class DeconzDevice(object):
     
     def update(self, event):
         """Signal that a new event has been received."""
-        if self.callback:
-            self.callback()
+        for signal_update in self._callback:
+            signal_update()
     
     def as_dict(self):
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
-        if 'callback' in cdict:
-            del cdict['callback']
+        if '_callback' in cdict:
+            del cdict['_callback']
         return cdict
 
     @property
