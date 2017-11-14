@@ -17,12 +17,6 @@ TEMPERATURE = 'ZHATemperature'
 DECONZ_BINARY_SENSOR = [OPENCLOSE, PRESENCE]
 DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, PRESSURE, SWITCH, TEMPERATURE]
 
-# Wireless dimmer
-# 1002 Move to level 255
-# 2002 Move up
-# 3002 Move down
-# 4002 Move to level 0
-
 
 class DeconzSensor(DeconzDevice):
     """Deconz sensor representation.
