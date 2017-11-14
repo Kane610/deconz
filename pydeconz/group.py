@@ -37,7 +37,7 @@ class DeconzGroup(DeconzDevice):
         self._on = device['action'].get('on')
         self._sat = device['action'].get('sat')
         self._scenes = device.get('scenes')
-        self._xy = device['action'].get('xy')
+        self._x, self._y = device['action'].get('xy', (None, None))
         self._set_state_callback = set_state_callback
         super().__init__(device)
 
@@ -53,7 +53,7 @@ class DeconzGroup(DeconzDevice):
     @asyncio.coroutine
     def set_state(self, data):
         """Set state of light group.
-        
+
         {
             "on": true,
             "bri": 180,
@@ -80,12 +80,12 @@ class DeconzGroup(DeconzDevice):
     @property
     def brightness(self):
         """Brightness of the light group.
-        
+
         Depending on the light type 0 might not mean visible "off"
         but minimum brightness.
         """
         return self._bri
-    
+
     @property
     def groupclass(self):
         """"""
@@ -93,18 +93,13 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def devicemembership(self):
-        """A list of device ids (sensors) if this group was created by a device."""
+        """List of device ids (sensors) when group was created by a device."""
         return self._devicemembership
-    
-    @property
-    def effect(self):
-        """"""
-        return self._effect
-    
+
     @property
     def hidden(self):
-        """Indicates the hidden status of the group.
-        
+        """Indicate the hidden status of the group.
+
         Has no effect at the gateway but apps can uses this to hide groups.
         """
         return self._hidden
@@ -112,7 +107,7 @@ class DeconzGroup(DeconzDevice):
     @property
     def hue(self):
         """Color hue of the light group.
-        
+
         The hue parameter in the HSV color model is between 0°-360°
         and is mapped to 0..65535 to get 16-bit resolution.
         """
@@ -122,11 +117,11 @@ class DeconzGroup(DeconzDevice):
     def id(self):
         """The id of the group."""
         return self._id
-    
+
     @property
     def lights(self):
         """A list of all light ids of this group.
-        
+
         Sequence is defined by the gateway.
         """
         return self._lights
@@ -134,7 +129,7 @@ class DeconzGroup(DeconzDevice):
     @property
     def lightsequence(self):
         """A list of light ids of this group that can be sorted by the user.
-        
+
         Need not to contain all light ids of this group.
         """
         return self._lightsequence
@@ -142,18 +137,18 @@ class DeconzGroup(DeconzDevice):
     @property
     def multideviceids(self):
         """A list of light ids of this group.
-        
-        Subsequent ids from multidevices with multiple endpoints like the FLS-PP.
+
+        Subsequent ids from multidevices with multiple endpoints.
         """
         return self._multideviceids
 
     @property
     def sat(self):
         """Color saturation of the light.
-        
+
         There 0 means no color at all and 255 is the greatest saturation
-         of the color.
-         """
+        of the color.
+        """
         return self._sat
 
     @property
@@ -163,18 +158,21 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def ct(self):
-        """Mired color temperature of the light. (2000K - 6500K)"""
+        """Mired color temperature of the light. (2000K - 6500K)."""
         return self._ct
 
     @property
     def xy(self):
-        """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        return self._xy
+        """CIE xy color space coordinates as array [x, y] of values (0..1)."""
+        if self._x and self._y:
+            return (self._x, self._y)
+        else:
+            return None
 
     @property
     def colormode(self):
-        """The current color mode of the light:
-        
+        """The current color mode of the light.
+
         hs - hue and saturation
         xy - CIE xy values
         ct - color temperature
@@ -183,8 +181,8 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def effect(self):
-        """Effect of the light:
-        
+        """Effect of the light.
+
         none - no effect
         colorloop
         """
