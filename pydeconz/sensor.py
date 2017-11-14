@@ -124,6 +124,11 @@ class ZHAOpenClose(DeconzSensor):
         super().__init__(device)
 
     @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
     def is_tripped(self):
         """Sensor is tripped."""
         return self.open
@@ -146,6 +151,11 @@ class ZHAPresence(DeconzSensor):
         self._dark = device['state'].get('dark')
         self._presence = device['state'].get('presence')
         super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
 
     @property
     def is_tripped(self):
