@@ -34,6 +34,9 @@ class DeconzSensor(DeconzDevice):
         self._ep = device.get('ep')
         self._on = device['config'].get('on')
         self._reachable = device['config'].get('reachable')
+        self._sensor_class = None
+        self._sensor_icon = None
+        self._sensor_unit = None
         super().__init__(device)
 
     def update(self, event):
@@ -67,6 +70,21 @@ class DeconzSensor(DeconzDevice):
         """Declare if the sensor is reachable."""
         return self._reachable
 
+    @property
+    def sensor_class(self):
+        """"""
+        return self._sensor_class
+
+    @property
+    def sensor_icon(self):
+        """"""
+        return self._sensor_icon
+
+    @property
+    def sensor_unit(self):
+        """"""
+        return self._sensor_unit
+
 
 class ZHAHumidity(DeconzSensor):
     """Humidity sensor.
@@ -78,6 +96,8 @@ class ZHAHumidity(DeconzSensor):
         """Initalize humidity sensor."""
         self._humidity = device['state'].get('humidity')
         super().__init__(device)
+        self._sensor_class = 'humidity'
+        self._sensor_unit = '%'
 
     @property
     def state(self):
@@ -100,11 +120,14 @@ class ZHALightLevel(DeconzSensor):
         """Initalize light level sensor."""
         self._lightlevel = device['state'].get('lightlevel')
         super().__init__(device)
+        self._sensor_class = 'lux'
+        self._sensor_unit = 'lux'
 
     @property
     def state(self):
         """Main state of sensor."""
-        return self.lightlevel
+        lux = round(10 ** (float(self.lightlevel - 1) / 10000), 1)
+        return lux
 
     @property
     def lightlevel(self):
@@ -122,6 +145,7 @@ class ZHAOpenClose(DeconzSensor):
         """Initialize Door/Window sensor."""
         self._open = device['state'].get('open')
         super().__init__(device)
+        self._sensor_class = 'opening'
 
     @property
     def state(self):
@@ -151,6 +175,7 @@ class ZHAPresence(DeconzSensor):
         self._dark = device['state'].get('dark')
         self._presence = device['state'].get('presence')
         super().__init__(device)
+        self._sensor_class = 'motion'
 
     @property
     def state(self):
@@ -183,6 +208,9 @@ class ZHAPressure(DeconzSensor):
         """Initalize pressure sensor."""
         self._pressure = device['state'].get('pressure')
         super().__init__(device)
+        self._sensor_class = 'pressure'
+        self._sensor_icon = 'mdi:gauge'
+        self._sensor_unit = 'kPa'
 
     @property
     def state(self):
@@ -227,11 +255,15 @@ class ZHATemperature(DeconzSensor):
         """Initalize temperature sensor."""
         self._temperature = device['state'].get('temperature')
         super().__init__(device)
+        self._sensor_class = 'temperature'
+        self._sensor_icon = 'mdi:thermometer'
+        self._sensor_unit = 'Celsius'
 
     @property
     def state(self):
         """Main state of sensor."""
-        return self.temperature
+        celsius = round(float(self.temperature) / 100, 1)
+        return celsius
 
     @property
     def temperature(self):
