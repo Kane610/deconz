@@ -3,23 +3,21 @@
 # pip install /home/pi/pydeconz/ --target /home/pi/home-assistant/venv/lib/python3.4/site-packages/ --upgrade
 # pip install -e /home/pi/pydeconz/
 # Upload to PyPI Live
-# python setup.py sdist upload -r pypi
-# python setup.py sdist bdist_wheel upload
 # python setup.py sdist bdist_wheel
-# twine upload dist/*
+# twine upload dist/pydeconz-*
 
 from setuptools import setup
 
 setup(
   name='pydeconz',
   packages=['pydeconz'],
-  version='10',
+  version='11',
   description='A python library for communicating with deconz REST-API from dresden elektronik',
   author='Robert Svensson',
   author_email='Kane610@users.noreply.github.com',
   license='MIT',
   url='https://github.com/Kane610/deconz',
-  download_url='https://github.com/Kane610/deconz/archive/v10.tar.gz',
+  download_url='https://github.com/Kane610/deconz/archive/v11.tar.gz',
   install_requires=['aiohttp'],
   keywords=['deconz', 'zigbee', 'homeassistant'],
   classifiers=[
