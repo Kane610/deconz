@@ -53,6 +53,7 @@ def request(session, url, **kwargs):
     """Do a web request and manage response."""
     try:
         with async_timeout.timeout(10):
+            _LOGGER.debug('Sending %s to %s', kwargs, url)
             response = yield from session(url, **kwargs)
         if response.status != 200:
             _LOGGER.error("HTTP status %d, response %s.",
