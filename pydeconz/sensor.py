@@ -72,17 +72,17 @@ class DeconzSensor(DeconzDevice):
 
     @property
     def sensor_class(self):
-        """"""
+        """Define what device class sensor belongs to."""
         return self._sensor_class
 
     @property
     def sensor_icon(self):
-        """"""
+        """What Material Design icon should be used with this device."""
         return self._sensor_icon
 
     @property
     def sensor_unit(self):
-        """"""
+        """What unit of measurement the sensor reports."""
         return self._sensor_unit
 
 
