@@ -1,9 +1,9 @@
 """Python library to connect Deconz and Home Assistant to work together."""
 
 import asyncio
-import async_timeout
 import logging
 import aiohttp
+import async_timeout
 
 _LOGGER = logging.getLogger(__name__)
 
