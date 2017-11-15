@@ -35,6 +35,7 @@ class DeconzGroup(DeconzDevice):
         self._lightsequence = device.get('lightsequence')
         self._multideviceids = device.get('multideviceids')
         self._on = device['action'].get('on')
+        self._reachable = True
         self._sat = device['action'].get('sat')
         self._scenes = device.get('scenes')
         self._x, self._y = device['action'].get('xy', (None, None))
@@ -187,3 +188,8 @@ class DeconzGroup(DeconzDevice):
         colorloop
         """
         return self._effect
+
+    @property
+    def reachable(self):
+        """True if the light is reachable and accepts commands."""
+        return self._reachable
