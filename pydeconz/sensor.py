@@ -102,7 +102,8 @@ class ZHAHumidity(DeconzSensor):
     @property
     def state(self):
         """Main state of sensor."""
-        return self.humidity
+        humidity = round(float(self.humidity) / 100, 1)
+        return humidity
 
     @property
     def humidity(self):
@@ -210,7 +211,7 @@ class ZHAPressure(DeconzSensor):
         super().__init__(device)
         self._sensor_class = 'pressure'
         self._sensor_icon = 'mdi:gauge'
-        self._sensor_unit = 'kPa'
+        self._sensor_unit = 'hPa'
 
     @property
     def state(self):
@@ -257,7 +258,7 @@ class ZHATemperature(DeconzSensor):
         super().__init__(device)
         self._sensor_class = 'temperature'
         self._sensor_icon = 'mdi:thermometer'
-        self._sensor_unit = 'Celsius'
+        self._sensor_unit = '°C'
 
     @property
     def state(self):
