@@ -21,16 +21,18 @@ class DeconzLight(DeconzDevice):
         Set callback to set state of device.
         """
         self._device_id = device_id
-        self._alert = device['state'].get('alert')
-        self._bri = device['state'].get('bri')
-        self._colormode = device['state'].get('colormode')
-        self._ct = device['state'].get('ct')
-        self._effect = device['state'].get('effect')
-        self._hue = device['state'].get('hue')
-        self._on = device['state'].get('on')
-        self._reachable = device['state'].get('reachable')
-        self._sat = device['state'].get('sat')
-        self._x, self._y = device['state'].get('xy', (None, None))
+        state = device.get('state')
+        if state:
+            self._alert = state.get('alert')
+            self._bri = state.get('bri')
+            self._colormode = state.get('colormode')
+            self._ct = state.get('ct')
+            self._effect = state.get('effect')
+            self._hue = state.get('hue')
+            self._on = state.get('on')
+            self._reachable = state.get('reachable')
+            self._sat = state.get('sat')
+            self._x, self._y = state.get('xy', (None, None))
         self._set_state_callback = set_state_callback
         super().__init__(device)
 
@@ -46,7 +48,7 @@ class DeconzLight(DeconzDevice):
     @asyncio.coroutine
     def set_state(self, data):
         """Set state of light.
-        
+
         {
             "on": true,
             "bri": 180,

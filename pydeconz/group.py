@@ -3,12 +3,12 @@
 import asyncio
 import logging
 
-from .deconzdevice import DeconzDevice
+from .light import DeconzLight
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzGroup(DeconzDevice):
+class DeconzGroup(DeconzLight):
     """Deconz light group representation.
 
     Dresden Elektroniks documentation of light groupss in Deconz
@@ -20,7 +20,7 @@ class DeconzGroup(DeconzDevice):
 
         Set callback to set state of device.
         """
-        self._device_id = device_id
+        super().__init__(device_id, device, set_state_callback)
         self._any_on = device['state'].get('any_on')
         self._bri = device['action'].get('bri')
         self._class = device.get('class')
@@ -39,17 +39,6 @@ class DeconzGroup(DeconzDevice):
         self._sat = device['action'].get('sat')
         self._scenes = device.get('scenes')
         self._x, self._y = device['action'].get('xy', (None, None))
-        self._set_state_callback = set_state_callback
-        super().__init__(device)
-
-    def update(self, event):
-        """New event for light group.
-
-        Check that state is part of event.
-        Signal that light has updated state.
-        """
-        self.update_attr(event.get('state', {}))
-        super().update(event)
 
     @asyncio.coroutine
     def set_state(self, data):
@@ -65,27 +54,12 @@ class DeconzGroup(DeconzDevice):
         """
         field = '/groups/' + self._device_id + '/action'
         yield from self._set_state_callback(field, data)
-
-    def as_dict(self):
-        """Callback for __dict__."""
-        cdict = super().as_dict()
-        if 'set_state' in cdict:
-            del cdict['set_state']
-        return cdict
+        self.update({'state':data})
 
     @property
     def state(self):
         """True if any light in light group is on."""
         return self._any_on
-
-    @property
-    def brightness(self):
-        """Brightness of the light group.
-
-        Depending on the light type 0 might not mean visible "off"
-        but minimum brightness.
-        """
-        return self._bri
 
     @property
     def groupclass(self):
@@ -104,15 +78,6 @@ class DeconzGroup(DeconzDevice):
         Has no effect at the gateway but apps can uses this to hide groups.
         """
         return self._hidden
-
-    @property
-    def hue(self):
-        """Color hue of the light group.
-
-        The hue parameter in the HSV color model is between 0°-360°
-        and is mapped to 0..65535 to get 16-bit resolution.
-        """
-        return self._hue
 
     @property
     def id(self):
@@ -144,52 +109,6 @@ class DeconzGroup(DeconzDevice):
         return self._multideviceids
 
     @property
-    def sat(self):
-        """Color saturation of the light.
-
-        There 0 means no color at all and 255 is the greatest saturation
-        of the color.
-        """
-        return self._sat
-
-    @property
     def scenes(self):
         """A list of scenes of the group."""
         return self._scenes
-
-    @property
-    def ct(self):
-        """Mired color temperature of the light. (2000K - 6500K)."""
-        return self._ct
-
-    @property
-    def xy(self):
-        """CIE xy color space coordinates as array [x, y] of values (0..1)."""
-        if self._x and self._y:
-            return (self._x, self._y)
-        else:
-            return None
-
-    @property
-    def colormode(self):
-        """The current color mode of the light.
-
-        hs - hue and saturation
-        xy - CIE xy values
-        ct - color temperature
-        """
-        return self._colormode
-
-    @property
-    def effect(self):
-        """Effect of the light.
-
-        none - no effect
-        colorloop
-        """
-        return self._effect
-
-    @property
-    def reachable(self):
-        """True if the light is reachable and accepts commands."""
-        return self._reachable
