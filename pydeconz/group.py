@@ -51,6 +51,8 @@ class DeconzGroup(DeconzLight):
             "sat": 255,
             "transitiontime": 10
         }
+
+        Also update local values of group since websockets doesn't.
         """
         field = '/groups/' + self._device_id + '/action'
         yield from self._set_state_callback(field, data)
