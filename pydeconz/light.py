@@ -75,7 +75,7 @@ class DeconzLight(DeconzDevice):
     @property
     def brightness(self):
         """Brightness of the light.
-        
+
         Depending on the light type 0 might not mean visible "off"
         but minimum brightness.
         """
@@ -84,16 +84,16 @@ class DeconzLight(DeconzDevice):
     @property
     def hue(self):
         """Color hue of the light.
-        
+
         The hue parameter in the HSV color model is between 0°-360°
-         and is mapped to 0..65535 to get 16-bit resolution.
-         """
+        and is mapped to 0..65535 to get 16-bit resolution.
+        """
         return self._hue
 
     @property
     def sat(self):
         """Color saturation of the light.
-        
+
         There 0 means no color at all and 255 is the greatest saturation
         of the color.
         """
@@ -101,7 +101,7 @@ class DeconzLight(DeconzDevice):
 
     @property
     def ct(self):
-        """Mired color temperature of the light. (2000K - 6500K)"""
+        """Mired color temperature of the light. (2000K - 6500K)."""
         return self._ct
 
     @property
@@ -115,7 +115,7 @@ class DeconzLight(DeconzDevice):
     @property
     def alert(self):
         """Temporary alert effect.
-        
+
         Following values are possible:
         none - light is not performing an alert
         select - light is blinking a short time
@@ -125,8 +125,8 @@ class DeconzLight(DeconzDevice):
 
     @property
     def colormode(self):
-        """The current color mode of the light:
-        
+        """The current color mode of the light.
+
         hs - hue and saturation
         xy - CIE xy values
         ct - color temperature
@@ -135,8 +135,8 @@ class DeconzLight(DeconzDevice):
 
     @property
     def effect(self):
-        """Effect of the light:
-        
+        """Effect of the light.
+
         none - no effect
         colorloop
         """

@@ -54,7 +54,7 @@ class DeconzGroup(DeconzLight):
         """
         field = '/groups/' + self._device_id + '/action'
         yield from self._set_state_callback(field, data)
-        self.update({'state':data})
+        self.update({'state': data})
 
     @property
     def state(self):
