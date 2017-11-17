@@ -25,7 +25,7 @@ class DeconzDevice(object):
         self._type = device.get('type')
         self._uniqueid = device.get('uniqueid')
         self._callback = []
-        _LOGGER.debug('New device created %s', self.__dict__)
+        _LOGGER.debug('%s created as %s', self._name, self.__dict__)
     
     def register_callback(self, callback):
         """Register callback for signalling.
