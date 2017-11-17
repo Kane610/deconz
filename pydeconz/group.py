@@ -20,7 +20,6 @@ class DeconzGroup(DeconzLight):
 
         Set callback to set state of device.
         """
-        super().__init__(device_id, device, set_state_callback)
         self._any_on = device['state'].get('any_on')
         self._bri = device['action'].get('bri')
         self._class = device.get('class')
@@ -39,6 +38,8 @@ class DeconzGroup(DeconzLight):
         self._sat = device['action'].get('sat')
         self._scenes = device.get('scenes')
         self._x, self._y = device['action'].get('xy', (None, None))
+        del device['state']
+        super().__init__(device_id, device, set_state_callback)
 
     @asyncio.coroutine
     def set_state(self, data):
