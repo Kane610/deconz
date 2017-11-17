@@ -67,4 +67,5 @@ def request(session, url, **kwargs):
         _LOGGER.error("Error getting DeConz data from %s.", url)
         return False
     else:
+        _LOGGER.debug('HTTP request response: %s', result)
         return result
