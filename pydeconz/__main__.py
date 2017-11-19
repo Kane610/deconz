@@ -14,33 +14,26 @@ def main(loop, **kwargs):
         print(api_key)
 
     deconz = DeconzSession(loop, **kwargs)
-    result = yield from deconz.populate_config()
-    result = yield from deconz.populate_lights()
-    result = yield from deconz.populate_sensors()
+    result = yield from deconz.load_parameters()
+    if result is False:
+        print('Failed to setup deCONZ')
+        return False
     deconz.start()
-#    print(deconz.lights)
-#    field = '/lights/1/state'
-#    data = {'on': False}
-#    yield from deconz.lights['1'].set_state(field, data)
-    #while True:
-    #    yield from deconz.get_event_async()
-    #    pass
-    #try:
-    #    yield from delete_all_keys(loop, **kwargs)
-    #finally:
-    #    pass
-#    yield from deconz.close()
-    #yield from delete_api_key(loop, **kwargs)
+    from pprint import pprint
+    for dev_id, dev in deconz.groups.items():
+        pprint(dev.__dict__)
+    # yield from deconz.close()
+    # yield from delete_api_key(loop, **kwargs)
 
 
 kw = {'host': '10.0.1.16',
       'port': 80,
-      'api_key': '61314EDEDA',
+      'api_key': '501AF019AB',
       'username': 'delight',
-      'password': 'delight'}
+      'password': 'delight'
+      }
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main(loop, **kw))
-# loop.call_soon(partial(main, loop, **kw))
 loop.run_forever()
 loop.close()
