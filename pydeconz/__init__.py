@@ -48,46 +48,34 @@ class DeconzSession:
             self.websocket.stop()
 
     @asyncio.coroutine
-    def populate_config(self):
-        """Load Deconz configuration parameters."""
-        config = yield from self.get_state_async('/config')
-        if config:
-            self.config = DeconzConfig(config)
+    def load_parameters(self):
+        """Load deCONZ parameters."""
+        data = yield from self.get_state_async('')
+        if not data:
+            _LOGGER.error('Couldn\'t load data from deCONZ')
+            return False
+        config = data.get('config', {})
+        groups = data.get('groups', {})
+        lights = data.get('lights', {})
+        sensors = data.get('sensors', {})
 
-    @asyncio.coroutine
-    def populate_groups(self):
-        """Create lights based on all lights registered in Deconz."""
-        groups = yield from self.get_state_async('/groups')
-        if groups:
-            for group_id, group in groups.items():
-                self.groups[group_id] = DeconzGroup(group_id, group, self.put_state_async)
+        self.config = DeconzConfig(config)
 
-    @asyncio.coroutine
-    def populate_lights(self):
-        """Create lights based on all lights registered in Deconz."""
-        lights = yield from self.get_state_async('/lights')
-        if lights:
-            for light_id, light in lights.items():
-                self.lights[light_id] = DeconzLight(light_id, light, self.put_state_async)
+        for group_id, group in groups.items():
+            group = DeconzGroup(group_id, group, self.put_state_async)
+            self.groups[group_id] = group
 
-    #@asyncio.coroutine
-    def populate_scenes(self):
-        """Create lights based on all lights registered in Deconz."""
-        #groups = yield from self.get_state_async('/groups')
-        if self.groups:
-            for group_id, group in self.groups.items():
-                for scene in group.scenes:
-                    scene = DeconzScene(group, scene, self.put_state_async)
-                    self.scenes[group_id + '_' + scene.id] = scene
-            print(self.scenes)
+            for scene in group.scenes:
+                scene = DeconzScene(group, scene, self.put_state_async)
+                self.scenes[group_id + '_' + scene.id] = scene
 
-    @asyncio.coroutine
-    def populate_sensors(self):
-        """Create sensors based on all sensors registered in Deconz."""
-        sensors = yield from self.get_state_async('/sensors')
-        if sensors:
-            for sensor_id, sensor in sensors.items():
-                self.sensors[sensor_id] = create_sensor(sensor)
+        for light_id, light in lights.items():
+            self.lights[light_id] = DeconzLight(light_id, light, self.put_state_async)
+
+        for sensor_id, sensor in sensors.items():
+            self.sensors[sensor_id] = create_sensor(sensor)
+
+        return True
 
     @asyncio.coroutine
     def put_state_async(self, field, data):
