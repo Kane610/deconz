@@ -115,3 +115,30 @@ class DeconzGroup(DeconzLight):
     def scenes(self):
         """A list of scenes of the group."""
         return self._scenes
+
+
+class DeconzScene(object):
+    """"""
+    def __init__(self, group, scene, set_state_callback):
+        """"""
+        self._group_id = group.id
+        self._group_name = group.name
+        self._id = scene.get('id')
+        self._name = scene.get('name')
+        self._set_state_callback = set_state_callback
+
+    @asyncio.coroutine
+    def set_state(self, data):
+        """Recall scene to group."""
+        field = '/groups/' + self._group_id + '/scenes/' + self._id + '/recall'
+        yield from self._set_state_callback(field, data)
+
+    @property
+    def id(self):
+        """Scene ID from deCONZ."""
+        return self._id
+
+    @property
+    def name(self):
+        """Scene name."""
+        return self._name
