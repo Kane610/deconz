@@ -33,17 +33,17 @@ class DeconzDevice(object):
         Will be called at the end of updating device information in self.update.
         """
         self._callback.append(callback)
-    
+
     def update_attr(self, attr):
         """Update input attr in self."""
         _LOGGER.debug('Update %s', attr)
         for key, value in attr.items():
             self.__setattr__("_{0}".format(key), value)
-    
-    def update(self, event):
+     
+    def update(self, event, reason = {}):
         """Signal that a new event has been received."""
         for signal_update in self._callback:
-            signal_update()
+            signal_update(reason)
     
     def as_dict(self):
         """Callback for __dict__."""
