@@ -9,10 +9,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @asyncio.coroutine
-def get_api_key(loop, host, port, username, password, **kwargs):
+def get_api_key(loop, host, port, username=None, password=None, **kwargs):
     """Get a new API key for devicetype."""
     url = 'http://' + host + ':' + str(port) + '/api'
-    auth = aiohttp.BasicAuth(username, password=password)
+    auth = None
+    if username and password:
+        auth = aiohttp.BasicAuth(username, password=password)
     data = b'{"devicetype": "pydeconz"}'
     session = aiohttp.ClientSession(loop=loop)
     response = yield from request(session.post, url, auth=auth, data=data)
