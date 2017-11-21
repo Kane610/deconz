@@ -6,7 +6,7 @@ import logging
 import aiohttp
 
 from .config import DeconzConfig
-from .group import DeconzGroup, DeconzScene
+from .group import DeconzGroup
 from .light import DeconzLight
 from .sensor import create_sensor
 from .utils import request
@@ -21,7 +21,6 @@ class DeconzSession:
         """Setup session and host information."""
         self.groups = {}
         self.lights = {}
-        self.scenes = {}
         self.sensors = {}
         self.config = None
         self.loop = loop
@@ -47,6 +46,14 @@ class DeconzSession:
         if self.websocket:
             self.websocket.stop()
 
+    @property
+    def scenes(self):
+        scenes = {}
+        for _, group in self.groups.items():
+            for _, scene in group.scenes.items():
+                scenes[group.id + '_' + scene.id] = scene
+        return scenes
+
     @asyncio.coroutine
     def load_parameters(self):
         """Load deCONZ parameters."""
@@ -62,12 +69,7 @@ class DeconzSession:
         self.config = DeconzConfig(config)
 
         for group_id, group in groups.items():
-            group = DeconzGroup(group_id, group, self.put_state_async)
-            self.groups[group_id] = group
-
-            for scene in group.scenes:
-                scene = DeconzScene(group, scene, self.put_state_async)
-                self.scenes[group_id + '_' + scene.id] = scene
+            self.groups[group_id] = DeconzGroup(group_id, group, self.put_state_async)
 
         for light_id, light in lights.items():
             self.lights[light_id] = DeconzLight(light_id, light, self.put_state_async)

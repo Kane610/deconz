@@ -36,10 +36,13 @@ class DeconzGroup(DeconzLight):
         self._on = device['action'].get('on')
         self._reachable = True
         self._sat = device['action'].get('sat')
-        self._scenes = device.get('scenes')
+        self._scenes = {}
         self._x, self._y = device['action'].get('xy', (None, None))
         del device['state']
         super().__init__(device_id, device, set_state_callback)
+        for scene_json in device.get('scenes'):
+            scene = DeconzScene(self, scene_json, set_state_callback)
+            self._scenes[scene.id] = scene
 
     @asyncio.coroutine
     def set_state(self, data):
@@ -132,6 +135,11 @@ class DeconzScene(object):
         """Recall scene to group."""
         field = '/groups/' + self._group_id + '/scenes/' + self._id + '/recall'
         yield from self._set_state_callback(field, data)
+
+    @property
+    def full_name(self):
+        """Full name."""
+        return self._group_name + ' ' + self._name
 
     @property
     def id(self):
