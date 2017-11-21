@@ -63,8 +63,8 @@ class DeconzLight(DeconzDevice):
     def as_dict(self):
         """Callback for __dict__."""
         cdict = super().as_dict()
-        if 'set_state' in cdict:
-            del cdict['set_state']
+        if '_set_state_callback' in cdict:
+            del cdict['_set_state_callback']
         return cdict
 
     @property

@@ -62,6 +62,13 @@ class DeconzGroup(DeconzLight):
         yield from self._set_state_callback(field, data)
         self.update({'state': data})
 
+    def as_dict(self):
+        """Callback for __dict__."""
+        cdict = super().as_dict()
+        if '_scenes' in cdict:
+            del cdict['_scenes']
+        return cdict
+
     @property
     def state(self):
         """True if any light in light group is on."""
@@ -150,3 +157,10 @@ class DeconzScene(object):
     def name(self):
         """Scene name."""
         return self._name
+
+    def as_dict(self):
+        """Callback for __dict__."""
+        cdict = self.__dict__.copy()
+        if '_set_state_callback' in cdict:
+            del cdict['_set_state_callback']
+        return cdict
