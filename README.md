@@ -10,3 +10,4 @@ Only host address and API key are necessary for normal operations.
 ## Acknowledgements
 * Mattias Flodins custom deCONZ component was a great source of inspiration.
 * Maija Vilkina and her blog [Snillevilla](https://snillevilla.se/) has been a huge help in getting deCONZ up and running.
+* Thanks to donnieb, dkmh, simonporter007, kroimon, Henrik Nilsson for verifying functionality!
