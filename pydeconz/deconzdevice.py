@@ -24,15 +24,15 @@ class DeconzDevice(object):
         self._swversion = device.get('swversion')
         self._type = device.get('type')
         self._uniqueid = device.get('uniqueid')
-        self._callback = []
+        self._async_callback = []
         _LOGGER.debug('%s created as %s', self._name, self.__dict__)
     
-    def register_callback(self, callback):
+    def register_async_callback(self, async_callback):
         """Register callback for signalling.
         
         Will be called at the end of updating device information in self.update.
         """
-        self._callback.append(callback)
+        self._async_callback.append(async_callback)
 
     def update_attr(self, attr):
         """Update input attr in self."""
@@ -42,8 +42,14 @@ class DeconzDevice(object):
      
     def update(self, event, reason = {}):
         """Signal that a new event has been received."""
-        for signal_update in self._callback:
-            signal_update(reason)
+        for async_signal_update in self._async_callback:
+            async_signal_update(reason)
+
+    def update_manually(self, data):
+        """Update values not updated over websocket."""
+        attribs = ['name', 'swversion']
+        for attr in attribs:
+            print('Update manually', data.get(attr))
     
     def as_dict(self):
         """Callback for __dict__."""

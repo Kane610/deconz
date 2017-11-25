@@ -15,7 +15,7 @@ class DeconzGroup(DeconzLight):
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
-    def __init__(self, device_id, device, set_state_callback):
+    def __init__(self, device_id, device, async_set_state_callback):
         """Set initial information about light group.
 
         Set callback to set state of device.
@@ -39,13 +39,13 @@ class DeconzGroup(DeconzLight):
         self._scenes = {}
         self._x, self._y = device['action'].get('xy', (None, None))
         del device['state']
-        super().__init__(device_id, device, set_state_callback)
+        super().__init__(device_id, device, async_set_state_callback)
         for scene_json in device.get('scenes'):
-            scene = DeconzScene(self, scene_json, set_state_callback)
+            scene = DeconzScene(self, scene_json, async_set_state_callback)
             self._scenes[scene.id] = scene
 
     @asyncio.coroutine
-    def set_state(self, data):
+    def async_set_state(self, data):
         """Set state of light group.
 
         {
@@ -59,7 +59,7 @@ class DeconzGroup(DeconzLight):
         Also update local values of group since websockets doesn't.
         """
         field = '/groups/' + self._device_id + '/action'
-        yield from self._set_state_callback(field, data)
+        yield from self._async_set_state_callback(field, data)
         self.update({'state': data})
 
     def as_dict(self):
@@ -129,19 +129,19 @@ class DeconzGroup(DeconzLight):
 
 class DeconzScene(object):
     """"""
-    def __init__(self, group, scene, set_state_callback):
+    def __init__(self, group, scene, async_set_state_callback):
         """"""
         self._group_id = group.id
         self._group_name = group.name
         self._id = scene.get('id')
         self._name = scene.get('name')
-        self._set_state_callback = set_state_callback
+        self._async_set_state_callback = async_set_state_callback
 
     @asyncio.coroutine
-    def set_state(self, data):
+    def async_set_state(self, data):
         """Recall scene to group."""
         field = '/groups/' + self._group_id + '/scenes/' + self._id + '/recall'
-        yield from self._set_state_callback(field, data)
+        yield from self._async_set_state_callback(field, data)
 
     @property
     def full_name(self):
@@ -161,6 +161,6 @@ class DeconzScene(object):
     def as_dict(self):
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
-        if '_set_state_callback' in cdict:
-            del cdict['_set_state_callback']
+        if '_async_set_state_callback' in cdict:
+            del cdict['_async_set_state_callback']
         return cdict

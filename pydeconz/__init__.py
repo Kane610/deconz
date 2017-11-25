@@ -9,7 +9,7 @@ from .config import DeconzConfig
 from .group import DeconzGroup
 from .light import DeconzLight
 from .sensor import create_sensor
-from .utils import request
+from .utils import async_request
 from .websocket import WSClient
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,9 +55,9 @@ class DeconzSession:
         return scenes
 
     @asyncio.coroutine
-    def load_parameters(self):
+    def async_load_parameters(self):
         """Load deCONZ parameters."""
-        data = yield from self.get_state_async('')
+        data = yield from self.async_get_state('')
         if not data:
             _LOGGER.error('Couldn\'t load data from deCONZ')
             return False
@@ -66,21 +66,31 @@ class DeconzSession:
         lights = data.get('lights', {})
         sensors = data.get('sensors', {})
 
-        self.config = DeconzConfig(config)
+        if not self.config:
+            self.config = DeconzConfig(config)
 
         for group_id, group in groups.items():
-            self.groups[group_id] = DeconzGroup(group_id, group, self.put_state_async)
+            if group_id not in self.groups:
+                self.groups[group_id] = DeconzGroup(group_id, group, self.async_put_state)
+            else:
+                self.groups[group_id].update_manually(group)
 
         for light_id, light in lights.items():
-            self.lights[light_id] = DeconzLight(light_id, light, self.put_state_async)
+            if light_id not in self.lights:
+                self.lights[light_id] = DeconzLight(light_id, light, self.async_put_state)
+            else:
+                self.lights[light_id].update_manually(light)
 
         for sensor_id, sensor in sensors.items():
-            self.sensors[sensor_id] = create_sensor(sensor)
+            if sensor_id not in self.sensors:
+                self.sensors[sensor_id] = create_sensor(sensor)
+            else:
+                self.sensors[sensor_id].update_manually(sensor)
 
         return True
 
     @asyncio.coroutine
-    def put_state_async(self, field, data):
+    def async_put_state(self, field, data):
         """Set state of object in Deconz.
 
         Field is a string representing a specific device in Deconz
@@ -93,11 +103,11 @@ class DeconzSession:
         session = self.session.put
         url = self.api_url + field
         jsondata = json.dumps(data)
-        response_dict = yield from request(session, url, data=jsondata)
+        response_dict = yield from async_request(session, url, data=jsondata)
         return response_dict
 
     @asyncio.coroutine
-    def get_state_async(self, field):
+    def async_get_state(self, field):
         """Get state of object in Deconz.
 
         Field is a string representing an API endpoint or lower
@@ -107,7 +117,7 @@ class DeconzSession:
         """
         session = self.session.get
         url = self.api_url + field
-        response_dict = yield from request(session, url)
+        response_dict = yield from async_request(session, url)
         return response_dict
 
     def event_handler(self, event):

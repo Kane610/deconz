@@ -15,10 +15,10 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, device_id, device, set_state_callback):
+    def __init__(self, device_id, device, async_set_state_callback):
         """Set initial information about light.
 
-        Set callback to set state of device.
+        Set async callback to set state of device.
         """
         self._device_id = device_id
         state = device.get('state')
@@ -33,7 +33,7 @@ class DeconzLight(DeconzDevice):
             self._reachable = state.get('reachable')
             self._sat = state.get('sat')
             self._x, self._y = state.get('xy', (None, None))
-        self._set_state_callback = set_state_callback
+        self._async_set_state_callback = async_set_state_callback
         super().__init__(device)
 
     def update(self, event):
@@ -46,7 +46,7 @@ class DeconzLight(DeconzDevice):
         super().update(event)
 
     @asyncio.coroutine
-    def set_state(self, data):
+    def async_set_state(self, data):
         """Set state of light.
 
         {
@@ -58,13 +58,13 @@ class DeconzLight(DeconzDevice):
         }
         """
         field = '/lights/' + self._device_id + '/state'
-        yield from self._set_state_callback(field, data)
+        yield from self._async_set_state_callback(field, data)
 
     def as_dict(self):
         """Callback for __dict__."""
         cdict = super().as_dict()
-        if '_set_state_callback' in cdict:
-            del cdict['_set_state_callback']
+        if '_async_set_state_callback' in cdict:
+            del cdict['_async_set_state_callback']
         return cdict
 
     @property
