@@ -12,7 +12,7 @@ setup(
   name='pydeconz',
   packages=['pydeconz'],
   version='20',
-  description='A python library for communicating with deconz REST-API from dresden elektronik',
+  description='A Python library for communicating with deCONZ REST-API from Dresden Elektronik',
   author='Robert Svensson',
   author_email='Kane610@users.noreply.github.com',
   license='MIT',

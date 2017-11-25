@@ -1,16 +1,14 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
-
-from pprint import pprint
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class DeconzConfig:
-    """Deconz light representation.
+    """deCONZ configuration representation.
 
-    Dresden Elektroniks documentation of lights in Deconz
+    Dresden Elektroniks documentation of config in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/config/
     {
         'UTC': '2017-11-04T12:01:19',
@@ -67,7 +65,6 @@ class DeconzConfig:
     """
 
     def __init__(self, config):
-    #def __init__(self, device, set_state_callback):
         """Set initial information about light.
 
         Set callback to set state of device.

@@ -1,4 +1,4 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import asyncio
 import logging
@@ -29,7 +29,7 @@ def async_get_api_key(loop, host, port, username=None, password=None, **kwargs):
 
 @asyncio.coroutine
 def async_delete_api_key(loop, host, port, api_key, **kwargs):
-    """Delete API key from Deconz."""
+    """Delete API key from deCONZ."""
     url = 'http://' + host + ':' + str(port) + '/api' + api_key + '/config/whitelist/' + api_key
     session = aiohttp.ClientSession(loop=loop)
     response = yield from async_request(session.delete, url)
@@ -63,10 +63,10 @@ def async_request(session, url, **kwargs):
             return False
         result = yield from response.json()
     except asyncio.TimeoutError:
-        _LOGGER.error("Timeout getting DeConz data from %s.", url)
+        _LOGGER.error("Timeout getting deCONZ data from %s.", url)
         return False
     except aiohttp.ClientError:
-        _LOGGER.error("Error getting DeConz data from %s.", url)
+        _LOGGER.error("Error getting deCONZ data from %s.", url)
         return False
     else:
         _LOGGER.debug('HTTP request response: %s', result)

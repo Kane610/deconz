@@ -1,22 +1,19 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzDevice(object):
-    """Deconz resource base representation.
+class DeconzDevice:
+    """deCONZ resource base representation.
 
     Dresden Elektroniks REST API documentation
     http://dresden-elektronik.github.io/deconz-rest-doc/
     """
 
     def __init__(self, device):
-        """Set initial information about light.
-
-        Set callback to set state of device.
-        """
+        """Set initial information common to all device types."""
         self._etag = device.get('etag')
         self._manufacturername = device.get('manufacturername')
         self._modelid = device.get('modelid')

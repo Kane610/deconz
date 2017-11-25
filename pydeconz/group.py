@@ -1,4 +1,4 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import asyncio
 import logging
@@ -9,9 +9,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DeconzGroup(DeconzLight):
-    """Deconz light group representation.
+    """deCONZ light group representation.
 
-    Dresden Elektroniks documentation of light groupss in Deconz
+    Dresden Elektroniks documentation of light groups in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
@@ -127,10 +127,18 @@ class DeconzGroup(DeconzLight):
         return self._scenes
 
 
-class DeconzScene(object):
-    """"""
+class DeconzScene:
+    """deCONZ scene representation.
+
+    Dresden Elektroniks documentation of scenes in deCONZ
+    http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
+    """
+
     def __init__(self, group, scene, async_set_state_callback):
-        """"""
+        """Set initial information about scene.
+
+        Set callback to set state of device.
+        """
         self._group_id = group.id
         self._group_name = group.name
         self._id = scene.get('id')

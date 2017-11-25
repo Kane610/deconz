@@ -1,4 +1,4 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
 
@@ -19,17 +19,14 @@ DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, PRESSURE, SWITCH, TEMPERATURE]
 
 
 class DeconzSensor(DeconzDevice):
-    """Deconz sensor representation.
+    """deCONZ sensor representation.
 
-    Dresden Elektroniks documentation of sensors in Deconz
+    Dresden Elektroniks documentation of sensors in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
     def __init__(self, device):
-        """Set initial information about sensor.
-
-        Set callback to set state of device.
-        """
+        """Set initial information about sensor."""
         self._battery = device['config'].get('battery')
         self._ep = device.get('ep')
         self._on = device['config'].get('on')

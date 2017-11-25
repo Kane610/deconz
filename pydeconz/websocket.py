@@ -1,4 +1,4 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 # http://lucumr.pocoo.org/2012/9/24/websockets-101/
 
@@ -56,9 +56,9 @@ class WSClient(asyncio.Protocol):
             self.transport.close()
 
     def retry(self):
-        """Retry to connect to Deconz."""
+        """Retry to connect to deCONZ."""
         self.loop.call_later(RETRY_TIMER, self.start)
-        _LOGGER.debug('Reconnecting to Deconz in %i.', RETRY_TIMER)
+        _LOGGER.debug('Reconnecting to deCONZ in %i.', RETRY_TIMER)
 
     def connection_made(self, transport):
         """Do the websocket handshake.
@@ -100,7 +100,7 @@ class WSClient(asyncio.Protocol):
     def connection_lost(self, exc):
         """Happen when device closes connection or stop() has been called."""
         if self.state == STATE_RUNNING:
-            _LOGGER.warning('Lost connection to Deconz')
+            _LOGGER.warning('Lost connection to deCONZ')
             self.retry()
 
     def get_payload(self, data):

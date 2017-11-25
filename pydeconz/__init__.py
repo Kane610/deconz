@@ -1,4 +1,4 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import asyncio
 import json
@@ -15,7 +15,7 @@ from .websocket import WSClient
 _LOGGER = logging.getLogger(__name__)
 
 class DeconzSession:
-    """Deconz representation that handles lights and sensors."""
+    """deCONZ representation that handles lights, groups, scenes and sensors."""
 
     def __init__(self, loop, host, port, api_key, **kwargs):
         """Setup session and host information."""
@@ -29,7 +29,7 @@ class DeconzSession:
         self.websocket = None
 
     def start(self):
-        """Connect websocket to Deconz."""
+        """Connect websocket to deCONZ."""
         if self.config:
             self.websocket = WSClient(self.loop,
                                       self.config.host,
@@ -37,11 +37,11 @@ class DeconzSession:
                                       self.event_handler)
             self.websocket.start()
         else:
-            _LOGGER.error('No Deconz config available')
+            _LOGGER.error('No deCONZ config available')
 
     def close(self):
-        """Close websession and websocket to Deconz."""
-        _LOGGER.info('Shutting down connections to Deconz.')
+        """Close websession and websocket to deCONZ."""
+        _LOGGER.info('Shutting down connections to deCONZ.')
         self.session.close()
         if self.websocket:
             self.websocket.stop()
@@ -91,9 +91,9 @@ class DeconzSession:
 
     @asyncio.coroutine
     def async_put_state(self, field, data):
-        """Set state of object in Deconz.
+        """Set state of object in deCONZ.
 
-        Field is a string representing a specific device in Deconz
+        Field is a string representing a specific device in deCONZ
         e.g. field='/lights/1/state'.
         Data is a json object with what data you want to alter
         e.g. data={'on': True}.
@@ -108,7 +108,7 @@ class DeconzSession:
 
     @asyncio.coroutine
     def async_get_state(self, field):
-        """Get state of object in Deconz.
+        """Get state of object in deCONZ.
 
         Field is a string representing an API endpoint or lower
         e.g. field='/lights'.

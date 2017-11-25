@@ -1,4 +1,4 @@
-"""Python library to connect Deconz and Home Assistant to work together."""
+"""Python library to connect deCONZ and Home Assistant to work together."""
 
 import asyncio
 import logging
@@ -9,9 +9,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DeconzLight(DeconzDevice):
-    """Deconz light representation.
+    """deCONZ light representation.
 
-    Dresden Elektroniks documentation of lights in Deconz
+    Dresden Elektroniks documentation of lights in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
