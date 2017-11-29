@@ -34,7 +34,7 @@ class DeconzSession:
             self.websocket = WSClient(self.loop,
                                       self.config.host,
                                       self.config.websocketport,
-                                      self.event_handler)
+                                      self.async_event_handler)
             self.websocket.start()
         else:
             _LOGGER.error('No deCONZ config available')
@@ -120,7 +120,7 @@ class DeconzSession:
         response_dict = yield from async_request(session, url)
         return response_dict
 
-    def event_handler(self, event):
+    def async_event_handler(self, event):
         """Receive event from websocket and identifies where the event belong.
 
         {
@@ -133,11 +133,11 @@ class DeconzSession:
         """
         if event['e'] == 'changed':
             if event['r'] == 'groups' and event['id'] in self.groups:
-                self.groups[event['id']].update(event)
+                self.groups[event['id']].async_update(event)
             elif event['r'] == 'lights' and event['id'] in self.lights:
-                self.lights[event['id']].update(event)
+                self.lights[event['id']].async_update(event)
             elif event['r'] == 'sensors' and event['id'] in self.sensors:
-                self.sensors[event['id']].update(event)
+                self.sensors[event['id']].async_update(event)
             else:
                 _LOGGER.debug('Not supported event %s', event)
         else:

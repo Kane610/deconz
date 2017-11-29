@@ -60,7 +60,7 @@ class DeconzGroup(DeconzLight):
         """
         field = '/groups/' + self._device_id + '/action'
         yield from self._async_set_state_callback(field, data)
-        self.update({'state': data})
+        self.async_update({'state': data})
 
     def as_dict(self):
         """Callback for __dict__."""

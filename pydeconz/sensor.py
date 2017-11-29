@@ -36,7 +36,7 @@ class DeconzSensor(DeconzDevice):
         self._sensor_unit = None
         super().__init__(device)
 
-    def update(self, event, reason = {}):
+    def async_update(self, event, reason = {}):
         """New event for sensor.
 
         Check if state is part of event.
@@ -46,7 +46,7 @@ class DeconzSensor(DeconzDevice):
         for data in ['state', 'config']:
             self.update_attr(event.get(data, {}))
             reason[data] = data in event
-        super().update(event, reason)
+        super().async_update(event, reason)
 
     @property
     def battery(self):

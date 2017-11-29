@@ -36,14 +36,14 @@ class DeconzLight(DeconzDevice):
         self._async_set_state_callback = async_set_state_callback
         super().__init__(device)
 
-    def update(self, event):
+    def async_update(self, event):
         """New event for light.
 
         Check that state is part of event.
         Signal that light has updated state.
         """
         self.update_attr(event.get('state', {}))
-        super().update(event)
+        super().async_update(event)
 
     @asyncio.coroutine
     def async_set_state(self, data):

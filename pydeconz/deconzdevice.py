@@ -37,7 +37,7 @@ class DeconzDevice:
         for key, value in attr.items():
             self.__setattr__("_{0}".format(key), value)
      
-    def update(self, event, reason = {}):
+    def async_update(self, event, reason = {}):
         """Signal that a new event has been received."""
         for async_signal_update in self._async_callback:
             async_signal_update(reason)

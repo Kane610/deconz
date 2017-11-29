@@ -21,12 +21,12 @@ RETRY_TIMER = 15
 class WSClient(asyncio.Protocol):
     """Websocket transport, session handling, message generation."""
 
-    def __init__(self, loop, host, port, callback):
+    def __init__(self, loop, host, port, async_callback):
         """Create resources for websocket communication."""
         self.loop = loop
         self.host = host
         self.port = port
-        self.callback = callback
+        self.async_callback = async_callback
         self.state = None
         self.transport = None
 
@@ -94,7 +94,7 @@ class WSClient(asyncio.Protocol):
 
         while len(data) > 0:
             payload, extra_data = self.get_payload(data)
-            self.callback(payload)
+            self.async_callback(payload)
             data = extra_data
 
     def connection_lost(self, exc):
