@@ -48,6 +48,7 @@ class DeconzSession:
 
     @property
     def scenes(self):
+        """Return all scenes available."""
         scenes = {}
         for _, group in self.groups.items():
             for _, scene in group.scenes.items():
@@ -142,4 +143,3 @@ class DeconzSession:
                 _LOGGER.debug('Not supported event %s', event)
         else:
             _LOGGER.debug('Not supported event %s', event)
-            

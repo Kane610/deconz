@@ -36,7 +36,7 @@ class DeconzSensor(DeconzDevice):
         self._sensor_unit = None
         super().__init__(device)
 
-    def async_update(self, event, reason = {}):
+    def async_update(self, event, reason={}):
         """New event for sensor.
 
         Check if state is part of event.
