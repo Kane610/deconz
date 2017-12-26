@@ -23,21 +23,21 @@ class DeconzDevice:
         self._uniqueid = device.get('uniqueid')
         self._async_callback = []
         _LOGGER.debug('%s created as %s', self._name, self.__dict__)
-    
+
     def register_async_callback(self, async_callback):
         """Register callback for signalling.
-        
+
         Will be called at the end of updating device information in self.update.
         """
         self._async_callback.append(async_callback)
 
     def update_attr(self, attr):
         """Update input attr in self."""
-        _LOGGER.debug('Update %s', attr)
         for key, value in attr.items():
             self.__setattr__("_{0}".format(key), value)
-     
-    def async_update(self, event, reason = {}):
+            _LOGGER.debug('Update %s with %s', key, value)
+
+    def async_update(self, event, reason={}):
         """Signal that a new event has been received."""
         for async_signal_update in self._async_callback:
             async_signal_update(reason)
@@ -47,7 +47,7 @@ class DeconzDevice:
         attribs = ['name', 'swversion']
         for attr in attribs:
             print('Update manually', data.get(attr))
-    
+
     def as_dict(self):
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
