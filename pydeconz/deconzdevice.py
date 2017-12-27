@@ -27,15 +27,23 @@ class DeconzDevice:
     def register_async_callback(self, async_callback):
         """Register callback for signalling.
 
-        Will be called at the end of updating device information in self.update.
+        Callback will be called at the end of
+        updating device information in self.update.
         """
         self._async_callback.append(async_callback)
 
     def update_attr(self, attr):
-        """Update input attr in self."""
+        """Update input attr in self.
+
+        Return list of attributes with changed values.
+        """
+        changed_attr = []
         for key, value in attr.items():
+            if getattr(self, "_{0}".format(key), None) != value:
+                changed_attr.append(key)
             self.__setattr__("_{0}".format(key), value)
             _LOGGER.debug('Update %s with %s', key, value)
+        return changed_attr
 
     def async_update(self, event, reason={}):
         """Signal that a new event has been received."""

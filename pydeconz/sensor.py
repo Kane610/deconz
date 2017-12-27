@@ -39,13 +39,15 @@ class DeconzSensor(DeconzDevice):
     def async_update(self, event, reason={}):
         """New event for sensor.
 
-        Check if state is part of event.
-        Check if config is part of event.
-        Signal that sensor has updated state.
+        Check if state or config is part of event.
+        Signal that sensor has updated attributes.
+        Inform what attributes got changed values.
         """
+        reason['attr'] = []
         for data in ['state', 'config']:
-            self.update_attr(event.get(data, {}))
+            changed_attr = self.update_attr(event.get(data, {}))
             reason[data] = data in event
+            reason['attr'] += changed_attr
         super().async_update(event, reason)
 
     @property
