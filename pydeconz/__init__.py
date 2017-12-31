@@ -3,7 +3,6 @@
 import asyncio
 import json
 import logging
-import aiohttp
 
 from .config import DeconzConfig
 from .group import DeconzGroup
@@ -17,14 +16,14 @@ _LOGGER = logging.getLogger(__name__)
 class DeconzSession:
     """deCONZ representation that handles lights, groups, scenes and sensors."""
 
-    def __init__(self, loop, host, port, api_key, **kwargs):
+    def __init__(self, loop, websession, host, port, api_key, **kwargs):
         """Setup session and host information."""
         self.groups = {}
         self.lights = {}
         self.sensors = {}
         self.config = None
         self.loop = loop
-        self.session = aiohttp.ClientSession(loop=loop)
+        self.session = websession
         self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
         self.websocket = None
 
@@ -42,7 +41,6 @@ class DeconzSession:
     def close(self):
         """Close websession and websocket to deCONZ."""
         _LOGGER.info('Shutting down connections to deCONZ.')
-        self.session.close()
         if self.websocket:
             self.websocket.stop()
 
