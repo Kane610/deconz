@@ -8,6 +8,7 @@ import logging
 import os
 
 from base64 import encodestring as base64encode
+from struct import unpack
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -105,20 +106,17 @@ class WSClient(asyncio.Protocol):
 
     def get_payload(self, data):
         """Parse length of payload and return it."""
-        header = ord(data[1:2])
-        if header <= 125:
-            # No extra payload information.
-            start = 2
-            end = header + start
-        elif header == 126:
+        start = 2
+        length = ord(data[1:2])
+        if length == 126:
             # Payload information are an extra 2 bytes.
             start = 4
-            end = ord(data[3:4]) + start
-        elif header == 127:
+            length, = unpack(">H", data[2:4])
+        elif length == 127:
             # Payload information are an extra 6 bytes.
             start = 8
-            end = header + start
-            _LOGGER.error('Websocket received data: %s, %s', data, data[start:end])
+            length, = unpack(">I", data[2:6])
+        end = start + length
         payload = json.loads(data[start:end].decode())
         extra_data = data[end:]
         return payload, extra_data
