@@ -11,11 +11,11 @@ LIGHTLEVEL = 'ZHALightLevel'
 OPENCLOSE = 'ZHAOpenClose'
 PRESENCE = 'ZHAPresence'
 PRESSURE = 'ZHAPressure'
-SWITCH = 'ZHASwitch'
+SWITCH = ['ZHASwitch', 'ZGPSwitch']
 TEMPERATURE = 'ZHATemperature'
 
 DECONZ_BINARY_SENSOR = [OPENCLOSE, PRESENCE]
-DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, PRESSURE, SWITCH, TEMPERATURE]
+DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, PRESSURE, TEMPERATURE] + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -224,7 +224,7 @@ class ZHAPressure(DeconzSensor):
         return self._pressure
 
 
-class ZHASwitch(DeconzSensor):
+class Switch(DeconzSensor):
     """Switch.
 
     State parameter is a string named 'buttonevent'.
@@ -284,9 +284,10 @@ def create_sensor(sensor):
         return ZHAPresence(sensor)
     elif sensor['type'] == PRESSURE:
         return ZHAPressure(sensor)
-    elif sensor['type'] == SWITCH:
-        return ZHASwitch(sensor)
+    elif sensor['type'] in SWITCH:
+        return Switch(sensor)
     elif sensor['type'] == TEMPERATURE:
         return ZHATemperature(sensor)
     else:
-        return None
+        _LOGGER.warning('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
+        return False
