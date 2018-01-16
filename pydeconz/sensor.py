@@ -6,16 +6,16 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-HUMIDITY = 'ZHAHumidity'
-LIGHTLEVEL = 'ZHALightLevel'
-OPENCLOSE = 'ZHAOpenClose'
-PRESENCE = 'ZHAPresence'
-PRESSURE = 'ZHAPressure'
+HUMIDITY = ['ZHAHumidity']
+LIGHTLEVEL = ['ZHALightLevel']
+OPENCLOSE = ['ZHAOpenClose']
+PRESENCE = ['ZHAPresence']
+PRESSURE = ['ZHAPressure']
 SWITCH = ['ZHASwitch', 'ZGPSwitch']
-TEMPERATURE = 'ZHATemperature'
+TEMPERATURE = ['ZHATemperature']
 
-DECONZ_BINARY_SENSOR = [OPENCLOSE, PRESENCE]
-DECONZ_SENSOR = [HUMIDITY, LIGHTLEVEL, PRESSURE, TEMPERATURE] + SWITCH
+DECONZ_BINARY_SENSOR = OPENCLOSE + PRESENCE
+DECONZ_SENSOR = HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -86,7 +86,7 @@ class DeconzSensor(DeconzDevice):
         return self._sensor_unit
 
 
-class ZHAHumidity(DeconzSensor):
+class Humidity(DeconzSensor):
     """Humidity sensor.
 
     State parameter is a string named 'humidity'.
@@ -111,7 +111,7 @@ class ZHAHumidity(DeconzSensor):
         return self._humidity
 
 
-class ZHALightLevel(DeconzSensor):
+class LightLevel(DeconzSensor):
     """Light level sensor.
 
     State parameter is a string named lightlevel.
@@ -136,7 +136,7 @@ class ZHALightLevel(DeconzSensor):
         return self._lightlevel
 
 
-class ZHAOpenClose(DeconzSensor):
+class OpenClose(DeconzSensor):
     """Door/Window sensor.
 
     State parameter is a boolean named 'open'.
@@ -164,7 +164,7 @@ class ZHAOpenClose(DeconzSensor):
         return self._open
 
 
-class ZHAPresence(DeconzSensor):
+class Presence(DeconzSensor):
     """Presence detector.
 
     State parameter is a boolean named 'presence'.
@@ -199,7 +199,7 @@ class ZHAPresence(DeconzSensor):
         return self._presence
 
 
-class ZHAPressure(DeconzSensor):
+class Pressure(DeconzSensor):
     """Pressure sensor.
 
     State parameter is a string named 'pressure'.
@@ -246,7 +246,7 @@ class Switch(DeconzSensor):
         return self._buttonevent
 
 
-class ZHATemperature(DeconzSensor):
+class Temperature(DeconzSensor):
     """Temperature sensor.
 
     State parameter is a string named 'temperature'.
@@ -274,20 +274,20 @@ class ZHATemperature(DeconzSensor):
 
 def create_sensor(sensor):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] == HUMIDITY:
-        return ZHAHumidity(sensor)
-    elif sensor['type'] == LIGHTLEVEL:
-        return ZHALightLevel(sensor)
-    elif sensor['type'] == OPENCLOSE:
-        return ZHAOpenClose(sensor)
-    elif sensor['type'] == PRESENCE:
-        return ZHAPresence(sensor)
-    elif sensor['type'] == PRESSURE:
-        return ZHAPressure(sensor)
+    if sensor['type'] in HUMIDITY:
+        return Humidity(sensor)
+    elif sensor['type'] in LIGHTLEVEL:
+        return LightLevel(sensor)
+    elif sensor['type'] in OPENCLOSE:
+        return OpenClose(sensor)
+    elif sensor['type'] in PRESENCE:
+        return Presence(sensor)
+    elif sensor['type'] in PRESSURE:
+        return Pressure(sensor)
     elif sensor['type'] in SWITCH:
         return Switch(sensor)
-    elif sensor['type'] == TEMPERATURE:
-        return ZHATemperature(sensor)
+    elif sensor['type'] in TEMPERATURE:
+        return Temperature(sensor)
     else:
         _LOGGER.warning('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
         return False
