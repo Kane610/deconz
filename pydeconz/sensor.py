@@ -6,6 +6,7 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
+GENERIC = ['CLIPGenericStatus']
 HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
 LIGHTLEVEL = ['ZHALightLevel', 'CLIPLightLevel']
 OPENCLOSE = ['ZHAOpenClose', 'CLIPOpenClose']
@@ -15,7 +16,7 @@ SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 
 DECONZ_BINARY_SENSOR = OPENCLOSE + PRESENCE
-DECONZ_SENSOR = HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
+DECONZ_SENSOR = GENERIC + HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -84,6 +85,28 @@ class DeconzSensor(DeconzDevice):
     def sensor_unit(self):
         """What unit of measurement the sensor reports."""
         return self._sensor_unit
+
+
+class Generic(DeconzSensor):
+    """Generic sensor.
+
+    State parameter is a number named 'status'.
+    """
+
+    def __init__(self, device):
+        """Initalize generic sensor."""
+        self._status = device['state'].get('status')
+        super().__init__(device)
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.status
+
+    @property
+    def status(self):
+        """Status."""
+        return self._status
 
 
 class Humidity(DeconzSensor):
@@ -274,7 +297,9 @@ class Temperature(DeconzSensor):
 
 def create_sensor(sensor):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] in HUMIDITY:
+    if sensor['type'] in GENERIC:
+        return Generic(sensor)
+    elif sensor['type'] in HUMIDITY:
         return Humidity(sensor)
     elif sensor['type'] in LIGHTLEVEL:
         return LightLevel(sensor)
