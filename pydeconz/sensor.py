@@ -6,13 +6,13 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-HUMIDITY = ['ZHAHumidity']
-LIGHTLEVEL = ['ZHALightLevel']
-OPENCLOSE = ['ZHAOpenClose']
-PRESENCE = ['ZHAPresence']
-PRESSURE = ['ZHAPressure']
-SWITCH = ['ZHASwitch', 'ZGPSwitch']
-TEMPERATURE = ['ZHATemperature']
+HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
+LIGHTLEVEL = ['ZHALightLevel', 'CLIPLightLevel']
+OPENCLOSE = ['ZHAOpenClose', 'CLIPOpenClose']
+PRESENCE = ['ZHAPresence', 'CLIPPresence']
+PRESSURE = ['ZHAPressure', 'CLIPPressure']
+SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
+TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 
 DECONZ_BINARY_SENSOR = OPENCLOSE + PRESENCE
 DECONZ_SENSOR = HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
