@@ -290,4 +290,4 @@ def create_sensor(sensor):
         return Temperature(sensor)
     else:
         _LOGGER.warning('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
-        return False
+        return None
