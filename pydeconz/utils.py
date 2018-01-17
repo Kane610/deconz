@@ -47,7 +47,7 @@ def async_delete_all_keys(loop, host, port, api_key, **kwargs):
     yield from session.close()
     for key, _ in response['whitelist'].items():
         if key != api_key:
-            yield from delete_api_key(loop, host, port, key)
+            yield from async_delete_api_key(loop, host, port, key)
 
 
 @asyncio.coroutine
