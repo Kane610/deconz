@@ -26,8 +26,9 @@ class DeconzSensor(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Set initial information about sensor."""
+        self._device_id = device_id
         self._battery = device['config'].get('battery')
         self._ep = device.get('ep')
         self._on = device['config'].get('on')
@@ -93,10 +94,10 @@ class Generic(DeconzSensor):
     State parameter is a number named 'status'.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initalize generic sensor."""
         self._status = device['state'].get('status')
-        super().__init__(device)
+        super().__init__(device_id, device)
 
     @property
     def state(self):
@@ -115,10 +116,10 @@ class Humidity(DeconzSensor):
     State parameter is a string named 'humidity'.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initalize humidity sensor."""
         self._humidity = device['state'].get('humidity')
-        super().__init__(device)
+        super().__init__(device_id, device)
         self._sensor_class = 'humidity'
         self._sensor_unit = '%'
 
@@ -140,10 +141,10 @@ class LightLevel(DeconzSensor):
     State parameter is a string named lightlevel.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initalize light level sensor."""
         self._lightlevel = device['state'].get('lightlevel')
-        super().__init__(device)
+        super().__init__(device_id, device)
         self._sensor_class = 'lux'
         self._sensor_unit = 'lux'
 
@@ -165,10 +166,10 @@ class OpenClose(DeconzSensor):
     State parameter is a boolean named 'open'.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initialize Door/Window sensor."""
         self._open = device['state'].get('open')
-        super().__init__(device)
+        super().__init__(device_id, device)
         self._sensor_class = 'opening'
 
     @property
@@ -194,11 +195,11 @@ class Presence(DeconzSensor):
     Also has a boolean 'dark' representing lighting in area of placement.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initialize presence detector."""
         self._dark = device['state'].get('dark')
         self._presence = device['state'].get('presence')
-        super().__init__(device)
+        super().__init__(device_id, device)
         self._sensor_class = 'motion'
 
     @property
@@ -228,10 +229,10 @@ class Pressure(DeconzSensor):
     State parameter is a string named 'pressure'.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initalize pressure sensor."""
         self._pressure = device['state'].get('pressure')
-        super().__init__(device)
+        super().__init__(device_id, device)
         self._sensor_class = 'pressure'
         self._sensor_icon = 'mdi:gauge'
         self._sensor_unit = 'hPa'
@@ -253,10 +254,10 @@ class Switch(DeconzSensor):
     State parameter is a string named 'buttonevent'.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initalize switch sensor."""
         self._buttonevent = device['state'].get('buttonevent')
-        super().__init__(device)
+        super().__init__(device_id, device)
 
     @property
     def state(self):
@@ -275,10 +276,10 @@ class Temperature(DeconzSensor):
     State parameter is a string named 'temperature'.
     """
 
-    def __init__(self, device):
+    def __init__(self, device_id, device):
         """Initalize temperature sensor."""
         self._temperature = device['state'].get('temperature')
-        super().__init__(device)
+        super().__init__(device_id, device)
         self._sensor_class = 'temperature'
         self._sensor_icon = 'mdi:thermometer'
         self._sensor_unit = '°C'
@@ -295,24 +296,24 @@ class Temperature(DeconzSensor):
         return self._temperature
 
 
-def create_sensor(sensor):
+def create_sensor(sensor_id, sensor):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in GENERIC:
-        return Generic(sensor)
+        return Generic(sensor_id, sensor)
     elif sensor['type'] in HUMIDITY:
-        return Humidity(sensor)
+        return Humidity(sensor_id, sensor)
     elif sensor['type'] in LIGHTLEVEL:
-        return LightLevel(sensor)
+        return LightLevel(sensor_id, sensor)
     elif sensor['type'] in OPENCLOSE:
-        return OpenClose(sensor)
+        return OpenClose(sensor_id, sensor)
     elif sensor['type'] in PRESENCE:
-        return Presence(sensor)
+        return Presence(sensor_id, sensor)
     elif sensor['type'] in PRESSURE:
-        return Pressure(sensor)
+        return Pressure(sensor_id, sensor)
     elif sensor['type'] in SWITCH:
-        return Switch(sensor)
+        return Switch(sensor_id, sensor)
     elif sensor['type'] in TEMPERATURE:
-        return Temperature(sensor)
+        return Temperature(sensor_id, sensor)
     else:
         _LOGGER.warning('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
         return None

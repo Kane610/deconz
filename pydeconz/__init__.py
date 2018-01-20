@@ -82,7 +82,7 @@ class DeconzSession:
 
         for sensor_id, sensor in sensors.items():
             if sensor_id not in self.sensors:
-                self.sensors[sensor_id] = create_sensor(sensor)
+                self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
             else:
                 self.sensors[sensor_id].update_manually(sensor)
 
