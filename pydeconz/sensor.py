@@ -29,6 +29,7 @@ class DeconzSensor(DeconzDevice):
     def __init__(self, device_id, device):
         """Set initial information about sensor."""
         self._device_id = device_id
+        self._deconz_id = '/sensors/' + device_id
         self._battery = device['config'].get('battery')
         self._ep = device.get('ep')
         self._on = device['config'].get('on')

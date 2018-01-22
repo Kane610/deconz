@@ -21,6 +21,7 @@ class DeconzLight(DeconzDevice):
         Set async callback to set state of device.
         """
         self._device_id = device_id
+        self._deconz_id = '/lights/' + device_id
         state = device.get('state')
         if state:
             self._alert = state.get('alert')
@@ -57,7 +58,7 @@ class DeconzLight(DeconzDevice):
             "transitiontime": 10
         }
         """
-        field = '/lights/' + self._device_id + '/state'
+        field = self._deconz_id + '/state'
         yield from self._async_set_state_callback(field, data)
 
     def as_dict(self):

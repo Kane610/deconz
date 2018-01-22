@@ -40,6 +40,7 @@ class DeconzGroup(DeconzLight):
         self._x, self._y = device['action'].get('xy', (None, None))
         del device['state']
         super().__init__(device_id, device, async_set_state_callback)
+        self._deconz_id = '/groups/' + device_id
         for scene_json in device.get('scenes'):
             scene = DeconzScene(self, scene_json, async_set_state_callback)
             self._scenes[scene.id] = scene
@@ -58,7 +59,7 @@ class DeconzGroup(DeconzLight):
 
         Also update local values of group since websockets doesn't.
         """
-        field = '/groups/' + self._device_id + '/action'
+        field = self._deconz_id + '/action'
         yield from self._async_set_state_callback(field, data)
         self.async_update({'state': data})
 
@@ -143,12 +144,13 @@ class DeconzScene:
         self._group_name = group.name
         self._id = scene.get('id')
         self._name = scene.get('name')
+        self._deconz_id = group._deconz_id + '/scenes/' + self._id
         self._async_set_state_callback = async_set_state_callback
 
     @asyncio.coroutine
     def async_set_state(self, data):
         """Recall scene to group."""
-        field = '/groups/' + self._group_id + '/scenes/' + self._id + '/recall'
+        field = self._deconz_id + '/recall'
         yield from self._async_set_state_callback(field, data)
 
     @property
