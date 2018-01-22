@@ -28,7 +28,7 @@ class DeconzDevice:
         """Register callback for signalling.
 
         Callback will be called at the end of
-        updating device information in self.update.
+        updating device information in self.async_update.
         """
         self._async_callback.append(async_callback)
 
@@ -46,7 +46,10 @@ class DeconzDevice:
         return changed_attr
 
     def async_update(self, event, reason={}):
-        """Signal that a new event has been received."""
+        """Signal that a new event has been received.
+
+        Reason is used to convey a message to upper implementation.
+        """
         for async_signal_update in self._async_callback:
             async_signal_update(reason)
 
