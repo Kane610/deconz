@@ -48,8 +48,8 @@ class DeconzSession:
     def scenes(self):
         """Return all scenes available."""
         scenes = {}
-        for _, group in self.groups.items():
-            for _, scene in group.scenes.items():
+        for group in self.groups.values():
+            for scene in group.scenes.values():
                 scenes[group.id + '_' + scene.id] = scene
         return scenes
 
