@@ -70,7 +70,6 @@ class DeconzConfig:
         Set callback to set state of device.
         """
         self._apiversion = config.get('apiversion')
-        self._ipaddress = config.get('ipaddress')
         self._linkbutton = config.get('linkbutton')
         self._modelid = config.get('modelid')
         self._name = config.get('name')
@@ -86,11 +85,6 @@ class DeconzConfig:
     def apiversion(self):
         """The version of the deCONZ Rest API."""
         return self._apiversion
-
-    @property
-    def host(self):
-        """IPv4 address of the gateway."""
-        return self._ipaddress
 
     @property
     def linkbutton(self):

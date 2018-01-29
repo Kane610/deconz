@@ -24,6 +24,7 @@ class DeconzSession:
         self.config = None
         self.loop = loop
         self.session = websession
+        self.host = host
         self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
         self.websocket = None
 
@@ -31,7 +32,7 @@ class DeconzSession:
         """Connect websocket to deCONZ."""
         if self.config:
             self.websocket = WSClient(self.loop,
-                                      self.config.host,
+                                      self.host,
                                       self.config.websocketport,
                                       self.async_event_handler)
             self.websocket.start()
