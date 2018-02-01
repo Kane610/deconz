@@ -3,12 +3,12 @@
 import asyncio
 import logging
 
-from .light import DeconzLight
+from .light import DeconzLightBase
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzGroup(DeconzLight):
+class DeconzGroup(DeconzLightBase):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ
@@ -20,6 +20,7 @@ class DeconzGroup(DeconzLight):
 
         Set callback to set state of device.
         """
+        deconz_id = '/groups/' + device_id
         self._any_on = device['state'].get('any_on')
         self._bri = device['action'].get('bri')
         self._class = device.get('class')
@@ -38,9 +39,7 @@ class DeconzGroup(DeconzLight):
         self._sat = device['action'].get('sat')
         self._scenes = {}
         self._x, self._y = device['action'].get('xy', (None, None))
-        del device['state']
-        super().__init__(device_id, device, async_set_state_callback)
-        self._deconz_id = '/groups/' + device_id
+        super().__init__(deconz_id, device, async_set_state_callback)
         for scene_json in device.get('scenes'):
             scene = DeconzScene(self, scene_json, async_set_state_callback)
             self._scenes[scene.id] = scene
@@ -59,7 +58,7 @@ class DeconzGroup(DeconzLight):
 
         Also update local values of group since websockets doesn't.
         """
-        field = self._deconz_id + '/action'
+        field = self.deconz_id + '/action'
         yield from self._async_set_state_callback(field, data)
         self.async_update({'state': data})
 
@@ -144,7 +143,7 @@ class DeconzScene:
         self._group_name = group.name
         self._id = scene.get('id')
         self._name = scene.get('name')
-        self._deconz_id = group._deconz_id + '/scenes/' + self._id
+        self._deconz_id = group.deconz_id + '/scenes/' + self._id
         self._async_set_state_callback = async_set_state_callback
 
     @asyncio.coroutine
@@ -152,6 +151,11 @@ class DeconzScene:
         """Recall scene to group."""
         field = self._deconz_id + '/recall'
         yield from self._async_set_state_callback(field, data)
+
+    @property
+    def deconz_id(self):
+        """Id to call scene over API e.g. /groups/1/scenes/1."""
+        return self._deconz_id
 
     @property
     def full_name(self):

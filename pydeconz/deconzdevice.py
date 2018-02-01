@@ -12,8 +12,9 @@ class DeconzDevice:
     http://dresden-elektronik.github.io/deconz-rest-doc/
     """
 
-    def __init__(self, device):
+    def __init__(self, deconz_id, device):
         """Set initial information common to all device types."""
+        self._deconz_id = deconz_id
         self._etag = device.get('etag')
         self._manufacturername = device.get('manufacturername')
         self._modelid = device.get('modelid')
@@ -42,7 +43,7 @@ class DeconzDevice:
             if getattr(self, "_{0}".format(key), None) != value:
                 changed_attr.append(key)
             self.__setattr__("_{0}".format(key), value)
-            _LOGGER.debug('Update %s with %s', key, value)
+            _LOGGER.debug('%s: update %s with %s', self.name, key, value)
         return changed_attr
 
     def async_update(self, event, reason={}):
@@ -65,6 +66,11 @@ class DeconzDevice:
         if '_callback' in cdict:
             del cdict['_callback']
         return cdict
+
+    @property
+    def deconz_id(self):
+        """Id to call device over API e.g. /sensors/1."""
+        return self._deconz_id
 
     @property
     def etag(self):

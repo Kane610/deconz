@@ -28,8 +28,7 @@ class DeconzSensor(DeconzDevice):
 
     def __init__(self, device_id, device):
         """Set initial information about sensor."""
-        self._device_id = device_id
-        self._deconz_id = '/sensors/' + device_id
+        deconz_id = '/sensors/' + device_id
         self._battery = device['config'].get('battery')
         self._ep = device.get('ep')
         self._on = device['config'].get('on')
@@ -37,7 +36,7 @@ class DeconzSensor(DeconzDevice):
         self._sensor_class = None
         self._sensor_icon = None
         self._sensor_unit = None
-        super().__init__(device)
+        super().__init__(deconz_id, device)
 
     def async_update(self, event, reason={}):
         """New event for sensor.

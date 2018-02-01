@@ -8,34 +8,20 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzLight(DeconzDevice):
-    """deCONZ light representation.
+class DeconzLightBase(DeconzDevice):
+    """deCONZ light base representation.
 
     Dresden Elektroniks documentation of lights in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, device_id, device, async_set_state_callback):
+    def __init__(self, deconz_id, device, async_set_state_callback):
         """Set initial information about light.
 
         Set async callback to set state of device.
         """
-        self._device_id = device_id
-        self._deconz_id = '/lights/' + device_id
-        state = device.get('state')
-        if state:
-            self._alert = state.get('alert')
-            self._bri = state.get('bri')
-            self._colormode = state.get('colormode')
-            self._ct = state.get('ct')
-            self._effect = state.get('effect')
-            self._hue = state.get('hue')
-            self._on = state.get('on')
-            self._reachable = state.get('reachable')
-            self._sat = state.get('sat')
-            self._x, self._y = state.get('xy', (None, None))
         self._async_set_state_callback = async_set_state_callback
-        super().__init__(device)
+        super().__init__(deconz_id, device)
 
     def async_update(self, event):
         """New event for light.
@@ -46,32 +32,12 @@ class DeconzLight(DeconzDevice):
         self.update_attr(event.get('state', {}))
         super().async_update(event)
 
-    @asyncio.coroutine
-    def async_set_state(self, data):
-        """Set state of light.
-
-        {
-            "on": true,
-            "bri": 180,
-            "hue": 43680,
-            "sat": 255,
-            "transitiontime": 10
-        }
-        """
-        field = self._deconz_id + '/state'
-        yield from self._async_set_state_callback(field, data)
-
     def as_dict(self):
         """Callback for __dict__."""
         cdict = super().as_dict()
         if '_async_set_state_callback' in cdict:
             del cdict['_async_set_state_callback']
         return cdict
-
-    @property
-    def state(self):
-        """True if the light is on."""
-        return self._on
 
     @property
     def brightness(self):
@@ -114,17 +80,6 @@ class DeconzLight(DeconzDevice):
             return None
 
     @property
-    def alert(self):
-        """Temporary alert effect.
-
-        Following values are possible:
-        none - light is not performing an alert
-        select - light is blinking a short time
-        lselect - light is blinking a longer time
-        """
-        return self._alert
-
-    @property
     def colormode(self):
         """The current color mode of the light.
 
@@ -147,3 +102,60 @@ class DeconzLight(DeconzDevice):
     def reachable(self):
         """True if the light is reachable and accepts commands."""
         return self._reachable
+
+
+class DeconzLight(DeconzLightBase):
+    """deCONZ light representation.
+
+    Dresden Elektroniks documentation of lights in deCONZ
+    http://dresden-elektronik.github.io/deconz-rest-doc/lights/
+    """
+
+    def __init__(self, device_id, device, async_set_state_callback):
+        """Set initial information about light.
+
+        Set async callback to set state of device.
+        """
+        deconz_id = '/lights/' + device_id
+        self._alert = device['state'].get('alert')
+        self._bri = device['state'].get('bri')
+        self._colormode = device['state'].get('colormode')
+        self._ct = device['state'].get('ct')
+        self._effect = device['state'].get('effect')
+        self._hue = device['state'].get('hue')
+        self._on = device['state'].get('on')
+        self._reachable = device['state'].get('reachable')
+        self._sat = device['state'].get('sat')
+        self._x, self._y = device['state'].get('xy', (None, None))
+        super().__init__(deconz_id, device, async_set_state_callback)
+
+    @asyncio.coroutine
+    def async_set_state(self, data):
+        """Set state of light.
+
+        {
+            "on": true,
+            "bri": 180,
+            "hue": 43680,
+            "sat": 255,
+            "transitiontime": 10
+        }
+        """
+        field = self.deconz_id + '/state'
+        yield from self._async_set_state_callback(field, data)
+
+    @property
+    def state(self):
+        """True if the light is on."""
+        return self._on
+
+    @property
+    def alert(self):
+        """Temporary alert effect.
+
+        Following values are possible:
+        none - light is not performing an alert
+        select - light is blinking a short time
+        lselect - light is blinking a longer time
+        """
+        return self._alert
