@@ -16,7 +16,7 @@ PRESSURE = ['ZHAPressure', 'CLIPPressure']
 SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 
-DECONZ_BINARY_SENSOR = FIRE + OPENCLOSE + PRESENCE
+DECONZ_BINARY_SENSOR = WATER + FIRE + OPENCLOSE + PRESENCE
 DECONZ_SENSOR = GENERIC + HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
 
 
@@ -87,6 +87,62 @@ class DeconzSensor(DeconzDevice):
     def sensor_unit(self):
         """What unit of measurement the sensor reports."""
         return self._sensor_unit
+
+
+class Water(DeconzSensor):
+    """Water sensor.
+
+    State parameter is a boolean named 'water'.
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize Water sensor."""
+        self._open = device['state'].get('water')
+        super().__init__(device_id, device)
+        self._sensor_class = 'moisture'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.water
+
+    @property
+    def fire(self):
+        """Water detected."""
+        return self._water
+
+
+class Fire(DeconzSensor):
+    """Fire sensor.
+
+    State parameter is a boolean named 'fire'.
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize Fire sensor."""
+        self._open = device['state'].get('fire')
+        super().__init__(device_id, device)
+        self._sensor_class = 'smoke'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.fire
+
+    @property
+    def fire(self):
+        """Fire detected."""
+        return self._fire
 
 
 class Fire(DeconzSensor):
@@ -327,7 +383,9 @@ class Temperature(DeconzSensor):
 
 def create_sensor(sensor_id, sensor):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] in FIRE:
+    if sensor['type'] in WATER:
+        return Water(sensor_id, sensor)
+    elif sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
     elif sensor['type'] in GENERIC:
         return Generic(sensor_id, sensor)
