@@ -12,7 +12,7 @@ from setuptools import setup
 setup(
     name='pydeconz',
     packages=['pydeconz'],
-    version='28',
+    version='29',
     description='A Python library for communicating with deCONZ REST-API from Dresden Elektronik',
     author='Robert Svensson',
     author_email='Kane610@users.noreply.github.com',
