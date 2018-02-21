@@ -15,6 +15,7 @@ PRESENCE = ['ZHAPresence', 'CLIPPresence']
 PRESSURE = ['ZHAPressure', 'CLIPPressure']
 SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
+WATER = ['ZHAWater']
 
 DECONZ_BINARY_SENSOR = WATER + FIRE + OPENCLOSE + PRESENCE
 DECONZ_SENSOR = GENERIC + HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
@@ -89,38 +90,27 @@ class DeconzSensor(DeconzDevice):
         return self._sensor_unit
 
 
-class Water(DeconzSensor):
-    """Water sensor.
-
-    State parameter is a boolean named 'water'.
-    """
-
-    def __init__(self, device_id, device):
-        """Initialize Water sensor."""
-        self._open = device['state'].get('water')
-        super().__init__(device_id, device)
-        self._sensor_class = 'moisture'
-
-    @property
-    def state(self):
-        """Main state of sensor."""
-        return self.is_tripped
-
-    @property
-    def is_tripped(self):
-        """Sensor is tripped."""
-        return self.water
-
-    @property
-    def fire(self):
-        """Water detected."""
-        return self._water
-
-
 class Fire(DeconzSensor):
     """Fire sensor.
 
     State parameter is a boolean named 'fire'.
+    {
+        "config": {
+            "on": true,
+            "reachable": true
+        },
+        "ep": 1,
+        "etag": "2b585d2c016bfd665ba27a8fdad28670",
+        "manufacturername": "LUMI",
+        "modelid": "lumi.sensor_smoke",
+        "name": "sensor_kitchen_smoke",
+        "state": {
+            "fire": false,
+            "lastupdated": "2018-02-20T11:25:02"
+        },
+        "type": "ZHAFire",
+        "uniqueid": "00:15:8d:00:01:d9:3e:7c-01-0500"
+    }
     """
 
     def __init__(self, device_id, device):
@@ -353,11 +343,55 @@ class Temperature(DeconzSensor):
         return self._temperature
 
 
+class Water(DeconzSensor):
+    """Water sensor.
+
+    State parameter is a boolean named 'water'.
+
+    {
+        "config": {
+            "on": true,
+            "reachable": true
+        },
+        "ep": 1,
+        "etag": "94521af24c973d190dfaac12fd73f9bd",
+        "manufacturername": "LUMI",
+        "modelid": "lumi.sensor_wleak.aq1",
+        "name": "lumi.sensor_wleak.aq1",
+        "state": {
+            "lastupdated": "2018-02-20T21:26:09",
+            "water": false
+        },
+        "type": "ZHAWater",
+        "uniqueid": "00:15:8d:00:02:11:22:a9-01-0500"
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize Water sensor."""
+        self._water = device['state'].get('water')
+        super().__init__(device_id, device)
+        self._sensor_class = 'moisture'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.water
+
+    @property
+    def water(self):
+        """Water detected."""
+        return self._water
+
+
 def create_sensor(sensor_id, sensor):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] in WATER:
-        return Water(sensor_id, sensor)
-    elif sensor['type'] in FIRE:
+    if sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
     elif sensor['type'] in GENERIC:
         return Generic(sensor_id, sensor)
@@ -375,6 +409,8 @@ def create_sensor(sensor_id, sensor):
         return Switch(sensor_id, sensor)
     elif sensor['type'] in TEMPERATURE:
         return Temperature(sensor_id, sensor)
+    elif sensor['type'] in WATER:
+        return Water(sensor_id, sensor)
     else:
         _LOGGER.warning('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
         return None
