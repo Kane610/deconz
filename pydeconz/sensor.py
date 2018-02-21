@@ -97,7 +97,7 @@ class Fire(DeconzSensor):
 
     def __init__(self, device_id, device):
         """Initialize Fire sensor."""
-        self._open = device['state'].get('fire')
+        self._fire = device['state'].get('fire')
         super().__init__(device_id, device)
         self._sensor_class = 'smoke'
 
