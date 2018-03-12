@@ -1,6 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import asyncio
 import logging
 
 from .light import DeconzLightBase
@@ -44,8 +43,7 @@ class DeconzGroup(DeconzLightBase):
             scene = DeconzScene(self, scene_json, async_set_state_callback)
             self._scenes[scene.id] = scene
 
-    @asyncio.coroutine
-    def async_set_state(self, data):
+    async def async_set_state(self, data):
         """Set state of light group.
 
         {
@@ -59,7 +57,7 @@ class DeconzGroup(DeconzLightBase):
         Also update local values of group since websockets doesn't.
         """
         field = self.deconz_id + '/action'
-        yield from self._async_set_state_callback(field, data)
+        await self._async_set_state_callback(field, data)
         self.async_update({'state': data})
 
     def as_dict(self):
@@ -146,11 +144,10 @@ class DeconzScene:
         self._deconz_id = group.deconz_id + '/scenes/' + self._id
         self._async_set_state_callback = async_set_state_callback
 
-    @asyncio.coroutine
-    def async_set_state(self, data):
+    async def async_set_state(self, data):
         """Recall scene to group."""
         field = self._deconz_id + '/recall'
-        yield from self._async_set_state_callback(field, data)
+        await self._async_set_state_callback(field, data)
 
     @property
     def deconz_id(self):

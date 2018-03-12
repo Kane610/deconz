@@ -1,6 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import asyncio
 import logging
 
 from .deconzdevice import DeconzDevice
@@ -129,8 +128,7 @@ class DeconzLight(DeconzLightBase):
         self._x, self._y = device['state'].get('xy', (None, None))
         super().__init__(deconz_id, device, async_set_state_callback)
 
-    @asyncio.coroutine
-    def async_set_state(self, data):
+    async def async_set_state(self, data):
         """Set state of light.
 
         {
@@ -142,7 +140,7 @@ class DeconzLight(DeconzLightBase):
         }
         """
         field = self.deconz_id + '/state'
-        yield from self._async_set_state_callback(field, data)
+        await self._async_set_state_callback(field, data)
 
     @property
     def state(self):

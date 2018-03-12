@@ -1,6 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import asyncio
 import json
 import logging
 
@@ -54,10 +53,9 @@ class DeconzSession:
                 scenes[group.id + '_' + scene.id] = scene
         return scenes
 
-    @asyncio.coroutine
-    def async_load_parameters(self):
+    async def async_load_parameters(self):
         """Load deCONZ parameters."""
-        data = yield from self.async_get_state('')
+        data = await self.async_get_state('')
         if not data:
             _LOGGER.error('Couldn\'t load data from deCONZ')
             return False
@@ -89,8 +87,7 @@ class DeconzSession:
 
         return True
 
-    @asyncio.coroutine
-    def async_put_state(self, field, data):
+    async def async_put_state(self, field, data):
         """Set state of object in deCONZ.
 
         Field is a string representing a specific device in deCONZ
@@ -103,11 +100,10 @@ class DeconzSession:
         session = self.session.put
         url = self.api_url + field
         jsondata = json.dumps(data)
-        response_dict = yield from async_request(session, url, data=jsondata)
+        response_dict = await async_request(session, url, data=jsondata)
         return response_dict
 
-    @asyncio.coroutine
-    def async_get_state(self, field):
+    async def async_get_state(self, field):
         """Get state of object in deCONZ.
 
         Field is a string representing an API endpoint or lower
@@ -117,7 +113,7 @@ class DeconzSession:
         """
         session = self.session.get
         url = self.api_url + field
-        response_dict = yield from async_request(session, url)
+        response_dict = await async_request(session, url)
         return response_dict
 
     def async_event_handler(self, event):
