@@ -6,11 +6,13 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
+CONSUMPTION = ['ZHAConsumption']
 FIRE = ['ZHAFire']
 GENERIC = ['CLIPGenericStatus']
 HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
 LIGHTLEVEL = ['ZHALightLevel', 'CLIPLightLevel']
 OPENCLOSE = ['ZHAOpenClose', 'CLIPOpenClose']
+POWER = ['ZHAPower']
 PRESENCE = ['ZHAPresence', 'CLIPPresence']
 PRESSURE = ['ZHAPressure', 'CLIPPressure']
 SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
@@ -18,7 +20,7 @@ TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 WATER = ['ZHAWater']
 
 DECONZ_BINARY_SENSOR = FIRE + OPENCLOSE + PRESENCE + WATER
-DECONZ_SENSOR = GENERIC + HUMIDITY + LIGHTLEVEL + PRESSURE + TEMPERATURE + SWITCH
+DECONZ_SENSOR = CONSUMPTION + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -88,6 +90,45 @@ class DeconzSensor(DeconzDevice):
     def sensor_unit(self):
         """What unit of measurement the sensor reports."""
         return self._sensor_unit
+
+
+class Consumption(DeconzSensor):
+    """Power consumption sensor.
+
+    State parameter is a number named 'consumption'.
+    {
+        'config': {
+            'on': True,
+            'reachable': True
+        },
+        'ep': 1,
+        'etag': 'a99e5bc463d15c23af7e89946e784cca',
+        'manufacturername': 'Heiman',
+        'modelid': 'SmartPlug',
+        'name': 'Consumption 15',
+        'state': {
+            'consumption': 11342,
+            'lastupdated': '2018-03-12T19:19:08'
+        },
+        'type': 'ZHAConsumption',
+        'uniqueid': '00:0d:6f:00:0b:7a:64:29-01-0702'
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initalize consumtion sensor."""
+        self._consumption = device['state'].get('consumption')
+        super().__init__(device_id, device)
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.consumption
+
+    @property
+    def consumption(self):
+        """Status."""
+        return self._consumption
 
 
 class Fire(DeconzSensor):
@@ -233,6 +274,60 @@ class OpenClose(DeconzSensor):
     def open(self):
         """Door open."""
         return self._open
+
+
+class Power(DeconzSensor):
+    """Power sensor.
+
+    State parameter is a number named 'power'.
+    {
+        'config': {
+            'on': True,
+            'reachable': True
+        },
+        'ep': 1,
+        'etag': '96e71c7db4685b334d3d0decc3f11868',
+        'manufacturername': 'Heiman',
+        'modelid': 'SmartPlug',
+        'name': 'Power 16',
+        'state': {
+            'current': 34,
+            'lastupdated': '2018-03-12T19:22:13',
+            'power': 64,
+            'voltage': 231
+        },
+        'type': 'ZHAPower',
+        'uniqueid': '00:0d:6f:00:0b:7a:64:29-01-0b04'
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initalize power sensor."""
+        self._current = device['state'].get('current')
+        self._power = device['state'].get('power')
+        self._voltage = device['state'].get('voltage')
+        super().__init__(device_id, device)
+        self._sensor_unit = 'Watts'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.power
+
+    @property
+    def current(self):
+        """Status."""
+        return self._current
+
+    @property
+    def power(self):
+        """Status."""
+        return self._power
+
+    @property
+    def voltage(self):
+        """Status."""
+        return self._voltage
 
 
 class Presence(DeconzSensor):
@@ -391,7 +486,9 @@ class Water(DeconzSensor):
 
 def create_sensor(sensor_id, sensor):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] in FIRE:
+    if sensor['type'] in CONSUMPTION:
+        return Consumption(sensor_id, sensor)
+    elif sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
     elif sensor['type'] in GENERIC:
         return Generic(sensor_id, sensor)
@@ -401,6 +498,8 @@ def create_sensor(sensor_id, sensor):
         return LightLevel(sensor_id, sensor)
     elif sensor['type'] in OPENCLOSE:
         return OpenClose(sensor_id, sensor)
+    elif sensor['type'] in POWER:
+        return Power(sensor_id, sensor)
     elif sensor['type'] in PRESENCE:
         return Presence(sensor_id, sensor)
     elif sensor['type'] in PRESSURE:
