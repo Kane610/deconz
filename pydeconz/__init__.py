@@ -68,22 +68,13 @@ class DeconzSession:
             self.config = DeconzConfig(config)
 
         for group_id, group in groups.items():
-            if group_id not in self.groups:
-                self.groups[group_id] = DeconzGroup(group_id, group, self.async_put_state)
-            else:
-                self.groups[group_id].update_manually(group)
+            self.groups[group_id] = DeconzGroup(group_id, group, self.async_put_state)
 
         for light_id, light in lights.items():
-            if light_id not in self.lights:
-                self.lights[light_id] = DeconzLight(light_id, light, self.async_put_state)
-            else:
-                self.lights[light_id].update_manually(light)
+            self.lights[light_id] = DeconzLight(light_id, light, self.async_put_state)
 
         for sensor_id, sensor in sensors.items():
-            if sensor_id not in self.sensors:
-                self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
-            else:
-                self.sensors[sensor_id].update_manually(sensor)
+            self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
 
         return True
 
