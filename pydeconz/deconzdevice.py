@@ -54,12 +54,6 @@ class DeconzDevice:
         for async_signal_update in self._async_callback:
             async_signal_update(reason)
 
-    def update_manually(self, data):
-        """Update values not updated over websocket."""
-        attribs = ['name', 'swversion']
-        for attr in attribs:
-            print('Update manually', data.get(attr))
-
     def as_dict(self):
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
