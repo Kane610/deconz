@@ -74,7 +74,9 @@ class DeconzSession:
             self.lights[light_id] = DeconzLight(light_id, light, self.async_put_state)
 
         for sensor_id, sensor in sensors.items():
-            self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
+            new_sensor = create_sensor(sensor_id, sensor)
+            if new_sensor:
+                self.sensors[sensor_id] = new_sensor
 
         return True
 
