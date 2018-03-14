@@ -116,18 +116,20 @@ class Consumption(DeconzSensor):
     """
 
     def __init__(self, device_id, device):
-        """Initalize consumtion sensor."""
+        """Initalize consumption sensor."""
         self._consumption = device['state'].get('consumption')
         super().__init__(device_id, device)
+        self._sensor_unit = 'kWh'
 
     @property
     def state(self):
         """Main state of sensor."""
-        return self.consumption
+        consumption = float(self.consumption/1000)
+        return consumption
 
     @property
     def consumption(self):
-        """Status."""
+        """Consumption."""
         return self._consumption
 
 
@@ -316,17 +318,17 @@ class Power(DeconzSensor):
 
     @property
     def current(self):
-        """Status."""
+        """Current."""
         return self._current
 
     @property
     def power(self):
-        """Status."""
+        """Power."""
         return self._power
 
     @property
     def voltage(self):
-        """Status."""
+        """Voltage."""
         return self._voltage
 
 
