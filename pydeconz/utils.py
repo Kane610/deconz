@@ -79,7 +79,8 @@ async def async_discovery(session):
             bridges.append({'bridgeid': bridge['id'],
                             'host': bridge['internalipaddress'],
                             'port': bridge['internalport']})
-        print(bridges)
+        _LOGGER.info("Discovered the following bridges: %s.", bridges)
         return bridges
     else:
+        _LOGGER.info("No discoverable bridge available.")
         return False
