@@ -70,6 +70,7 @@ class DeconzConfig:
         Set callback to set state of device.
         """
         self._apiversion = config.get('apiversion')
+        self._bridgeid = config.get('bridgeid')
         self._linkbutton = config.get('linkbutton')
         self._modelid = config.get('modelid')
         self._name = config.get('name')
@@ -85,6 +86,11 @@ class DeconzConfig:
     def apiversion(self):
         """The version of the deCONZ Rest API."""
         return self._apiversion
+
+    @property
+    def bridgeid(self):
+        """Hardware ID."""
+        return self._bridgeid
 
     @property
     def linkbutton(self):
