@@ -67,3 +67,19 @@ async def async_request(session, url, **kwargs):
     else:
         _LOGGER.debug('HTTP request response: %s', result)
         return result
+
+
+URL_DISCOVER = 'https://dresden-light.appspot.com/discover'
+async def async_discovery(session):
+    """Find bridges allowing gateway discovery."""
+    json_dict = await async_request(session.get, URL_DISCOVER)
+    if json_dict:
+        bridges = []
+        for bridge in json_dict:
+            bridges.append({'bridgeid': bridge['id'],
+                            'host': bridge['internalipaddress'],
+                            'port': bridge['internalport']})
+        print(bridges)
+        return bridges
+    else:
+        return False
