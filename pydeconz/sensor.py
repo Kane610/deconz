@@ -7,6 +7,7 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 CONSUMPTION = ['ZHAConsumption']
+DAYLIGHT = ['Daylight']
 FIRE = ['ZHAFire']
 GENERIC = ['CLIPGenericStatus']
 HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
@@ -19,7 +20,7 @@ SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 WATER = ['ZHAWater']
 
-DECONZ_BINARY_SENSOR = FIRE + OPENCLOSE + PRESENCE + WATER
+DECONZ_BINARY_SENSOR = DAYLIGHT + FIRE + OPENCLOSE + PRESENCE + WATER
 DECONZ_SENSOR = CONSUMPTION + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
 
 
@@ -131,6 +132,59 @@ class Consumption(DeconzSensor):
     def consumption(self):
         """Consumption."""
         return self._consumption
+
+class Daylight(DeconzSensor):
+    """Daylight sensor.
+
+    State parameter is a boolean named 'daylight'.
+    Also has a "status" number.
+    {
+        "config": {
+            "configured": true,
+            "on": true,
+            "sunriseoffset": 30,
+            "sunsetoffset": -30
+        },
+        "etag": "55047cf652a7e594d0ee7e6fae01dd38",
+        "manufacturername": "Philips",
+        "modelid": "PHDL00",
+        "name": "Daylight",
+        "state": {
+            "daylight": true,
+            "lastupdated": "2018-03-24T17:26:12",
+            "status": 170
+        },
+        "swversion": "1.0",
+        "type": "Daylight"
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize daylight sensor."""
+        self._daylight = device['state'].get('daylight')
+        self._status = device['state'].get('status')
+        super().__init__(device_id, device)
+        self._sensor_class = 'daylight'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.daylight
+
+    @property
+    def daylight(self):
+        """If it's daylight or not."""
+        return self._daylight
+
+    @property
+    def status(self):
+        """Daylight status."""
+        return self._status
 
 
 class Fire(DeconzSensor):
@@ -490,6 +544,8 @@ def create_sensor(sensor_id, sensor):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in CONSUMPTION:
         return Consumption(sensor_id, sensor)
+    elif sensor['type'] in DAYLIGHT:
+        return Daylight(sensor_id, sensor)
     elif sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
     elif sensor['type'] in GENERIC:
