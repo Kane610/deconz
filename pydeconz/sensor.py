@@ -163,7 +163,6 @@ class Daylight(DeconzSensor):
     def __init__(self, device_id, device):
         """Initialize daylight sensor."""
         self._daylight = device['state'].get('daylight')
-        self._reachable = True
         self._status = device['state'].get('status')
         super().__init__(device_id, device)
         self._sensor_class = 'daylight'
@@ -187,6 +186,11 @@ class Daylight(DeconzSensor):
     def status(self):
         """Daylight status."""
         return self._status
+
+    @property
+    def reachable(self):
+        """Always reachable, built into deCONZ."""
+        return True
 
 
 class Fire(DeconzSensor):
