@@ -7,6 +7,7 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 CONSUMPTION = ['ZHAConsumption']
+DAYLIGHT = ['Daylight']
 FIRE = ['ZHAFire']
 GENERIC = ['CLIPGenericStatus']
 HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
@@ -20,7 +21,7 @@ TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 WATER = ['ZHAWater']
 
 DECONZ_BINARY_SENSOR = FIRE + OPENCLOSE + PRESENCE + WATER
-DECONZ_SENSOR = CONSUMPTION + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
+DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -131,6 +132,87 @@ class Consumption(DeconzSensor):
     def consumption(self):
         """Consumption."""
         return self._consumption
+
+class Daylight(DeconzSensor):
+    """Daylight sensor built into deCONZ software.
+
+    State parameter is a string derived from 'status' parameter.
+    Strings from daylight.h at https://github.com/dresden-elektronik/deconz-rest-plugin.
+    Also has a 'daylight' boolean.
+    Has no 'reachable' config parameter, so set sensor reachable True here.
+    {
+        "config": {
+            "configured": true,
+            "on": true,
+            "sunriseoffset": 30,
+            "sunsetoffset": -30
+        },
+        "etag": "55047cf652a7e594d0ee7e6fae01dd38",
+        "manufacturername": "Philips",
+        "modelid": "PHDL00",
+        "name": "Daylight",
+        "state": {
+            "daylight": true,
+            "lastupdated": "2018-03-24T17:26:12",
+            "status": 170
+        },
+        "swversion": "1.0",
+        "type": "Daylight"
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize daylight sensor."""
+        self._daylight = device['state'].get('daylight')
+        self._status = device['state'].get('status')
+        super().__init__(device_id, device)
+        self._reachable = True
+        self._sensor_class = 'daylight'
+        self._sensor_icon = 'mdi:white-balance-sunny'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.status
+
+    @property
+    def status(self):
+        """Return the daylight status string."""
+        if self._status == 100:
+            return "nadir"
+        elif self._status == 110:
+            return "night_end"
+        elif self._status == 120:
+            return "nautical_dawn"
+        elif self._status == 130:
+            return "dawn"
+        elif self._status == 140:
+            return "sunrise_start"
+        elif self._status == 150:
+            return "sunrise_end"
+        elif self._status == 160:
+            return "golden_hour_1"
+        elif self._status == 170:
+            return "solar_noon"
+        elif self._status == 180:
+            return "golden_hour_2"
+        elif self._status == 190:
+            return "sunset_start"
+        elif self._status == 200:
+            return "sunset_end"
+        elif self._status == 210:
+            return "dusk"
+        elif self._status == 220:
+            return "nautical_dusk"
+        elif self._status == 230:
+            return "night_start"
+        else:
+            return "unknown"
+
+    @property
+    def daylight(self):
+        """True if daylight, false if not."""
+        return self._daylight
 
 
 class Fire(DeconzSensor):
@@ -497,6 +579,8 @@ def create_sensor(sensor_id, sensor):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in CONSUMPTION:
         return Consumption(sensor_id, sensor)
+    elif sensor['type'] in DAYLIGHT:
+        return Daylight(sensor_id, sensor)
     elif sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
     elif sensor['type'] in GENERIC:
