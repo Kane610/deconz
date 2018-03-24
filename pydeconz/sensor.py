@@ -134,10 +134,11 @@ class Consumption(DeconzSensor):
         return self._consumption
 
 class Daylight(DeconzSensor):
-    """Daylight sensor.
+    """Daylight sensor built into deCONZ software.
 
     State parameter is a boolean named 'daylight'.
-    Also has a "status" number.
+    Also has a 'status' number.
+    Has no 'reachable' config parameter, so set sensor reachable True here.
     {
         "config": {
             "configured": true,
@@ -162,6 +163,7 @@ class Daylight(DeconzSensor):
     def __init__(self, device_id, device):
         """Initialize daylight sensor."""
         self._daylight = device['state'].get('daylight')
+        self._reachable = True
         self._status = device['state'].get('status')
         super().__init__(device_id, device)
         self._sensor_class = 'daylight'
