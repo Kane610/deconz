@@ -165,9 +165,9 @@ class Daylight(DeconzSensor):
         """Initialize daylight sensor."""
         self._daylight = device['state'].get('daylight')
         self._status = device['state'].get('status')
-        self._sensor_icon = 'mdi:white-balance-sunny'
         super().__init__(device_id, device)
         self._sensor_class = 'daylight'
+        self._sensor_icon = 'mdi:white-balance-sunny'
 
     @property
     def state(self):
