@@ -20,8 +20,8 @@ SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 WATER = ['ZHAWater']
 
-DECONZ_BINARY_SENSOR = DAYLIGHT + FIRE + OPENCLOSE + PRESENCE + WATER
-DECONZ_SENSOR = CONSUMPTION + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
+DECONZ_BINARY_SENSOR = FIRE + OPENCLOSE + PRESENCE + WATER
+DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -136,8 +136,9 @@ class Consumption(DeconzSensor):
 class Daylight(DeconzSensor):
     """Daylight sensor built into deCONZ software.
 
-    State parameter is a boolean named 'daylight'.
-    Also has a 'status' number.
+    State parameter is a string derived from 'status' parameter.
+    Strings from daylight.h at https://github.com/dresden-elektronik/deconz-rest-plugin.
+    Also has a 'daylight' boolean.
     Has no 'reachable' config parameter, so set sensor reachable True here.
     {
         "config": {
@@ -164,28 +165,53 @@ class Daylight(DeconzSensor):
         """Initialize daylight sensor."""
         self._daylight = device['state'].get('daylight')
         self._status = device['state'].get('status')
+        self._sensor_icon = 'mdi:white-balance-sunny'
         super().__init__(device_id, device)
         self._sensor_class = 'daylight'
 
     @property
     def state(self):
         """Main state of sensor."""
-        return self.is_tripped
-
-    @property
-    def is_tripped(self):
-        """Sensor is tripped."""
-        return self.daylight
-
-    @property
-    def daylight(self):
-        """If it's daylight or not."""
-        return self._daylight
+        return self.status
 
     @property
     def status(self):
-        """Daylight status."""
-        return self._status
+        """Return the daylight status string."""
+        if self._status == 100:
+            return "nadir"
+        elif self._status == 110:
+            return "night_end"
+        elif self._status == 120:
+            return "nautical_dawn"
+        elif self._status == 130:
+            return "dawn"
+        elif self._status == 140:
+            return "sunrise_start"
+        elif self._status == 150:
+            return "sunrise_end"
+        elif self._status == 160:
+            return "golden_hour_1"
+        elif self._status == 170:
+            return "solar_noon"
+        elif self._status == 180:
+            return "golden_hour_2"
+        elif self._status == 190:
+            return "sunset_start"
+        elif self._status == 200:
+            return "sunset_end"
+        elif self._status == 210:
+            return "dusk"
+        elif self._status == 220:
+            return "nautical_dusk"
+        elif self._status == 230:
+            return "night_start"
+        else:
+            return "unknown"
+
+    @property
+    def daylight(self):
+        """True if daylight, false if not."""
+        return self._daylight
 
     @property
     def reachable(self):
