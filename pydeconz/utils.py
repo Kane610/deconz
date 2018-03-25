@@ -20,7 +20,7 @@ async def async_get_api_key(loop, host, port, username=None, password=None, **kw
     await session.close()
     if response:
         api_key = response[0]['success']['username']
-        _LOGGER.info('API key: %s', api_key)
+        _LOGGER.info("API key: %s", api_key)
         return api_key
     else:
         return False
@@ -51,7 +51,7 @@ async def async_request(session, url, **kwargs):
     """Do a web request and manage response."""
     try:
         with async_timeout.timeout(10):
-            _LOGGER.debug('Sending %s to %s', kwargs, url)
+            _LOGGER.debug("Sending %s to %s", kwargs, url)
             response = await session(url, **kwargs)
         if response.status != 200:
             _LOGGER.error("HTTP status %d, response %s.",
@@ -65,7 +65,7 @@ async def async_request(session, url, **kwargs):
         _LOGGER.error("Error getting deCONZ data from %s.", url)
         return False
     else:
-        _LOGGER.debug('HTTP request response: %s', result)
+        _LOGGER.debug("HTTP request response: %s", result)
         return result
 
 
