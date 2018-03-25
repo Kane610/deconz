@@ -229,10 +229,12 @@ class LightLevel(DeconzSensor):
     """Light level sensor.
 
     State parameter is a string named lightlevel.
+    Also has a boolean 'dark' representing lighting in area of placement.
     """
 
     def __init__(self, device_id, device):
         """Initalize light level sensor."""
+        self._dark = device['state'].get('dark')
         self._lightlevel = device['state'].get('lightlevel')
         super().__init__(device_id, device)
         self._sensor_class = 'lux'
@@ -243,6 +245,11 @@ class LightLevel(DeconzSensor):
         """Main state of sensor."""
         lux = round(10 ** (float(self.lightlevel - 1) / 10000), 1)
         return lux
+
+    @property
+    def dark(self):
+        """If the area near the sensor is light or not."""
+        return self._dark
 
     @property
     def lightlevel(self):
@@ -358,7 +365,7 @@ class Presence(DeconzSensor):
 
     @property
     def dark(self):
-        """If the area near the sensor as light or not."""
+        """If the area near the sensor is light or not."""
         return self._dark
 
     @property
