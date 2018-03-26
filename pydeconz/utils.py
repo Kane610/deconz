@@ -8,14 +8,13 @@ import async_timeout
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_get_api_key(loop, host, port, username=None, password=None, **kwargs):
+async def async_get_api_key(session, host, port, username=None, password=None, **kwargs):
     """Get a new API key for devicetype."""
     url = 'http://' + host + ':' + str(port) + '/api'
     auth = None
     if username and password:
         auth = aiohttp.BasicAuth(username, password=password)
     data = b'{"devicetype": "pydeconz"}'
-    session = aiohttp.ClientSession(loop=loop)
     response = await async_request(session.post, url, auth=auth, data=data)
     await session.close()
     if response:
