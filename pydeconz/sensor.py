@@ -168,6 +168,7 @@ class Daylight(DeconzSensor):
         super().__init__(device_id, device)
         self._sensor_class = 'daylight'
         self._sensor_icon = 'mdi:white-balance-sunny'
+        self._reachable = True
 
     @property
     def state(self):
@@ -212,11 +213,6 @@ class Daylight(DeconzSensor):
     def daylight(self):
         """True if daylight, false if not."""
         return self._daylight
-
-    @property
-    def reachable(self):
-        """Always reachable, built into deCONZ."""
-        return True
 
 
 class Fire(DeconzSensor):
