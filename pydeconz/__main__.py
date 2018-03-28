@@ -20,7 +20,7 @@ async def main(loop, **kwargs):
     if result is False:
         print('Failed to setup deCONZ')
         return False
-    deconz.start()
+    await deconz.start()
     from pprint import pprint
     pprint(deconz.__dict__)
     await deconz.async_delete_state('/lights/2/groups', {'reset':'true'})
@@ -34,8 +34,8 @@ async def main(loop, **kwargs):
 kw = {'host': '10.0.0.10',
       'port': 8088,
       'api_key': '8BA2DD354B',
-      'username': 'delight',
-      'password': 'delight'
+      #'username': 'delight',
+      #'password': 'delight'
       }
 
 loop = asyncio.get_event_loop()
