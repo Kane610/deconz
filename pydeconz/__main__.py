@@ -20,10 +20,10 @@ async def main(loop, **kwargs):
     if result is False:
         print('Failed to setup deCONZ')
         return False
-    await deconz.start()
+    deconz.start()
     from pprint import pprint
     pprint(deconz.__dict__)
-    await deconz.async_delete_state('/lights/2/groups', {'reset':'true'})
+    #await deconz.async_delete_state('/lights/2/groups', {'reset':'true'})
     #for dev_id, dev in deconz.config.values():
     #    pprint(dev.__dict__)
     # await deconz.close()

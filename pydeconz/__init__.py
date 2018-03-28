@@ -27,14 +27,15 @@ class DeconzSession:
         self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
         self.websocket = None
 
-    async def start(self):
+    def start(self):
         """Connect websocket to deCONZ."""
         if self.config:
-            self.websocket = WSClient(self.session,
+            self.websocket = WSClient(self.loop,
+                                      self.session,
                                       self.host,
                                       self.config.websocketport,
                                       self.async_event_handler)
-            self.loop.create_task(self.websocket.start())
+            self.websocket.start()
         else:
             _LOGGER.error('No deCONZ config available')
 
