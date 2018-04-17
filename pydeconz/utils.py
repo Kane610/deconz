@@ -16,7 +16,6 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
         auth = aiohttp.BasicAuth(username, password=password)
     data = b'{"devicetype": "pydeconz"}'
     response = await async_request(session.post, url, auth=auth, data=data)
-    await session.close()
     if response:
         api_key = response[0]['success']['username']
         _LOGGER.info("API key: %s", api_key)
