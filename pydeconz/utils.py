@@ -45,6 +45,18 @@ async def async_delete_all_keys(loop, host, port, api_key, **kwargs):
             await async_delete_api_key(loop, host, port, key)
 
 
+async def async_get_bridgeid(session, host, port, api_key, **kwargs):
+    """Get bridge id for bridge."""
+    url = 'http://' + host + ':' + str(port) + '/api/' + api_key + '/config'
+    response = await async_request(session.get, url)
+    if response:
+        bridgeid = response['bridgeid']
+        _LOGGER.info("Bridge id: %s", bridgeid)
+        return bridgeid
+    else:
+        return False
+
+
 async def async_request(session, url, **kwargs):
     """Do a web request and manage response."""
     try:
