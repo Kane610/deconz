@@ -6,7 +6,7 @@ import logging
 from .config import DeconzConfig
 from .group import DeconzGroup
 from .light import DeconzLight
-from .sensor import create_sensor
+from .sensor import create_sensor, supported_sensor
 from .utils import async_request
 from .websocket import WSClient
 
@@ -26,6 +26,7 @@ class DeconzSession:
         self.host = host
         self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
         self.websocket = None
+        self.async_add_device_callback = kwargs.get('async_add_device')
 
     def start(self):
         """Connect websocket to deCONZ."""
@@ -68,15 +69,16 @@ class DeconzSession:
             self.config = DeconzConfig(config)
 
         for group_id, group in groups.items():
-            self.groups[group_id] = DeconzGroup(group_id, group, self.async_put_state)
+            self.groups[group_id] = DeconzGroup(
+                group_id, group, self.async_put_state)
 
         for light_id, light in lights.items():
-            self.lights[light_id] = DeconzLight(light_id, light, self.async_put_state)
+            self.lights[light_id] = DeconzLight(
+                light_id, light, self.async_put_state)
 
         for sensor_id, sensor in sensors.items():
-            new_sensor = create_sensor(sensor_id, sensor)
-            if new_sensor:
-                self.sensors[sensor_id] = new_sensor
+            if supported_sensor(sensor):
+                self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
 
         return True
 
@@ -120,7 +122,26 @@ class DeconzSession:
             "state": { "buttonevent": 2002 }
         }
         """
-        if event['e'] == 'changed':
+        if event['e'] == 'added':
+            if event['r'] == 'lights' and event['id'] not in self.lights:
+                device_type = 'light'
+                device = self.lights[event['id']] = DeconzLight(
+                    event['id'], event['light'], self.async_put_state)
+            elif event['r'] == 'sensors' and event['id'] not in self.sensors:
+                if supported_sensor(event['sensor']):
+                    device_type = 'sensor'
+                    device = self.sensors[event['id']] = create_sensor(
+                        event['id'], event['sensor'])
+                else:
+                    _LOGGER.warn('Unsupported sensor %s', event)
+                    return
+            else:
+                _LOGGER.debug('Unsupported event %s', event)
+                return
+            if self.async_add_device_callback:
+                self.async_add_device_callback(device_type, device)
+
+        elif event['e'] == 'changed':
             if event['r'] == 'groups' and event['id'] in self.groups:
                 self.groups[event['id']].async_update(event)
             elif event['r'] == 'lights' and event['id'] in self.lights:
@@ -128,6 +149,8 @@ class DeconzSession:
             elif event['r'] == 'sensors' and event['id'] in self.sensors:
                 self.sensors[event['id']].async_update(event)
             else:
-                _LOGGER.debug('Not supported event %s', event)
+                _LOGGER.debug('Unsupported event %s', event)
+        elif event['e'] == 'deleted':
+            _LOGGER.debug('Removed event %s', event)
         else:
-            _LOGGER.debug('Not supported event %s', event)
+            _LOGGER.debug('Unsupported event %s', event)

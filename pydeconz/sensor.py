@@ -603,6 +603,11 @@ def create_sensor(sensor_id, sensor):
         return Temperature(sensor_id, sensor)
     elif sensor['type'] in WATER:
         return Water(sensor_id, sensor)
-    else:
-        _LOGGER.warning('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
-        return None
+
+
+def supported_sensor(sensor):
+    """Check if sensor is supported by pydeconz."""
+    if sensor['type'] in DECONZ_BINARY_SENSOR + DECONZ_SENSOR:
+        return True
+    _LOGGER.info('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
+    return False
