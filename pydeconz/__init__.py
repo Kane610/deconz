@@ -32,6 +32,7 @@ class DeconzSession:
         """Connect websocket to deCONZ."""
         if self.config:
             self.websocket = WSClient(self.loop,
+                                      self.session,
                                       self.host,
                                       self.config.websocketport,
                                       self.async_event_handler)
