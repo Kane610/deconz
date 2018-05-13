@@ -125,6 +125,8 @@ class Consumption(DeconzSensor):
     @property
     def state(self):
         """Main state of sensor."""
+        if self.consumption is None:
+            return None
         consumption = float(self.consumption/1000)
         return consumption
 
@@ -298,6 +300,8 @@ class Humidity(DeconzSensor):
     @property
     def state(self):
         """Main state of sensor."""
+        if self.humidity is None:
+            return None
         humidity = round(float(self.humidity) / 100, 1)
         return humidity
 
@@ -325,6 +329,8 @@ class LightLevel(DeconzSensor):
     @property
     def state(self):
         """Main state of sensor."""
+        if self.lightlevel is None:
+            return None
         lux = round(10 ** (float(self.lightlevel - 1) / 10000), 1)
         return lux
 
@@ -520,6 +526,8 @@ class Temperature(DeconzSensor):
     @property
     def state(self):
         """Main state of sensor."""
+        if self.temperature is None:
+            return None
         celsius = round(float(self.temperature) / 100, 1)
         return celsius
 
