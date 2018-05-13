@@ -24,23 +24,19 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
         return False
 
 
-async def async_delete_api_key(loop, host, port, api_key, **kwargs):
+async def async_delete_api_key(session, host, port, api_key, **kwargs):
     """Delete API key from deCONZ."""
     url = 'http://' + host + ':' + str(port) + '/api' + api_key + '/config/whitelist/' + api_key
-    session = aiohttp.ClientSession(loop=loop)
     response = await async_request(session.delete, url)
-    await session.close()
     if response:
         _LOGGER.info(response)
 
 
-async def async_delete_all_keys(loop, host, port, api_key, **kwargs):
+async def async_delete_all_keys(session, host, port, api_key, **kwargs):
     """Delete all API keys except for the one provided to the method."""
     url = 'http://' + host + ':' + str(port) + '/api' + api_key + '/config'
-    session = aiohttp.ClientSession(loop=loop)
     response = await async_request(session.get, url)
-    await session.close()
-    for key, _ in response['whitelist'].items():
+    for key in response['whitelist'].keys():
         if key != api_key:
             await async_delete_api_key(loop, host, port, key)
 
