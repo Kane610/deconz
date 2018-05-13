@@ -38,7 +38,7 @@ async def async_delete_all_keys(session, host, port, api_key, **kwargs):
     response = await async_request(session.get, url)
     for key in response['whitelist'].keys():
         if key != api_key:
-            await async_delete_api_key(loop, host, port, key)
+            await async_delete_api_key(session, host, port, key)
 
 
 async def async_get_bridgeid(session, host, port, api_key, **kwargs):
