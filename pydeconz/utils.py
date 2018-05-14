@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_get_api_key(session, host, port, username=None, password=None, **kwargs):
     """Get a new API key for devicetype."""
-    url = 'http://' + host + ':' + str(port) + '/api'
+    url = 'http://{}:{}/api'.format(host, str(port))
     auth = None
     if username and password:
         auth = aiohttp.BasicAuth(username, password=password)
@@ -26,7 +26,7 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
 
 async def async_delete_api_key(session, host, port, api_key, **kwargs):
     """Delete API key from deCONZ."""
-    url = 'http://' + host + ':' + str(port) + '/api' + api_key + '/config/whitelist/' + api_key
+    url = 'http://{}:{}/api/{}/config/whitelist/{3}'.format(host, str(port), api_key)
     response = await async_request(session.delete, url)
     if response:
         _LOGGER.info(response)
@@ -34,7 +34,7 @@ async def async_delete_api_key(session, host, port, api_key, **kwargs):
 
 async def async_delete_all_keys(session, host, port, api_key, **kwargs):
     """Delete all API keys except for the one provided to the method."""
-    url = 'http://' + host + ':' + str(port) + '/api' + api_key + '/config'
+    url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
     response = await async_request(session.get, url)
     for key in response['whitelist'].keys():
         if key != api_key:
@@ -43,7 +43,7 @@ async def async_delete_all_keys(session, host, port, api_key, **kwargs):
 
 async def async_get_bridgeid(session, host, port, api_key, **kwargs):
     """Get bridge id for bridge."""
-    url = 'http://' + host + ':' + str(port) + '/api/' + api_key + '/config'
+    url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
     response = await async_request(session.get, url)
     if response:
         bridgeid = response['bridgeid']
