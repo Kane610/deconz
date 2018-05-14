@@ -31,7 +31,7 @@ class WSClient:
 
     async def running(self):
         """Start websocket connection."""
-        url = 'http://' + self.host + ':' + str(self.port)
+        url = 'http://{}:{}'.format(self.host, self.port)
         try:
             async with self.session.ws_connect(url) as ws:
                 self.state = STATE_RUNNING
