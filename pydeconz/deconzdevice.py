@@ -1,6 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
+from pprint import pformat
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class DeconzDevice:
         self._type = device.get('type')
         self._uniqueid = device.get('uniqueid')
         self._async_callback = []
-        _LOGGER.debug('%s created as %s', self._name, self.__dict__)
+        _LOGGER.debug('%s created as \n%s', self._name, pformat(self.__dict__))
 
     def register_async_callback(self, async_callback):
         """Register callback for signalling.

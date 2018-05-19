@@ -2,6 +2,7 @@
 
 import json
 import logging
+from pprint import pformat
 
 from .config import DeconzConfig
 from .group import DeconzGroup
@@ -24,9 +25,10 @@ class DeconzSession:
         self.loop = loop
         self.session = websession
         self.host = host
-        self.api_url = 'http://%s:%d/api/%s' % (host, port, api_key)
+        self.api_url = 'http://{}:{}/api/{}'.format(host, port, api_key)
         self.websocket = None
         self.async_add_device_callback = kwargs.get('async_add_device')
+        self.async_connection_status_callback = kwargs.get('connection_status')
 
     def start(self):
         """Connect websocket to deCONZ."""
@@ -35,7 +37,7 @@ class DeconzSession:
                                       self.session,
                                       self.host,
                                       self.config.websocketport,
-                                      self.async_event_handler)
+                                      self.async_session_handler)
             self.websocket.start()
         else:
             _LOGGER.error('No deCONZ config available')
@@ -61,6 +63,9 @@ class DeconzSession:
         if not data:
             _LOGGER.error('Couldn\'t load data from deCONZ')
             return False
+
+        _LOGGER.debug(pformat(data))
+
         config = data.get('config', {})
         groups = data.get('groups', {})
         lights = data.get('lights', {})
@@ -111,6 +116,19 @@ class DeconzSession:
         url = self.api_url + field
         response_dict = await async_request(session, url)
         return response_dict
+
+    def async_session_handler(self, signal):
+        """Signalling from websocket.
+
+           data - new data available for processing.
+           state - network state has changed.
+        """
+        if signal == 'data':
+            self.async_event_handler(self.websocket.data)
+        elif signal == 'state':
+            if self.async_connection_status_callback:
+                self.async_connection_status_callback(
+                    self.websocket.state == 'running')
 
     def async_event_handler(self, event):
         """Receive event from websocket and identifies where the event belong.

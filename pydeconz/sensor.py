@@ -619,8 +619,3 @@ def supported_sensor(sensor):
         return True
     _LOGGER.info('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
     return False
-
-
-def clip_sensor(sensor):
-    """Check if sensor is a CLIP sensor."""
-    return sensor['type'].startswith('CLIP')

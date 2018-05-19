@@ -23,11 +23,30 @@ class WSClient:
         self.session = session
         self.host = host
         self.port = port
-        self.async_callback = async_callback
-        self.state = STATE_STARTING
+        self.async_session_handler_callback = async_callback
+        self._data = None
+        self._state = None
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def state(self):
+        """"""
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        """"""
+        self._state = value
+        _LOGGER.debug('Websocket %s', value)
+        self.async_session_handler_callback('state')
 
     def start(self):
-        self.loop.create_task(self.running())
+        if self.state != STATE_RUNNING:
+            self.state = STATE_STARTING
+            self.loop.create_task(self.running())
 
     async def running(self):
         """Start websocket connection."""
@@ -37,8 +56,9 @@ class WSClient:
                 self.state = STATE_RUNNING
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.TEXT:
+                        self._data = json.loads(msg.data)
+                        self.async_session_handler_callback('data')
                         _LOGGER.debug('Websocket data: %s', msg.data)
-                        self.async_callback(json.loads(msg.data))
                     elif msg.type == aiohttp.WSMsgType.CLOSED:
                         break
                     elif msg.type == aiohttp.WSMsgType.ERROR:
