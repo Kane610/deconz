@@ -74,7 +74,13 @@ class DeconzLightBase(DeconzDevice):
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
         if self._x is not None and self._y is not None:
-            return (self._x, self._y)
+            x = self._x
+            if self._x > 1:
+                x = self._x / 65555
+            y = self._y
+            if self._y > 1:
+                y = self._y / 65555
+            return (x, y)
         else:
             return None
 
