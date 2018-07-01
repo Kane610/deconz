@@ -9,7 +9,8 @@ _LOGGER = logging.getLogger(__name__)
 CONSUMPTION = ['ZHAConsumption']
 DAYLIGHT = ['Daylight']
 FIRE = ['ZHAFire']
-GENERIC = ['CLIPGenericStatus']
+GENERICFLAG = ['CLIPGenericFLAG']
+GENERICSTATUS = ['CLIPGenericStatus']
 HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
 LIGHTLEVEL = ['ZHALightLevel', 'CLIPLightLevel']
 OPENCLOSE = ['ZHAOpenClose', 'CLIPOpenClose']
@@ -20,8 +21,8 @@ SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 WATER = ['ZHAWater']
 
-DECONZ_BINARY_SENSOR = FIRE + OPENCLOSE + PRESENCE + WATER
-DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERIC + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
+DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + WATER
+DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -262,8 +263,45 @@ class Fire(DeconzSensor):
         return self._fire
 
 
-class Generic(DeconzSensor):
-    """Generic sensor.
+class GenericFlag(DeconzSensor):
+    """Generic flag sensor.
+
+    State parameter is a bool named 'flag'.
+    {
+        "config": {
+            "on": true,
+            "reachable": true
+        },
+        "modelid": "Switch",
+        "name": "Kitchen Switch",
+        "state": {
+            "flag": true,
+            "lastupdated": "2018-07-01T10:40:35"
+        },
+        "swversion": "1.0.0",
+        "type": "CLIPGenericFlag",
+        "uniqueid": "kitchen-switch"
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initalize flag sensor."""
+        self._flag = device['state'].get('flag')
+        super().__init__(device_id, device)
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.flag
+
+    @property
+    def flag(self):
+        """Flag status."""
+        return self._flag
+
+
+class GenericStatus(DeconzSensor):
+    """Generic status sensor.
 
     State parameter is a number named 'status'.
     """
@@ -591,8 +629,10 @@ def create_sensor(sensor_id, sensor):
         return Daylight(sensor_id, sensor)
     elif sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
-    elif sensor['type'] in GENERIC:
-        return Generic(sensor_id, sensor)
+    elif sensor['type'] in GENERICFLAG:
+        return GenericFlag(sensor_id, sensor)
+    elif sensor['type'] in GENERICSTATUS:
+        return GenericStatus(sensor_id, sensor)
     elif sensor['type'] in HUMIDITY:
         return Humidity(sensor_id, sensor)
     elif sensor['type'] in LIGHTLEVEL:
