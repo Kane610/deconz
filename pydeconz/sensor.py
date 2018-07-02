@@ -253,14 +253,14 @@ class Fire(DeconzSensor):
         return self.is_tripped
 
     @property
-    def is_tripped(self):
-        """Sensor is tripped."""
-        return self.fire
-
-    @property
     def fire(self):
         """Fire detected."""
         return self._fire
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.fire
 
 
 class GenericFlag(DeconzSensor):
@@ -298,6 +298,11 @@ class GenericFlag(DeconzSensor):
     def flag(self):
         """Flag status."""
         return self._flag
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.flag
 
 
 class GenericStatus(DeconzSensor):
@@ -485,14 +490,14 @@ class Presence(DeconzSensor):
         return self.is_tripped
 
     @property
-    def is_tripped(self):
-        """Sensor is tripped."""
-        return self.presence
-
-    @property
     def dark(self):
         """If the area near the sensor is light or not."""
         return self._dark
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.presence
 
     @property
     def presence(self):
