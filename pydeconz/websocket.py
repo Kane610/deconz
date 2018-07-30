@@ -102,6 +102,7 @@ class WSClient(asyncio.Protocol):
         self._data = None
         self._state = None
         self.transport = None
+        _LOGGER.warning('Using legacy websocket, this is not recommended')
 
     def start(self):
         """Start websocket connection."""

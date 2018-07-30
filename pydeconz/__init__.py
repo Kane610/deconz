@@ -9,7 +9,6 @@ from .group import DeconzGroup
 from .light import DeconzLight
 from .sensor import create_sensor, supported_sensor
 from .utils import async_request
-from .websocket import WSClient
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +25,11 @@ class DeconzSession:
         self.session = websession
         self.host = host
         self.api_url = 'http://{}:{}/api/{}'.format(host, port, api_key)
+        if 'legacy_websocket' in kwargs:
+            from .websocket import WSClient as ws_client
+        else:
+            from .websocket import AIOWSClient as ws_client
+        self.ws_client = ws_client
         self.websocket = None
         self.async_add_device_callback = kwargs.get('async_add_device')
         self.async_connection_status_callback = kwargs.get('connection_status')
@@ -33,11 +37,9 @@ class DeconzSession:
     def start(self):
         """Connect websocket to deCONZ."""
         if self.config:
-            self.websocket = WSClient(self.loop,
-                                      self.session,
-                                      self.host,
-                                      self.config.websocketport,
-                                      self.async_session_handler)
+            self.websocket = self.ws_client(
+                self.loop, self.session, self.host,
+                self.config.websocketport, self.async_session_handler)
             self.websocket.start()
         else:
             _LOGGER.error('No deCONZ config available')
@@ -152,7 +154,7 @@ class DeconzSession:
                     device = self.sensors[event['id']] = create_sensor(
                         event['id'], event['sensor'])
                 else:
-                    _LOGGER.warn('Unsupported sensor %s', event)
+                    _LOGGER.warning('Unsupported sensor %s', event)
                     return
             else:
                 _LOGGER.debug('Unsupported event %s', event)
