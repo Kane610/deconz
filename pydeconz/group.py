@@ -20,6 +20,7 @@ class DeconzGroup(DeconzLightBase):
         Set callback to set state of device.
         """
         deconz_id = '/groups/' + device_id
+        self._all_on = device['state'].get('all_on')
         self._any_on = device['state'].get('any_on')
         self._bri = device['action'].get('bri')
         self._class = device.get('class')
@@ -76,6 +77,11 @@ class DeconzGroup(DeconzLightBase):
     def groupclass(self):
         """"""
         return self._class
+
+    @property
+    def all_on(self):
+        """True if all lights in light group are on"""
+        return self._all_on
 
     @property
     def devicemembership(self):
