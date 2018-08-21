@@ -72,6 +72,7 @@ class DeconzConfig:
         self._apiversion = config.get('apiversion')
         self._bridgeid = config.get('bridgeid')
         self._linkbutton = config.get('linkbutton')
+        self._mac = config.get('mac')
         self._modelid = config.get('modelid')
         self._name = config.get('name')
         self._networkopenduration = config.get('networkopenduration')
@@ -96,6 +97,11 @@ class DeconzConfig:
     def linkbutton(self):
         """True if the gateway is unlocked."""
         return self._linkbutton
+
+    @property
+    def mac(self):
+        """MAC address of the gateway"""
+        return self._mac
 
     @property
     def modelid(self):
@@ -134,6 +140,6 @@ class DeconzConfig:
     @property
     def zigbeechannel(self):
         """The current wireless frequency channel used by the Gateway.
-        
+
         Supported channels: 11, 15, 20, 25."""
         return self._zigbeechannel
