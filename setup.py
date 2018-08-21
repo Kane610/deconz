@@ -2,17 +2,17 @@
 
 # https://jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/
 # http://peterdowns.com/posts/first-time-with-pypi.html
-# pip install -e /home/pi/pydeconz/
+# pip install -e .
 # Upload to PyPI Live
 # python setup.py sdist bdist_wheel
-# twine upload dist/pydeconz-*
+# twine upload dist/pydeconz-* --skip-existing
 
 from setuptools import setup
 
 setup(
     name='pydeconz',
     packages=['pydeconz'],
-    version='43',
+    version='44',
     description='A Python library for communicating with deCONZ REST-API from Dresden Elektronik',
     author='Robert Svensson',
     author_email='Kane610@users.noreply.github.com',
