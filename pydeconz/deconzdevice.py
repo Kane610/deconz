@@ -23,7 +23,7 @@ class DeconzDevice:
         self._swversion = device.get('swversion')
         self._type = device.get('type')
         self._uniqueid = device.get('uniqueid')
-        self._async_callback = []
+        self._async_callbacks = []
         _LOGGER.debug('%s created as \n%s', self._name, pformat(self.__dict__))
 
     def register_async_callback(self, async_callback):
@@ -32,7 +32,14 @@ class DeconzDevice:
         Callback will be called at the end of
         updating device information in self.async_update.
         """
-        self._async_callback.append(async_callback)
+        self._async_callbacks.append(async_callback)
+
+    def remove_callback(self, callback):
+        """Remove callback previously registered."""
+        if callback in self._async_callbacks:
+            print('remove', self._async_callbacks)
+            self._async_callbacks.remove(callback)
+            print('remov2', self._async_callbacks)
 
     def update_attr(self, attr):
         """Update input attr in self.
@@ -52,7 +59,7 @@ class DeconzDevice:
 
         Reason is used to convey a message to upper implementation.
         """
-        for async_signal_update in self._async_callback:
+        for async_signal_update in self._async_callbacks:
             async_signal_update(reason)
 
     def as_dict(self):
