@@ -60,7 +60,9 @@ class AIOWSClient:
             async with self.session.ws_connect(url) as ws:
                 self.state = STATE_RUNNING
                 async for msg in ws:
-                    if msg.type == aiohttp.WSMsgType.TEXT:
+                    if self.state == STATE_STOPPED:
+                        break
+                    elif msg.type == aiohttp.WSMsgType.TEXT:
                         self._data = json.loads(msg.data)
                         self.async_session_handler_callback('data')
                         _LOGGER.debug('Websocket data: %s', msg.data)
