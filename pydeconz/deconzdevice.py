@@ -37,9 +37,7 @@ class DeconzDevice:
     def remove_callback(self, callback):
         """Remove callback previously registered."""
         if callback in self._async_callbacks:
-            print('remove', self._async_callbacks)
             self._async_callbacks.remove(callback)
-            print('remov2', self._async_callbacks)
 
     def update_attr(self, attr):
         """Update input attr in self.
