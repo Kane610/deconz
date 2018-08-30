@@ -22,7 +22,8 @@ TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 WATER = ['ZHAWater']
 
 DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + WATER
-DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
+DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + \
+                LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
 
 
 class DeconzSensor(DeconzDevice):
@@ -140,7 +141,8 @@ class Daylight(DeconzSensor):
     """Daylight sensor built into deCONZ software.
 
     State parameter is a string derived from 'status' parameter.
-    Strings from daylight.h at https://github.com/dresden-elektronik/deconz-rest-plugin.
+    Strings from daylight.h at
+    https://github.com/dresden-elektronik/deconz-rest-plugin.
     Also has a 'daylight' boolean.
     Has no 'reachable' config parameter, so set sensor reachable True here.
     {
@@ -662,5 +664,6 @@ def supported_sensor(sensor):
     """Check if sensor is supported by pydeconz."""
     if sensor['type'] in DECONZ_BINARY_SENSOR + DECONZ_SENSOR:
         return True
-    _LOGGER.info('Unsupported sensor type %s (%s)', sensor['type'], sensor['name'])
+    _LOGGER.info('Unsupported sensor type %s (%s)',
+                 sensor['type'], sensor['name'])
     return False
