@@ -60,7 +60,10 @@ class DeconzSession:
         return scenes
 
     async def async_load_parameters(self):
-        """Load deCONZ parameters."""
+        """Load deCONZ parameters.
+
+        Returns lists of indices of which devices was added.
+        """
         data = await self.async_get_state('')
         if not data:
             _LOGGER.error('Couldn\'t load data from deCONZ')
@@ -73,22 +76,32 @@ class DeconzSession:
         lights = data.get('lights', {})
         sensors = data.get('sensors', {})
 
+        updates = {'group': [],
+                   'light': [],
+                   'sensor': []}
+
         if not self.config:
             self.config = DeconzConfig(config)
 
         for group_id, group in groups.items():
-            self.groups[group_id] = DeconzGroup(
-                group_id, group, self.async_put_state)
+            if group_id not in self.groups:
+                self.groups[group_id] = DeconzGroup(
+                    group_id, group, self.async_put_state)
+                updates['group'].append(group_id)
 
         for light_id, light in lights.items():
-            self.lights[light_id] = DeconzLight(
-                light_id, light, self.async_put_state)
+            if light_id not in self.lights:
+                self.lights[light_id] = DeconzLight(
+                    light_id, light, self.async_put_state)
+                updates['light'].append(light_id)
 
         for sensor_id, sensor in sensors.items():
             if supported_sensor(sensor):
-                self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
+                if sensor_id not in self.sensors:
+                    self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
+                    updates['sensor'].append(sensor_id)
 
-        return True
+        return updates
 
     async def async_put_state(self, field, data):
         """Set state of object in deCONZ.
