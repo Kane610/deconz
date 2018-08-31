@@ -40,9 +40,7 @@ class DeconzGroup(DeconzLightBase):
         self._scenes = {}
         self._x, self._y = device['action'].get('xy', (None, None))
         super().__init__(deconz_id, device, async_set_state_callback)
-        for scene_json in device.get('scenes'):
-            scene = DeconzScene(self, scene_json, async_set_state_callback)
-            self._scenes[scene.id] = scene
+        self.async_add_scenes(device.get('scenes'), async_set_state_callback)
 
     async def async_set_state(self, data):
         """Set state of light group.
@@ -129,6 +127,14 @@ class DeconzGroup(DeconzLightBase):
     def scenes(self):
         """A list of scenes of the group."""
         return self._scenes
+
+    def async_add_scenes(self, scenes, async_set_state_callback):
+        """Add scenes belonging to group."""
+        self._scenes = {
+            scene['id']: DeconzScene(self, scene, async_set_state_callback)
+            for scene in scenes
+            if scene['id'] not in self._scenes
+        }
 
 
 class DeconzScene:

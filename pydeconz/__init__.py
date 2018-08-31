@@ -19,6 +19,7 @@ class DeconzSession:
         """Setup session and host information."""
         self.groups = {}
         self.lights = {}
+        self.scenes = {}
         self.sensors = {}
         self.config = None
         self.loop = loop
@@ -50,16 +51,7 @@ class DeconzSession:
         if self.websocket:
             self.websocket.stop()
 
-    @property
-    def scenes(self):
-        """Return all scenes available."""
-        scenes = {}
-        for group in self.groups.values():
-            for scene in group.scenes.values():
-                scenes[group.id + '_' + scene.id] = scene
-        return scenes
-
-    async def async_load_parameters(self):
+    async def async_load_parameters(self) -> bool:
         """Load deCONZ parameters.
 
         Returns lists of indices of which devices was added.
@@ -76,34 +68,43 @@ class DeconzSession:
         lights = data.get('lights', {})
         sensors = data.get('sensors', {})
 
-        updates = {'group': [],
-                   'light': [],
-                   'sensor': []}
-
         if not self.config:
             self.config = DeconzConfig(config)
 
+        # Update scene for existing groups
         for group_id, group in groups.items():
-            if group_id not in self.groups:
-                self.groups[group_id] = DeconzGroup(
-                    group_id, group, self.async_put_state)
-                updates['group'].append(group_id)
+            if group_id in self.groups:
+                self.groups[group_id].async_add_scenes(
+                    group.get('scenes'), self.async_put_state)
 
-        for light_id, light in lights.items():
-            if light_id not in self.lights:
-                self.lights[light_id] = DeconzLight(
-                    light_id, light, self.async_put_state)
-                updates['light'].append(light_id)
+        self.groups.update({
+            group_id: DeconzGroup(group_id, group, self.async_put_state)
+            for group_id, group in groups.items()
+            if group_id not in self.groups
+        })
 
-        for sensor_id, sensor in sensors.items():
-            if supported_sensor(sensor):
-                if sensor_id not in self.sensors:
-                    self.sensors[sensor_id] = create_sensor(sensor_id, sensor)
-                    updates['sensor'].append(sensor_id)
+        self.lights.update({
+            light_id: DeconzLight(light_id, light, self.async_put_state)
+            for light_id, light in lights.items()
+            if light_id not in self.lights
+        })
 
-        return updates
+        self.scenes.update({
+            group.id + '_' + scene.id: scene
+            for group in self.groups.values()
+            for scene in group.scenes.values()
+            if group.id + '_' + scene.id not in self.scenes
+        })
 
-    async def async_put_state(self, field, data):
+        self.sensors.update({
+            sensor_id: create_sensor(sensor_id, sensor)
+            for sensor_id, sensor in sensors.items()
+            if supported_sensor(sensor) and sensor_id not in self.sensors
+        })
+
+        return True
+
+    async def async_put_state(self, field: str, data: dict):
         """Set state of object in deCONZ.
 
         Field is a string representing a specific device in deCONZ
@@ -119,7 +120,7 @@ class DeconzSession:
         response_dict = await async_request(session, url, data=jsondata)
         return response_dict
 
-    async def async_get_state(self, field):
+    async def async_get_state(self, field: str) -> dict:
         """Get state of object in deCONZ.
 
         Field is a string representing an API endpoint or lower
@@ -132,7 +133,7 @@ class DeconzSession:
         response_dict = await async_request(session, url)
         return response_dict
 
-    def async_session_handler(self, signal):
+    def async_session_handler(self, signal: str):
         """Signalling from websocket.
 
            data - new data available for processing.
@@ -145,7 +146,7 @@ class DeconzSession:
                 self.async_connection_status_callback(
                     self.websocket.state == 'running')
 
-    def async_event_handler(self, event):
+    def async_event_handler(self, event: dict):
         """Receive event from websocket and identifies where the event belong.
 
         {
@@ -157,10 +158,12 @@ class DeconzSession:
         }
         """
         if event['e'] == 'added':
+
             if event['r'] == 'lights' and event['id'] not in self.lights:
                 device_type = 'light'
                 device = self.lights[event['id']] = DeconzLight(
                     event['id'], event['light'], self.async_put_state)
+
             elif event['r'] == 'sensors' and event['id'] not in self.sensors:
                 if supported_sensor(event['sensor']):
                     device_type = 'sensor'
@@ -169,22 +172,30 @@ class DeconzSession:
                 else:
                     _LOGGER.warning('Unsupported sensor %s', event)
                     return
+
             else:
                 _LOGGER.debug('Unsupported event %s', event)
                 return
+
             if self.async_add_device_callback:
                 self.async_add_device_callback(device_type, device)
 
         elif event['e'] == 'changed':
+
             if event['r'] == 'groups' and event['id'] in self.groups:
                 self.groups[event['id']].async_update(event)
+
             elif event['r'] == 'lights' and event['id'] in self.lights:
                 self.lights[event['id']].async_update(event)
+
             elif event['r'] == 'sensors' and event['id'] in self.sensors:
                 self.sensors[event['id']].async_update(event)
+
             else:
                 _LOGGER.debug('Unsupported event %s', event)
+
         elif event['e'] == 'deleted':
             _LOGGER.debug('Removed event %s', event)
+
         else:
             _LOGGER.debug('Unsupported event %s', event)
