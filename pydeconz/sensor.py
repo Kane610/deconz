@@ -6,6 +6,7 @@ from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
+ALARM = ['ZHAAlarm']
 CONSUMPTION = ['ZHAConsumption']
 DAYLIGHT = ['Daylight']
 FIRE = ['ZHAFire']
@@ -19,11 +20,13 @@ PRESENCE = ['ZHAPresence', 'CLIPPresence']
 PRESSURE = ['ZHAPressure', 'CLIPPressure']
 SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
+THERMOSTAT = ['ZHAThermostat', 'CLIPThermostat']
 WATER = ['ZHAWater']
 
 DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + WATER
 DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + \
-                LIGHTLEVEL + POWER + PRESSURE + TEMPERATURE + SWITCH
+                LIGHTLEVEL + POWER + PRESSURE + SWITCH + TEMPERATURE + \
+                THERMOSTAT
 
 
 class DeconzSensor(DeconzDevice):
@@ -38,8 +41,11 @@ class DeconzSensor(DeconzDevice):
         deconz_id = '/sensors/' + device_id
         self._battery = device['config'].get('battery')
         self._ep = device.get('ep')
+        self._lowbattery = device['state'].get('lowbattery')
         self._on = device['config'].get('on')
         self._reachable = device['config'].get('reachable')
+        self._tampered = device['state'].get('tampered')
+        # self._temperature = device['config'].get('temperature')
         self._sensor_class = None
         self._sensor_icon = None
         self._sensor_unit = None
@@ -70,6 +76,11 @@ class DeconzSensor(DeconzDevice):
         return self._ep
 
     @property
+    def lowbattery(self):
+        """Low battery."""
+        return self._lowbattery
+
+    @property
     def on(self):
         """Declare if the sensor is on or off."""
         return self._on
@@ -93,6 +104,60 @@ class DeconzSensor(DeconzDevice):
     def sensor_unit(self):
         """What unit of measurement the sensor reports."""
         return self._sensor_unit
+
+    @property
+    def tampered(self):
+        """Tampered."""
+        return self._tampered
+
+    # @property
+    # def temperature(self):
+    #     """Temperature."""
+    #     return self._temperature
+
+
+class Alarm(DeconzSensor):
+    """Alarm sensor.
+
+    {
+        'config': {
+            'battery': 100,
+            'on': True,
+            'reachable': True,
+            'temperature': 2600
+        },
+        'ep': 1,
+        'etag': '18c0f3c2100904e31a7f938db2ba9ba9',
+        'manufacturername': 'dresden elektronik',
+        'modelid': 'lumi.sensor_motion.aq2',
+        'name': 'Alarm 10',
+        'state': {
+            'alarm': None,
+            'lastupdated': 'none',
+            'lowbattery': None,
+            'tampered': None
+        },
+        'swversion': '20170627',
+        'type': 'ZHAAlarm',
+        'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0500'
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize alarm sensor."""
+        self._alarm = device['state'].get('alarm')
+        super().__init__(device_id, device)
+        self._sensor_class = 'motion'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.alarm
+
+    @property
+    def alarm(self):
+        """Alarm."""
+        return self._alarm
 
 
 class Consumption(DeconzSensor):
@@ -168,8 +233,11 @@ class Daylight(DeconzSensor):
 
     def __init__(self, device_id, device):
         """Initialize daylight sensor."""
+        self._configured = device['state'].get('configured')
         self._daylight = device['state'].get('daylight')
         self._status = device['state'].get('status')
+        self._sunriseoffset = device['config'].get('sunriseoffset')
+        self._sunsetoffset = device['config'].get('sunsetoffset')
         super().__init__(device_id, device)
         self._reachable = True
         self._sensor_class = 'daylight'
@@ -179,6 +247,16 @@ class Daylight(DeconzSensor):
     def state(self):
         """Main state of sensor."""
         return self.status
+
+    @property
+    def configured(self):
+        """Is daylight sensor configured."""
+        return self._configured
+
+    @property
+    def daylight(self):
+        """True if daylight, false if not."""
+        return self._daylight
 
     @property
     def status(self):
@@ -215,9 +293,14 @@ class Daylight(DeconzSensor):
             return "unknown"
 
     @property
-    def daylight(self):
-        """True if daylight, false if not."""
-        return self._daylight
+    def sunriseoffset(self):
+        """Sunrise offset."""
+        return self._sunriseoffset
+
+    @property
+    def sunsetoffset(self):
+        """Sunset offset."""
+        return self._sunsetoffset
 
 
 class Fire(DeconzSensor):
@@ -360,13 +443,41 @@ class LightLevel(DeconzSensor):
     """Light level sensor.
 
     State parameter is a string named lightlevel.
-    Also has a boolean 'dark' representing lighting in area of placement.
+    {
+        'config': {
+            'battery': 100,
+            'on': True,
+            'reachable': True,
+            'temperature': 2600,
+            'tholddark': 12000,
+            'tholdoffset': 7000
+        },
+        'ep': 1,
+        'etag': '26e97d94b471c1799a1a5951cee7938b',
+        'manufacturername': 'dresden elektronik',
+        'modelid': 'lumi.sensor_motion.aq2',
+        'name': 'LightLevel 9',
+        'state': {
+            'dark': True,
+            'daylight': False,
+            'lastupdated': '2019-01-29T07:19:53',
+            'lightlevel': 0,
+            'lux': 0
+        },
+        'swversion': '20170627',
+        'type': 'ZHALightLevel',
+        'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0400'
+    }
     """
 
     def __init__(self, device_id, device):
         """Initalize light level sensor."""
         self._dark = device['state'].get('dark')
+        self._daylight = device['state'].get('daylight')
         self._lightlevel = device['state'].get('lightlevel')
+        self._lux = device['state'].get('lux')
+        self._tholddark = device['config'].get('tholddark')
+        self._tholdoffset = device['config'].get('tholdoffset')
         super().__init__(device_id, device)
         self._sensor_class = 'lux'
         self._sensor_unit = 'lux'
@@ -385,9 +496,29 @@ class LightLevel(DeconzSensor):
         return self._dark
 
     @property
+    def daylight(self):
+        """Daylight."""
+        return self._daylight
+
+    @property
     def lightlevel(self):
         """Light level."""
         return self._lightlevel
+
+    @property
+    def lux(self):
+        """Lux."""
+        return self._lux
+
+    @property
+    def tholddark(self):
+        """Threshold to hold dark."""
+        return self._tholddark
+
+    @property
+    def tholdoffset(self):
+        """Offset for threshold to hold dark."""
+        return self._tholdoffset
 
 
 class OpenClose(DeconzSensor):
@@ -477,11 +608,32 @@ class Presence(DeconzSensor):
 
     State parameter is a boolean named 'presence'.
     Also has a boolean 'dark' representing lighting in area of placement.
+    {
+        'config': {
+            'battery': 100,
+            'duration': 60,
+            'on': True,
+            'reachable': True,
+            'temperature': 2600
+        },
+        'ep': 1,
+        'etag': '26e97d94b471c1799a1a5951cee7938b',
+        'manufacturername': 'dresden elektronik',
+        'modelid': 'lumi.sensor_motion.aq2',
+        'name': 'presence1',
+        'state': {
+            'lastupdated': '2019-01-29T07:19:53',
+            'presence': False
+        },
+        'swversion': '20170627',
+        'type': 'ZHAPresence',
+        'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0406'}
     """
 
     def __init__(self, device_id, device):
         """Initialize presence detector."""
         self._dark = device['state'].get('dark')
+        self._duration = device['config'].get('duration')
         self._presence = device['state'].get('presence')
         super().__init__(device_id, device)
         self._sensor_class = 'motion'
@@ -495,6 +647,11 @@ class Presence(DeconzSensor):
     def dark(self):
         """If the area near the sensor is light or not."""
         return self._dark
+
+    @property
+    def duration(self):
+        """Minimum duration which presence will be true."""
+        return self._duration
 
     @property
     def is_tripped(self):
@@ -571,38 +728,117 @@ class Temperature(DeconzSensor):
     @property
     def state(self):
         """Main state of sensor."""
-        if self.temperature is None:
-            return None
-        celsius = round(float(self.temperature) / 100, 1)
-        return celsius
+        return self.temperature
 
     @property
     def temperature(self):
         """Temperature."""
-        return self._temperature
+        return self.convert_temperature(self._temperature)
+
+    def convert_temperature(self, temperature):
+        """Convert temperature to celsius"""
+        if temperature is None:
+            return None
+        return round(float(temperature) / 100, 1)
+
+
+class Thermostat(Temperature):
+    """Thermostat "sensor".
+
+    State parameter is a string named 'temperature'.
+    {
+        "config": {
+            "battery": 100,
+            "heatsetpoint": 2200,
+            "offset": 0,
+            "on": true,
+            "reachable": true,
+            "scheduler": "Monday,Tuesday,Wednesday,Thursday,Friday 04:00 2300 06:00 1700 15:00 2300 16:00 2200 21:00 1800;Saturday 06:00 2200 21:00 1800;",
+            "scheduleron": true
+        },
+        "ep": 1,
+        "etag": "06745a49746f448cc3fd23bd6010accd",
+        "manufacturername": "Bitron Home",
+        "modelid": "902010/32",
+        "name": "Thermostat 39",
+        "state": {
+            "lastupdated": "2019-01-11T16:20:15",
+            "on": false,
+            "temperature": 2260
+        },
+        "swversion": "V1b225-20151013",
+        "type": "ZHAThermostat",
+        "uniqueid": "00:0d:6f:00:0e:f0:df:19-01-0201"
+    }
+    """
+
+    def __init__(self, device_id, device, async_set_state_callback):
+        """Initalize temperature sensor."""
+        self._async_set_state_callback = async_set_state_callback
+        self._heatsetpoint = device['config'].get('heatsetpoint')
+        self._offset = device['config'].get('offset')
+        self._scheduler = device['config'].get('scheduler')
+        self._scheduleron = device['config'].get('scheduleron')
+        super().__init__(device_id, device)
+
+    async def async_set_config(self, data):
+        """Set config of thermostat.
+
+        {
+            "on": true,
+            "heatsetpoint": 180,
+        }
+        """
+        field = self.deconz_id + '/config'
+        await self._async_set_state_callback(field, data)
+
+    @property
+    def heatsetpoint(self):
+        """"""
+        return self.convert_temperature(self._heatsetpoint)
+
+    @property
+    def offset(self):
+        """"""
+        return self._offset
+
+    @property
+    def scheduler(self):
+        """"""
+        return self._scheduler
+
+    @property
+    def scheduleron(self):
+        """"""
+        return self._scheduleron
+
 
 
 class Water(DeconzSensor):
     """Water sensor.
 
     State parameter is a boolean named 'water'.
-
     {
-        "config": {
-            "on": true,
-            "reachable": true
+        'config': {
+            'battery': 100,
+            'on': True,
+            'reachable': True,
+            'temperature': 2500
         },
-        "ep": 1,
-        "etag": "94521af24c973d190dfaac12fd73f9bd",
-        "manufacturername": "LUMI",
-        "modelid": "lumi.sensor_wleak.aq1",
-        "name": "lumi.sensor_wleak.aq1",
-        "state": {
-            "lastupdated": "2018-02-20T21:26:09",
-            "water": false
+        'ep': 1,
+        'etag': 'fae893708dfe9b358df59107d944fa1c',
+        'manufacturername': 'LUMI',
+        'modelid': 'lumi.sensor_wleak.aq1',
+        'name': 'water2',
+        'state': {
+            'lastupdated': '2019-01-29T07:13:20',
+            'lowbattery': False,
+            'tampered': False,
+            'water': False
         },
-        "type": "ZHAWater",
-        "uniqueid": "00:15:8d:00:02:11:22:a9-01-0500"
+        'swversion': '20170721',
+        'type': 'ZHAWater',
+        'uniqueid': '00:15:8d:00:02:2f:07:db-01-0500'
     }
     """
 
@@ -628,7 +864,7 @@ class Water(DeconzSensor):
         return self._water
 
 
-def create_sensor(sensor_id, sensor):
+def create_sensor(sensor_id, sensor, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in CONSUMPTION:
         return Consumption(sensor_id, sensor)
@@ -656,6 +892,8 @@ def create_sensor(sensor_id, sensor):
         return Switch(sensor_id, sensor)
     elif sensor['type'] in TEMPERATURE:
         return Temperature(sensor_id, sensor)
+    elif sensor['type'] in THERMOSTAT:
+        return Thermostat(sensor_id, sensor, async_set_state_callback)
     elif sensor['type'] in WATER:
         return Water(sensor_id, sensor)
 

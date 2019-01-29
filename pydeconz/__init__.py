@@ -97,7 +97,7 @@ class DeconzSession:
         })
 
         self.sensors.update({
-            sensor_id: create_sensor(sensor_id, sensor)
+            sensor_id: create_sensor(sensor_id, sensor, self.async_put_state)
             for sensor_id, sensor in sensors.items()
             if supported_sensor(sensor) and sensor_id not in self.sensors
         })
