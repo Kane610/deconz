@@ -136,6 +136,21 @@ class DeconzGroup(DeconzLightBase):
             if scene['id'] not in self._scenes
         }
 
+    def update_color_state(self, light):
+        """Sync color state with light."""
+        x, y = light.xy
+        self.async_update({
+            'state': {
+                'bri': light.brightness,
+                'hue': light.hue,
+                'sat': light.sat,
+                'ct': light.ct,
+                'x': x,
+                'y': y,
+                'colormode': light.colormode,
+            },
+        })
+
 
 class DeconzScene:
     """deCONZ scene representation.

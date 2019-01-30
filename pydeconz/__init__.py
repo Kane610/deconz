@@ -88,6 +88,7 @@ class DeconzSession:
             for light_id, light in lights.items()
             if light_id not in self.lights
         })
+        self.update_group_color()
 
         self.scenes.update({
             group.id + '_' + scene.id: scene
@@ -187,6 +188,7 @@ class DeconzSession:
 
             elif event['r'] == 'lights' and event['id'] in self.lights:
                 self.lights[event['id']].async_update(event)
+                self.update_group_color()
 
             elif event['r'] == 'sensors' and event['id'] in self.sensors:
                 self.sensors[event['id']].async_update(event)
@@ -199,3 +201,21 @@ class DeconzSession:
 
         else:
             _LOGGER.debug('Unsupported event %s', event)
+
+    def update_group_color(self):
+        """Update group colors based on light states.
+
+        deCONZ group updates don't contain any information about the current
+        state of the lights in the group. This method updates the color
+        properties of the group to the current color of the lights in the
+        group.
+
+        For groups where the lights have different colors the group color will
+        only reflect the color of the latest changed light in the group.
+        """
+        for group in self.groups.values():
+            group_lights = (
+                self.lights[light_id]
+                for light_id in group.lights
+                if self.lights[light_id].reachable)
+            group.update_color_state(next(group_lights))
