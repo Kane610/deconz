@@ -138,7 +138,7 @@ class DeconzGroup(DeconzLightBase):
 
     def update_color_state(self, light):
         """Sync color state with light."""
-        x, y = light.xy
+        x, y = light.xy or (None, None)
         self.async_update({
             'state': {
                 'bri': light.brightness,
