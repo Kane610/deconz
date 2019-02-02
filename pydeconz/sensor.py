@@ -25,8 +25,7 @@ WATER = ['ZHAWater']
 
 DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + WATER
 DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + \
-                LIGHTLEVEL + POWER + PRESSURE + SWITCH + TEMPERATURE + \
-                THERMOSTAT
+                LIGHTLEVEL + POWER + PRESSURE + SWITCH + TEMPERATURE
 
 
 class DeconzSensor(DeconzDevice):
@@ -794,22 +793,22 @@ class Thermostat(Temperature):
 
     @property
     def heatsetpoint(self):
-        """"""
+        """Heating setpoint"""
         return self.convert_temperature(self._heatsetpoint)
 
     @property
     def offset(self):
-        """"""
+        """Temperature offset."""
         return self._offset
 
     @property
     def scheduler(self):
-        """"""
+        """Scheduler setpoints."""
         return self._scheduler
 
     @property
     def scheduleron(self):
-        """"""
+        """Scheduler on or off."""
         return self._scheduleron
 
 
