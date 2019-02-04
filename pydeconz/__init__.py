@@ -35,7 +35,7 @@ class DeconzSession:
         self.async_add_device_callback = kwargs.get('async_add_device')
         self.async_connection_status_callback = kwargs.get('connection_status')
 
-    def start(self):
+    def start(self) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
             self.websocket = self.ws_client(
@@ -45,7 +45,7 @@ class DeconzSession:
         else:
             _LOGGER.error('No deCONZ config available')
 
-    def close(self):
+    def close(self) -> None:
         """Close websession and websocket to deCONZ."""
         _LOGGER.info('Shutting down connections to deCONZ.')
         if self.websocket:
@@ -88,7 +88,7 @@ class DeconzSession:
             for light_id, light in lights.items()
             if light_id not in self.lights
         })
-        self.update_group_color()
+        self.update_group_color(self.lights.keys())
 
         self.scenes.update({
             group.id + '_' + scene.id: scene
@@ -105,7 +105,7 @@ class DeconzSession:
 
         return True
 
-    async def async_put_state(self, field: str, data: dict):
+    async def async_put_state(self, field: str, data: dict) -> dict:
         """Set state of object in deCONZ.
 
         Field is a string representing a specific device in deCONZ
@@ -134,7 +134,7 @@ class DeconzSession:
         response_dict = await async_request(session, url)
         return response_dict
 
-    def async_session_handler(self, signal: str):
+    def async_session_handler(self, signal: str) -> None:
         """Signalling from websocket.
 
            data - new data available for processing.
@@ -147,7 +147,7 @@ class DeconzSession:
                 self.async_connection_status_callback(
                     self.websocket.state == 'running')
 
-    def async_event_handler(self, event: dict):
+    def async_event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
 
         {
@@ -169,7 +169,7 @@ class DeconzSession:
                 if supported_sensor(event['sensor']):
                     device_type = 'sensor'
                     device = self.sensors[event['id']] = create_sensor(
-                        event['id'], event['sensor'])
+                        event['id'], event['sensor'], self.async_put_state)
                 else:
                     _LOGGER.warning('Unsupported sensor %s', event)
                     return
@@ -188,7 +188,7 @@ class DeconzSession:
 
             elif event['r'] == 'lights' and event['id'] in self.lights:
                 self.lights[event['id']].async_update(event)
-                self.update_group_color()
+                self.update_group_color([event['id']])
 
             elif event['r'] == 'sensors' and event['id'] in self.sensors:
                 self.sensors[event['id']].async_update(event)
@@ -202,7 +202,7 @@ class DeconzSession:
         else:
             _LOGGER.debug('Unsupported event %s', event)
 
-    def update_group_color(self):
+    def update_group_color(self, lights: list) -> None:
         """Update group colors based on light states.
 
         deCONZ group updates don't contain any information about the current
@@ -214,8 +214,17 @@ class DeconzSession:
         only reflect the color of the latest changed light in the group.
         """
         for group in self.groups.values():
-            group_lights = (
-                self.lights[light_id]
-                for light_id in group.lights
-                if self.lights[light_id].reachable)
-            group.update_color_state(next(group_lights))
+            # Skip group if there are no common light ids.
+            if not any({*lights} & {*group.lights}):
+                continue
+
+            # More than one light means load_parameters called this method.
+            # Then we take first best light to be available.
+            light_ids = lights
+            if len(light_ids) > 1:
+                light_ids = group.lights
+
+            for light_id in light_ids:
+                if self.lights[light_id].reachable:
+                    group.update_color_state(self.lights[light_id])
+                    break

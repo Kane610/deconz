@@ -46,10 +46,12 @@ class DeconzDevice:
         """
         changed_attr = []
         for key, value in attr.items():
+            if value is None:
+                continue
             if getattr(self, "_{0}".format(key), None) != value:
                 changed_attr.append(key)
-            self.__setattr__("_{0}".format(key), value)
-            _LOGGER.debug('%s: update %s with %s', self.name, key, value)
+                self.__setattr__("_{0}".format(key), value)
+                _LOGGER.debug('%s: update %s with %s', self.name, key, value)
         return changed_attr
 
     def async_update(self, event, reason={}):
