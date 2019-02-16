@@ -748,26 +748,28 @@ class Thermostat(Temperature):
     {
         "config": {
             "battery": 100,
-            "heatsetpoint": 2200,
+            "displayflipped": true,
+            "heatsetpoint": 2100,
+            "locked": false,
+            "mode": "auto",
             "offset": 0,
             "on": true,
-            "reachable": true,
-            "scheduler": "Monday,Tuesday,Wednesday,Thursday,Friday 04:00 2300 06:00 1700 15:00 2300 16:00 2200 21:00 1800;Saturday 06:00 2200 21:00 1800;",
-            "scheduleron": true
+            "reachable": true
         },
         "ep": 1,
-        "etag": "06745a49746f448cc3fd23bd6010accd",
-        "manufacturername": "Bitron Home",
-        "modelid": "902010/32",
-        "name": "Thermostat 39",
+        "etag": "25aac331bc3c4b465cfb2197f6243ea4",
+        "manufacturername": "Eurotronic",
+        "modelid": "SPZB0001",
+        "name": "Living Room Radiator",
         "state": {
-            "lastupdated": "2019-01-11T16:20:15",
+            "lastupdated": "2019-02-10T22:41:32",
             "on": false,
-            "temperature": 2260
+            "temperature": 2149,
+            "valve": 0
         },
-        "swversion": "V1b225-20151013",
+        "swversion": "15181120",
         "type": "ZHAThermostat",
-        "uniqueid": "00:0d:6f:00:0e:f0:df:19-01-0201"
+        "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201"
     }
     """
 
@@ -775,16 +777,18 @@ class Thermostat(Temperature):
         """Initalize temperature sensor."""
         self._async_set_state_callback = async_set_state_callback
         self._heatsetpoint = device['config'].get('heatsetpoint')
+        self._locked = device['config'].get('locked')
+        self._mode = device['config'].get('mode')
         self._offset = device['config'].get('offset')
-        self._scheduler = device['config'].get('scheduler')
-        self._scheduleron = device['config'].get('scheduleron')
+        self._valve = device['state'].get('valve')
         super().__init__(device_id, device)
+        self._on = device['state'].get('on')
 
     async def async_set_config(self, data):
         """Set config of thermostat.
 
         {
-            "on": true,
+            "mode": "auto",
             "heatsetpoint": 180,
         }
         """
@@ -797,19 +801,19 @@ class Thermostat(Temperature):
         return self.convert_temperature(self._heatsetpoint)
 
     @property
+    def mode(self):
+        """Thermostat mode; "off", "heat", and "auto"."""
+        return self.mode
+
+    @property
     def offset(self):
         """Temperature offset."""
         return self._offset
 
     @property
-    def scheduler(self):
-        """Scheduler setpoints."""
-        return self._scheduler
-
-    @property
-    def scheduleron(self):
-        """Scheduler on or off."""
-        return self._scheduleron
+    def valve(self):
+        """How open the valve is."""
+        return self._valve
 
 
 
