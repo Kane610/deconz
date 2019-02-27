@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_get_api_key(session, host, port, username=None, password=None, **kwargs):
     """Get a new API key for devicetype."""
-    url = 'http://{}:{}/api'.format(host, str(port))
+    url = 'http://{host}:{port}/api'.format(host=host, port=str(port))
     auth = None
     if username and password:
         auth = aiohttp.BasicAuth(username, password=password)
@@ -26,7 +26,8 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
 
 async def async_delete_api_key(session, host, port, api_key, **kwargs):
     """Delete API key from deCONZ."""
-    url = 'http://{}:{}/api/{}/config/whitelist/{3}'.format(host, str(port), api_key)
+    url = 'http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}'.format(
+        host=host, port=str(port), api_key=api_key)
     response = await async_request(session.delete, url)
     if response:
         _LOGGER.info(response)
