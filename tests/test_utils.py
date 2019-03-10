@@ -38,8 +38,8 @@ async def test_get_api_key_with_credentials() -> None:
     with patch('pydeconz.utils.async_request',
                new=CoroutineMock(
                    return_value=[{'success': {'username': API_KEY}}])):
-        response = await utils.async_get_api_key(session, IP, PORT,
-            username='user', password='pass')
+        response = await utils.async_get_api_key(
+            session, IP, PORT, username='user', password='pass')
 
     assert response == API_KEY
 
@@ -164,8 +164,8 @@ async def test_request_fails_raise_error() -> None:
     response.json = CoroutineMock(return_value={
         'error': {
             'type': 1,
-      		'address': 'address',
-      		'description': 'description'
+            'address': 'address',
+            'description': 'description'
         }
     })
     session = CoroutineMock(return_value=response)
@@ -174,5 +174,3 @@ async def test_request_fails_raise_error() -> None:
         await utils.async_request(session, 'url')
 
     assert str(e_info.value) == "address description"
-
-
