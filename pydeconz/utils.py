@@ -27,7 +27,7 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
     return api_key
 
 
-async def async_delete_api_key(session, host, port, api_key, **kwargs):
+async def async_delete_api_key(session, host, port, api_key):
     """Delete API key from deCONZ."""
     url = 'http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}'.format(
         host=host, port=str(port), api_key=api_key)
@@ -37,14 +37,15 @@ async def async_delete_api_key(session, host, port, api_key, **kwargs):
     _LOGGER.info(response)
 
 
-async def async_delete_all_keys(session, host, port, api_key, **kwargs):
-    """Delete all API keys except for the one provided to the method."""
+async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
+    """Delete all API keys except for the ones provided to the method."""
     url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
 
     response = await async_request(session.get, url)
 
+    api_keys.append(api_key)
     for key in response['whitelist'].keys():
-        if key != api_key:
+        if key not in api_keys:
             await async_delete_api_key(session, host, port, key)
 
 
@@ -86,6 +87,7 @@ async def async_request(session, url, **kwargs):
             raise ResponseError(
                 "Invalid content type: {}".format(res.content_type))
         response = await res.json()
+        _LOGGER.debug("HTTP request response: %s", response)
         _raise_on_error(response)
         return response
 
@@ -97,7 +99,7 @@ async def async_request(session, url, **kwargs):
 
 def _raise_on_error(data):
     """Check response for error message."""
-    if isinstance(data, list):
+    if isinstance(data, list) and data:
         data = data[0]
 
     if isinstance(data, dict) and 'error' in data:
