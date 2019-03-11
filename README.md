@@ -1,9 +1,7 @@
 # deCONZ
-Python library wrapping deCONZ rest api for Home-Assistant.
+Python library wrapping [deCONZ rest api](https://dresden-elektronik.github.io/deconz-rest-doc/) for Home-Assistant.
 
-Currently supports lights, remotes, humidity sensors, light level sensors, motion sensors, pressure sensors and temperature sensors.
-
-Generate an API key using utils.py/get_api_key, host, username and password are required parameters. Or follow snillevilla.se guide to get a key.
+This implementation should cover most devices supported by deCONZ, if that is not the case please create an issue with debug logs and we will get it supported.
 
 Only host address and API key are necessary for normal operations.
 
