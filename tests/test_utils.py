@@ -161,30 +161,16 @@ async def test_request_fails_raise_error() -> None:
     """Test a successful call of request."""
     response = Mock()
     response.content_type = 'application/json'
-    response.json = CoroutineMock(return_value={
+    response.json = CoroutineMock(return_value=[{
         'error': {
             'type': 1,
             'address': 'address',
             'description': 'description'
         }
-    })
+    }])
     session = CoroutineMock(return_value=response)
 
     with pytest.raises(errors.Unauthorized) as e_info:
         await utils.async_request(session, 'url')
 
     assert str(e_info.value) == "address description"
-
-
-def test_raise_on_error() -> None:
-    """Test a successful raise on error."""
-    error = [
-        {'error': {
-            'address': '/',
-            'description': 'unauthorized user',
-            'type': 1
-            }
-        }
-    ]
-    with pytest.raises(errors.Unauthorized):
-        utils._raise_on_error(error)
