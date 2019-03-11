@@ -97,6 +97,8 @@ async def async_request(session, url, **kwargs):
 
 def _raise_on_error(data):
     """Check response for error message."""
+    if isinstance(data, list):
+        data = data[0]
+
     if isinstance(data, dict) and 'error' in data:
-        print('error', data)
         raise_error(data['error'])
