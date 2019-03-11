@@ -61,12 +61,3 @@ async def test_load_parameters(session) -> None:
     assert session.sensors['s1'].deconz_id == '/sensors/s1'
     assert session.sensors['s1'].type == GENERICSTATUS[0]
 
-
-@pytest.mark.asyncio
-async def test_load_parameters_fails_no_data(session) -> None:
-    """Test a failing call of load_parameters."""
-    with patch('pydeconz.DeconzSession.async_get_state',
-               new=CoroutineMock(return_value=False)):
-        result = await session.async_load_parameters()
-
-    assert not result

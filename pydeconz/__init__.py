@@ -57,9 +57,6 @@ class DeconzSession:
         Returns lists of indices of which devices was added.
         """
         data = await self.async_get_state('')
-        if not data:
-            _LOGGER.error('Couldn\'t load data from deCONZ')
-            return False
 
         _LOGGER.debug(pformat(data))
 
@@ -102,8 +99,6 @@ class DeconzSession:
             for sensor_id, sensor in sensors.items()
             if supported_sensor(sensor) and sensor_id not in self.sensors
         })
-
-        return True
 
     async def async_put_state(self, field: str, data: dict) -> dict:
         """Set state of object in deCONZ.
