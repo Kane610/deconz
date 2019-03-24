@@ -21,12 +21,15 @@ PRESSURE = ['ZHAPressure', 'CLIPPressure']
 SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
 TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
 THERMOSTAT = ['ZHAThermostat', 'CLIPThermostat']
+VIBRATION = ['ZHAVibration']
 WATER = ['ZHAWater']
 
-DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + WATER
+DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + \
+                       VIBRATION + WATER
 DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + \
                 LIGHTLEVEL + POWER + PRESSURE + SWITCH + TEMPERATURE
 OTHER_SENSOR = THERMOSTAT
+
 
 class DeconzSensor(DeconzDevice):
     """deCONZ sensor representation.
@@ -200,6 +203,7 @@ class Consumption(DeconzSensor):
     def consumption(self):
         """Consumption."""
         return self._consumption
+
 
 class Daylight(DeconzSensor):
     """Daylight sensor built into deCONZ software.
@@ -816,6 +820,93 @@ class Thermostat(Temperature):
         return self._valve
 
 
+class Vibration(DeconzSensor):
+    """Vibration sensor.
+
+    State parameter is a string named 'vibration'.
+    {
+        "config": {
+            "battery": 91,
+            "on": true,
+            "pending": [],
+            "reachable": true,
+            "sensitivity": 21,
+            "sensitivitymax": 21,
+            "temperature": 3200
+        },
+        "ep": 1,
+        "etag": "b7599df551944df97b2aa87d160b9c45",
+        "manufacturername": "LUMI",
+        "modelid": "lumi.vibration.aq1",
+        "name": "Vibration 9",
+        "state": {
+            "lastupdated": "2019-03-09T15:53:07",
+            "orientation": [
+                10,
+                1059,
+                0
+            ],
+            "tiltangle": 83,
+            "vibration": true,
+            "vibrationstrength": 114
+        },
+        "swversion": "20180130",
+        "type": "ZHAVibration",
+        "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101"
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initalize vibration sensor."""
+        self._sensitivity = device['config'].get('sensitivity')
+        self._sensitivitymax = device['config'].get('sensitivitymax')
+        self._orientation = device['state'].get('orientation')
+        self._tiltangle = device['state'].get('tiltangle')
+        self._vibration = device['state'].get('vibration')
+        self._vibrationstrength = device['state'].get('vibrationstrength')
+        super().__init__(device_id, device)
+        self._sensor_class = 'motion'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
+    def is_tripped(self) -> bool:
+        """Sensor is tripped."""
+        return self.vibration
+
+    @property
+    def orientation(self) -> list:
+        """Orientation."""
+        return self._orientation
+
+    @property
+    def sensitivity(self) -> int:
+        """Configured sensitivity"""
+        return self._sensitivity
+
+    @property
+    def sensitivitymax(self) -> int:
+        """Configured max sensitivity."""
+        return self._sensitivitymax
+
+    @property
+    def tiltangle(self) -> int:
+        """Tilt angle."""
+        return self._tiltangle
+
+    @property
+    def vibration(self) -> bool:
+        """Vibration."""
+        return self._vibration
+
+    @property
+    def vibrationstrength(self) -> int:
+        """Strength of vibration."""
+        return self._vibrationstrength
+
 
 class Water(DeconzSensor):
     """Water sensor.
@@ -871,33 +962,35 @@ def create_sensor(sensor_id, sensor, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in CONSUMPTION:
         return Consumption(sensor_id, sensor)
-    elif sensor['type'] in DAYLIGHT:
+    if sensor['type'] in DAYLIGHT:
         return Daylight(sensor_id, sensor)
-    elif sensor['type'] in FIRE:
+    if sensor['type'] in FIRE:
         return Fire(sensor_id, sensor)
-    elif sensor['type'] in GENERICFLAG:
+    if sensor['type'] in GENERICFLAG:
         return GenericFlag(sensor_id, sensor)
-    elif sensor['type'] in GENERICSTATUS:
+    if sensor['type'] in GENERICSTATUS:
         return GenericStatus(sensor_id, sensor)
-    elif sensor['type'] in HUMIDITY:
+    if sensor['type'] in HUMIDITY:
         return Humidity(sensor_id, sensor)
-    elif sensor['type'] in LIGHTLEVEL:
+    if sensor['type'] in LIGHTLEVEL:
         return LightLevel(sensor_id, sensor)
-    elif sensor['type'] in OPENCLOSE:
+    if sensor['type'] in OPENCLOSE:
         return OpenClose(sensor_id, sensor)
-    elif sensor['type'] in POWER:
+    if sensor['type'] in POWER:
         return Power(sensor_id, sensor)
-    elif sensor['type'] in PRESENCE:
+    if sensor['type'] in PRESENCE:
         return Presence(sensor_id, sensor)
-    elif sensor['type'] in PRESSURE:
+    if sensor['type'] in PRESSURE:
         return Pressure(sensor_id, sensor)
-    elif sensor['type'] in SWITCH:
+    if sensor['type'] in SWITCH:
         return Switch(sensor_id, sensor)
-    elif sensor['type'] in TEMPERATURE:
+    if sensor['type'] in TEMPERATURE:
         return Temperature(sensor_id, sensor)
-    elif sensor['type'] in THERMOSTAT:
+    if sensor['type'] in THERMOSTAT:
         return Thermostat(sensor_id, sensor, async_set_state_callback)
-    elif sensor['type'] in WATER:
+    if sensor['type'] in VIBRATION:
+        return Vibration(sensor_id, sensor)
+    if sensor['type'] in WATER:
         return Water(sensor_id, sensor)
 
 
