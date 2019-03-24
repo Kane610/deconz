@@ -38,6 +38,7 @@ class DeconzGroup(DeconzLightBase):
         self._reachable = True
         self._sat = device['action'].get('sat')
         self._scenes = {}
+        self._xy = (None, None)
         self._x, self._y = device['action'].get('xy', (None, None))
         super().__init__(deconz_id, device, async_set_state_callback)
         self.async_add_scenes(device.get('scenes'), async_set_state_callback)

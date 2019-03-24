@@ -80,7 +80,6 @@ async def test_vibration_sensor():
     sensor.register_async_callback(mock_callback)
     assert sensor._async_callbacks
 
-    event = {}
     event = {"state": {
         "lastupdated": "2019-03-15T10:15:17",
         "orientation": [0, 84, 6]
