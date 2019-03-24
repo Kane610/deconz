@@ -73,6 +73,9 @@ class DeconzLightBase(DeconzDevice):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
+        if self._xy != (None, None):
+            self._x, self._y = self._xy
+
         if self._x is not None and self._y is not None:
             x = self._x
             if self._x > 1:
@@ -81,8 +84,8 @@ class DeconzLightBase(DeconzDevice):
             if self._y > 1:
                 y = self._y / 65555
             return (x, y)
-        else:
-            return None
+
+        return None
 
     @property
     def colormode(self):
@@ -131,6 +134,7 @@ class DeconzLight(DeconzLightBase):
         self._on = device['state'].get('on')
         self._reachable = device['state'].get('reachable')
         self._sat = device['state'].get('sat')
+        self._xy = (None, None)
         self._x, self._y = device['state'].get('xy', (None, None))
         super().__init__(deconz_id, device, async_set_state_callback)
 
