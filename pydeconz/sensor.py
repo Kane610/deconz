@@ -7,6 +7,7 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 ALARM = ['ZHAAlarm']
+CARBONMONOXIDE = ['ZHACarbonMonoxide']
 CONSUMPTION = ['ZHAConsumption']
 DAYLIGHT = ['Daylight']
 FIRE = ['ZHAFire']
@@ -24,8 +25,8 @@ THERMOSTAT = ['ZHAThermostat', 'CLIPThermostat']
 VIBRATION = ['ZHAVibration']
 WATER = ['ZHAWater']
 
-DECONZ_BINARY_SENSOR = FIRE + GENERICFLAG + OPENCLOSE + PRESENCE + \
-                       VIBRATION + WATER
+DECONZ_BINARY_SENSOR = CARBONMONOXIDE + FIRE + GENERICFLAG + OPENCLOSE + \
+                       PRESENCE + VIBRATION + WATER
 DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + \
                 LIGHTLEVEL + POWER + PRESSURE + SWITCH + TEMPERATURE
 OTHER_SENSOR = THERMOSTAT
@@ -160,6 +161,56 @@ class Alarm(DeconzSensor):
     def alarm(self):
         """Alarm."""
         return self._alarm
+
+
+class CarbonMonoxide(DeconzSensor):
+    """Carbon monoxide sensor.
+
+    State parameter is a boolean named 'carbonmonoxide'.
+    {
+        'config': {
+            'battery': 100,
+            'on': True,
+            'pending': [],
+            'reachable': True
+        },
+        'ep': 1,
+        'etag': 'b7599df551944df97b2aa87d160b9c45',
+        'manufacturername': 'Heiman',
+        'modelid': 'CO_V16',
+        'name': 'Cave, CO',
+        'state': {
+            'carbonmonoxide': False,
+            'lastupdated': 'none',
+            'lowbattery': False,
+            'tampered': False
+        },
+        'swversion': '20150330',
+        'type': 'ZHACarbonMonoxide',
+        'uniqueid': '00:15:8d:00:02:a5:21:24-01-0101'
+    }
+    """
+
+    def __init__(self, device_id, device):
+        """Initialize Carbon monoxide sensor."""
+        self._carbonmonoxide = device['state'].get('carbonmonoxide')
+        super().__init__(device_id, device)
+        self._sensor_class = 'carbon_monoxide'
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.is_tripped
+
+    @property
+    def carbonmonoxide(self):
+        """Fire detected."""
+        return self._carbonmonoxide
+
+    @property
+    def is_tripped(self):
+        """Sensor is tripped."""
+        return self.carbonmonoxide
 
 
 class Consumption(DeconzSensor):
@@ -962,6 +1013,8 @@ def create_sensor(sensor_id, sensor, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in CONSUMPTION:
         return Consumption(sensor_id, sensor)
+    if sensor['type'] in CARBONMONOXIDE:
+        return CarbonMonoxide(sensor_id, sensor)
     if sensor['type'] in DAYLIGHT:
         return Daylight(sensor_id, sensor)
     if sensor['type'] in FIRE:

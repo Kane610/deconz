@@ -46,6 +46,31 @@ async def test_supported_sensor_fails():
     assert not result
 
 
+async def test_carbonmonoxide_sensor():
+    """Verify that vibration sensor works."""
+    sensor = create_sensor('0', FIXTURE_CARBONMONOXIDE, None)
+
+    assert sensor.state is False
+    assert sensor.is_tripped is False
+
+    # DeconzSensor
+    assert sensor.battery == 100
+    assert sensor.ep == 1
+    assert sensor.lowbattery is False
+    assert sensor.on is True
+    assert sensor.reachable is True
+
+    # DeconzDevice
+    assert sensor.deconz_id == '/sensors/0'
+    assert sensor.etag == 'b7599df551944df97b2aa87d160b9c45'
+    assert sensor.manufacturer == 'Heiman'
+    assert sensor.modelid == 'CO_V16'
+    assert sensor.name == "Cave, CO"
+    assert sensor.swversion == '20150330'
+    assert sensor.type == 'ZHACarbonMonoxide'
+    assert sensor.uniqueid == '00:15:8d:00:02:a5:21:24-01-0101'
+
+
 async def test_vibration_sensor():
     """Verify that vibration sensor works."""
     sensor = create_sensor('0', FIXTURE_VIBRATION, None)
@@ -94,6 +119,30 @@ async def test_vibration_sensor():
 
     sensor.remove_callback(mock_callback)
     assert not sensor._async_callbacks
+
+
+FIXTURE_CARBONMONOXIDE = {
+    'config': {
+        'battery': 100,
+        'on': True,
+        'pending': [],
+        'reachable': True
+    },
+    'ep': 1,
+    'etag': 'b7599df551944df97b2aa87d160b9c45',
+    'manufacturername': 'Heiman',
+    'modelid': 'CO_V16',
+    'name': 'Cave, CO',
+    'state': {
+         'carbonmonoxide': False,
+         'lastupdated': 'none',
+         'lowbattery': False,
+         'tampered': False
+    },
+    'swversion': '20150330',
+    'type': 'ZHACarbonMonoxide',
+    'uniqueid': '00:15:8d:00:02:a5:21:24-01-0101'
+}
 
 
 FIXTURE_VIBRATION = {
