@@ -73,6 +73,7 @@ async def async_discovery(session):
         bridges.append({'bridgeid': bridge['id'],
                         'host': bridge['internalipaddress'],
                         'port': bridge['internalport']})
+
     _LOGGER.info("Discovered the following bridges: %s.", bridges)
 
     return bridges
@@ -81,14 +82,19 @@ async def async_discovery(session):
 async def async_request(session, url, **kwargs):
     """Do a web request and manage response."""
     _LOGGER.debug("Sending %s to %s", kwargs, url)
+
     try:
         res = await session(url, **kwargs)
+
         if res.content_type != 'application/json':
             raise ResponseError(
                 "Invalid content type: {}".format(res.content_type))
+
         response = await res.json()
         _LOGGER.debug("HTTP request response: %s", response)
+
         _raise_on_error(response)
+
         return response
 
     except aiohttp.client_exceptions.ClientError as err:
