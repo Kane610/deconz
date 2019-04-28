@@ -34,6 +34,7 @@ class Forbidden(pydeconzException):
 class ResourceNotFound(pydeconzException):
     """The requested resource (light, group, ...) was not found."""
 
+
 class BridgeBusy(pydeconzException):
     """The Bridge is busy, too many requests (more than 20)."""
 
