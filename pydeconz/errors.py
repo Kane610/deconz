@@ -35,6 +35,10 @@ class ResourceNotFound(pydeconzException):
     """The requested resource (light, group, ...) was not found."""
 
 
+class BridgeBusy(pydeconzException):
+    """The Bridge is busy, too many requests (more than 20)."""
+
+
 ERRORS = {
     1: Unauthorized,  # Unauthorized user
     2: BadRequest,  # Body contains invalid JSON
@@ -44,6 +48,7 @@ ERRORS = {
     6: RequestError,  # Parameter not available
     7: RequestError,  # Invalid value for parameter
     8: RequestError,  # Parameter is not modifiable
+    901: BridgeBusy,  # May occur when sending too fast
 }
 
 
