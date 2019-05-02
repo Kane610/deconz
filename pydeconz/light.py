@@ -2,25 +2,25 @@
 
 import logging
 
-from .deconzdevice import DeconzDevice
+from .deconzdevice import DeconzDevice, DeconzDeviceSetter
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzLightBase(DeconzDevice):
+class DeconzLightBase(DeconzDevice, DeconzDeviceSetter):
     """deCONZ light base representation.
 
     Dresden Elektroniks documentation of lights in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, deconz_id, device, async_set_state_callback):
+    def __init__(self, device_id, device, loop, async_set_state_callback):
         """Set initial information about light.
 
         Set async callback to set state of device.
         """
-        self._async_set_state_callback = async_set_state_callback
-        super().__init__(deconz_id, device)
+        DeconzDevice.__init__(self, device_id, device)
+        DeconzDeviceSetter.__init__(self, loop, async_set_state_callback)
 
     def async_update(self, event):
         """New event for light.
@@ -119,12 +119,13 @@ class DeconzLight(DeconzLightBase):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, device_id, device, async_set_state_callback):
+    DECONZ_TYPE = '/lights/'
+
+    def __init__(self, device_id, device, loop, async_set_state_callback):
         """Set initial information about light.
 
         Set async callback to set state of device.
         """
-        deconz_id = '/lights/' + device_id
         self._alert = device['state'].get('alert')
         self._bri = device['state'].get('bri')
         self._colormode = device['state'].get('colormode')
@@ -136,7 +137,7 @@ class DeconzLight(DeconzLightBase):
         self._sat = device['state'].get('sat')
         self._xy = (None, None)
         self._x, self._y = device['state'].get('xy', (None, None))
-        super().__init__(deconz_id, device, async_set_state_callback)
+        super().__init__(device_id, device, loop, async_set_state_callback)
 
     async def async_set_state(self, data):
         """Set state of light.
@@ -150,7 +151,8 @@ class DeconzLight(DeconzLightBase):
         }
         """
         field = self.deconz_id + '/state'
-        await self._async_set_state_callback(field, data)
+
+        await self.async_set(field, data)
 
     @property
     def state(self):

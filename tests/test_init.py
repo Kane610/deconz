@@ -46,9 +46,8 @@ async def test_load_parameters(session) -> None:
                        'config': {}
                        }}
                })):
-        result = await session.async_load_parameters()
+        await session.async_load_parameters()
 
-    assert result
     assert session.config.bridgeid == '012345'
     assert 'g1' in session.groups
     assert session.groups['g1'].id == 'gid'

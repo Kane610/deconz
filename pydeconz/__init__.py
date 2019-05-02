@@ -75,13 +75,15 @@ class DeconzSession:
                     group.get('scenes'), self.async_put_state)
 
         self.groups.update({
-            group_id: DeconzGroup(group_id, group, self.async_put_state)
+            group_id: DeconzGroup(group_id, group,
+                                  self.loop, self.async_put_state)
             for group_id, group in groups.items()
             if group_id not in self.groups
         })
 
         self.lights.update({
-            light_id: DeconzLight(light_id, light, self.async_put_state)
+            light_id: DeconzLight(light_id, light,
+                                  self.loop, self.async_put_state)
             for light_id, light in lights.items()
             if light_id not in self.lights
         })
@@ -95,7 +97,8 @@ class DeconzSession:
         })
 
         self.sensors.update({
-            sensor_id: create_sensor(sensor_id, sensor, self.async_put_state)
+            sensor_id: create_sensor(sensor_id, sensor,
+                                     self.loop, self.async_put_state)
             for sensor_id, sensor in sensors.items()
             if supported_sensor(sensor) and sensor_id not in self.sensors
         })
@@ -158,13 +161,15 @@ class DeconzSession:
             if event['r'] == 'lights' and event['id'] not in self.lights:
                 device_type = 'light'
                 device = self.lights[event['id']] = DeconzLight(
-                    event['id'], event['light'], self.async_put_state)
+                    event['id'], event['light'],
+                    self.loop, self.async_put_state)
 
             elif event['r'] == 'sensors' and event['id'] not in self.sensors:
                 if supported_sensor(event['sensor']):
                     device_type = 'sensor'
                     device = self.sensors[event['id']] = create_sensor(
-                        event['id'], event['sensor'], self.async_put_state)
+                        event['id'], event['sensor'],
+                        self.loop, self.async_put_state)
                 else:
                     _LOGGER.warning('Unsupported sensor %s', event)
                     return
