@@ -14,12 +14,13 @@ class DeconzGroup(DeconzLightBase):
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
-    def __init__(self, device_id, device, async_set_state_callback):
+    DECONZ_TYPE = '/groups/'
+
+    def __init__(self, device_id, device, loop, async_set_state_callback):
         """Set initial information about light group.
 
         Set callback to set state of device.
         """
-        deconz_id = '/groups/' + device_id
         self._all_on = device['state'].get('all_on')
         self._any_on = device['state'].get('any_on')
         self._bri = device['action'].get('bri')
@@ -40,7 +41,7 @@ class DeconzGroup(DeconzLightBase):
         self._scenes = {}
         self._xy = (None, None)
         self._x, self._y = device['action'].get('xy', (None, None))
-        super().__init__(deconz_id, device, async_set_state_callback)
+        super().__init__(device_id, device, loop, async_set_state_callback)
         self.async_add_scenes(device.get('scenes'), async_set_state_callback)
 
     async def async_set_state(self, data):
@@ -57,8 +58,9 @@ class DeconzGroup(DeconzLightBase):
         Also update local values of group since websockets doesn't.
         """
         field = self.deconz_id + '/action'
-        await self._async_set_state_callback(field, data)
         self.async_update({'state': data})
+
+        await self.async_set(field, data)
 
     def as_dict(self):
         """Callback for __dict__."""

@@ -2,7 +2,7 @@
 
 import logging
 
-from .deconzdevice import DeconzDevice
+from .deconzdevice import DeconzDevice, DeconzDeviceSetter
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,9 +39,10 @@ class DeconzSensor(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
+    DECONZ_TYPE = '/sensors/'
+
     def __init__(self, device_id, device):
         """Set initial information about sensor."""
-        deconz_id = '/sensors/' + device_id
         self._battery = device['config'].get('battery')
         self._ep = device.get('ep')
         self._lowbattery = device['state'].get('lowbattery')
@@ -52,7 +53,7 @@ class DeconzSensor(DeconzDevice):
         self._sensor_class = None
         self._sensor_icon = None
         self._sensor_unit = None
-        super().__init__(deconz_id, device)
+        super().__init__(device_id, device)
 
     def async_update(self, event, reason={}):
         """New event for sensor.
@@ -796,7 +797,7 @@ class Temperature(DeconzSensor):
         return round(float(temperature) / 100, 1)
 
 
-class Thermostat(Temperature):
+class Thermostat(Temperature, DeconzDeviceSetter):
     """Thermostat "sensor".
 
     State parameter is a string named 'temperature'.
@@ -828,15 +829,17 @@ class Thermostat(Temperature):
     }
     """
 
-    def __init__(self, device_id, device, async_set_state_callback):
+    def __init__(self, device_id, device, loop, async_set_state_callback):
         """Initalize temperature sensor."""
-        self._async_set_state_callback = async_set_state_callback
         self._heatsetpoint = device['config'].get('heatsetpoint')
         self._locked = device['config'].get('locked')
         self._mode = device['config'].get('mode')
         self._offset = device['config'].get('offset')
         self._valve = device['state'].get('valve')
-        super().__init__(device_id, device)
+
+        Temperature.__init__(self, device_id, device)
+        DeconzDeviceSetter.__init__(self, async_set_state_callback, loop)
+
         self._on = device['state'].get('on')
 
     async def async_set_config(self, data):
@@ -848,7 +851,8 @@ class Thermostat(Temperature):
         }
         """
         field = self.deconz_id + '/config'
-        await self._async_set_state_callback(field, data)
+
+        await self.async_set(field, data)
 
     @property
     def heatsetpoint(self):
@@ -858,7 +862,7 @@ class Thermostat(Temperature):
     @property
     def mode(self):
         """Thermostat mode; "off", "heat", and "auto"."""
-        return self.mode
+        return self._mode
 
     @property
     def offset(self):
@@ -1009,7 +1013,8 @@ class Water(DeconzSensor):
         return self._water
 
 
-def create_sensor(sensor_id, sensor, async_set_state_callback):
+def create_sensor(
+        sensor_id, sensor, loop, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
     if sensor['type'] in CONSUMPTION:
         return Consumption(sensor_id, sensor)
@@ -1040,7 +1045,7 @@ def create_sensor(sensor_id, sensor, async_set_state_callback):
     if sensor['type'] in TEMPERATURE:
         return Temperature(sensor_id, sensor)
     if sensor['type'] in THERMOSTAT:
-        return Thermostat(sensor_id, sensor, async_set_state_callback)
+        return Thermostat(sensor_id, sensor, loop, async_set_state_callback)
     if sensor['type'] in VIBRATION:
         return Vibration(sensor_id, sensor)
     if sensor['type'] in WATER:
