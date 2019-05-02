@@ -16,8 +16,8 @@ async def test_create_light():
     """
     light = DeconzLight('0', FIXTURE_RGB_LIGHT, None, None)
 
-    assert light.state == False
-    assert light.alert == None
+    assert light.state is False
+    assert light.alert is None
 
     assert light.brightness == 111
     assert light.hue == 7998
@@ -25,8 +25,8 @@ async def test_create_light():
     assert light.ct == 307
     assert light.xy == (0.421253, 0.39921)
     assert light.colormode == 'ct'
-    assert light.effect == None
-    assert light.reachable == True
+    assert light.effect is None
+    assert light.reachable is True
 
     assert light.deconz_id == '/lights/0'
     assert light.etag == '026bcfe544ad76c7534e5ca8ed39047c'

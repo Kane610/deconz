@@ -233,7 +233,6 @@ FIXTURE_VIBRATION = {
 }
 
 
-
 FIXTURE_HUE_DIMMER = {
     'config': {
         'battery': 90,

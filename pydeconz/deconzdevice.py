@@ -132,6 +132,7 @@ class DeconzDeviceSetter:
 
         except BridgeBusy:
             _LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
+
             def retry_set():
                 """Retry set state."""
                 self._loop.create_task(self.async_set(field, data, tries + 1))
