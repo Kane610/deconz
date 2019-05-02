@@ -5,19 +5,21 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 
 from unittest.mock import Mock
 
-from pydeconz.sensor import (
-    DECONZ_BINARY_SENSOR, DECONZ_SENSOR, OTHER_SENSOR,
-    create_sensor, supported_sensor)
+from pydeconz.sensor import SENSOR_CLASSES, create_sensor, supported_sensor
 
 
 async def test_create_sensor():
     """Verify that create-sensor can create all types."""
-    sensor_id = '0'
-    for sensor_type in DECONZ_BINARY_SENSOR + DECONZ_SENSOR + OTHER_SENSOR:
-        sensor = {'type': sensor_type, 'config': {}, 'state': {}}
-        result = create_sensor(sensor_id, sensor, None, None)
+    assert len(SENSOR_CLASSES) == 18
 
-        assert result
+    sensor_id = '0'
+
+    for sensor_class in SENSOR_CLASSES:
+        for sensor_type in sensor_class.ZHATYPE:
+            sensor = {'type': sensor_type, 'config': {}, 'state': {}}
+            result = create_sensor(sensor_id, sensor, None, None)
+
+            assert result
 
 
 async def test_create_sensor_fails():
@@ -31,11 +33,12 @@ async def test_create_sensor_fails():
 
 async def test_supported_sensor():
     """Verify supported_sensor."""
-    for sensor_type in DECONZ_BINARY_SENSOR + DECONZ_SENSOR + OTHER_SENSOR:
-        sensor = {'type': sensor_type}
-        result = supported_sensor(sensor)
+    for sensor_class in SENSOR_CLASSES:
+        for sensor_type in sensor_class.ZHATYPE:
+            sensor = {'type': sensor_type}
+            result = supported_sensor(sensor)
 
-        assert result
+            assert result
 
 
 async def test_supported_sensor_fails():
@@ -49,6 +52,10 @@ async def test_supported_sensor_fails():
 async def test_carbonmonoxide_sensor():
     """Verify that vibration sensor works."""
     sensor = create_sensor('0', FIXTURE_CARBONMONOXIDE, None, None)
+
+    assert sensor.BINARY == True
+    assert sensor.ZHATYPE == ('ZHACarbonMonoxide',)
+    assert sensor.SENSOR_CLASS == 'carbon_monoxide'
 
     assert sensor.state is False
     assert sensor.is_tripped is False
@@ -74,6 +81,9 @@ async def test_carbonmonoxide_sensor():
 async def test_thermostat_sensor():
     """Verify that thermostat sensor works."""
     sensor = create_sensor('0', FIXTURE_THERMOSTAT, None, None)
+
+    assert sensor.BINARY == False
+    assert sensor.ZHATYPE == ('ZHAThermostat', 'CLIPThermostat')
 
     assert sensor.state == 21.5
     assert sensor.heatsetpoint == 21.00
@@ -102,6 +112,10 @@ async def test_thermostat_sensor():
 async def test_vibration_sensor():
     """Verify that vibration sensor works."""
     sensor = create_sensor('0', FIXTURE_VIBRATION, None, None)
+
+    assert sensor.BINARY is True
+    assert sensor.ZHATYPE == ('ZHAVibration',)
+    assert sensor.SENSOR_CLASS == 'motion'
 
     assert sensor.state is True
     assert sensor.is_tripped is True
