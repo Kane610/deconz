@@ -838,7 +838,7 @@ class Thermostat(Temperature, DeconzDeviceSetter):
         self._valve = device['state'].get('valve')
 
         Temperature.__init__(self, device_id, device)
-        DeconzDeviceSetter.__init__(self, async_set_state_callback, loop)
+        DeconzDeviceSetter.__init__(self, loop, async_set_state_callback)
 
         self._on = device['state'].get('on')
 
