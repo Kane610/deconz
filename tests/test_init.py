@@ -10,7 +10,7 @@ import pytest
 import aiohttp
 
 from pydeconz import DeconzSession
-from pydeconz.sensor import GENERICSTATUS
+from pydeconz.sensor import GenericStatus
 
 API_KEY = '1234567890'
 IP = '127.0.0.1'
@@ -41,7 +41,7 @@ async def test_load_parameters(session) -> None:
                        }},
                    'lights': {'l1': {'state': {}}},
                    'sensors': {'s1': {
-                       'type': GENERICSTATUS[0],
+                       'type': GenericStatus.ZHATYPE[0],
                        'state': {},
                        'config': {}
                        }}
@@ -58,5 +58,5 @@ async def test_load_parameters(session) -> None:
     assert session.lights['l1'].deconz_id == '/lights/l1'
     assert 's1' in session.sensors
     assert session.sensors['s1'].deconz_id == '/sensors/s1'
-    assert session.sensors['s1'].type == GENERICSTATUS[0]
+    assert session.sensors['s1'].type == GenericStatus.ZHATYPE[0]
 

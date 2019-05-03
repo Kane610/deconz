@@ -6,31 +6,6 @@ from .deconzdevice import DeconzDevice, DeconzDeviceSetter
 
 _LOGGER = logging.getLogger(__name__)
 
-ALARM = ['ZHAAlarm']
-CARBONMONOXIDE = ['ZHACarbonMonoxide']
-CONSUMPTION = ['ZHAConsumption']
-DAYLIGHT = ['Daylight']
-FIRE = ['ZHAFire']
-GENERICFLAG = ['CLIPGenericFlag']
-GENERICSTATUS = ['CLIPGenericStatus']
-HUMIDITY = ['ZHAHumidity', 'CLIPHumidity']
-LIGHTLEVEL = ['ZHALightLevel', 'CLIPLightLevel']
-OPENCLOSE = ['ZHAOpenClose', 'CLIPOpenClose']
-POWER = ['ZHAPower']
-PRESENCE = ['ZHAPresence', 'CLIPPresence']
-PRESSURE = ['ZHAPressure', 'CLIPPressure']
-SWITCH = ['ZHASwitch', 'ZGPSwitch', 'CLIPSwitch']
-TEMPERATURE = ['ZHATemperature', 'CLIPTemperature']
-THERMOSTAT = ['ZHAThermostat', 'CLIPThermostat']
-VIBRATION = ['ZHAVibration']
-WATER = ['ZHAWater']
-
-DECONZ_BINARY_SENSOR = CARBONMONOXIDE + FIRE + GENERICFLAG + OPENCLOSE + \
-                       PRESENCE + VIBRATION + WATER
-DECONZ_SENSOR = CONSUMPTION + DAYLIGHT + GENERICSTATUS + HUMIDITY + \
-                LIGHTLEVEL + POWER + PRESSURE + SWITCH + TEMPERATURE
-OTHER_SENSOR = THERMOSTAT
-
 
 class DeconzSensor(DeconzDevice):
     """deCONZ sensor representation.
@@ -41,6 +16,13 @@ class DeconzSensor(DeconzDevice):
 
     DECONZ_TYPE = '/sensors/'
 
+    BINARY = None
+    ZHATYPE = set()
+
+    SENSOR_CLASS = None
+    SENSOR_ICON = None
+    SENSOR_UNIT = None
+
     def __init__(self, device_id, device):
         """Set initial information about sensor."""
         self._battery = device['config'].get('battery')
@@ -50,9 +32,6 @@ class DeconzSensor(DeconzDevice):
         self._reachable = device['config'].get('reachable')
         self._tampered = device['state'].get('tampered')
         # self._temperature = device['config'].get('temperature')
-        self._sensor_class = None
-        self._sensor_icon = None
-        self._sensor_unit = None
         super().__init__(device_id, device)
 
     def async_update(self, event, reason={}):
@@ -95,21 +74,6 @@ class DeconzSensor(DeconzDevice):
         return self._reachable
 
     @property
-    def sensor_class(self):
-        """Define what device class sensor belongs to."""
-        return self._sensor_class
-
-    @property
-    def sensor_icon(self):
-        """What Material Design icon should be used with this device."""
-        return self._sensor_icon
-
-    @property
-    def sensor_unit(self):
-        """What unit of measurement the sensor reports."""
-        return self._sensor_unit
-
-    @property
     def tampered(self):
         """Tampered."""
         return self._tampered
@@ -147,11 +111,15 @@ class Alarm(DeconzSensor):
     }
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHAAlarm',)
+
+    SENSOR_CLASS = 'motion'
+
     def __init__(self, device_id, device):
         """Initialize alarm sensor."""
         self._alarm = device['state'].get('alarm')
         super().__init__(device_id, device)
-        self._sensor_class = 'motion'
 
     @property
     def state(self):
@@ -192,11 +160,15 @@ class CarbonMonoxide(DeconzSensor):
     }
     """
 
+    BINARY = True
+    ZHATYPE = ('ZHACarbonMonoxide',)
+
+    SENSOR_CLASS = 'carbon_monoxide'
+
     def __init__(self, device_id, device):
         """Initialize Carbon monoxide sensor."""
         self._carbonmonoxide = device['state'].get('carbonmonoxide')
         super().__init__(device_id, device)
-        self._sensor_class = 'carbon_monoxide'
 
     @property
     def state(self):
@@ -237,11 +209,15 @@ class Consumption(DeconzSensor):
     }
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHAConsumption',)
+
+    SENSOR_CLASS = 'kWh'
+
     def __init__(self, device_id, device):
         """Initalize consumption sensor."""
         self._consumption = device['state'].get('consumption')
         super().__init__(device_id, device)
-        self._sensor_unit = 'kWh'
 
     @property
     def state(self):
@@ -286,6 +262,12 @@ class Daylight(DeconzSensor):
     }
     """
 
+    BINARY = False
+    ZHATYPE = ('Daylight',)
+
+    SENSOR_CLASS = 'daylight'
+    SENSOR_ICON = 'mdi:white-balance-sunny'
+
     def __init__(self, device_id, device):
         """Initialize daylight sensor."""
         self._configured = device['state'].get('configured')
@@ -295,8 +277,6 @@ class Daylight(DeconzSensor):
         self._sunsetoffset = device['config'].get('sunsetoffset')
         super().__init__(device_id, device)
         self._reachable = True
-        self._sensor_class = 'daylight'
-        self._sensor_icon = 'mdi:white-balance-sunny'
 
     @property
     def state(self):
@@ -381,11 +361,15 @@ class Fire(DeconzSensor):
     }
     """
 
+    BINARY = True
+    ZHATYPE = ('ZHAFire',)
+
+    SENSOR_CLASS = 'smoke'
+
     def __init__(self, device_id, device):
         """Initialize Fire sensor."""
         self._fire = device['state'].get('fire')
         super().__init__(device_id, device)
-        self._sensor_class = 'smoke'
 
     @property
     def state(self):
@@ -424,6 +408,9 @@ class GenericFlag(DeconzSensor):
     }
     """
 
+    BINARY = True
+    ZHATYPE = ('CLIPGenericFlag',)
+
     def __init__(self, device_id, device):
         """Initalize flag sensor."""
         self._flag = device['state'].get('flag')
@@ -451,6 +438,9 @@ class GenericStatus(DeconzSensor):
     State parameter is a number named 'status'.
     """
 
+    BINARY = False
+    ZHATYPE = ('CLIPGenericStatus',)
+
     def __init__(self, device_id, device):
         """Initalize generic sensor."""
         self._status = device['state'].get('status')
@@ -473,12 +463,16 @@ class Humidity(DeconzSensor):
     State parameter is a string named 'humidity'.
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHAHumidity', 'CLIPHumidity')
+
+    SENSOR_CLASS = 'humidity'
+    SENSOR_UNIT = '%'
+
     def __init__(self, device_id, device):
         """Initalize humidity sensor."""
         self._humidity = device['state'].get('humidity')
         super().__init__(device_id, device)
-        self._sensor_class = 'humidity'
-        self._sensor_unit = '%'
 
     @property
     def state(self):
@@ -525,6 +519,12 @@ class LightLevel(DeconzSensor):
     }
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHALightLevel', 'CLIPLightLevel')
+
+    SENSOR_CLASS = 'lux'
+    SENSOR_UNIT = 'lux'
+
     def __init__(self, device_id, device):
         """Initalize light level sensor."""
         self._dark = device['state'].get('dark')
@@ -534,8 +534,6 @@ class LightLevel(DeconzSensor):
         self._tholddark = device['config'].get('tholddark')
         self._tholdoffset = device['config'].get('tholdoffset')
         super().__init__(device_id, device)
-        self._sensor_class = 'lux'
-        self._sensor_unit = 'lux'
 
     @property
     def state(self):
@@ -582,11 +580,15 @@ class OpenClose(DeconzSensor):
     State parameter is a boolean named 'open'.
     """
 
+    BINARY = True
+    ZHATYPE = ('ZHAOpenClose', 'CLIPOpenClose')
+
+    SENSOR_CLASS = 'opening'
+
     def __init__(self, device_id, device):
         """Initialize Door/Window sensor."""
         self._open = device['state'].get('open')
         super().__init__(device_id, device)
-        self._sensor_class = 'opening'
 
     @property
     def state(self):
@@ -629,13 +631,17 @@ class Power(DeconzSensor):
     }
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHAPower',)
+
+    SENSOR_UNIT = 'Watts'
+
     def __init__(self, device_id, device):
         """Initalize power sensor."""
         self._current = device['state'].get('current')
         self._power = device['state'].get('power')
         self._voltage = device['state'].get('voltage')
         super().__init__(device_id, device)
-        self._sensor_unit = 'Watts'
 
     @property
     def state(self):
@@ -685,13 +691,17 @@ class Presence(DeconzSensor):
         'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0406'}
     """
 
+    BINARY = True
+    ZHATYPE = ('ZHAPresence', 'CLIPPresence')
+
+    SENSOR_CLASS = 'motion'
+
     def __init__(self, device_id, device):
         """Initialize presence detector."""
         self._dark = device['state'].get('dark')
         self._duration = device['config'].get('duration')
         self._presence = device['state'].get('presence')
         super().__init__(device_id, device)
-        self._sensor_class = 'motion'
 
     @property
     def state(self):
@@ -725,13 +735,17 @@ class Pressure(DeconzSensor):
     State parameter is a string named 'pressure'.
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHAPressure', 'CLIPPressure')
+
+    SENSOR_CLASS = 'pressure'
+    SENSOR_ICON = 'mdi:gauge'
+    SENSOR_UNIT = 'hPa'
+
     def __init__(self, device_id, device):
         """Initalize pressure sensor."""
         self._pressure = device['state'].get('pressure')
         super().__init__(device_id, device)
-        self._sensor_class = 'pressure'
-        self._sensor_icon = 'mdi:gauge'
-        self._sensor_unit = 'hPa'
 
     @property
     def state(self):
@@ -749,6 +763,9 @@ class Switch(DeconzSensor):
 
     State parameter is a string named 'buttonevent'.
     """
+
+    BINARY = False
+    ZHATYPE = ('ZHASwitch', 'ZGPSwitch', 'CLIPSwitch')
 
     def __init__(self, device_id, device):
         """Initalize switch sensor."""
@@ -772,13 +789,17 @@ class Temperature(DeconzSensor):
     State parameter is a string named 'temperature'.
     """
 
+    BINARY = False
+    ZHATYPE = ('ZHATemperature', 'CLIPTemperature')
+
+    SENSOR_CLASS = 'temperature'
+    SENSOR_ICON = 'mdi:thermometer'
+    SENSOR_UNIT = '°C'
+
     def __init__(self, device_id, device):
         """Initalize temperature sensor."""
         self._temperature = device['state'].get('temperature')
         super().__init__(device_id, device)
-        self._sensor_class = 'temperature'
-        self._sensor_icon = 'mdi:thermometer'
-        self._sensor_unit = '°C'
 
     @property
     def state(self):
@@ -828,6 +849,9 @@ class Thermostat(Temperature, DeconzDeviceSetter):
         "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201"
     }
     """
+
+    BINARY = False
+    ZHATYPE = ('ZHAThermostat', 'CLIPThermostat')
 
     def __init__(self, device_id, device, loop, async_set_state_callback):
         """Initalize temperature sensor."""
@@ -911,6 +935,11 @@ class Vibration(DeconzSensor):
     }
     """
 
+    BINARY = True
+    ZHATYPE = ('ZHAVibration',)
+
+    SENSOR_CLASS = 'motion'
+
     def __init__(self, device_id, device):
         """Initalize vibration sensor."""
         self._sensitivity = device['config'].get('sensitivity')
@@ -920,7 +949,6 @@ class Vibration(DeconzSensor):
         self._vibration = device['state'].get('vibration')
         self._vibrationstrength = device['state'].get('vibrationstrength')
         super().__init__(device_id, device)
-        self._sensor_class = 'motion'
 
     @property
     def state(self):
@@ -991,11 +1019,15 @@ class Water(DeconzSensor):
     }
     """
 
+    BINARY = True
+    ZHATYPE = ('ZHAWater',)
+
+    SENSOR_CLASS = 'moisture'
+
     def __init__(self, device_id, device):
         """Initialize Water sensor."""
         self._water = device['state'].get('water')
         super().__init__(device_id, device)
-        self._sensor_class = 'moisture'
 
     @property
     def state(self):
@@ -1013,49 +1045,28 @@ class Water(DeconzSensor):
         return self._water
 
 
-def create_sensor(
-        sensor_id, sensor, loop, async_set_state_callback):
+SENSOR_CLASSES = (
+    Alarm, Consumption, CarbonMonoxide, Daylight, Fire, GenericFlag,
+    GenericStatus, Humidity, LightLevel, OpenClose, Power, Presence, Pressure,
+    Switch, Temperature, Thermostat, Vibration, Water)
+
+
+def create_sensor(sensor_id, sensor, loop, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] in CONSUMPTION:
-        return Consumption(sensor_id, sensor)
-    if sensor['type'] in CARBONMONOXIDE:
-        return CarbonMonoxide(sensor_id, sensor)
-    if sensor['type'] in DAYLIGHT:
-        return Daylight(sensor_id, sensor)
-    if sensor['type'] in FIRE:
-        return Fire(sensor_id, sensor)
-    if sensor['type'] in GENERICFLAG:
-        return GenericFlag(sensor_id, sensor)
-    if sensor['type'] in GENERICSTATUS:
-        return GenericStatus(sensor_id, sensor)
-    if sensor['type'] in HUMIDITY:
-        return Humidity(sensor_id, sensor)
-    if sensor['type'] in LIGHTLEVEL:
-        return LightLevel(sensor_id, sensor)
-    if sensor['type'] in OPENCLOSE:
-        return OpenClose(sensor_id, sensor)
-    if sensor['type'] in POWER:
-        return Power(sensor_id, sensor)
-    if sensor['type'] in PRESENCE:
-        return Presence(sensor_id, sensor)
-    if sensor['type'] in PRESSURE:
-        return Pressure(sensor_id, sensor)
-    if sensor['type'] in SWITCH:
-        return Switch(sensor_id, sensor)
-    if sensor['type'] in TEMPERATURE:
-        return Temperature(sensor_id, sensor)
-    if sensor['type'] in THERMOSTAT:
+    if sensor['type'] in Thermostat.ZHATYPE:
         return Thermostat(sensor_id, sensor, loop, async_set_state_callback)
-    if sensor['type'] in VIBRATION:
-        return Vibration(sensor_id, sensor)
-    if sensor['type'] in WATER:
-        return Water(sensor_id, sensor)
+
+    for sensor_class in SENSOR_CLASSES:
+        if sensor['type'] in sensor_class.ZHATYPE:
+            return sensor_class(sensor_id, sensor)
 
 
 def supported_sensor(sensor):
     """Check if sensor is supported by pydeconz."""
-    if sensor['type'] in DECONZ_BINARY_SENSOR + DECONZ_SENSOR + OTHER_SENSOR:
-        return True
+    for sensor_class in SENSOR_CLASSES:
+        if sensor['type'] in sensor_class.ZHATYPE:
+            return True
+
     _LOGGER.info('Unsupported sensor type %s (%s)',
                  sensor['type'], sensor['name'])
     return False
