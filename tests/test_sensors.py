@@ -53,7 +53,7 @@ async def test_carbonmonoxide_sensor():
     """Verify that vibration sensor works."""
     sensor = create_sensor('0', FIXTURE_CARBONMONOXIDE, None, None)
 
-    assert sensor.BINARY == True
+    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ('ZHACarbonMonoxide',)
     assert sensor.SENSOR_CLASS == 'carbon_monoxide'
 
@@ -82,7 +82,7 @@ async def test_thermostat_sensor():
     """Verify that thermostat sensor works."""
     sensor = create_sensor('0', FIXTURE_THERMOSTAT, None, None)
 
-    assert sensor.BINARY == False
+    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ('ZHAThermostat', 'CLIPThermostat')
 
     assert sensor.state == 21.5
