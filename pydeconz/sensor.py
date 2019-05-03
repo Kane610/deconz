@@ -23,17 +23,6 @@ class DeconzSensor(DeconzDevice):
     SENSOR_ICON = None
     SENSOR_UNIT = None
 
-    def __init__(self, device_id, device):
-        """Set initial information about sensor."""
-        self._battery = device['config'].get('battery')
-        self._ep = device.get('ep')
-        self._lowbattery = device['state'].get('lowbattery')
-        self._on = device['config'].get('on')
-        self._reachable = device['config'].get('reachable')
-        self._tampered = device['state'].get('tampered')
-        # self._temperature = device['config'].get('temperature')
-        super().__init__(device_id, device)
-
     def async_update(self, event, reason={}):
         """New event for sensor.
 
@@ -51,32 +40,32 @@ class DeconzSensor(DeconzDevice):
     @property
     def battery(self):
         """The battery status of the sensor."""
-        return self._battery
+        return self.raw['config'].get('battery')
 
     @property
     def ep(self):
         """The Endpoint of the sensor."""
-        return self._ep
+        return self.raw.get('ep')
 
     @property
     def lowbattery(self):
         """Low battery."""
-        return self._lowbattery
+        return self.raw['state'].get('lowbattery')
 
     @property
     def on(self):
         """Declare if the sensor is on or off."""
-        return self._on
+        return self.raw['config'].get('on')
 
     @property
     def reachable(self):
         """Declare if the sensor is reachable."""
-        return self._reachable
+        return self.raw['config'].get('reachable', True)
 
     @property
     def tampered(self):
         """Tampered."""
-        return self._tampered
+        return self.raw['state'].get('tampered')
 
     # @property
     # def temperature(self):
@@ -116,11 +105,6 @@ class Alarm(DeconzSensor):
 
     SENSOR_CLASS = 'motion'
 
-    def __init__(self, device_id, device):
-        """Initialize alarm sensor."""
-        self._alarm = device['state'].get('alarm')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -129,7 +113,7 @@ class Alarm(DeconzSensor):
     @property
     def alarm(self):
         """Alarm."""
-        return self._alarm
+        return self.raw['state'].get('alarm')
 
 
 class CarbonMonoxide(DeconzSensor):
@@ -165,11 +149,6 @@ class CarbonMonoxide(DeconzSensor):
 
     SENSOR_CLASS = 'carbon_monoxide'
 
-    def __init__(self, device_id, device):
-        """Initialize Carbon monoxide sensor."""
-        self._carbonmonoxide = device['state'].get('carbonmonoxide')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -178,7 +157,7 @@ class CarbonMonoxide(DeconzSensor):
     @property
     def carbonmonoxide(self):
         """Fire detected."""
-        return self._carbonmonoxide
+        return self.raw['state'].get('carbonmonoxide')
 
     @property
     def is_tripped(self):
@@ -214,11 +193,6 @@ class Consumption(DeconzSensor):
 
     SENSOR_CLASS = 'kWh'
 
-    def __init__(self, device_id, device):
-        """Initalize consumption sensor."""
-        self._consumption = device['state'].get('consumption')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -230,7 +204,7 @@ class Consumption(DeconzSensor):
     @property
     def consumption(self):
         """Consumption."""
-        return self._consumption
+        return self.raw['state'].get('consumption')
 
 
 class Daylight(DeconzSensor):
@@ -268,16 +242,6 @@ class Daylight(DeconzSensor):
     SENSOR_CLASS = 'daylight'
     SENSOR_ICON = 'mdi:white-balance-sunny'
 
-    def __init__(self, device_id, device):
-        """Initialize daylight sensor."""
-        self._configured = device['state'].get('configured')
-        self._daylight = device['state'].get('daylight')
-        self._status = device['state'].get('status')
-        self._sunriseoffset = device['config'].get('sunriseoffset')
-        self._sunsetoffset = device['config'].get('sunsetoffset')
-        super().__init__(device_id, device)
-        self._reachable = True
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -286,56 +250,56 @@ class Daylight(DeconzSensor):
     @property
     def configured(self):
         """Is daylight sensor configured."""
-        return self._configured
+        return self.raw['state'].get('configured')
 
     @property
     def daylight(self):
         """True if daylight, false if not."""
-        return self._daylight
+        return self.raw['state'].get('daylight')
 
     @property
     def status(self):
         """Return the daylight status string."""
-        if self._status == 100:
+        status = self.raw['state'].get('status')
+        if status == 100:
             return "nadir"
-        elif self._status == 110:
+        if status == 110:
             return "night_end"
-        elif self._status == 120:
+        if status == 120:
             return "nautical_dawn"
-        elif self._status == 130:
+        if status == 130:
             return "dawn"
-        elif self._status == 140:
+        if status == 140:
             return "sunrise_start"
-        elif self._status == 150:
+        if status == 150:
             return "sunrise_end"
-        elif self._status == 160:
+        if status == 160:
             return "golden_hour_1"
-        elif self._status == 170:
+        if status == 170:
             return "solar_noon"
-        elif self._status == 180:
+        if status == 180:
             return "golden_hour_2"
-        elif self._status == 190:
+        if status == 190:
             return "sunset_start"
-        elif self._status == 200:
+        if status == 200:
             return "sunset_end"
-        elif self._status == 210:
+        if status == 210:
             return "dusk"
-        elif self._status == 220:
+        if status == 220:
             return "nautical_dusk"
-        elif self._status == 230:
+        if status == 230:
             return "night_start"
-        else:
-            return "unknown"
+        return "unknown"
 
     @property
     def sunriseoffset(self):
         """Sunrise offset."""
-        return self._sunriseoffset
+        return self.raw['config'].get('sunriseoffset')
 
     @property
     def sunsetoffset(self):
         """Sunset offset."""
-        return self._sunsetoffset
+        return self.raw['config'].get('sunsetoffset')
 
 
 class Fire(DeconzSensor):
@@ -366,11 +330,6 @@ class Fire(DeconzSensor):
 
     SENSOR_CLASS = 'smoke'
 
-    def __init__(self, device_id, device):
-        """Initialize Fire sensor."""
-        self._fire = device['state'].get('fire')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -379,7 +338,7 @@ class Fire(DeconzSensor):
     @property
     def fire(self):
         """Fire detected."""
-        return self._fire
+        return self.raw['state'].get('fire')
 
     @property
     def is_tripped(self):
@@ -411,11 +370,6 @@ class GenericFlag(DeconzSensor):
     BINARY = True
     ZHATYPE = ('CLIPGenericFlag',)
 
-    def __init__(self, device_id, device):
-        """Initalize flag sensor."""
-        self._flag = device['state'].get('flag')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -424,7 +378,7 @@ class GenericFlag(DeconzSensor):
     @property
     def flag(self):
         """Flag status."""
-        return self._flag
+        return self.raw['state'].get('flag')
 
     @property
     def is_tripped(self):
@@ -441,11 +395,6 @@ class GenericStatus(DeconzSensor):
     BINARY = False
     ZHATYPE = ('CLIPGenericStatus',)
 
-    def __init__(self, device_id, device):
-        """Initalize generic sensor."""
-        self._status = device['state'].get('status')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -454,7 +403,7 @@ class GenericStatus(DeconzSensor):
     @property
     def status(self):
         """Status."""
-        return self._status
+        return self.raw['state'].get('status')
 
 
 class Humidity(DeconzSensor):
@@ -469,11 +418,6 @@ class Humidity(DeconzSensor):
     SENSOR_CLASS = 'humidity'
     SENSOR_UNIT = '%'
 
-    def __init__(self, device_id, device):
-        """Initalize humidity sensor."""
-        self._humidity = device['state'].get('humidity')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -485,7 +429,7 @@ class Humidity(DeconzSensor):
     @property
     def humidity(self):
         """Humidity level."""
-        return self._humidity
+        return self.raw['state'].get('humidity')
 
 
 class LightLevel(DeconzSensor):
@@ -525,16 +469,6 @@ class LightLevel(DeconzSensor):
     SENSOR_CLASS = 'lux'
     SENSOR_UNIT = 'lux'
 
-    def __init__(self, device_id, device):
-        """Initalize light level sensor."""
-        self._dark = device['state'].get('dark')
-        self._daylight = device['state'].get('daylight')
-        self._lightlevel = device['state'].get('lightlevel')
-        self._lux = device['state'].get('lux')
-        self._tholddark = device['config'].get('tholddark')
-        self._tholdoffset = device['config'].get('tholdoffset')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -546,32 +480,32 @@ class LightLevel(DeconzSensor):
     @property
     def dark(self):
         """If the area near the sensor is light or not."""
-        return self._dark
+        return self.raw['state'].get('dark')
 
     @property
     def daylight(self):
         """Daylight."""
-        return self._daylight
+        return self.raw['state'].get('daylight')
 
     @property
     def lightlevel(self):
         """Light level."""
-        return self._lightlevel
+        return self.raw['state'].get('daylight')
 
     @property
     def lux(self):
         """Lux."""
-        return self._lux
+        return self.raw['state'].get('daylight')
 
     @property
     def tholddark(self):
         """Threshold to hold dark."""
-        return self._tholddark
+        return self.raw['config'].get('tholddark')
 
     @property
     def tholdoffset(self):
         """Offset for threshold to hold dark."""
-        return self._tholdoffset
+        return self.raw['config'].get('tholddark')
 
 
 class OpenClose(DeconzSensor):
@@ -584,11 +518,6 @@ class OpenClose(DeconzSensor):
     ZHATYPE = ('ZHAOpenClose', 'CLIPOpenClose')
 
     SENSOR_CLASS = 'opening'
-
-    def __init__(self, device_id, device):
-        """Initialize Door/Window sensor."""
-        self._open = device['state'].get('open')
-        super().__init__(device_id, device)
 
     @property
     def state(self):
@@ -603,7 +532,7 @@ class OpenClose(DeconzSensor):
     @property
     def open(self):
         """Door open."""
-        return self._open
+        return self.raw['state'].get('open')
 
 
 class Power(DeconzSensor):
@@ -636,13 +565,6 @@ class Power(DeconzSensor):
 
     SENSOR_UNIT = 'Watts'
 
-    def __init__(self, device_id, device):
-        """Initalize power sensor."""
-        self._current = device['state'].get('current')
-        self._power = device['state'].get('power')
-        self._voltage = device['state'].get('voltage')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -651,17 +573,17 @@ class Power(DeconzSensor):
     @property
     def current(self):
         """Current."""
-        return self._current
+        return self.raw['state'].get('current')
 
     @property
     def power(self):
         """Power."""
-        return self._power
+        return self.raw['state'].get('power')
 
     @property
     def voltage(self):
         """Voltage."""
-        return self._voltage
+        return self.raw['state'].get('voltage')
 
 
 class Presence(DeconzSensor):
@@ -696,13 +618,6 @@ class Presence(DeconzSensor):
 
     SENSOR_CLASS = 'motion'
 
-    def __init__(self, device_id, device):
-        """Initialize presence detector."""
-        self._dark = device['state'].get('dark')
-        self._duration = device['config'].get('duration')
-        self._presence = device['state'].get('presence')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -711,12 +626,12 @@ class Presence(DeconzSensor):
     @property
     def dark(self):
         """If the area near the sensor is light or not."""
-        return self._dark
+        return self.raw['state'].get('voltage')
 
     @property
     def duration(self):
         """Minimum duration which presence will be true."""
-        return self._duration
+        return self.raw['config'].get('duration')
 
     @property
     def is_tripped(self):
@@ -726,7 +641,7 @@ class Presence(DeconzSensor):
     @property
     def presence(self):
         """Motion detected."""
-        return self._presence
+        return self.raw['state'].get('presence')
 
 
 class Pressure(DeconzSensor):
@@ -742,11 +657,6 @@ class Pressure(DeconzSensor):
     SENSOR_ICON = 'mdi:gauge'
     SENSOR_UNIT = 'hPa'
 
-    def __init__(self, device_id, device):
-        """Initalize pressure sensor."""
-        self._pressure = device['state'].get('pressure')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -755,7 +665,7 @@ class Pressure(DeconzSensor):
     @property
     def pressure(self):
         """Pressure."""
-        return self._pressure
+        return self.raw['state'].get('pressure')
 
 
 class Switch(DeconzSensor):
@@ -767,11 +677,6 @@ class Switch(DeconzSensor):
     BINARY = False
     ZHATYPE = ('ZHASwitch', 'ZGPSwitch', 'CLIPSwitch')
 
-    def __init__(self, device_id, device):
-        """Initalize switch sensor."""
-        self._buttonevent = device['state'].get('buttonevent')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of switch."""
@@ -780,7 +685,7 @@ class Switch(DeconzSensor):
     @property
     def buttonevent(self):
         """Button press."""
-        return self._buttonevent
+        return self.raw['state'].get('pressure')
 
 
 class Temperature(DeconzSensor):
@@ -796,11 +701,6 @@ class Temperature(DeconzSensor):
     SENSOR_ICON = 'mdi:thermometer'
     SENSOR_UNIT = '°C'
 
-    def __init__(self, device_id, device):
-        """Initalize temperature sensor."""
-        self._temperature = device['state'].get('temperature')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -809,7 +709,7 @@ class Temperature(DeconzSensor):
     @property
     def temperature(self):
         """Temperature."""
-        return self.convert_temperature(self._temperature)
+        return self.convert_temperature(self.raw['state'].get('temperature'))
 
     def convert_temperature(self, temperature):
         """Convert temperature to celsius"""
@@ -853,18 +753,10 @@ class Thermostat(Temperature, DeconzDeviceSetter):
     BINARY = False
     ZHATYPE = ('ZHAThermostat', 'CLIPThermostat')
 
-    def __init__(self, device_id, device, loop, async_set_state_callback):
+    def __init__(self, device_id, raw, loop, async_set_state_callback):
         """Initalize temperature sensor."""
-        self._heatsetpoint = device['config'].get('heatsetpoint')
-        self._locked = device['config'].get('locked')
-        self._mode = device['config'].get('mode')
-        self._offset = device['config'].get('offset')
-        self._valve = device['state'].get('valve')
-
-        Temperature.__init__(self, device_id, device)
+        Temperature.__init__(self, device_id, raw)
         DeconzDeviceSetter.__init__(self, loop, async_set_state_callback)
-
-        self._on = device['state'].get('on')
 
     async def async_set_config(self, data):
         """Set config of thermostat.
@@ -881,22 +773,32 @@ class Thermostat(Temperature, DeconzDeviceSetter):
     @property
     def heatsetpoint(self):
         """Heating setpoint"""
-        return self.convert_temperature(self._heatsetpoint)
+        return self.convert_temperature(self.raw['config'].get('heatsetpoint'))
+
+    @property
+    def locked(self):
+        """"""
+        return self.raw['config'].get('locked')
 
     @property
     def mode(self):
         """Thermostat mode; "off", "heat", and "auto"."""
-        return self._mode
+        return self.raw['config'].get('mode')
 
     @property
     def offset(self):
         """Temperature offset."""
-        return self._offset
+        return self.raw['config'].get('offset')
+
+    @property
+    def on(self):
+        """Declare if the sensor is on or off."""
+        return self.raw['state'].get('on')
 
     @property
     def valve(self):
         """How open the valve is."""
-        return self._valve
+        return self.raw['state'].get('valve')
 
 
 class Vibration(DeconzSensor):
@@ -940,16 +842,6 @@ class Vibration(DeconzSensor):
 
     SENSOR_CLASS = 'motion'
 
-    def __init__(self, device_id, device):
-        """Initalize vibration sensor."""
-        self._sensitivity = device['config'].get('sensitivity')
-        self._sensitivitymax = device['config'].get('sensitivitymax')
-        self._orientation = device['state'].get('orientation')
-        self._tiltangle = device['state'].get('tiltangle')
-        self._vibration = device['state'].get('vibration')
-        self._vibrationstrength = device['state'].get('vibrationstrength')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -963,32 +855,32 @@ class Vibration(DeconzSensor):
     @property
     def orientation(self) -> list:
         """Orientation."""
-        return self._orientation
+        return self.raw['state'].get('orientation')
 
     @property
     def sensitivity(self) -> int:
         """Configured sensitivity"""
-        return self._sensitivity
+        return self.raw['config'].get('sensitivity')
 
     @property
     def sensitivitymax(self) -> int:
         """Configured max sensitivity."""
-        return self._sensitivitymax
+        return self.raw['config'].get('sensitivitymax')
 
     @property
     def tiltangle(self) -> int:
         """Tilt angle."""
-        return self._tiltangle
+        return self.raw['state'].get('tiltangle')
 
     @property
     def vibration(self) -> bool:
         """Vibration."""
-        return self._vibration
+        return self.raw['state'].get('vibration')
 
     @property
     def vibrationstrength(self) -> int:
         """Strength of vibration."""
-        return self._vibrationstrength
+        return self.raw['state'].get('vibrationstrength')
 
 
 class Water(DeconzSensor):
@@ -1024,11 +916,6 @@ class Water(DeconzSensor):
 
     SENSOR_CLASS = 'moisture'
 
-    def __init__(self, device_id, device):
-        """Initialize Water sensor."""
-        self._water = device['state'].get('water')
-        super().__init__(device_id, device)
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -1042,7 +929,7 @@ class Water(DeconzSensor):
     @property
     def water(self):
         """Water detected."""
-        return self._water
+        return self.raw['state'].get('water')
 
 
 SENSOR_CLASSES = (

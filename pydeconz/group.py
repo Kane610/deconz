@@ -16,33 +16,13 @@ class DeconzGroup(DeconzLightBase):
 
     DECONZ_TYPE = '/groups/'
 
-    def __init__(self, device_id, device, loop, async_set_state_callback):
+    def __init__(self, device_id, raw, loop, async_set_state_callback):
         """Set initial information about light group.
 
         Set callback to set state of device.
         """
-        self._all_on = device['state'].get('all_on')
-        self._any_on = device['state'].get('any_on')
-        self._bri = device['action'].get('bri')
-        self._class = device.get('class')
-        self._colormode = device['action'].get('colormode')
-        self._ct = device['action'].get('ct')
-        self._devicemembership = device.get('devicemembership')
-        self._effect = device['action'].get('effect')
-        self._hidden = device.get('hidden')
-        self._hue = device['action'].get('hue')
-        self._id = device.get('id')
-        self._lights = device.get('lights')
-        self._lightsequence = device.get('lightsequence')
-        self._multideviceids = device.get('multideviceids')
-        self._on = device['action'].get('on')
-        self._reachable = True
-        self._sat = device['action'].get('sat')
-        self._scenes = {}
-        self._xy = (None, None)
-        self._x, self._y = device['action'].get('xy', (None, None))
-        super().__init__(device_id, device, loop, async_set_state_callback)
-        self.async_add_scenes(device.get('scenes'), async_set_state_callback)
+        super().__init__(device_id, raw, loop, async_set_state_callback)
+        self.async_add_scenes(raw.get('scenes'), async_set_state_callback)
 
     async def async_set_state(self, data):
         """Set state of light group.
@@ -62,32 +42,102 @@ class DeconzGroup(DeconzLightBase):
 
         await self.async_set(field, data)
 
-    def as_dict(self):
-        """Callback for __dict__."""
-        cdict = super().as_dict()
-        if '_scenes' in cdict:
-            del cdict['_scenes']
-        return cdict
-
     @property
     def state(self):
         """True if any light in light group is on."""
-        return self._any_on
+        return self.any_on
+
+    @property
+    def brightness(self):
+        """Brightness of the light.
+
+        Depending on the light type 0 might not mean visible "off"
+        but minimum brightness.
+        """
+        return self.raw['action'].get('bri')
+
+    @property
+    def ct(self):
+        """Mired color temperature of the light. (2000K - 6500K)."""
+        return self.raw['action'].get('ct')
+
+    @property
+    def hue(self):
+        """Color hue of the light.
+
+        The hue parameter in the HSV color model is between 0°-360°
+        and is mapped to 0..65535 to get 16-bit resolution.
+        """
+        return self.raw['action'].get('hue')
+
+    @property
+    def sat(self):
+        """Color saturation of the light.
+
+        There 0 means no color at all and 255 is the greatest saturation
+        of the color.
+        """
+        return self.raw['action'].get('sat')
+
+    @property
+    def xy(self):
+        """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
+        if 'xy' not in self.raw['action']:
+            return None
+
+        x, y = self.raw['action']['xy']
+
+        if x > 1:
+            x = x / 65555
+
+        if y > 1:
+            y = y / 65555
+
+        return (x, y)
+
+    @property
+    def colormode(self):
+        """The current color mode of the light.
+
+        hs - hue and saturation
+        xy - CIE xy values
+        ct - color temperature
+        """
+        return self.raw['action'].get('colormode')
+
+    @property
+    def effect(self):
+        """Effect of the light.
+
+        none - no effect
+        colorloop
+        """
+        return self.raw['action'].get('effect')
+
+    @property
+    def reachable(self):
+        """True if the light is reachable and accepts commands."""
+        return True
 
     @property
     def groupclass(self):
         """"""
-        return self._class
+        return self.raw.get('class')
 
     @property
     def all_on(self):
         """True if all lights in light group are on"""
-        return self._all_on
+        return self.raw['state'].get('all_on')
+
+    @property
+    def any_on(self):
+        """True if any lights in light group are on"""
+        return self.raw['state'].get('any_on')
 
     @property
     def devicemembership(self):
         """List of device ids (sensors) when group was created by a device."""
-        return self._devicemembership
+        return self.raw.get('devicemembership')
 
     @property
     def hidden(self):
@@ -95,12 +145,12 @@ class DeconzGroup(DeconzLightBase):
 
         Has no effect at the gateway but apps can uses this to hide groups.
         """
-        return self._hidden
+        return self.raw.get('hidden')
 
     @property
     def id(self):
         """The id of the group."""
-        return self._id
+        return self.raw.get('id')
 
     @property
     def lights(self):
@@ -108,7 +158,7 @@ class DeconzGroup(DeconzLightBase):
 
         Sequence is defined by the gateway.
         """
-        return self._lights
+        return self.raw.get('lights')
 
     @property
     def lightsequence(self):
@@ -116,7 +166,7 @@ class DeconzGroup(DeconzLightBase):
 
         Need not to contain all light ids of this group.
         """
-        return self._lightsequence
+        return self.raw.get('lightsequence')
 
     @property
     def multideviceids(self):
@@ -124,7 +174,7 @@ class DeconzGroup(DeconzLightBase):
 
         Subsequent ids from multidevices with multiple endpoints.
         """
-        return self._multideviceids
+        return self.raw.get('multideviceids')
 
     @property
     def scenes(self):
@@ -198,10 +248,3 @@ class DeconzScene:
     def name(self):
         """Scene name."""
         return self._name
-
-    def as_dict(self):
-        """Callback for __dict__."""
-        cdict = self.__dict__.copy()
-        if '_async_set_state_callback' in cdict:
-            del cdict['_async_set_state_callback']
-        return cdict

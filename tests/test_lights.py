@@ -43,32 +43,12 @@ async def test_create_light():
 
     event = {"state": {
         "lastupdated": "2019-03-15T10:15:17",
-        "x": 0.1,
-        "y": 0.1
+        "xy": [0.1, 0.1],
     }}
     light.async_update(event)
 
     assert light.xy == (0.1, 0.1)
     mock_callback.assert_called_with({})
-
-    event = {"state": {
-        "lastupdated": "2019-03-15T10:15:17",
-        "xy": [0.2, 0.2],
-        "x": 0.1,
-        "y": 0.1
-    }}
-    light.async_update(event)
-
-    assert light.xy == (0.2, 0.2)
-
-    event = {"state": {
-        "lastupdated": "2019-03-15T10:15:17",
-        "x": 0.1,
-        "y": 0.1
-    }}
-    light.async_update(event)
-
-    assert light.xy == (0.2, 0.2)
 
     light.remove_callback(mock_callback)
     assert not light._async_callbacks

@@ -17,18 +17,13 @@ class DeconzDevice:
 
     DECONZ_TYPE = ''
 
-    def __init__(self, device_id, device):
+    def __init__(self, device_id, raw):
         """Set initial information common to all device types."""
-        self._device_id = device_id
-        self._etag = device.get('etag')
-        self._manufacturername = device.get('manufacturername')
-        self._modelid = device.get('modelid')
-        self._name = device.get('name')
-        self._swversion = device.get('swversion')
-        self._type = device.get('type')
-        self._uniqueid = device.get('uniqueid')
+        self.device_id = device_id
+        self.raw = raw
+
         self._async_callbacks = []
-        _LOGGER.debug('%s created as \n%s', self._name, pformat(self.__dict__))
+        _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
 
     def register_async_callback(self, async_callback):
         """Register callback for signalling.
@@ -66,52 +61,45 @@ class DeconzDevice:
         for async_signal_update in self._async_callbacks:
             async_signal_update(reason)
 
-    def as_dict(self):
-        """Callback for __dict__."""
-        cdict = self.__dict__.copy()
-        if '_callback' in cdict:
-            del cdict['_callback']
-        return cdict
-
     @property
     def deconz_id(self):
         """Id to call device over API e.g. /sensors/1."""
-        return self.DECONZ_TYPE + self._device_id
+        return self.DECONZ_TYPE + self.device_id
 
     @property
     def etag(self):
         """HTTP etag which changes on any action to the device."""
-        return self._etag
+        return self.raw.get('etag')
 
     @property
     def manufacturer(self):
         """The manufacturer of the device."""
-        return self._manufacturername
+        return self.raw.get('manufacturername')
 
     @property
     def modelid(self):
         """An identifier unique to the product."""
-        return self._modelid
+        return self.raw.get('modelid')
 
     @property
     def name(self):
         """Name of the device."""
-        return self._name
+        return self.raw.get('name')
 
     @property
     def swversion(self):
         """Firmware version."""
-        return self._swversion
+        return self.raw.get('swversion')
 
     @property
     def type(self):
         """Human readable type of the device."""
-        return self._type
+        return self.raw.get('type')
 
     @property
     def uniqueid(self):
         """The current state of the device."""
-        return self._uniqueid
+        return self.raw.get('uniqueid')
 
 
 class DeconzDeviceSetter:

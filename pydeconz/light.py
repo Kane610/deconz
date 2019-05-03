@@ -14,12 +14,12 @@ class DeconzLightBase(DeconzDevice, DeconzDeviceSetter):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    def __init__(self, device_id, device, loop, async_set_state_callback):
+    def __init__(self, device_id, raw, loop, async_set_state_callback):
         """Set initial information about light.
 
         Set async callback to set state of device.
         """
-        DeconzDevice.__init__(self, device_id, device)
+        DeconzDevice.__init__(self, device_id, raw)
         DeconzDeviceSetter.__init__(self, loop, async_set_state_callback)
 
     def async_update(self, event):
@@ -31,86 +31,6 @@ class DeconzLightBase(DeconzDevice, DeconzDeviceSetter):
         self.update_attr(event.get('state', {}))
         super().async_update(event)
 
-    def as_dict(self):
-        """Callback for __dict__."""
-        cdict = super().as_dict()
-        if '_async_set_state_callback' in cdict:
-            del cdict['_async_set_state_callback']
-        return cdict
-
-    @property
-    def brightness(self):
-        """Brightness of the light.
-
-        Depending on the light type 0 might not mean visible "off"
-        but minimum brightness.
-        """
-        return self._bri
-
-    @property
-    def hue(self):
-        """Color hue of the light.
-
-        The hue parameter in the HSV color model is between 0°-360°
-        and is mapped to 0..65535 to get 16-bit resolution.
-        """
-        return self._hue
-
-    @property
-    def sat(self):
-        """Color saturation of the light.
-
-        There 0 means no color at all and 255 is the greatest saturation
-        of the color.
-        """
-        return self._sat
-
-    @property
-    def ct(self):
-        """Mired color temperature of the light. (2000K - 6500K)."""
-        return self._ct
-
-    @property
-    def xy(self):
-        """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if self._xy != (None, None):
-            self._x, self._y = self._xy
-
-        if self._x is not None and self._y is not None:
-            x = self._x
-            if self._x > 1:
-                x = self._x / 65555
-            y = self._y
-            if self._y > 1:
-                y = self._y / 65555
-            return (x, y)
-
-        return None
-
-    @property
-    def colormode(self):
-        """The current color mode of the light.
-
-        hs - hue and saturation
-        xy - CIE xy values
-        ct - color temperature
-        """
-        return self._colormode
-
-    @property
-    def effect(self):
-        """Effect of the light.
-
-        none - no effect
-        colorloop
-        """
-        return self._effect
-
-    @property
-    def reachable(self):
-        """True if the light is reachable and accepts commands."""
-        return self._reachable
-
 
 class DeconzLight(DeconzLightBase):
     """deCONZ light representation.
@@ -121,23 +41,12 @@ class DeconzLight(DeconzLightBase):
 
     DECONZ_TYPE = '/lights/'
 
-    def __init__(self, device_id, device, loop, async_set_state_callback):
+    def __init__(self, device_id, raw, loop, async_set_state_callback):
         """Set initial information about light.
 
         Set async callback to set state of device.
         """
-        self._alert = device['state'].get('alert')
-        self._bri = device['state'].get('bri')
-        self._colormode = device['state'].get('colormode')
-        self._ct = device['state'].get('ct')
-        self._effect = device['state'].get('effect')
-        self._hue = device['state'].get('hue')
-        self._on = device['state'].get('on')
-        self._reachable = device['state'].get('reachable')
-        self._sat = device['state'].get('sat')
-        self._xy = (None, None)
-        self._x, self._y = device['state'].get('xy', (None, None))
-        super().__init__(device_id, device, loop, async_set_state_callback)
+        super().__init__(device_id, raw, loop, async_set_state_callback)
 
     async def async_set_state(self, data):
         """Set state of light.
@@ -157,7 +66,7 @@ class DeconzLight(DeconzLightBase):
     @property
     def state(self):
         """True if the light is on."""
-        return self._on
+        return self.raw['state'].get('on')
 
     @property
     def alert(self):
@@ -168,4 +77,76 @@ class DeconzLight(DeconzLightBase):
         select - light is blinking a short time
         lselect - light is blinking a longer time
         """
-        return self._alert
+        return self.raw['state'].get('alert')
+
+    @property
+    def brightness(self):
+        """Brightness of the light.
+
+        Depending on the light type 0 might not mean visible "off"
+        but minimum brightness.
+        """
+        return self.raw['state'].get('bri')
+
+    @property
+    def ct(self):
+        """Mired color temperature of the light. (2000K - 6500K)."""
+        return self.raw['state'].get('ct')
+
+    @property
+    def hue(self):
+        """Color hue of the light.
+
+        The hue parameter in the HSV color model is between 0°-360°
+        and is mapped to 0..65535 to get 16-bit resolution.
+        """
+        return self.raw['state'].get('hue')
+
+    @property
+    def sat(self):
+        """Color saturation of the light.
+
+        There 0 means no color at all and 255 is the greatest saturation
+        of the color.
+        """
+        return self.raw['state'].get('sat')
+
+    @property
+    def xy(self):
+        """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
+        if 'xy' not in self.raw['state']:
+            return None
+
+        x, y = self.raw['state']['xy']
+
+        if x > 1:
+            x = x / 65555
+
+        if y > 1:
+            y = y / 65555
+
+        return (x, y)
+
+    @property
+    def colormode(self):
+        """The current color mode of the light.
+
+        hs - hue and saturation
+        xy - CIE xy values
+        ct - color temperature
+        """
+        return self.raw['state'].get('colormode')
+
+    @property
+    def effect(self):
+        """Effect of the light.
+
+        none - no effect
+        colorloop
+        """
+        return self.raw['state'].get('effect')
+
+    @property
+    def reachable(self):
+        """True if the light is reachable and accepts commands."""
+        return self.raw['state']['reachable']
