@@ -153,11 +153,8 @@ async def test_vibration_sensor():
     }}
     sensor.async_update(event)
 
-    mock_callback.assert_called_with({
-        'attr': ['lastupdated', 'orientation'],
-        'state': True,
-        'config': False
-    })
+    mock_callback.assert_called_once()
+    assert sensor.changed_keys == {'state', 'lastupdated', 'orientation'}
 
     sensor.remove_callback(mock_callback)
     assert not sensor._async_callbacks

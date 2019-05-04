@@ -23,20 +23,6 @@ class DeconzSensor(DeconzDevice):
     SENSOR_ICON = None
     SENSOR_UNIT = None
 
-    def async_update(self, event, reason={}):
-        """New event for sensor.
-
-        Check if state or config is part of event.
-        Signal that sensor has updated attributes.
-        Inform what attributes got changed values.
-        """
-        reason['attr'] = []
-        for data in ['state', 'config']:
-            changed_attr = self.update_attr(event.get(data, {}))
-            reason[data] = data in event
-            reason['attr'] += changed_attr
-        super().async_update(event, reason)
-
     @property
     def battery(self):
         """The battery status of the sensor."""
@@ -68,9 +54,9 @@ class DeconzSensor(DeconzDevice):
         return self.raw['state'].get('tampered')
 
     # @property
-    # def temperature(self):
-    #     """Temperature."""
-    #     return self._temperature
+    # def secondary_temperature(self):
+    #     """Extra temperature available on some Xiaomi devices."""
+    #     return self.raw['config'].get('temperature')
 
 
 class Alarm(DeconzSensor):
@@ -752,18 +738,6 @@ class Thermostat(Temperature):
 
     BINARY = False
     ZHATYPE = ('ZHAThermostat', 'CLIPThermostat')
-
-    async def async_set_config(self, data):
-        """Set config of thermostat.
-
-        {
-            "mode": "auto",
-            "heatsetpoint": 180,
-        }
-        """
-        field = self.deconz_id + '/config'
-
-        await self.async_set(field, data)
 
     @property
     def heatsetpoint(self):

@@ -7,24 +7,7 @@ from .deconzdevice import DeconzDevice
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzLightBase(DeconzDevice):
-    """deCONZ light base representation.
-
-    Dresden Elektroniks documentation of lights in deCONZ
-    http://dresden-elektronik.github.io/deconz-rest-doc/lights/
-    """
-
-    def async_update(self, event):
-        """New event for light.
-
-        Check that state is part of event.
-        Signal that light has updated state.
-        """
-        self.update_attr(event.get('state', {}))
-        super().async_update(event)
-
-
-class DeconzLight(DeconzLightBase):
+class DeconzLight(DeconzDevice):
     """deCONZ light representation.
 
     Dresden Elektroniks documentation of lights in deCONZ
@@ -32,28 +15,6 @@ class DeconzLight(DeconzLightBase):
     """
 
     DECONZ_TYPE = '/lights/'
-
-    def __init__(self, device_id, raw, loop, async_set_state_callback):
-        """Set initial information about light.
-
-        Set async callback to set state of device.
-        """
-        super().__init__(device_id, raw, loop, async_set_state_callback)
-
-    async def async_set_state(self, data):
-        """Set state of light.
-
-        {
-            "on": true,
-            "bri": 180,
-            "hue": 43680,
-            "sat": 255,
-            "transitiontime": 10
-        }
-        """
-        field = self.deconz_id + '/state'
-
-        await self.async_set(field, data)
 
     @property
     def state(self):

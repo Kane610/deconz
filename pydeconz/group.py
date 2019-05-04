@@ -2,12 +2,12 @@
 
 import logging
 
-from .light import DeconzLightBase
+from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzGroup(DeconzLightBase):
+class DeconzGroup(DeconzDevice):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ
@@ -19,7 +19,7 @@ class DeconzGroup(DeconzLightBase):
     def __init__(self, device_id, raw, loop, async_set_state_callback):
         """Set initial information about light group.
 
-        Set callback to set state of device.
+        Create scenes related to light group.
         """
         super().__init__(device_id, raw, loop, async_set_state_callback)
         self._scenes = {}
@@ -28,20 +28,11 @@ class DeconzGroup(DeconzLightBase):
     async def async_set_state(self, data):
         """Set state of light group.
 
-        {
-            "on": true,
-            "bri": 180,
-            "hue": 43680,
-            "sat": 255,
-            "transitiontime": 10
-        }
-
         Also update local values of group since websockets doesn't.
         """
-        field = self.deconz_id + '/action'
-        self.async_update({'state': data})
+        self.async_update({'action': data})
 
-        await self.async_set(field, data)
+        await super().async_set_state(data)
 
     @property
     def state(self):
@@ -83,7 +74,8 @@ class DeconzGroup(DeconzLightBase):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if 'xy' not in self.raw['action']:
+        if 'xy' not in self.raw['action'] or \
+                self.raw['action']['xy'] == (None, None):
             return None
 
         x, y = self.raw['action']['xy']
@@ -192,15 +184,13 @@ class DeconzGroup(DeconzLightBase):
 
     def update_color_state(self, light):
         """Sync color state with light."""
-        x, y = light.xy or (None, None)
         self.async_update({
-            'state': {
+            'action': {
                 'bri': light.brightness,
                 'hue': light.hue,
                 'sat': light.sat,
                 'ct': light.ct,
-                'x': x,
-                'y': y,
+                'xy': light.xy or (None, None),
                 'colormode': light.colormode,
             },
         })

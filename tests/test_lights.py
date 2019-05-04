@@ -3,6 +3,7 @@
 pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 """
 
+from copy import deepcopy
 from unittest.mock import Mock
 
 from pydeconz.light import DeconzLight
@@ -14,7 +15,7 @@ async def test_create_light():
     Just tests a subset right now;
         xy will also be signalled as a set from 0.61.
     """
-    light = DeconzLight('0', FIXTURE_RGB_LIGHT, None, None)
+    light = DeconzLight('0', deepcopy(FIXTURE_RGB_LIGHT), None, None)
 
     assert light.state is False
     assert light.alert is None
@@ -42,13 +43,14 @@ async def test_create_light():
     assert light._async_callbacks
 
     event = {"state": {
-        "lastupdated": "2019-03-15T10:15:17",
         "xy": [0.1, 0.1],
     }}
     light.async_update(event)
 
+    assert light.brightness == 111
     assert light.xy == (0.1, 0.1)
-    mock_callback.assert_called_with({})
+    mock_callback.assert_called_once()
+    assert light.changed_keys == {'state', 'xy'}
 
     light.remove_callback(mock_callback)
     assert not light._async_callbacks

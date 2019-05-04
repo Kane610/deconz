@@ -21,6 +21,7 @@ class DeconzDevice:
         """Set initial information common to all device types."""
         self.device_id = device_id
         self.raw = raw
+        self.changed_keys = set()
 
         self.loop = loop
         self._async_set_callback = async_set_callback
@@ -28,6 +29,33 @@ class DeconzDevice:
 
         self._async_callbacks = []
         _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
+
+    async def async_set_config(self, data):
+        """Set config of device.
+
+        {
+            "mode": "auto",
+            "heatsetpoint": 180,
+        }
+        """
+        field = self.deconz_id + '/config'
+
+        await self.async_set(field, data)
+
+    async def async_set_state(self, data: dict):
+        """Set state of device.
+
+        {
+            "on": true,
+            "bri": 180,
+            "hue": 43680,
+            "sat": 255,
+            "transitiontime": 10
+        }
+        """
+        field = self.deconz_id + '/state'
+
+        await self.async_set(field, data)
 
     async def async_set(self, field, data, tries=0):
         """Set state of device."""
@@ -67,28 +95,27 @@ class DeconzDevice:
         if callback in self._async_callbacks:
             self._async_callbacks.remove(callback)
 
-    def update_attr(self, attr):
+    def async_update(self, raw):
         """Update input attr in self.
 
         Return list of attributes with changed values.
         """
-        changed_attr = []
-        for key, value in attr.items():
-            if value is None:
-                continue
-            if getattr(self, "_{0}".format(key), None) != value:
-                changed_attr.append(key)
-                self.__setattr__("_{0}".format(key), value)
-                _LOGGER.debug('%s: update %s with %s', self.name, key, value)
-        return changed_attr
+        changed_keys = set()
 
-    def async_update(self, event, reason={}):
-        """Signal that a new event has been received.
+        for k, v in raw.items():
+            changed_keys.add(k)
 
-        Reason is used to convey a message to upper implementation.
-        """
+            if isinstance(self.raw.get(k), dict) and isinstance(v, dict):
+                changed_keys.update(set(v.keys()))
+                self.raw[k].update(v)
+
+            else:
+                self.raw[k] = v
+
+        self.changed_keys = changed_keys
+
         for async_signal_update in self._async_callbacks:
-            async_signal_update(reason)
+            async_signal_update()
 
     @property
     def deconz_id(self):
