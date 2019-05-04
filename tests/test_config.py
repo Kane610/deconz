@@ -3,8 +3,6 @@
 pytest --cov-report term-missing --cov=pydeconz.config tests/test_config.py
 """
 
-from unittest.mock import Mock
-
 from pydeconz.config import DeconzConfig
 
 
@@ -14,7 +12,7 @@ async def test_create_config():
 
     assert config.apiversion == '1.0.4'
     assert config.bridgeid == '0123456789ABCDEF'
-    assert config.linkbutton == False
+    assert config.linkbutton is False
     assert config.mac == '00:11:22:33:44:55'
     assert config.modelid == 'deCONZ'
     assert config.name == 'deCONZ-GW'
