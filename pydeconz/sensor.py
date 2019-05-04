@@ -2,7 +2,7 @@
 
 import logging
 
-from .deconzdevice import DeconzDevice, DeconzDeviceSetter
+from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -718,7 +718,7 @@ class Temperature(DeconzSensor):
         return round(float(temperature) / 100, 1)
 
 
-class Thermostat(Temperature, DeconzDeviceSetter):
+class Thermostat(Temperature):
     """Thermostat "sensor".
 
     State parameter is a string named 'temperature'.
@@ -752,11 +752,6 @@ class Thermostat(Temperature, DeconzDeviceSetter):
 
     BINARY = False
     ZHATYPE = ('ZHAThermostat', 'CLIPThermostat')
-
-    def __init__(self, device_id, raw, loop, async_set_state_callback):
-        """Initalize temperature sensor."""
-        Temperature.__init__(self, device_id, raw)
-        DeconzDeviceSetter.__init__(self, loop, async_set_state_callback)
 
     async def async_set_config(self, data):
         """Set config of thermostat.
@@ -938,22 +933,20 @@ SENSOR_CLASSES = (
     Switch, Temperature, Thermostat, Vibration, Water)
 
 
-def create_sensor(sensor_id, sensor, loop, async_set_state_callback):
+def create_sensor(sensor_id, raw, loop, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
-    if sensor['type'] in Thermostat.ZHATYPE:
-        return Thermostat(sensor_id, sensor, loop, async_set_state_callback)
-
     for sensor_class in SENSOR_CLASSES:
-        if sensor['type'] in sensor_class.ZHATYPE:
-            return sensor_class(sensor_id, sensor)
+        if raw['type'] in sensor_class.ZHATYPE:
+            return sensor_class(
+                sensor_id, raw, loop, async_set_state_callback)
 
 
-def supported_sensor(sensor):
+def supported_sensor(raw):
     """Check if sensor is supported by pydeconz."""
     for sensor_class in SENSOR_CLASSES:
-        if sensor['type'] in sensor_class.ZHATYPE:
+        if raw['type'] in sensor_class.ZHATYPE:
             return True
 
     _LOGGER.info('Unsupported sensor type %s (%s)',
-                 sensor['type'], sensor['name'])
+                 raw['type'], raw['name'])
     return False

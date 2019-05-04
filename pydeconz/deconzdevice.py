@@ -17,13 +17,42 @@ class DeconzDevice:
 
     DECONZ_TYPE = ''
 
-    def __init__(self, device_id, raw):
+    def __init__(self, device_id, raw, loop, async_set_callback):
         """Set initial information common to all device types."""
         self.device_id = device_id
         self.raw = raw
 
+        self.loop = loop
+        self._async_set_callback = async_set_callback
+        self._cancel_retry = None
+
         self._async_callbacks = []
         _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
+
+    async def async_set(self, field, data, tries=0):
+        """Set state of device."""
+        if tries == 0:
+            self.cancel_retry()
+
+        try:
+            await self._async_set_callback(field, data)
+
+        except BridgeBusy:
+            _LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
+
+            def retry_set():
+                """Retry set state."""
+                self.loop.create_task(self.async_set(field, data, tries + 1))
+
+            if tries < 3:
+                retry_delay = 2 ** (tries + 1)
+                self._cancel_retry = \
+                    self.loop.call_later(retry_delay, retry_set)
+
+    def cancel_retry(self):
+        if self._cancel_retry is not None:
+            self._cancel_retry()
+            self._cancel_retry = None
 
     def register_async_callback(self, async_callback):
         """Register callback for signalling.
@@ -100,37 +129,3 @@ class DeconzDevice:
     def uniqueid(self):
         """The current state of the device."""
         return self.raw.get('uniqueid')
-
-
-class DeconzDeviceSetter:
-    """"""
-
-    def __init__(self, loop, async_set_callback):
-        self._loop = loop
-        self._async_set_callback = async_set_callback
-        self._cancel_retry = None
-
-    async def async_set(self, field, data, tries=0):
-        """Set state of device."""
-        if tries == 0:
-            self.cancel_retry()
-
-        try:
-            await self._async_set_callback(field, data)
-
-        except BridgeBusy:
-            _LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
-
-            def retry_set():
-                """Retry set state."""
-                self._loop.create_task(self.async_set(field, data, tries + 1))
-
-            if tries < 3:
-                retry_delay = 2 ** (tries + 1)
-                self._cancel_retry = \
-                    self._loop.call_later(retry_delay, retry_set)
-
-    def cancel_retry(self):
-        if self._cancel_retry is not None:
-            self._cancel_retry()
-            self._cancel_retry = None

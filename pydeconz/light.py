@@ -2,25 +2,17 @@
 
 import logging
 
-from .deconzdevice import DeconzDevice, DeconzDeviceSetter
+from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeconzLightBase(DeconzDevice, DeconzDeviceSetter):
+class DeconzLightBase(DeconzDevice):
     """deCONZ light base representation.
 
     Dresden Elektroniks documentation of lights in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
-
-    def __init__(self, device_id, raw, loop, async_set_state_callback):
-        """Set initial information about light.
-
-        Set async callback to set state of device.
-        """
-        DeconzDevice.__init__(self, device_id, raw)
-        DeconzDeviceSetter.__init__(self, loop, async_set_state_callback)
 
     def async_update(self, event):
         """New event for light.

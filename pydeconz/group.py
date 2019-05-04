@@ -22,6 +22,7 @@ class DeconzGroup(DeconzLightBase):
         Set callback to set state of device.
         """
         super().__init__(device_id, raw, loop, async_set_state_callback)
+        self._scenes = {}
         self.async_add_scenes(raw.get('scenes'), async_set_state_callback)
 
     async def async_set_state(self, data):
