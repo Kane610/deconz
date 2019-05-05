@@ -60,31 +60,7 @@ class DeconzSensor(DeconzDevice):
 
 
 class Alarm(DeconzSensor):
-    """Alarm sensor.
-
-    {
-        'config': {
-            'battery': 100,
-            'on': True,
-            'reachable': True,
-            'temperature': 2600
-        },
-        'ep': 1,
-        'etag': '18c0f3c2100904e31a7f938db2ba9ba9',
-        'manufacturername': 'dresden elektronik',
-        'modelid': 'lumi.sensor_motion.aq2',
-        'name': 'Alarm 10',
-        'state': {
-            'alarm': None,
-            'lastupdated': 'none',
-            'lowbattery': None,
-            'tampered': None
-        },
-        'swversion': '20170627',
-        'type': 'ZHAAlarm',
-        'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0500'
-    }
-    """
+    """Alarm sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHAAlarm',)
@@ -103,32 +79,7 @@ class Alarm(DeconzSensor):
 
 
 class CarbonMonoxide(DeconzSensor):
-    """Carbon monoxide sensor.
-
-    State parameter is a boolean named 'carbonmonoxide'.
-    {
-        'config': {
-            'battery': 100,
-            'on': True,
-            'pending': [],
-            'reachable': True
-        },
-        'ep': 1,
-        'etag': 'b7599df551944df97b2aa87d160b9c45',
-        'manufacturername': 'Heiman',
-        'modelid': 'CO_V16',
-        'name': 'Cave, CO',
-        'state': {
-            'carbonmonoxide': False,
-            'lastupdated': 'none',
-            'lowbattery': False,
-            'tampered': False
-        },
-        'swversion': '20150330',
-        'type': 'ZHACarbonMonoxide',
-        'uniqueid': '00:15:8d:00:02:a5:21:24-01-0101'
-    }
-    """
+    """Carbon monoxide sensor."""
 
     BINARY = True
     ZHATYPE = ('ZHACarbonMonoxide',)
@@ -142,7 +93,7 @@ class CarbonMonoxide(DeconzSensor):
 
     @property
     def carbonmonoxide(self):
-        """Fire detected."""
+        """Carbon monoxide detected."""
         return self.raw['state'].get('carbonmonoxide')
 
     @property
@@ -152,27 +103,7 @@ class CarbonMonoxide(DeconzSensor):
 
 
 class Consumption(DeconzSensor):
-    """Power consumption sensor.
-
-    State parameter is a number named 'consumption'.
-    {
-        'config': {
-            'on': True,
-            'reachable': True
-        },
-        'ep': 1,
-        'etag': 'a99e5bc463d15c23af7e89946e784cca',
-        'manufacturername': 'Heiman',
-        'modelid': 'SmartPlug',
-        'name': 'Consumption 15',
-        'state': {
-            'consumption': 11342,
-            'lastupdated': '2018-03-12T19:19:08'
-        },
-        'type': 'ZHAConsumption',
-        'uniqueid': '00:0d:6f:00:0b:7a:64:29-01-0702'
-    }
-    """
+    """Power consumption sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHAConsumption',)
@@ -184,8 +115,8 @@ class Consumption(DeconzSensor):
         """Main state of sensor."""
         if self.consumption is None:
             return None
-        consumption = float(self.consumption/1000)
-        return consumption
+
+        return float(self.consumption/1000)
 
     @property
     def consumption(self):
@@ -196,30 +127,10 @@ class Consumption(DeconzSensor):
 class Daylight(DeconzSensor):
     """Daylight sensor built into deCONZ software.
 
-    State parameter is a string derived from 'status' parameter.
     Strings from daylight.h at
     https://github.com/dresden-elektronik/deconz-rest-plugin.
     Also has a 'daylight' boolean.
     Has no 'reachable' config parameter, so set sensor reachable True here.
-    {
-        "config": {
-            "configured": true,
-            "on": true,
-            "sunriseoffset": 30,
-            "sunsetoffset": -30
-        },
-        "etag": "55047cf652a7e594d0ee7e6fae01dd38",
-        "manufacturername": "Philips",
-        "modelid": "PHDL00",
-        "name": "Daylight",
-        "state": {
-            "daylight": true,
-            "lastupdated": "2018-03-24T17:26:12",
-            "status": 170
-        },
-        "swversion": "1.0",
-        "type": "Daylight"
-    }
     """
 
     BINARY = False
@@ -236,7 +147,7 @@ class Daylight(DeconzSensor):
     @property
     def configured(self):
         """Is daylight sensor configured."""
-        return self.raw['state'].get('configured')
+        return self.raw['config'].get('configured')
 
     @property
     def daylight(self):
@@ -248,34 +159,34 @@ class Daylight(DeconzSensor):
         """Return the daylight status string."""
         status = self.raw['state'].get('status')
         if status == 100:
-            return "nadir"
+            return 'nadir'
         if status == 110:
-            return "night_end"
+            return 'night_end'
         if status == 120:
-            return "nautical_dawn"
+            return 'nautical_dawn'
         if status == 130:
-            return "dawn"
+            return 'dawn'
         if status == 140:
-            return "sunrise_start"
+            return 'sunrise_start'
         if status == 150:
-            return "sunrise_end"
+            return 'sunrise_end'
         if status == 160:
-            return "golden_hour_1"
+            return 'golden_hour_1'
         if status == 170:
-            return "solar_noon"
+            return 'solar_noon'
         if status == 180:
-            return "golden_hour_2"
+            return 'golden_hour_2'
         if status == 190:
-            return "sunset_start"
+            return 'sunset_start'
         if status == 200:
-            return "sunset_end"
+            return 'sunset_end'
         if status == 210:
-            return "dusk"
+            return 'dusk'
         if status == 220:
-            return "nautical_dusk"
+            return 'nautical_dusk'
         if status == 230:
-            return "night_start"
-        return "unknown"
+            return 'night_start'
+        return 'unknown'
 
     @property
     def sunriseoffset(self):
@@ -289,27 +200,7 @@ class Daylight(DeconzSensor):
 
 
 class Fire(DeconzSensor):
-    """Fire sensor.
-
-    State parameter is a boolean named 'fire'.
-    {
-        "config": {
-            "on": true,
-            "reachable": true
-        },
-        "ep": 1,
-        "etag": "2b585d2c016bfd665ba27a8fdad28670",
-        "manufacturername": "LUMI",
-        "modelid": "lumi.sensor_smoke",
-        "name": "sensor_kitchen_smoke",
-        "state": {
-            "fire": false,
-            "lastupdated": "2018-02-20T11:25:02"
-        },
-        "type": "ZHAFire",
-        "uniqueid": "00:15:8d:00:01:d9:3e:7c-01-0500"
-    }
-    """
+    """Fire sensor."""
 
     BINARY = True
     ZHATYPE = ('ZHAFire',)
@@ -373,10 +264,7 @@ class GenericFlag(DeconzSensor):
 
 
 class GenericStatus(DeconzSensor):
-    """Generic status sensor.
-
-    State parameter is a number named 'status'.
-    """
+    """Generic status sensor."""
 
     BINARY = False
     ZHATYPE = ('CLIPGenericStatus',)
@@ -393,10 +281,7 @@ class GenericStatus(DeconzSensor):
 
 
 class Humidity(DeconzSensor):
-    """Humidity sensor.
-
-    State parameter is a string named 'humidity'.
-    """
+    """Humidity sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHAHumidity', 'CLIPHumidity')
@@ -419,35 +304,7 @@ class Humidity(DeconzSensor):
 
 
 class LightLevel(DeconzSensor):
-    """Light level sensor.
-
-    State parameter is a string named lightlevel.
-    {
-        'config': {
-            'battery': 100,
-            'on': True,
-            'reachable': True,
-            'temperature': 2600,
-            'tholddark': 12000,
-            'tholdoffset': 7000
-        },
-        'ep': 1,
-        'etag': '26e97d94b471c1799a1a5951cee7938b',
-        'manufacturername': 'dresden elektronik',
-        'modelid': 'lumi.sensor_motion.aq2',
-        'name': 'LightLevel 9',
-        'state': {
-            'dark': True,
-            'daylight': False,
-            'lastupdated': '2019-01-29T07:19:53',
-            'lightlevel': 0,
-            'lux': 0
-        },
-        'swversion': '20170627',
-        'type': 'ZHALightLevel',
-        'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0400'
-    }
-    """
+    """Light level sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHALightLevel', 'CLIPLightLevel')
@@ -476,12 +333,12 @@ class LightLevel(DeconzSensor):
     @property
     def lightlevel(self):
         """Light level."""
-        return self.raw['state'].get('daylight')
+        return self.raw['state'].get('lightlevel')
 
     @property
     def lux(self):
         """Lux."""
-        return self.raw['state'].get('daylight')
+        return self.raw['state'].get('lux')
 
     @property
     def tholddark(self):
@@ -491,14 +348,11 @@ class LightLevel(DeconzSensor):
     @property
     def tholdoffset(self):
         """Offset for threshold to hold dark."""
-        return self.raw['config'].get('tholddark')
+        return self.raw['config'].get('tholdoffset')
 
 
 class OpenClose(DeconzSensor):
-    """Door/Window sensor.
-
-    State parameter is a boolean named 'open'.
-    """
+    """Door/Window sensor."""
 
     BINARY = True
     ZHATYPE = ('ZHAOpenClose', 'CLIPOpenClose')
@@ -522,29 +376,7 @@ class OpenClose(DeconzSensor):
 
 
 class Power(DeconzSensor):
-    """Power sensor.
-
-    State parameter is a number named 'power'.
-    {
-        'config': {
-            'on': True,
-            'reachable': True
-        },
-        'ep': 1,
-        'etag': '96e71c7db4685b334d3d0decc3f11868',
-        'manufacturername': 'Heiman',
-        'modelid': 'SmartPlug',
-        'name': 'Power 16',
-        'state': {
-            'current': 34,
-            'lastupdated': '2018-03-12T19:22:13',
-            'power': 64,
-            'voltage': 231
-        },
-        'type': 'ZHAPower',
-        'uniqueid': '00:0d:6f:00:0b:7a:64:29-01-0b04'
-    }
-    """
+    """Power sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHAPower',)
@@ -573,31 +405,7 @@ class Power(DeconzSensor):
 
 
 class Presence(DeconzSensor):
-    """Presence detector.
-
-    State parameter is a boolean named 'presence'.
-    Also has a boolean 'dark' representing lighting in area of placement.
-    {
-        'config': {
-            'battery': 100,
-            'duration': 60,
-            'on': True,
-            'reachable': True,
-            'temperature': 2600
-        },
-        'ep': 1,
-        'etag': '26e97d94b471c1799a1a5951cee7938b',
-        'manufacturername': 'dresden elektronik',
-        'modelid': 'lumi.sensor_motion.aq2',
-        'name': 'presence1',
-        'state': {
-            'lastupdated': '2019-01-29T07:19:53',
-            'presence': False
-        },
-        'swversion': '20170627',
-        'type': 'ZHAPresence',
-        'uniqueid': '00:15:8d:00:02:b5:d1:80-01-0406'}
-    """
+    """Presence detector."""
 
     BINARY = True
     ZHATYPE = ('ZHAPresence', 'CLIPPresence')
@@ -612,7 +420,7 @@ class Presence(DeconzSensor):
     @property
     def dark(self):
         """If the area near the sensor is light or not."""
-        return self.raw['state'].get('voltage')
+        return self.raw['state'].get('dark')
 
     @property
     def duration(self):
@@ -631,10 +439,7 @@ class Presence(DeconzSensor):
 
 
 class Pressure(DeconzSensor):
-    """Pressure sensor.
-
-    State parameter is a string named 'pressure'.
-    """
+    """Pressure sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHAPressure', 'CLIPPressure')
@@ -655,10 +460,7 @@ class Pressure(DeconzSensor):
 
 
 class Switch(DeconzSensor):
-    """Switch.
-
-    State parameter is a string named 'buttonevent'.
-    """
+    """Switch."""
 
     BINARY = False
     ZHATYPE = ('ZHASwitch', 'ZGPSwitch', 'CLIPSwitch')
@@ -675,10 +477,7 @@ class Switch(DeconzSensor):
 
 
 class Temperature(DeconzSensor):
-    """Temperature sensor.
-
-    State parameter is a string named 'temperature'.
-    """
+    """Temperature sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHATemperature', 'CLIPTemperature')
@@ -705,36 +504,7 @@ class Temperature(DeconzSensor):
 
 
 class Thermostat(Temperature):
-    """Thermostat "sensor".
-
-    State parameter is a string named 'temperature'.
-    {
-        "config": {
-            "battery": 100,
-            "displayflipped": true,
-            "heatsetpoint": 2100,
-            "locked": false,
-            "mode": "auto",
-            "offset": 0,
-            "on": true,
-            "reachable": true
-        },
-        "ep": 1,
-        "etag": "25aac331bc3c4b465cfb2197f6243ea4",
-        "manufacturername": "Eurotronic",
-        "modelid": "SPZB0001",
-        "name": "Living Room Radiator",
-        "state": {
-            "lastupdated": "2019-02-10T22:41:32",
-            "on": false,
-            "temperature": 2149,
-            "valve": 0
-        },
-        "swversion": "15181120",
-        "type": "ZHAThermostat",
-        "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201"
-    }
-    """
+    """Thermostat "sensor"."""
 
     BINARY = False
     ZHATYPE = ('ZHAThermostat', 'CLIPThermostat')
@@ -771,40 +541,7 @@ class Thermostat(Temperature):
 
 
 class Vibration(DeconzSensor):
-    """Vibration sensor.
-
-    State parameter is a string named 'vibration'.
-    {
-        "config": {
-            "battery": 91,
-            "on": true,
-            "pending": [],
-            "reachable": true,
-            "sensitivity": 21,
-            "sensitivitymax": 21,
-            "temperature": 3200
-        },
-        "ep": 1,
-        "etag": "b7599df551944df97b2aa87d160b9c45",
-        "manufacturername": "LUMI",
-        "modelid": "lumi.vibration.aq1",
-        "name": "Vibration 9",
-        "state": {
-            "lastupdated": "2019-03-09T15:53:07",
-            "orientation": [
-                10,
-                1059,
-                0
-            ],
-            "tiltangle": 83,
-            "vibration": true,
-            "vibrationstrength": 114
-        },
-        "swversion": "20180130",
-        "type": "ZHAVibration",
-        "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101"
-    }
-    """
+    """Vibration sensor."""
 
     BINARY = True
     ZHATYPE = ('ZHAVibration',)
@@ -853,32 +590,7 @@ class Vibration(DeconzSensor):
 
 
 class Water(DeconzSensor):
-    """Water sensor.
-
-    State parameter is a boolean named 'water'.
-    {
-        'config': {
-            'battery': 100,
-            'on': True,
-            'reachable': True,
-            'temperature': 2500
-        },
-        'ep': 1,
-        'etag': 'fae893708dfe9b358df59107d944fa1c',
-        'manufacturername': 'LUMI',
-        'modelid': 'lumi.sensor_wleak.aq1',
-        'name': 'water2',
-        'state': {
-            'lastupdated': '2019-01-29T07:13:20',
-            'lowbattery': False,
-            'tampered': False,
-            'water': False
-        },
-        'swversion': '20170721',
-        'type': 'ZHAWater',
-        'uniqueid': '00:15:8d:00:02:2f:07:db-01-0500'
-    }
-    """
+    """Water sensor."""
 
     BINARY = True
     ZHATYPE = ('ZHAWater',)
