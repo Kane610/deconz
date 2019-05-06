@@ -53,10 +53,14 @@ class DeconzSensor(DeconzDevice):
         """Tampered."""
         return self.raw['state'].get('tampered')
 
-    # @property
-    # def secondary_temperature(self):
-    #     """Extra temperature available on some Xiaomi devices."""
-    #     return self.raw['config'].get('temperature')
+    @property
+    def secondary_temperature(self):
+        """Extra temperature available on some Xiaomi devices."""
+        if 'temperature' not in self.raw['config']:
+            return None
+
+        return Temperature.convert_temperature(
+            self.raw['config'].get('temperature'))
 
 
 class Alarm(DeconzSensor):
@@ -224,25 +228,7 @@ class Fire(DeconzSensor):
 
 
 class GenericFlag(DeconzSensor):
-    """Generic flag sensor.
-
-    State parameter is a bool named 'flag'.
-    {
-        "config": {
-            "on": true,
-            "reachable": true
-        },
-        "modelid": "Switch",
-        "name": "Kitchen Switch",
-        "state": {
-            "flag": true,
-            "lastupdated": "2018-07-01T10:40:35"
-        },
-        "swversion": "1.0.0",
-        "type": "CLIPGenericFlag",
-        "uniqueid": "kitchen-switch"
-    }
-    """
+    """Generic flag sensor."""
 
     BINARY = True
     ZHATYPE = ('CLIPGenericFlag',)
@@ -294,8 +280,8 @@ class Humidity(DeconzSensor):
         """Main state of sensor."""
         if self.humidity is None:
             return None
-        humidity = round(float(self.humidity) / 100, 1)
-        return humidity
+
+        return round(float(self.humidity) / 100, 1)
 
     @property
     def humidity(self):
@@ -317,8 +303,8 @@ class LightLevel(DeconzSensor):
         """Main state of sensor."""
         if self.lightlevel is None:
             return None
-        lux = round(10 ** (float(self.lightlevel - 1) / 10000), 1)
-        return lux
+
+        return round(10 ** (float(self.lightlevel - 1) / 10000), 1)
 
     @property
     def dark(self):
@@ -460,7 +446,7 @@ class Pressure(DeconzSensor):
 
 
 class Switch(DeconzSensor):
-    """Switch."""
+    """Switch sensor."""
 
     BINARY = False
     ZHATYPE = ('ZHASwitch', 'ZGPSwitch', 'CLIPSwitch')
@@ -473,7 +459,7 @@ class Switch(DeconzSensor):
     @property
     def buttonevent(self):
         """Button press."""
-        return self.raw['state'].get('pressure')
+        return self.raw['state'].get('buttonevent')
 
 
 class Temperature(DeconzSensor):
@@ -496,10 +482,12 @@ class Temperature(DeconzSensor):
         """Temperature."""
         return self.convert_temperature(self.raw['state'].get('temperature'))
 
-    def convert_temperature(self, temperature):
+    @staticmethod
+    def convert_temperature(temperature):
         """Convert temperature to celsius"""
         if temperature is None:
             return None
+
         return round(float(temperature) / 100, 1)
 
 

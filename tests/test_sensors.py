@@ -67,6 +67,7 @@ async def test_alarm_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature == 26
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -98,6 +99,7 @@ async def test_carbonmonoxide_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is False
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -128,6 +130,7 @@ async def test_consumption_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -138,6 +141,10 @@ async def test_consumption_sensor():
     assert sensor.swversion is None
     assert sensor.type == 'ZHAConsumption'
     assert sensor.uniqueid == '00:0d:6f:00:0b:7a:64:29-01-0702'
+
+    del sensor.raw['state']['consumption']
+    assert sensor.state is None
+
 
 
 async def test_daylight_sensor():
@@ -163,6 +170,7 @@ async def test_daylight_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -174,6 +182,21 @@ async def test_daylight_sensor():
     assert sensor.type == 'Daylight'
     assert sensor.uniqueid is None
 
+    statuses = {
+        100: 'nadir', 110: 'night_end', 120: 'nautical_dawn', 130: 'dawn',
+        140: 'sunrise_start', 150: 'sunrise_end', 160: 'golden_hour_1',
+        170: 'solar_noon', 180: 'golden_hour_2', 190: 'sunset_start',
+        200: 'sunset_end', 210: 'dusk', 220: 'nautical_dusk',
+        230: 'night_start', 0: 'unknown'
+    }
+
+    for k, v in statuses.items():
+        event = {"state": {"status": k}}
+        sensor.async_update(event)
+
+        assert sensor.state == v
+        assert sensor.changed_keys == {'state', 'status'}
+
 
 async def test_fire_sensor():
     """Verify that fire sensor works."""
@@ -183,9 +206,9 @@ async def test_fire_sensor():
     assert sensor.ZHATYPE == ('ZHAFire',)
     assert sensor.SENSOR_CLASS == 'smoke'
 
-    assert sensor.state == False
-    assert sensor.is_tripped == False
-    assert sensor.fire == False
+    assert sensor.state is False
+    assert sensor.is_tripped is False
+    assert sensor.fire is False
 
     # DeconzSensor
     assert sensor.battery is None
@@ -194,6 +217,7 @@ async def test_fire_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -224,6 +248,7 @@ async def test_genericflag_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -253,6 +278,7 @@ async def test_genericstatus_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -284,6 +310,7 @@ async def test_humidity_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -294,6 +321,9 @@ async def test_humidity_sensor():
     assert sensor.swversion == '20161129'
     assert sensor.type == 'ZHAHumidity'
     assert sensor.uniqueid == '00:15:8d:00:02:45:dc:53-01-0405'
+
+    del sensor.raw['state']['humidity']
+    assert sensor.state is None
 
 
 async def test_lightlevel_sensor():
@@ -320,6 +350,7 @@ async def test_lightlevel_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -330,6 +361,9 @@ async def test_lightlevel_sensor():
     assert sensor.swversion == '6.1.0.18912'
     assert sensor.type == 'ZHALightLevel'
     assert sensor.uniqueid == '00:17:88:01:03:28:8c:9b-02-0400'
+
+    del sensor.raw['state']['lightlevel']
+    assert sensor.state is None
 
 
 async def test_openclose_sensor():
@@ -351,6 +385,7 @@ async def test_openclose_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature == 33
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -383,6 +418,7 @@ async def test_power_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -416,6 +452,7 @@ async def test_presence_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -426,6 +463,7 @@ async def test_presence_sensor():
     assert sensor.swversion == '6.1.0.18912'
     assert sensor.type == 'ZHAPresence'
     assert sensor.uniqueid == '00:17:88:01:03:28:8c:9b-02-0406'
+
 
 async def test_pressure_sensor():
     """Verify that pressure sensor works."""
@@ -447,6 +485,7 @@ async def test_pressure_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -459,7 +498,34 @@ async def test_pressure_sensor():
     assert sensor.uniqueid == '00:15:8d:00:02:45:dc:53-01-0403'
 
 
-### switch
+async def test_switch_sensor():
+    """Verify that temperature sensor works."""
+    sensor = create_sensor('0', FIXTURE_HUE_DIMMER, None, None)
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ('ZHASwitch', 'ZGPSwitch', 'CLIPSwitch')
+
+    assert sensor.state == 1002
+    assert sensor.buttonevent == 1002
+
+    # DeconzSensor
+    assert sensor.battery == 90
+    assert sensor.ep == 2
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == '/sensors/0'
+    assert sensor.etag == '233ae541bbb7ac98c42977753884b8d2'
+    assert sensor.manufacturer == 'Philips'
+    assert sensor.modelid == 'RWL021'
+    assert sensor.name == "Dimmer switch 3"
+    assert sensor.swversion == '5.45.1.17846'
+    assert sensor.type == 'ZHASwitch'
+    assert sensor.uniqueid == '00:17:88:01:02:0e:32:a3-02-fc00'
 
 
 async def test_temperature_sensor():
@@ -482,6 +548,7 @@ async def test_temperature_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -492,6 +559,9 @@ async def test_temperature_sensor():
     assert sensor.swversion == '20161129'
     assert sensor.type == 'ZHATemperature'
     assert sensor.uniqueid == '00:15:8d:00:02:45:dc:53-01-0402'
+
+    del sensor.raw['state']['temperature']
+    assert sensor.state is None
 
 
 async def test_thermostat_sensor():
@@ -516,6 +586,7 @@ async def test_thermostat_sensor():
     assert sensor.on is False
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -552,6 +623,7 @@ async def test_vibration_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.secondary_temperature == 32
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
@@ -598,6 +670,7 @@ async def test_water_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is False
+    assert sensor.secondary_temperature == 25
 
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
