@@ -575,6 +575,7 @@ async def test_thermostat_sensor():
     assert sensor.locked is False
     assert sensor.mode == 'auto'
     assert sensor.offset == 0
+    assert sensor.state_on is False
     assert sensor.temperature == 21.5
     assert sensor.valve == 0
 
@@ -582,7 +583,7 @@ async def test_thermostat_sensor():
     assert sensor.battery == 100
     assert sensor.ep == 1
     assert sensor.lowbattery is None
-    assert sensor.on is False
+    assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
     assert sensor.secondary_temperature is None

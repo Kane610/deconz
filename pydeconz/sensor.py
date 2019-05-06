@@ -518,7 +518,7 @@ class Thermostat(Temperature):
         return self.raw['config'].get('offset')
 
     @property
-    def on(self):
+    def state_on(self):
         """Declare if the sensor is on or off."""
         return self.raw['state'].get('on')
 
