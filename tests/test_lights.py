@@ -55,6 +55,12 @@ async def test_create_light():
     light.remove_callback(mock_callback)
     assert not light._async_callbacks
 
+    light.raw['state']['xy'] = (65555, 65555)
+    assert light.xy == (1, 1)
+
+    del light.raw['state']['xy']
+    assert light.xy is None
+
 
 FIXTURE_RGB_LIGHT = {
     "etag": "026bcfe544ad76c7534e5ca8ed39047c",

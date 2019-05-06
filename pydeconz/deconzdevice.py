@@ -31,30 +31,13 @@ class DeconzDevice:
         _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
 
     async def async_set_config(self, data):
-        """Set config of device.
-
-        {
-            "mode": "auto",
-            "heatsetpoint": 180,
-        }
-        """
+        """Set config of device."""
         field = self.deconz_id + '/config'
-
         await self.async_set(field, data)
 
     async def async_set_state(self, data: dict):
-        """Set state of device.
-
-        {
-            "on": true,
-            "bri": 180,
-            "hue": 43680,
-            "sat": 255,
-            "transitiontime": 10
-        }
-        """
+        """Set state of device."""
         field = self.deconz_id + '/state'
-
         await self.async_set(field, data)
 
     async def async_set(self, field, data, tries=0):

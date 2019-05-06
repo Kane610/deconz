@@ -146,7 +146,6 @@ async def test_consumption_sensor():
     assert sensor.state is None
 
 
-
 async def test_daylight_sensor():
     """Verify that daylight sensor works."""
     sensor = create_sensor('0', FIXTURE_DAYLIGHT, None, None)
