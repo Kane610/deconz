@@ -26,13 +26,9 @@ class DeconzGroup(DeconzDevice):
         self.async_add_scenes(raw.get('scenes'), async_set_state_callback)
 
     async def async_set_state(self, data):
-        """Set state of light group.
-
-        Also update local values of group since websockets doesn't.
-        """
-        self.async_update({'action': data})
-
-        await super().async_set_state(data)
+        """Set state of light group."""
+        field = self.deconz_id + '/action'
+        await self.async_set(field, data)
 
     @property
     def state(self):

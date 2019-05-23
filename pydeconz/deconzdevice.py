@@ -53,6 +53,7 @@ class DeconzDevice:
 
             def retry_set():
                 """Retry set state."""
+                self._cancel_retry = None
                 self.loop.create_task(self.async_set(field, data, tries + 1))
 
             if tries < 3:
@@ -81,7 +82,7 @@ class DeconzDevice:
     def async_update(self, raw):
         """Update input attr in self.
 
-        Return list of attributes with changed values.
+        Store a set of keys with changed values.
         """
         changed_keys = set()
 
