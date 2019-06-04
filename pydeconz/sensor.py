@@ -295,7 +295,7 @@ class LightLevel(DeconzSensor):
     BINARY = False
     ZHATYPE = ('ZHALightLevel', 'CLIPLightLevel')
 
-    SENSOR_CLASS = 'lux'
+    SENSOR_CLASS = 'illuminance'
     SENSOR_UNIT = 'lux'
 
     @property
