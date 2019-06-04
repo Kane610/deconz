@@ -331,7 +331,7 @@ async def test_lightlevel_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ('ZHALightLevel', 'CLIPLightLevel')
-    assert sensor.SENSOR_CLASS == 'lux'
+    assert sensor.SENSOR_CLASS == 'illuminance'
     assert sensor.SENSOR_UNIT == 'lux'
 
     assert sensor.state == 5
