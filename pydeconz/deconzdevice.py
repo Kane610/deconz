@@ -42,8 +42,7 @@ class DeconzDevice:
 
     async def async_set(self, field, data, tries=0):
         """Set state of device."""
-        if tries == 0:
-            self.cancel_retry()
+        self.cancel_retry()
 
         try:
             await self._async_set_callback(field, data)
@@ -63,7 +62,8 @@ class DeconzDevice:
 
     def cancel_retry(self):
         if self._cancel_retry is not None:
-            self._cancel_retry()
+            print('CANCEL RETRY')
+            self._cancel_retry.cancel()
             self._cancel_retry = None
 
     def register_async_callback(self, async_callback):
