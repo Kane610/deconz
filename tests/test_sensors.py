@@ -403,7 +403,7 @@ async def test_power_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ('ZHAPower',)
-    assert sensor.SENSOR_UNIT == 'Watts'
+    assert sensor.SENSOR_UNIT == 'W'
 
     assert sensor.state == 64
     assert sensor.current == 34

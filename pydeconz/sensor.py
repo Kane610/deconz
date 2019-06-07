@@ -367,7 +367,7 @@ class Power(DeconzSensor):
     BINARY = False
     ZHATYPE = ('ZHAPower',)
 
-    SENSOR_UNIT = 'Watts'
+    SENSOR_UNIT = 'W'
 
     @property
     def state(self):
