@@ -62,7 +62,6 @@ class DeconzDevice:
 
     def cancel_retry(self):
         if self._cancel_retry is not None:
-            print('CANCEL RETRY')
             self._cancel_retry.cancel()
             self._cancel_retry = None
 
