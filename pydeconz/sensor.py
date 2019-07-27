@@ -112,7 +112,7 @@ class Consumption(DeconzSensor):
     BINARY = False
     ZHATYPE = ('ZHAConsumption',)
 
-    SENSOR_CLASS = 'kWh'
+    SENSOR_UNIT = 'kWh'
 
     @property
     def state(self):
