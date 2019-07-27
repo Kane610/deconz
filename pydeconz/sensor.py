@@ -127,6 +127,11 @@ class Consumption(DeconzSensor):
         """Consumption."""
         return self.raw['state'].get('consumption')
 
+    @property
+    def power(self):
+        """Power."""
+        return self.raw['state'].get('power')
+
 
 class Daylight(DeconzSensor):
     """Daylight sensor built into deCONZ software.
@@ -602,7 +607,7 @@ class Water(DeconzSensor):
 
 
 SENSOR_CLASSES = (
-    Alarm, Consumption, CarbonMonoxide, Daylight, Fire, GenericFlag,
+    Alarm, CarbonMonoxide, Consumption, Daylight, Fire, GenericFlag,
     GenericStatus, Humidity, LightLevel, OpenClose, Power, Presence, Pressure,
     Switch, Temperature, Thermostat, Vibration, Water)
 
