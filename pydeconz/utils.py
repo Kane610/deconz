@@ -4,6 +4,7 @@ import asyncio
 import logging
 import aiohttp
 
+from .config import DeconzConfig
 from .errors import raise_error, ResponseError, RequestError
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,6 +48,16 @@ async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
     for key in response['whitelist'].keys():
         if key not in api_keys:
             await async_delete_api_key(session, host, port, key)
+
+
+async def async_get_gateway_config(session, host, port, api_key, **kwargs):
+    """Get bridge id for bridge."""
+    url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
+
+    response = await async_request(session.get, url)
+
+    _LOGGER.info("Gateway config: %s", response)
+    return DeconzConfig(response)
 
 
 async def async_get_bridgeid(session, host, port, api_key, **kwargs):

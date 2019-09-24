@@ -92,6 +92,11 @@ class DeconzLight(DeconzDevice):
         return self.raw['state'].get('colormode')
 
     @property
+    def hascolor(self) -> bool:
+        """Tells if light has color support."""
+        return self.raw['state'].get('hascolor')
+
+    @property
     def effect(self):
         """Effect of the light.
 
