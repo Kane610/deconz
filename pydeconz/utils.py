@@ -9,7 +9,7 @@ from .errors import raise_error, ResponseError, RequestError
 
 _LOGGER = logging.getLogger(__name__)
 
-URL_DISCOVER = 'https://dresden-light.appspot.com/discover'
+URL_DISCOVER = 'https://phoscon.de/discover'
 
 
 async def async_get_api_key(session, host, port, username=None, password=None, **kwargs):
