@@ -2,9 +2,18 @@
 
 import logging
 
+from .api import APIItems
 from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
+URL = "/lights"
+
+
+class Lights(APIItems):
+    """Represent deCONZ lights."""
+
+    def __init__(self, raw, loop, get_state, put_state):
+        super().__init__(raw, loop, get_state, put_state, URL, DeconzLight)
 
 
 class DeconzLight(DeconzDevice):
@@ -14,7 +23,7 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    DECONZ_TYPE = '/lights/'
+    DECONZ_TYPE = 'lights'
 
     @property
     def state(self):
@@ -67,8 +76,7 @@ class DeconzLight(DeconzDevice):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if 'xy' not in self.raw['state'] or \
-                self.raw['state']['xy'] == (None, None):
+        if 'xy' not in self.raw['state'] or self.raw['state']['xy'] == (None, None):
             return None
 
         x, y = self.raw['state']['xy']

@@ -5,27 +5,28 @@ import logging
 from pprint import pformat
 
 from .config import DeconzConfig
-from .group import DeconzGroup
-from .light import DeconzLight
-from .sensor import create_sensor, supported_sensor
+from .group import Groups
+from .light import Lights
+from .sensor import Sensors
 from .utils import async_request
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class DeconzSession:
     """deCONZ representation that handles lights, groups, scenes and sensors."""
 
     def __init__(self, loop, websession, host, port, api_key, **kwargs):
         """Setup session and host information."""
-        self.groups = {}
-        self.lights = {}
-        self.scenes = {}
-        self.sensors = {}
         self.config = None
+        self.groups = None
+        self.lights = None
+        self.scenes = {}
+        self.sensors = None
         self.loop = loop
         self.session = websession
         self.host = host
-        self.api_url = 'http://{}:{}/api/{}'.format(host, port, api_key)
+        self.api_url = f"http://{host}:{port}/api/{api_key}"
         if 'legacy_websocket' in kwargs:
             from .websocket import WSClient as ws_client
         else:
@@ -51,57 +52,45 @@ class DeconzSession:
         if self.websocket:
             self.websocket.stop()
 
-    async def async_load_parameters(self) -> bool:
-        """Load deCONZ parameters.
-
-        Returns lists of indices of which devices was added.
-        """
-        data = await self.async_get_state('')
+    async def initialize(self) -> None:
+        """Load deCONZ parameters"""
+        data = await self.async_get_state("")
 
         _LOGGER.debug(pformat(data))
+        self.config = DeconzConfig(data["config"])
 
-        config = data.get('config', {})
-        groups = data.get('groups', {})
-        lights = data.get('lights', {})
-        sensors = data.get('sensors', {})
+        self.groups = Groups(
+            data["groups"],
+            self.loop,
+            self.async_get_state,
+            self.async_put_state
+        )
+        self.lights = Lights(
+            data["lights"],
+            self.loop,
+            self.async_get_state,
+            self.async_put_state
+        )
+        self.sensors = Sensors(
+            data["sensors"],
+            self.loop,
+            self.async_get_state,
+            self.async_put_state
+        )
 
-        if not self.config:
-            self.config = DeconzConfig(config)
-
-        # Update scene for existing groups
-        for group_id, group in groups.items():
-            if group_id in self.groups:
-                self.groups[group_id].async_add_scenes(
-                    group.get('scenes'), self.async_put_state)
-
-        self.groups.update({
-            group_id: DeconzGroup(group_id, group,
-                                  self.loop, self.async_put_state)
-            for group_id, group in groups.items()
-            if group_id not in self.groups
-        })
-
-        self.lights.update({
-            light_id: DeconzLight(light_id, light,
-                                  self.loop, self.async_put_state)
-            for light_id, light in lights.items()
-            if light_id not in self.lights
-        })
         self.update_group_color(self.lights.keys())
+        self.update_scenes()
 
-        self.scenes.update({
-            group.id + '_' + scene.id: scene
-            for group in self.groups.values()
-            for scene in group.scenes.values()
-            if group.id + '_' + scene.id not in self.scenes
-        })
+    async def refresh_state(self) -> None:
+        """Refresh deCONZ parameters"""
+        data = await self.async_get_state("")
 
-        self.sensors.update({
-            sensor_id: create_sensor(sensor_id, sensor,
-                                     self.loop, self.async_put_state)
-            for sensor_id, sensor in sensors.items()
-            if supported_sensor(sensor) and sensor_id not in self.sensors
-        })
+        self.groups.process_raw(data["groups"])
+        self.lights.process_raw(data["lights"])
+        self.sensors.process_raw(data["sensors"])
+
+        self.update_group_color(self.lights.keys())
+        self.update_scenes()
 
     async def async_put_state(self, field: str, data: dict) -> dict:
         """Set state of object in deCONZ.
@@ -114,7 +103,7 @@ class DeconzSession:
         http://dresden-elektronik.github.io/deconz-rest-doc/rest/
         """
         session = self.session.put
-        url = self.api_url + field
+        url = f"{self.api_url}{field}"
         jsondata = json.dumps(data)
         response_dict = await async_request(session, url, data=jsondata)
         return response_dict
@@ -128,7 +117,7 @@ class DeconzSession:
         http://dresden-elektronik.github.io/deconz-rest-doc/rest/
         """
         session = self.session.get
-        url = self.api_url + field
+        url = f"{self.api_url}{field}"
         response_dict = await async_request(session, url)
         return response_dict
 
@@ -140,6 +129,7 @@ class DeconzSession:
         """
         if signal == 'data':
             self.async_event_handler(self.websocket.data)
+
         elif signal == 'state':
             if self.async_connection_status_callback:
                 self.async_connection_status_callback(
@@ -149,58 +139,47 @@ class DeconzSession:
         """Receive event from websocket and identifies where the event belong.
 
         {
-            "t": "event",
             "e": "changed",
-            "r": "sensors",
             "id": "12",
+            "r": "sensors",
+            "t": "event",
             "state": { "buttonevent": 2002 }
         }
+        {
+            'e': 'changed',
+            'id': '1',
+            'name': 'Spot 1',
+            'r': 'lights',
+            't': 'event',
+            'uniqueid': '00:17:88:01:02:03:04:fc-0b'
+        }
         """
-        if event['e'] == 'added':
-
-            if event['r'] == 'lights' and event['id'] not in self.lights:
-                device_type = 'light'
-                device = self.lights[event['id']] = DeconzLight(
-                    event['id'], event['light'],
-                    self.loop, self.async_put_state)
-
-            elif event['r'] == 'sensors' and event['id'] not in self.sensors:
-                if supported_sensor(event['sensor']):
-                    device_type = 'sensor'
-                    device = self.sensors[event['id']] = create_sensor(
-                        event['id'], event['sensor'],
-                        self.loop, self.async_put_state)
-                else:
-                    _LOGGER.warning('Unsupported sensor %s', event)
-                    return
-
-            else:
-                _LOGGER.debug('Unsupported event %s', event)
-                return
-
-            if self.async_add_device_callback:
-                self.async_add_device_callback(device_type, device)
-
-        elif event['e'] == 'changed':
-
-            if event['r'] == 'groups' and event['id'] in self.groups:
-                self.groups[event['id']].async_update(event)
-
-            elif event['r'] == 'lights' and event['id'] in self.lights:
-                self.lights[event['id']].async_update(event)
-                self.update_group_color([event['id']])
-
-            elif event['r'] == 'sensors' and event['id'] in self.sensors:
-                self.sensors[event['id']].async_update(event)
-
-            else:
-                _LOGGER.debug('Unsupported event %s', event)
-
-        elif event['e'] == 'deleted':
-            _LOGGER.debug('Removed event %s', event)
-
-        else:
+        if event["e"] not in ("added", "changed"):
             _LOGGER.debug('Unsupported event %s', event)
+            return
+
+        for resource, device_class in (
+            ("group", self.groups),
+            ("light", self.lights),
+            ("sensor", self.sensors)
+        ):
+            if event["r"] != f"{resource}s":
+                continue
+
+            if event["e"] == "changed" and event["id"] in device_class:
+                device_class.process_raw({event["id"]: event})
+                if resource == "lights":
+                    self.update_group_color([event['id']])
+                break
+
+            if event["e"] == "added" and event["id"] not in device_class:
+                device_class.process_raw({event["id"]: event[resource]})
+                device = device_class[event["id"]]
+                if self.async_add_device_callback:
+                    self.async_add_device_callback(device.DECONZ_TYPE, device)
+                break
+
+        return
 
     def update_group_color(self, lights: list) -> None:
         """Update group colors based on light states.
@@ -218,7 +197,7 @@ class DeconzSession:
             if not any({*lights} & {*group.lights}):
                 continue
 
-            # More than one light means load_parameters called this method.
+            # More than one light means initialize called this method.
             # Then we take first best light to be available.
             light_ids = lights
             if len(light_ids) > 1:
@@ -228,3 +207,12 @@ class DeconzSession:
                 if self.lights[light_id].reachable:
                     group.update_color_state(self.lights[light_id])
                     break
+
+    def update_scenes(self) -> None:
+        """Update scenes to hold all known scenes from existing groups."""
+        self.scenes.update({
+            f"{group.id}_{scene.id}": scene
+            for group in self.groups.values()
+            for scene in group.scenes.values()
+            if f"{group.id}_{scene.id}" not in self.scenes
+        })

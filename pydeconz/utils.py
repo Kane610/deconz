@@ -14,7 +14,7 @@ URL_DISCOVER = 'https://phoscon.de/discover'
 
 async def async_get_api_key(session, host, port, username=None, password=None, **kwargs):
     """Get a new API key for devicetype."""
-    url = 'http://{host}:{port}/api'.format(host=host, port=str(port))
+    url = f"http://{host}:{port}/api"
 
     auth = None
     if username and password:
@@ -30,8 +30,7 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
 
 async def async_delete_api_key(session, host, port, api_key):
     """Delete API key from deCONZ."""
-    url = 'http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}'.format(
-        host=host, port=str(port), api_key=api_key)
+    url = f"http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}"
 
     response = await async_request(session.delete, url)
 
@@ -40,7 +39,7 @@ async def async_delete_api_key(session, host, port, api_key):
 
 async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
     """Delete all API keys except for the ones provided to the method."""
-    url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
+    url = f"http://{host}:{port}/api/{api_key}/config"
 
     response = await async_request(session.get, url)
 
@@ -52,7 +51,7 @@ async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
 
 async def async_get_gateway_config(session, host, port, api_key, **kwargs):
     """Get bridge id for bridge."""
-    url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
+    url = f"http://{host}:{port}/api/{api_key}/config"
 
     response = await async_request(session.get, url)
 
@@ -62,7 +61,7 @@ async def async_get_gateway_config(session, host, port, api_key, **kwargs):
 
 async def async_get_bridgeid(session, host, port, api_key, **kwargs):
     """Get bridge id for bridge."""
-    url = 'http://{}:{}/api/{}/config'.format(host, str(port), api_key)
+    url = f"http://{host}:{port}/api/{api_key}/config"
 
     response = await async_request(session.get, url)
 
