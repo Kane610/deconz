@@ -15,7 +15,7 @@ class DeconzDevice:
     http://dresden-elektronik.github.io/deconz-rest-doc/
     """
 
-    DECONZ_TYPE = ''
+    DECONZ_TYPE = ""
 
     def __init__(self, device_id, raw, loop, async_set_callback):
         """Set initial information common to all device types."""
@@ -28,16 +28,16 @@ class DeconzDevice:
         self._cancel_retry = None
 
         self._async_callbacks = []
-        _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
+        _LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
     async def async_set_config(self, data):
         """Set config of device."""
-        field = self.deconz_id + '/config'
+        field = f"{self.deconz_id}/config"
         await self.async_set(field, data)
 
     async def async_set_state(self, data: dict):
         """Set state of device."""
-        field = self.deconz_id + '/state'
+        field = f"{self.deconz_id}/state"
         await self.async_set(field, data)
 
     async def async_set(self, field, data, tries=0):
@@ -103,7 +103,7 @@ class DeconzDevice:
     @property
     def deconz_id(self):
         """Id to call device over API e.g. /sensors/1."""
-        return self.DECONZ_TYPE + self.device_id
+        return f"/{self.DECONZ_TYPE}/{self.device_id}"
 
     @property
     def etag(self):
@@ -113,7 +113,7 @@ class DeconzDevice:
     @property
     def manufacturer(self):
         """The manufacturer of the device."""
-        return self.raw.get('manufacturername')
+        return self.raw.get('manufacturername', "")
 
     @property
     def modelid(self):

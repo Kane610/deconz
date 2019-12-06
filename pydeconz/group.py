@@ -1,10 +1,20 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
+from pprint import pformat
 
+from .api import APIItems
 from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
+URL = "/groups"
+
+
+class Groups(APIItems):
+    """Represent deCONZ groups."""
+
+    def __init__(self, raw, loop, get_state, put_state):
+        super().__init__(raw, loop, get_state, put_state, URL, DeconzGroup)
 
 
 class DeconzGroup(DeconzDevice):
@@ -14,7 +24,7 @@ class DeconzGroup(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
-    DECONZ_TYPE = '/groups/'
+    DECONZ_TYPE = 'groups'
 
     def __init__(self, device_id, raw, loop, async_set_state_callback):
         """Set initial information about light group.
@@ -22,12 +32,12 @@ class DeconzGroup(DeconzDevice):
         Create scenes related to light group.
         """
         super().__init__(device_id, raw, loop, async_set_state_callback)
-        self._scenes = {}
-        self.async_add_scenes(raw.get('scenes'), async_set_state_callback)
+        self._scenes = Scenes(self, loop, async_set_state_callback)
+        print(self._scenes.values(), self.scenes.values())
 
     async def async_set_state(self, data):
         """Set state of light group."""
-        field = self.deconz_id + '/action'
+        field = f"{self.deconz_id}/action"
         await self.async_set(field, data)
 
     @property
@@ -192,6 +202,29 @@ class DeconzGroup(DeconzDevice):
         })
 
 
+class Scenes(APIItems):
+    """Represent scenes of a deCONZ group."""
+
+    def __init__(self, group, loop, put_state):
+        self.group = group
+        url = f"{URL}/{group.device_id}/scenes"
+        super().__init__(group.raw.get("scenes"), loop, self.get_state, put_state, url, DeconzScene)
+
+    async def get_state(self, path):
+        pass
+
+    def process_raw(self, raw: list) -> None:
+        """"""
+        for raw_item in raw:
+            id = raw_item["id"]
+            obj = self._items.get(id)
+
+            if obj is not None:
+                obj.raw = raw_item
+            else:
+                self._items[id] = self._item_cls(self.group, raw_item, self._put)
+
+
 class DeconzScene:
     """deCONZ scene representation.
 
@@ -199,39 +232,37 @@ class DeconzScene:
     http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
     """
 
-    def __init__(self, group, scene, async_set_state_callback):
+    def __init__(self, group, raw, async_set_state_callback):
         """Set initial information about scene.
 
         Set callback to set state of device.
         """
-        self._group_id = group.id
-        self._group_name = group.name
-        self._id = scene.get('id')
-        self._name = scene.get('name')
-        self._deconz_id = group.deconz_id + '/scenes/' + self._id
+        self.group = group
+        self.raw = raw
         self._async_set_state_callback = async_set_state_callback
+        _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
 
     async def async_set_state(self, data):
         """Recall scene to group."""
-        field = self._deconz_id + '/recall'
+        field = f"{self.deconz_id}/recall"
         await self._async_set_state_callback(field, data)
 
     @property
     def deconz_id(self):
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return self._deconz_id
-
-    @property
-    def full_name(self):
-        """Full name."""
-        return self._group_name + ' ' + self._name
+        return f"{self.group.deconz_id}/scenes/{self.id}"
 
     @property
     def id(self):
-        """Scene ID from deCONZ."""
-        return self._id
+        """Scene ID."""
+        return self.raw["id"]
 
     @property
     def name(self):
         """Scene name."""
-        return self._name
+        return self.raw["name"]
+
+    @property
+    def full_name(self):
+        """Full name."""
+        return f"{self.group.name} {self.name}"

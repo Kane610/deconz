@@ -118,7 +118,7 @@ async def test_consumption_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ('ZHAConsumption',)
-    assert sensor.SENSOR_CLASS == 'kWh'
+    assert sensor.SENSOR_UNIT == 'kWh'
 
     assert sensor.state == 11.342
     assert sensor.consumption == 11342
@@ -252,7 +252,7 @@ async def test_genericflag_sensor():
     # DeconzDevice
     assert sensor.deconz_id == '/sensors/0'
     assert sensor.etag is None
-    assert sensor.manufacturer is None
+    assert sensor.manufacturer is ""
     assert sensor.modelid == 'Switch'
     assert sensor.name == "Kitchen Switch"
     assert sensor.swversion == '1.0.0'

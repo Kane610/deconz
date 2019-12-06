@@ -2,9 +2,18 @@
 
 import logging
 
+from .api import APIItems
 from .deconzdevice import DeconzDevice
 
 _LOGGER = logging.getLogger(__name__)
+URL = "/sensors"
+
+
+class Sensors(APIItems):
+    """Represent deCONZ sensors."""
+
+    def __init__(self, raw, loop, get_state, put_state):
+        super().__init__(raw, loop, get_state, put_state, URL, create_sensor)
 
 
 class DeconzSensor(DeconzDevice):
@@ -14,7 +23,7 @@ class DeconzSensor(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
-    DECONZ_TYPE = '/sensors/'
+    DECONZ_TYPE = 'sensors'
 
     BINARY = None
     ZHATYPE = set()
@@ -616,8 +625,7 @@ def create_sensor(sensor_id, raw, loop, async_set_state_callback):
     """Simplify creating sensor by not needing to know type."""
     for sensor_class in SENSOR_CLASSES:
         if raw['type'] in sensor_class.ZHATYPE:
-            return sensor_class(
-                sensor_id, raw, loop, async_set_state_callback)
+            return sensor_class(sensor_id, raw, loop, async_set_state_callback)
 
 
 def supported_sensor(raw):
@@ -626,6 +634,5 @@ def supported_sensor(raw):
         if raw['type'] in sensor_class.ZHATYPE:
             return True
 
-    _LOGGER.info('Unsupported sensor type %s (%s)',
-                 raw['type'], raw['name'])
+    _LOGGER.info('Unsupported sensor type %s (%s)', raw['type'], raw['name'])
     return False

@@ -4,7 +4,7 @@ pytest --cov-report term-missing --cov=pydeconz tests/test_init.py
 """
 import asyncio
 from unittest.mock import Mock, patch
-from asynctest import CoroutineMock
+from asynctest import Mock as async_Mock, patch as async_patch, CoroutineMock
 import pytest
 
 import aiohttp
@@ -26,15 +26,14 @@ def session() -> DeconzSession:
     return DeconzSession(loop, session, IP, PORT, API_KEY)
 
 
-@pytest.mark.asyncio
-async def test_load_parameters(session) -> None:
+async def test_initialize(session) -> None:
     """Test a successful call of load_parameters."""
     with patch('pydeconz.DeconzSession.async_get_state',
                new=CoroutineMock(return_value={
                    'config': {'bridgeid': '012345'},
                    'groups': {'g1': {
                        'id': 'gid',
-                       'scenes': [{'id': 'sc1'}],
+                       'scenes': [{'id': 'sc1', "name": "scene1"}],
                        'state': {},
                        'action': {},
                        'lights': []
@@ -46,9 +45,7 @@ async def test_load_parameters(session) -> None:
                        'config': {}
                        }}
                })):
-        await session.async_load_parameters()
-
-    assert session.config.bridgeid == '012345'
+        await session.initialize()
     assert 'g1' in session.groups
     assert session.groups['g1'].id == 'gid'
     assert 'sc1' in session.groups['g1'].scenes
@@ -59,4 +56,3 @@ async def test_load_parameters(session) -> None:
     assert 's1' in session.sensors
     assert session.sensors['s1'].deconz_id == '/sensors/s1'
     assert session.sensors['s1'].type == GenericStatus.ZHATYPE[0]
-
