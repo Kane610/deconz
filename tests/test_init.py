@@ -4,7 +4,7 @@ pytest --cov-report term-missing --cov=pydeconz tests/test_init.py
 """
 import asyncio
 from unittest.mock import Mock, patch
-from asynctest import Mock as async_Mock, patch as async_patch, CoroutineMock
+from asynctest import CoroutineMock
 import pytest
 
 import aiohttp
