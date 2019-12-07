@@ -32,7 +32,7 @@ class DeconzGroup(DeconzDevice):
         Create scenes related to light group.
         """
         super().__init__(device_id, raw, loop, request)
-        self._scenes = Scenes(self, loop, self.async_set)
+        self._scenes = Scenes(self, loop, request)
 
     async def async_set_state(self, data):
         """Set state of light group."""
@@ -241,7 +241,7 @@ class DeconzScene:
     async def async_set_state(self, data):
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
-        await self._request(field, data)
+        await self._request("put", field, json=data)
 
     @property
     def deconz_id(self):
