@@ -6,7 +6,7 @@ import aiohttp
 
 from . import _raise_on_error
 from .config import DeconzConfig
-from .errors import raise_error, ResponseError, RequestError
+from .errors import ResponseError, RequestError
 
 _LOGGER = logging.getLogger(__name__)
 

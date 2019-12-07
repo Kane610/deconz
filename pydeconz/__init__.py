@@ -1,6 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import json
 import logging
 from pprint import pformat
 
