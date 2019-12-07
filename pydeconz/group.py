@@ -207,7 +207,7 @@ class Scenes(APIItems):
     def __init__(self, group, loop, request):
         self.group = group
         url = f"{URL}/{group.device_id}/scenes"
-        super().__init__(group.raw.get("scenes"), loop, request, url, DeconzScene)
+        super().__init__(group.raw["scenes"], loop, request, url, DeconzScene)
 
     def process_raw(self, raw: list) -> None:
         """"""
