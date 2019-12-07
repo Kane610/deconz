@@ -13,8 +13,8 @@ URL = "/groups"
 class Groups(APIItems):
     """Represent deCONZ groups."""
 
-    def __init__(self, raw, loop, get_state, put_state):
-        super().__init__(raw, loop, get_state, put_state, URL, DeconzGroup)
+    def __init__(self, raw, loop, request):
+        super().__init__(raw, loop, request, URL, DeconzGroup)
 
 
 class DeconzGroup(DeconzDevice):
@@ -26,14 +26,13 @@ class DeconzGroup(DeconzDevice):
 
     DECONZ_TYPE = 'groups'
 
-    def __init__(self, device_id, raw, loop, async_set_state_callback):
+    def __init__(self, device_id, raw, loop, request):
         """Set initial information about light group.
 
         Create scenes related to light group.
         """
-        super().__init__(device_id, raw, loop, async_set_state_callback)
-        self._scenes = Scenes(self, loop, async_set_state_callback)
-        print(self._scenes.values(), self.scenes.values())
+        super().__init__(device_id, raw, loop, request)
+        self._scenes = Scenes(self, loop, request)
 
     async def async_set_state(self, data):
         """Set state of light group."""
@@ -180,10 +179,10 @@ class DeconzGroup(DeconzDevice):
         """A list of scenes of the group."""
         return self._scenes
 
-    def async_add_scenes(self, scenes, async_set_state_callback):
+    def async_add_scenes(self, scenes, request):
         """Add scenes belonging to group."""
         self._scenes = {
-            scene['id']: DeconzScene(self, scene, async_set_state_callback)
+            scene['id']: DeconzScene(self, scene, request)
             for scene in scenes
             if scene['id'] not in self._scenes
         }
@@ -205,13 +204,10 @@ class DeconzGroup(DeconzDevice):
 class Scenes(APIItems):
     """Represent scenes of a deCONZ group."""
 
-    def __init__(self, group, loop, put_state):
+    def __init__(self, group, loop, request):
         self.group = group
         url = f"{URL}/{group.device_id}/scenes"
-        super().__init__(group.raw.get("scenes"), loop, self.get_state, put_state, url, DeconzScene)
-
-    async def get_state(self, path):
-        pass
+        super().__init__(group.raw["scenes"], loop, request, url, DeconzScene)
 
     def process_raw(self, raw: list) -> None:
         """"""
@@ -222,7 +218,7 @@ class Scenes(APIItems):
             if obj is not None:
                 obj.raw = raw_item
             else:
-                self._items[id] = self._item_cls(self.group, raw_item, self._put)
+                self._items[id] = self._item_cls(self.group, raw_item, self._request)
 
 
 class DeconzScene:
@@ -232,20 +228,20 @@ class DeconzScene:
     http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
     """
 
-    def __init__(self, group, raw, async_set_state_callback):
+    def __init__(self, group, raw, request):
         """Set initial information about scene.
 
         Set callback to set state of device.
         """
         self.group = group
         self.raw = raw
-        self._async_set_state_callback = async_set_state_callback
+        self._request = request
         _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
 
     async def async_set_state(self, data):
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
-        await self._async_set_state_callback(field, data)
+        await self._request("put", field, json=data)
 
     @property
     def deconz_id(self):

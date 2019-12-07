@@ -5,7 +5,7 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 
 from unittest.mock import Mock
 
-from pydeconz.sensor import SENSOR_CLASSES, create_sensor, supported_sensor
+from pydeconz.sensor import SENSOR_CLASSES, create_sensor
 
 
 async def test_create_sensor():
@@ -25,26 +25,8 @@ async def test_create_sensor():
 async def test_create_sensor_fails():
     """Verify failing behavior for create_sensor."""
     sensor_id = '0'
-    sensor = {'type': 'not supported'}
+    sensor = {'type': 'not supported', "name": "name"}
     result = create_sensor(sensor_id, sensor, None, None)
-
-    assert not result
-
-
-async def test_supported_sensor():
-    """Verify supported_sensor."""
-    for sensor_class in SENSOR_CLASSES:
-        for sensor_type in sensor_class.ZHATYPE:
-            sensor = {'type': sensor_type}
-            result = supported_sensor(sensor)
-
-            assert result
-
-
-async def test_supported_sensor_fails():
-    """Verify failing behavior for supported_sensor."""
-    sensor = {'type': 'not supported', 'name': ''}
-    result = supported_sensor(sensor)
 
     assert not result
 
@@ -122,6 +104,7 @@ async def test_consumption_sensor():
 
     assert sensor.state == 11.342
     assert sensor.consumption == 11342
+    assert sensor.power == 123
 
     # DeconzSensor
     assert sensor.battery is None
@@ -742,7 +725,8 @@ FIXTURE_CONSUMPTION = {
     'name': 'Consumption 15',
     'state': {
         'consumption': 11342,
-        'lastupdated': '2018-03-12T19:19:08'
+        'lastupdated': '2018-03-12T19:19:08',
+        'power': 123
     },
     'type': 'ZHAConsumption',
     'uniqueid': '00:0d:6f:00:0b:7a:64:29-01-0702'

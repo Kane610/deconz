@@ -17,14 +17,14 @@ class DeconzDevice:
 
     DECONZ_TYPE = ""
 
-    def __init__(self, device_id, raw, loop, async_set_callback):
+    def __init__(self, device_id, raw, loop, request):
         """Set initial information common to all device types."""
         self.device_id = device_id
         self.raw = raw
         self.changed_keys = set()
 
         self.loop = loop
-        self._async_set_callback = async_set_callback
+        self._request = request
         self._cancel_retry = None
 
         self._async_callbacks = []
@@ -45,7 +45,7 @@ class DeconzDevice:
         self.cancel_retry()
 
         try:
-            await self._async_set_callback(field, data)
+            await self._request("put", field, json=data)
 
         except BridgeBusy:
             _LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))

@@ -28,7 +28,7 @@ def session() -> DeconzSession:
 
 async def test_initialize(session) -> None:
     """Test a successful call of load_parameters."""
-    with patch('pydeconz.DeconzSession.async_get_state',
+    with patch('pydeconz.DeconzSession.request',
                new=CoroutineMock(return_value={
                    'config': {'bridgeid': '012345'},
                    'groups': {'g1': {

@@ -1,14 +1,15 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import json
 import logging
 from pprint import pformat
 
+from aiohttp import client_exceptions
+
 from .config import DeconzConfig
+from .errors import raise_error, ResponseError, RequestError
 from .group import Groups
 from .light import Lights
 from .sensor import Sensors
-from .utils import async_request
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,7 +27,8 @@ class DeconzSession:
         self.loop = loop
         self.session = websession
         self.host = host
-        self.api_url = f"http://{host}:{port}/api/{api_key}"
+        self.port = port
+        self.api_key = api_key
         if 'legacy_websocket' in kwargs:
             from .websocket import WSClient as ws_client
         else:
@@ -54,36 +56,20 @@ class DeconzSession:
 
     async def initialize(self) -> None:
         """Load deCONZ parameters"""
-        data = await self.async_get_state("")
+        data = await self.request('get')
 
-        _LOGGER.debug(pformat(data))
         self.config = DeconzConfig(data["config"])
 
-        self.groups = Groups(
-            data["groups"],
-            self.loop,
-            self.async_get_state,
-            self.async_put_state
-        )
-        self.lights = Lights(
-            data["lights"],
-            self.loop,
-            self.async_get_state,
-            self.async_put_state
-        )
-        self.sensors = Sensors(
-            data["sensors"],
-            self.loop,
-            self.async_get_state,
-            self.async_put_state
-        )
+        self.groups = Groups(data["groups"], self.loop, self.request)
+        self.lights = Lights(data["lights"], self.loop, self.request)
+        self.sensors = Sensors(data["sensors"], self.loop, self.request)
 
         self.update_group_color(self.lights.keys())
         self.update_scenes()
 
     async def refresh_state(self) -> None:
         """Refresh deCONZ parameters"""
-        data = await self.async_get_state("")
+        data = await self.request('get')
 
         self.groups.process_raw(data["groups"])
         self.lights.process_raw(data["lights"])
@@ -92,34 +78,32 @@ class DeconzSession:
         self.update_group_color(self.lights.keys())
         self.update_scenes()
 
-    async def async_put_state(self, field: str, data: dict) -> dict:
-        """Set state of object in deCONZ.
+    async def request(self, method, path="", json=None):
+        """Make a request to the API."""
+        _LOGGER.debug(
+            "Sending \"%s\" \"%s\" to \"%s %s\"", method, json, self.host, path
+        )
 
-        Field is a string representing a specific device in deCONZ
-        e.g. field='/lights/1/state'.
-        Data is a json object with what data you want to alter
-        e.g. data={'on': True}.
-        See Dresden Elektroniks REST API documentation for details:
-        http://dresden-elektronik.github.io/deconz-rest-doc/rest/
-        """
-        session = self.session.put
-        url = f"{self.api_url}{field}"
-        jsondata = json.dumps(data)
-        response_dict = await async_request(session, url, data=jsondata)
-        return response_dict
+        url = f"http://{self.host}:{self.port}/api/{self.api_key}{path}"
 
-    async def async_get_state(self, field: str) -> dict:
-        """Get state of object in deCONZ.
+        try:
+            async with self.session.request(method, url, json=json) as res:
 
-        Field is a string representing an API endpoint or lower
-        e.g. field='/lights'.
-        See Dresden Elektroniks REST API documentation for details:
-        http://dresden-elektronik.github.io/deconz-rest-doc/rest/
-        """
-        session = self.session.get
-        url = f"{self.api_url}{field}"
-        response_dict = await async_request(session, url)
-        return response_dict
+                if res.content_type != 'application/json':
+                    raise ResponseError(
+                        'Invalid content type: {}'.format(res.content_type))
+
+                response = await res.json()
+                _LOGGER.debug("HTTP request response: %s", pformat(response))
+
+                _raise_on_error(response)
+
+                return response
+
+        except client_exceptions.ClientError as err:
+            raise RequestError(
+                'Error requesting data from {}: {}'.format(self.host, err)
+            ) from None
 
     def async_session_handler(self, signal: str) -> None:
         """Signalling from websocket.
@@ -216,3 +200,12 @@ class DeconzSession:
             for scene in group.scenes.values()
             if f"{group.id}_{scene.id}" not in self.scenes
         })
+
+
+def _raise_on_error(data):
+    """Check response for error message."""
+    if isinstance(data, list) and data:
+        data = data[0]
+
+    if isinstance(data, dict) and 'error' in data:
+        raise_error(data['error'])

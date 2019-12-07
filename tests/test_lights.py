@@ -27,6 +27,7 @@ async def test_create_light():
     assert light.xy == (0.421253, 0.39921)
     assert light.colormode == 'ct'
     assert light.effect is None
+    assert light.hascolor is True
     assert light.reachable is True
 
     assert light.deconz_id == '/lights/0'
@@ -75,6 +76,7 @@ FIXTURE_RGB_LIGHT = {
         "colormode": "ct",
         "ct": 307,
         "effect": None,
+        "hascolor": True,
         "hue": 7998,
         "on": False,
         "reachable": True,

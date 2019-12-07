@@ -55,28 +55,37 @@ class AIOWSClient:
 
     async def running(self):
         """Start websocket connection."""
-        url = 'http://{}:{}'.format(self.host, self.port)
+        url = f"http://{self.host}:{self.port}"
+
         try:
             async with self.session.ws_connect(url) as ws:
                 self.state = STATE_RUNNING
+
                 async for msg in ws:
+
                     if self.state == STATE_STOPPED:
                         break
+
                     elif msg.type == aiohttp.WSMsgType.TEXT:
                         self._data = json.loads(msg.data)
                         self.async_session_handler_callback('data')
-                        _LOGGER.debug('Websocket data: %s', msg.data)
+                        _LOGGER.debug(msg.data)
+
                     elif msg.type == aiohttp.WSMsgType.CLOSED:
                         break
+
                     elif msg.type == aiohttp.WSMsgType.ERROR:
                         break
+
         except aiohttp.ClientConnectorError:
             if self.state != STATE_STOPPED:
                 self.retry()
+
         except Exception as err:
             _LOGGER.error('Unexpected error %s', err)
             if self.state != STATE_STOPPED:
                 self.retry()
+
         else:
             if self.state != STATE_STOPPED:
                 self.retry()
@@ -184,7 +193,7 @@ class WSClient(asyncio.Protocol):
             self.state = STATE_RUNNING
             _LOGGER.debug('Websocket handshake: %s', data.decode())
             return
-        _LOGGER.debug('Websocket data: %s', data)
+        _LOGGER.debug(data)
 
         while len(data) > 0:
             payload, extra_data = self.get_payload(data)
