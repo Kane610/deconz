@@ -12,9 +12,9 @@ from struct import unpack
 
 _LOGGER = logging.getLogger(__name__)
 
-STATE_STARTING = 'starting'
-STATE_RUNNING = 'running'
-STATE_STOPPED = 'stopped'
+STATE_STARTING = "starting"
+STATE_RUNNING = "running"
+STATE_STOPPED = "stopped"
 
 RETRY_TIMER = 15
 
@@ -45,8 +45,8 @@ class AIOWSClient:
     def state(self, value):
         """"""
         self._state = value
-        _LOGGER.debug('Websocket %s', value)
-        self.async_session_handler_callback('state')
+        _LOGGER.debug("Websocket %s", value)
+        self.async_session_handler_callback("state")
 
     def start(self):
         if self.state != STATE_RUNNING:
@@ -68,7 +68,7 @@ class AIOWSClient:
 
                     elif msg.type == aiohttp.WSMsgType.TEXT:
                         self._data = json.loads(msg.data)
-                        self.async_session_handler_callback('data')
+                        self.async_session_handler_callback("data")
                         _LOGGER.debug(msg.data)
 
                     elif msg.type == aiohttp.WSMsgType.CLOSED:
@@ -82,7 +82,7 @@ class AIOWSClient:
                 self.retry()
 
         except Exception as err:
-            _LOGGER.error('Unexpected error %s', err)
+            _LOGGER.error("Unexpected error %s", err)
             if self.state != STATE_STOPPED:
                 self.retry()
 
@@ -98,7 +98,7 @@ class AIOWSClient:
         """Retry to connect to deCONZ."""
         self.state = STATE_STARTING
         self.loop.call_later(RETRY_TIMER, self.start)
-        _LOGGER.debug('Reconnecting to deCONZ in %i.', RETRY_TIMER)
+        _LOGGER.debug("Reconnecting to deCONZ in %i.", RETRY_TIMER)
 
 
 class WSClient(asyncio.Protocol):
@@ -113,13 +113,12 @@ class WSClient(asyncio.Protocol):
         self._data = None
         self._state = None
         self.transport = None
-        _LOGGER.warning('Using legacy websocket, this is not recommended')
+        _LOGGER.warning("Using legacy websocket, this is not recommended")
 
     def start(self):
         """Start websocket connection."""
         if self.state != STATE_RUNNING:
-            conn = self.loop.create_connection(
-                lambda: self, self.host, self.port)
+            conn = self.loop.create_connection(lambda: self, self.host, self.port)
             task = self.loop.create_task(conn)
             task.add_done_callback(self.init_done)
             self.state = STATE_STARTING
@@ -133,7 +132,7 @@ class WSClient(asyncio.Protocol):
             if fut.exception():
                 fut.result()
         except OSError as err:
-            _LOGGER.debug('Got exception %s', err)
+            _LOGGER.debug("Got exception %s", err)
             self.retry()
 
     @property
@@ -149,8 +148,8 @@ class WSClient(asyncio.Protocol):
     def state(self, value):
         """"""
         self._state = value
-        _LOGGER.debug('Websocket %s', value)
-        self.async_session_handler_callback('state')
+        _LOGGER.debug("Websocket %s", value)
+        self.async_session_handler_callback("state")
 
     def stop(self):
         """Close websocket connection."""
@@ -161,7 +160,7 @@ class WSClient(asyncio.Protocol):
     def retry(self):
         """Retry to connect to deCONZ."""
         self.loop.call_later(RETRY_TIMER, self.start)
-        _LOGGER.debug('Reconnecting to deCONZ in %i.', RETRY_TIMER)
+        _LOGGER.debug("Reconnecting to deCONZ in %i.", RETRY_TIMER)
 
     def connection_made(self, transport):
         """Do the websocket handshake.
@@ -169,17 +168,17 @@ class WSClient(asyncio.Protocol):
         According to https://tools.ietf.org/html/rfc6455
         """
         randomness = os.urandom(16)
-        key = base64encode(randomness).decode('utf-8').strip()
+        key = base64encode(randomness).decode("utf-8").strip()
         self.transport = transport
         message = "GET / HTTP/1.1\r\n"
-        message += "Host: " + self.host + ':' + str(self.port) + '\r\n'
+        message += "Host: " + self.host + ":" + str(self.port) + "\r\n"
         message += "User-Agent: Python/3.5 websockets/3.4\r\n"
         message += "Upgrade: Websocket\r\n"
         message += "Connection: Upgrade\r\n"
         message += "Sec-WebSocket-Key: " + key + "\r\n"
         message += "Sec-WebSocket-Version: 13\r\n"
         message += "\r\n"
-        _LOGGER.debug('Websocket handshake: %s', message)
+        _LOGGER.debug("Websocket handshake: %s", message)
         self.transport.write(message.encode())
 
     def data_received(self, data):
@@ -191,21 +190,21 @@ class WSClient(asyncio.Protocol):
         """
         if self.state == STATE_STARTING:
             self.state = STATE_RUNNING
-            _LOGGER.debug('Websocket handshake: %s', data.decode())
+            _LOGGER.debug("Websocket handshake: %s", data.decode())
             return
         _LOGGER.debug(data)
 
         while len(data) > 0:
             payload, extra_data = self.get_payload(data)
-            self._data = payload ###
-            self.async_session_handler_callback('data')###
-            #self.async_callback(payload)
+            self._data = payload  ###
+            self.async_session_handler_callback("data")  ###
+            # self.async_callback(payload)
             data = extra_data
 
     def connection_lost(self, exc):
         """Happen when device closes connection or stop() has been called."""
         if self.state == STATE_RUNNING:
-            _LOGGER.warning('Lost connection to deCONZ')
+            _LOGGER.warning("Lost connection to deCONZ")
             self.retry()
 
     def get_payload(self, data):
@@ -215,11 +214,11 @@ class WSClient(asyncio.Protocol):
         if length == 126:
             # Payload information are an extra 2 bytes.
             start = 4
-            length, = unpack(">H", data[2:4])
+            (length,) = unpack(">H", data[2:4])
         elif length == 127:
             # Payload information are an extra 6 bytes.
             start = 8
-            length, = unpack(">I", data[2:6])
+            (length,) = unpack(">I", data[2:6])
         end = start + length
         payload = json.loads(data[start:end].decode())
         extra_data = data[end:]

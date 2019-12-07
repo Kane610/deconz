@@ -24,7 +24,7 @@ class DeconzGroup(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
-    DECONZ_TYPE = 'groups'
+    DECONZ_TYPE = "groups"
 
     def __init__(self, device_id, raw, loop, request):
         """Set initial information about light group.
@@ -51,12 +51,12 @@ class DeconzGroup(DeconzDevice):
         Depending on the light type 0 might not mean visible "off"
         but minimum brightness.
         """
-        return self.raw['action'].get('bri')
+        return self.raw["action"].get("bri")
 
     @property
     def ct(self):
         """Mired color temperature of the light. (2000K - 6500K)."""
-        return self.raw['action'].get('ct')
+        return self.raw["action"].get("ct")
 
     @property
     def hue(self):
@@ -65,7 +65,7 @@ class DeconzGroup(DeconzDevice):
         The hue parameter in the HSV color model is between 0°-360°
         and is mapped to 0..65535 to get 16-bit resolution.
         """
-        return self.raw['action'].get('hue')
+        return self.raw["action"].get("hue")
 
     @property
     def sat(self):
@@ -74,16 +74,15 @@ class DeconzGroup(DeconzDevice):
         There 0 means no color at all and 255 is the greatest saturation
         of the color.
         """
-        return self.raw['action'].get('sat')
+        return self.raw["action"].get("sat")
 
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if 'xy' not in self.raw['action'] or \
-                self.raw['action']['xy'] == (None, None):
+        if "xy" not in self.raw["action"] or self.raw["action"]["xy"] == (None, None):
             return None
 
-        x, y = self.raw['action']['xy']
+        x, y = self.raw["action"]["xy"]
 
         if x > 1:
             x = x / 65555
@@ -101,7 +100,7 @@ class DeconzGroup(DeconzDevice):
         xy - CIE xy values
         ct - color temperature
         """
-        return self.raw['action'].get('colormode')
+        return self.raw["action"].get("colormode")
 
     @property
     def effect(self):
@@ -110,7 +109,7 @@ class DeconzGroup(DeconzDevice):
         none - no effect
         colorloop
         """
-        return self.raw['action'].get('effect')
+        return self.raw["action"].get("effect")
 
     @property
     def reachable(self):
@@ -120,22 +119,22 @@ class DeconzGroup(DeconzDevice):
     @property
     def groupclass(self):
         """"""
-        return self.raw.get('class')
+        return self.raw.get("class")
 
     @property
     def all_on(self):
         """True if all lights in light group are on"""
-        return self.raw['state'].get('all_on')
+        return self.raw["state"].get("all_on")
 
     @property
     def any_on(self):
         """True if any lights in light group are on"""
-        return self.raw['state'].get('any_on')
+        return self.raw["state"].get("any_on")
 
     @property
     def devicemembership(self):
         """List of device ids (sensors) when group was created by a device."""
-        return self.raw.get('devicemembership')
+        return self.raw.get("devicemembership")
 
     @property
     def hidden(self):
@@ -143,12 +142,12 @@ class DeconzGroup(DeconzDevice):
 
         Has no effect at the gateway but apps can uses this to hide groups.
         """
-        return self.raw.get('hidden')
+        return self.raw.get("hidden")
 
     @property
     def id(self):
         """The id of the group."""
-        return self.raw.get('id')
+        return self.raw.get("id")
 
     @property
     def lights(self):
@@ -156,7 +155,7 @@ class DeconzGroup(DeconzDevice):
 
         Sequence is defined by the gateway.
         """
-        return self.raw.get('lights')
+        return self.raw.get("lights")
 
     @property
     def lightsequence(self):
@@ -164,7 +163,7 @@ class DeconzGroup(DeconzDevice):
 
         Need not to contain all light ids of this group.
         """
-        return self.raw.get('lightsequence')
+        return self.raw.get("lightsequence")
 
     @property
     def multideviceids(self):
@@ -172,7 +171,7 @@ class DeconzGroup(DeconzDevice):
 
         Subsequent ids from multidevices with multiple endpoints.
         """
-        return self.raw.get('multideviceids')
+        return self.raw.get("multideviceids")
 
     @property
     def scenes(self):
@@ -182,23 +181,25 @@ class DeconzGroup(DeconzDevice):
     def async_add_scenes(self, scenes, request):
         """Add scenes belonging to group."""
         self._scenes = {
-            scene['id']: DeconzScene(self, scene, request)
+            scene["id"]: DeconzScene(self, scene, request)
             for scene in scenes
-            if scene['id'] not in self._scenes
+            if scene["id"] not in self._scenes
         }
 
     def update_color_state(self, light):
         """Sync color state with light."""
-        self.async_update({
-            'action': {
-                'bri': light.brightness,
-                'hue': light.hue,
-                'sat': light.sat,
-                'ct': light.ct,
-                'xy': light.xy or (None, None),
-                'colormode': light.colormode,
-            },
-        })
+        self.async_update(
+            {
+                "action": {
+                    "bri": light.brightness,
+                    "hue": light.hue,
+                    "sat": light.sat,
+                    "ct": light.ct,
+                    "xy": light.xy or (None, None),
+                    "colormode": light.colormode,
+                }
+            }
+        )
 
 
 class Scenes(APIItems):
@@ -236,7 +237,7 @@ class DeconzScene:
         self.group = group
         self.raw = raw
         self._request = request
-        _LOGGER.debug('%s created as \n%s', self.name, pformat(self.raw))
+        _LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
     async def async_set_state(self, data):
         """Recall scene to group."""

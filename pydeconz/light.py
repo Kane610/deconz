@@ -23,12 +23,12 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    DECONZ_TYPE = 'lights'
+    DECONZ_TYPE = "lights"
 
     @property
     def state(self):
         """True if the light is on."""
-        return self.raw['state'].get('on')
+        return self.raw["state"].get("on")
 
     @property
     def alert(self):
@@ -39,7 +39,7 @@ class DeconzLight(DeconzDevice):
         select - light is blinking a short time
         lselect - light is blinking a longer time
         """
-        return self.raw['state'].get('alert')
+        return self.raw["state"].get("alert")
 
     @property
     def brightness(self):
@@ -48,12 +48,12 @@ class DeconzLight(DeconzDevice):
         Depending on the light type 0 might not mean visible "off"
         but minimum brightness.
         """
-        return self.raw['state'].get('bri')
+        return self.raw["state"].get("bri")
 
     @property
     def ct(self):
         """Mired color temperature of the light. (2000K - 6500K)."""
-        return self.raw['state'].get('ct')
+        return self.raw["state"].get("ct")
 
     @property
     def hue(self):
@@ -62,7 +62,7 @@ class DeconzLight(DeconzDevice):
         The hue parameter in the HSV color model is between 0°-360°
         and is mapped to 0..65535 to get 16-bit resolution.
         """
-        return self.raw['state'].get('hue')
+        return self.raw["state"].get("hue")
 
     @property
     def sat(self):
@@ -71,15 +71,15 @@ class DeconzLight(DeconzDevice):
         There 0 means no color at all and 255 is the greatest saturation
         of the color.
         """
-        return self.raw['state'].get('sat')
+        return self.raw["state"].get("sat")
 
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if 'xy' not in self.raw['state'] or self.raw['state']['xy'] == (None, None):
+        if "xy" not in self.raw["state"] or self.raw["state"]["xy"] == (None, None):
             return None
 
-        x, y = self.raw['state']['xy']
+        x, y = self.raw["state"]["xy"]
 
         if x > 1:
             x = x / 65555
@@ -97,12 +97,12 @@ class DeconzLight(DeconzDevice):
         xy - CIE xy values
         ct - color temperature
         """
-        return self.raw['state'].get('colormode')
+        return self.raw["state"].get("colormode")
 
     @property
     def hascolor(self) -> bool:
         """Tells if light has color support."""
-        return self.raw['state'].get('hascolor')
+        return self.raw["state"].get("hascolor")
 
     @property
     def effect(self):
@@ -111,9 +111,9 @@ class DeconzLight(DeconzDevice):
         none - no effect
         colorloop
         """
-        return self.raw['state'].get('effect')
+        return self.raw["state"].get("effect")
 
     @property
     def reachable(self):
         """True if the light is reachable and accepts commands."""
-        return self.raw['state']['reachable']
+        return self.raw["state"]["reachable"]

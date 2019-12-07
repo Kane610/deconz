@@ -57,10 +57,13 @@ class DeconzDevice:
 
             if tries < 3:
                 retry_delay = 2 ** (tries + 1)
-                self._cancel_retry = \
-                    self.loop.call_later(retry_delay, retry_set)
+                self._cancel_retry = self.loop.call_later(retry_delay, retry_set)
 
     def cancel_retry(self):
+        """Cancel retry.
+
+        Called at the start of async_set.
+        """
         if self._cancel_retry is not None:
             self._cancel_retry.cancel()
             self._cancel_retry = None
@@ -107,35 +110,35 @@ class DeconzDevice:
 
     @property
     def etag(self):
-        """HTTP etag which changes on any action to the device."""
-        return self.raw.get('etag')
+        """HTTP etag change on any action to the device."""
+        return self.raw.get("etag")
 
     @property
     def manufacturer(self):
-        """The manufacturer of the device."""
-        return self.raw.get('manufacturername', "")
+        """Device manufacturer."""
+        return self.raw.get("manufacturername", "")
 
     @property
     def modelid(self):
-        """An identifier unique to the product."""
-        return self.raw.get('modelid')
+        """Device model."""
+        return self.raw.get("modelid")
 
     @property
     def name(self):
         """Name of the device."""
-        return self.raw.get('name')
+        return self.raw.get("name")
 
     @property
     def swversion(self):
         """Firmware version."""
-        return self.raw.get('swversion')
+        return self.raw.get("swversion")
 
     @property
     def type(self):
         """Human readable type of the device."""
-        return self.raw.get('type')
+        return self.raw.get("type")
 
     @property
     def uniqueid(self):
-        """The current state of the device."""
-        return self.raw.get('uniqueid')
+        """Id for unique device identification."""
+        return self.raw.get("uniqueid")

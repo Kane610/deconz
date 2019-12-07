@@ -29,34 +29,38 @@ class DeconzSession:
         self.host = host
         self.port = port
         self.api_key = api_key
-        if 'legacy_websocket' in kwargs:
+        if "legacy_websocket" in kwargs:
             from .websocket import WSClient as ws_client
         else:
             from .websocket import AIOWSClient as ws_client
         self.ws_client = ws_client
         self.websocket = None
-        self.async_add_device_callback = kwargs.get('async_add_device')
-        self.async_connection_status_callback = kwargs.get('connection_status')
+        self.async_add_device_callback = kwargs.get("async_add_device")
+        self.async_connection_status_callback = kwargs.get("connection_status")
 
     def start(self) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
             self.websocket = self.ws_client(
-                self.loop, self.session, self.host,
-                self.config.websocketport, self.async_session_handler)
+                self.loop,
+                self.session,
+                self.host,
+                self.config.websocketport,
+                self.async_session_handler,
+            )
             self.websocket.start()
         else:
-            _LOGGER.error('No deCONZ config available')
+            _LOGGER.error("No deCONZ config available")
 
     def close(self) -> None:
         """Close websession and websocket to deCONZ."""
-        _LOGGER.info('Shutting down connections to deCONZ.')
+        _LOGGER.info("Shutting down connections to deCONZ.")
         if self.websocket:
             self.websocket.stop()
 
     async def initialize(self) -> None:
         """Load deCONZ parameters"""
-        data = await self.request('get')
+        data = await self.request("get")
 
         self.config = DeconzConfig(data["config"])
 
@@ -69,7 +73,7 @@ class DeconzSession:
 
     async def refresh_state(self) -> None:
         """Refresh deCONZ parameters"""
-        data = await self.request('get')
+        data = await self.request("get")
 
         self.groups.process_raw(data["groups"])
         self.lights.process_raw(data["lights"])
@@ -80,18 +84,17 @@ class DeconzSession:
 
     async def request(self, method, path="", json=None):
         """Make a request to the API."""
-        _LOGGER.debug(
-            "Sending \"%s\" \"%s\" to \"%s %s\"", method, json, self.host, path
-        )
+        _LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
 
         url = f"http://{self.host}:{self.port}/api/{self.api_key}{path}"
 
         try:
             async with self.session.request(method, url, json=json) as res:
 
-                if res.content_type != 'application/json':
+                if res.content_type != "application/json":
                     raise ResponseError(
-                        'Invalid content type: {}'.format(res.content_type))
+                        "Invalid content type: {}".format(res.content_type)
+                    )
 
                 response = await res.json()
                 _LOGGER.debug("HTTP request response: %s", pformat(response))
@@ -102,7 +105,7 @@ class DeconzSession:
 
         except client_exceptions.ClientError as err:
             raise RequestError(
-                'Error requesting data from {}: {}'.format(self.host, err)
+                "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
     def async_session_handler(self, signal: str) -> None:
@@ -111,13 +114,12 @@ class DeconzSession:
            data - new data available for processing.
            state - network state has changed.
         """
-        if signal == 'data':
+        if signal == "data":
             self.async_event_handler(self.websocket.data)
 
-        elif signal == 'state':
+        elif signal == "state":
             if self.async_connection_status_callback:
-                self.async_connection_status_callback(
-                    self.websocket.state == 'running')
+                self.async_connection_status_callback(self.websocket.state == "running")
 
     def async_event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
@@ -139,13 +141,13 @@ class DeconzSession:
         }
         """
         if event["e"] not in ("added", "changed"):
-            _LOGGER.debug('Unsupported event %s', event)
+            _LOGGER.debug("Unsupported event %s", event)
             return
 
         for resource, device_class in (
             ("group", self.groups),
             ("light", self.lights),
-            ("sensor", self.sensors)
+            ("sensor", self.sensors),
         ):
             if event["r"] != f"{resource}s":
                 continue
@@ -153,7 +155,7 @@ class DeconzSession:
             if event["e"] == "changed" and event["id"] in device_class:
                 device_class.process_raw({event["id"]: event})
                 if resource == "lights":
-                    self.update_group_color([event['id']])
+                    self.update_group_color([event["id"]])
                 break
 
             if event["e"] == "added" and event["id"] not in device_class:
@@ -194,12 +196,14 @@ class DeconzSession:
 
     def update_scenes(self) -> None:
         """Update scenes to hold all known scenes from existing groups."""
-        self.scenes.update({
-            f"{group.id}_{scene.id}": scene
-            for group in self.groups.values()
-            for scene in group.scenes.values()
-            if f"{group.id}_{scene.id}" not in self.scenes
-        })
+        self.scenes.update(
+            {
+                f"{group.id}_{scene.id}": scene
+                for group in self.groups.values()
+                for scene in group.scenes.values()
+                if f"{group.id}_{scene.id}" not in self.scenes
+            }
+        )
 
 
 def _raise_on_error(data):
@@ -207,5 +211,5 @@ def _raise_on_error(data):
     if isinstance(data, list) and data:
         data = data[0]
 
-    if isinstance(data, dict) and 'error' in data:
-        raise_error(data['error'])
+    if isinstance(data, dict) and "error" in data:
+        raise_error(data["error"])

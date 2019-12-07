@@ -10,10 +10,12 @@ from .errors import ResponseError, RequestError
 
 _LOGGER = logging.getLogger(__name__)
 
-URL_DISCOVER = 'https://phoscon.de/discover'
+URL_DISCOVER = "https://phoscon.de/discover"
 
 
-async def async_get_api_key(session, host, port, username=None, password=None, **kwargs):
+async def async_get_api_key(
+    session, host, port, username=None, password=None, **kwargs
+):
     """Get a new API key for devicetype."""
     url = f"http://{host}:{port}/api"
 
@@ -24,7 +26,7 @@ async def async_get_api_key(session, host, port, username=None, password=None, *
     data = b'{"devicetype": "pydeconz"}'
     response = await async_request(session.post, url, auth=auth, data=data)
 
-    api_key = response[0]['success']['username']
+    api_key = response[0]["success"]["username"]
     _LOGGER.info("API key: %s", api_key)
     return api_key
 
@@ -45,7 +47,7 @@ async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
     response = await async_request(session.get, url)
 
     api_keys.append(api_key)
-    for key in response['whitelist'].keys():
+    for key in response["whitelist"].keys():
         if key not in api_keys:
             await async_delete_api_key(session, host, port, key)
 
@@ -66,7 +68,7 @@ async def async_get_bridgeid(session, host, port, api_key, **kwargs):
 
     response = await async_request(session.get, url)
 
-    bridgeid = response['bridgeid']
+    bridgeid = response["bridgeid"]
     _LOGGER.info("Bridge id: %s", bridgeid)
     return bridgeid
 
@@ -81,9 +83,13 @@ async def async_discovery(session):
         return bridges
 
     for bridge in response:
-        bridges.append({'bridgeid': bridge['id'],
-                        'host': bridge['internalipaddress'],
-                        'port': bridge['internalport']})
+        bridges.append(
+            {
+                "bridgeid": bridge["id"],
+                "host": bridge["internalipaddress"],
+                "port": bridge["internalport"],
+            }
+        )
 
     _LOGGER.info("Discovered the following bridges: %s.", bridges)
 
@@ -97,9 +103,8 @@ async def async_request(session, url, **kwargs):
     try:
         res = await session(url, **kwargs)
 
-        if res.content_type != 'application/json':
-            raise ResponseError(
-                "Invalid content type: {}".format(res.content_type))
+        if res.content_type != "application/json":
+            raise ResponseError("Invalid content type: {}".format(res.content_type))
 
         response = await res.json()
         _LOGGER.debug("HTTP request response: %s", response)
