@@ -18,61 +18,62 @@ class DeconzConfig:
 
     @property
     def apiversion(self):
-        """The version of the deCONZ Rest API."""
-        return self.raw.get('apiversion')
+        """deCONZ Rest API version."""
+        return self.raw.get("apiversion")
 
     @property
     def bridgeid(self):
         """Hardware ID."""
-        return self.raw.get('bridgeid')
+        return self.raw.get("bridgeid")
 
     @property
     def linkbutton(self):
-        """True if the gateway is unlocked."""
-        return self.raw.get('linkbutton')
+        """True if gateway is unlocked."""
+        return self.raw.get("linkbutton")
 
     @property
     def mac(self):
-        """MAC address of the gateway"""
-        return self.raw.get('mac')
+        """MAC address of gateway."""
+        return self.raw.get("mac")
 
     @property
     def modelid(self):
-        return self.raw.get('modelid')
+        """Model describing either conbee or raspbee."""
+        return self.raw.get("modelid")
 
     @property
     def name(self):
         """Name of the gateway."""
-        return self.raw.get('name')
+        return self.raw.get("name")
 
     @property
     def networkopenduration(self):
         """Can be used to store the permitjoin value permanently."""
-        return self.raw.get('networkopenduration')
+        return self.raw.get("networkopenduration")
 
     @property
     def panid(self):
         """The ZigBee pan ID of the gateway."""
-        return self.raw.get('panid')
+        return self.raw.get("panid")
 
     @property
     def swversion(self):
         """The software version of the gateway."""
-        return self.raw.get('swversion')
+        return self.raw.get("swversion")
 
     @property
     def uuid(self):
         """UPNP Unique Id of the gateway."""
-        return self.raw.get('uuid')
+        return self.raw.get("uuid")
 
     @property
     def websocketport(self):
         """Websocket port."""
-        return self.raw.get('websocketport')
+        return self.raw.get("websocketport")
 
     @property
     def zigbeechannel(self):
         """The current wireless frequency channel used by the Gateway.
 
         Supported channels: 11, 15, 20, 25."""
-        return self.raw.get('zigbeechannel')
+        return self.raw.get("zigbeechannel")
