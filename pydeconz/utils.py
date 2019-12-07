@@ -4,6 +4,7 @@ import asyncio
 import logging
 import aiohttp
 
+from . import _raise_on_error
 from .config import DeconzConfig
 from .errors import raise_error, ResponseError, RequestError
 
@@ -111,12 +112,3 @@ async def async_request(session, url, **kwargs):
         raise RequestError(
             "Error requesting data from {}: {}".format(url, err)
         ) from None
-
-
-def _raise_on_error(data):
-    """Check response for error message."""
-    if isinstance(data, list) and data:
-        data = data[0]
-
-    if isinstance(data, dict) and 'error' in data:
-        raise_error(data['error'])
