@@ -15,7 +15,7 @@ async def test_create_light():
     Just tests a subset right now;
         xy will also be signalled as a set from 0.61.
     """
-    light = DeconzLight("0", deepcopy(FIXTURE_RGB_LIGHT), None, None)
+    light = DeconzLight("0", deepcopy(FIXTURE_RGB_LIGHT), None)
 
     assert light.state is False
     assert light.alert is None

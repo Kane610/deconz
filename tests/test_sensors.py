@@ -17,7 +17,7 @@ async def test_create_sensor():
     for sensor_class in SENSOR_CLASSES:
         for sensor_type in sensor_class.ZHATYPE:
             sensor = {"type": sensor_type, "config": {}, "state": {}}
-            result = create_sensor(sensor_id, sensor, None, None)
+            result = create_sensor(sensor_id, sensor, None)
 
             assert result
 
@@ -26,14 +26,14 @@ async def test_create_sensor_fails():
     """Verify failing behavior for create_sensor."""
     sensor_id = "0"
     sensor = {"type": "not supported", "name": "name"}
-    result = create_sensor(sensor_id, sensor, None, None)
+    result = create_sensor(sensor_id, sensor, None)
 
     assert not result
 
 
 async def test_alarm_sensor():
     """Verify that alarm sensor works."""
-    sensor = create_sensor("0", FIXTURE_ALARM, None, None)
+    sensor = create_sensor("0", FIXTURE_ALARM, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAlarm",)
@@ -64,7 +64,7 @@ async def test_alarm_sensor():
 
 async def test_carbonmonoxide_sensor():
     """Verify that carbon monoxide sensor works."""
-    sensor = create_sensor("0", FIXTURE_CARBONMONOXIDE, None, None)
+    sensor = create_sensor("0", FIXTURE_CARBONMONOXIDE, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
@@ -96,7 +96,7 @@ async def test_carbonmonoxide_sensor():
 
 async def test_consumption_sensor():
     """Verify that consumption sensor works."""
-    sensor = create_sensor("0", FIXTURE_CONSUMPTION, None, None)
+    sensor = create_sensor("0", FIXTURE_CONSUMPTION, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAConsumption",)
@@ -131,7 +131,7 @@ async def test_consumption_sensor():
 
 async def test_daylight_sensor():
     """Verify that daylight sensor works."""
-    sensor = create_sensor("0", FIXTURE_DAYLIGHT, None, None)
+    sensor = create_sensor("0", FIXTURE_DAYLIGHT, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("Daylight",)
@@ -192,7 +192,7 @@ async def test_daylight_sensor():
 
 async def test_fire_sensor():
     """Verify that fire sensor works."""
-    sensor = create_sensor("0", FIXTURE_FIRE, None, None)
+    sensor = create_sensor("0", FIXTURE_FIRE, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
@@ -224,7 +224,7 @@ async def test_fire_sensor():
 
 async def test_genericflag_sensor():
     """Verify that generic flag sensor works."""
-    sensor = create_sensor("0", FIXTURE_GENERICFLAG, None, None)
+    sensor = create_sensor("0", FIXTURE_GENERICFLAG, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("CLIPGenericFlag",)
@@ -255,7 +255,7 @@ async def test_genericflag_sensor():
 
 async def test_genericstatus_sensor():
     """Verify that generic flag sensor works."""
-    sensor = create_sensor("0", FIXTURE_GENERICSTATUS, None, None)
+    sensor = create_sensor("0", FIXTURE_GENERICSTATUS, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("CLIPGenericStatus",)
@@ -285,7 +285,7 @@ async def test_genericstatus_sensor():
 
 async def test_humidity_sensor():
     """Verify that humidity sensor works."""
-    sensor = create_sensor("0", FIXTURE_HUMIDITY, None, None)
+    sensor = create_sensor("0", FIXTURE_HUMIDITY, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
@@ -320,7 +320,7 @@ async def test_humidity_sensor():
 
 async def test_lightlevel_sensor():
     """Verify that light level sensor works."""
-    sensor = create_sensor("0", FIXTURE_LIGHTLEVEL, None, None)
+    sensor = create_sensor("0", FIXTURE_LIGHTLEVEL, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
@@ -360,7 +360,7 @@ async def test_lightlevel_sensor():
 
 async def test_openclose_sensor():
     """Verify that open/close sensor works."""
-    sensor = create_sensor("0", FIXTURE_OPENCLOSE, None, None)
+    sensor = create_sensor("0", FIXTURE_OPENCLOSE, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
@@ -392,7 +392,7 @@ async def test_openclose_sensor():
 
 async def test_power_sensor():
     """Verify that power sensor works."""
-    sensor = create_sensor("0", FIXTURE_POWER, None, None)
+    sensor = create_sensor("0", FIXTURE_POWER, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPower",)
@@ -425,7 +425,7 @@ async def test_power_sensor():
 
 async def test_presence_sensor():
     """Verify that presence sensor works."""
-    sensor = create_sensor("0", FIXTURE_PRESENCE, None, None)
+    sensor = create_sensor("0", FIXTURE_PRESENCE, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
@@ -459,7 +459,7 @@ async def test_presence_sensor():
 
 async def test_pressure_sensor():
     """Verify that pressure sensor works."""
-    sensor = create_sensor("0", FIXTURE_PRESSURE, None, None)
+    sensor = create_sensor("0", FIXTURE_PRESSURE, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
@@ -492,7 +492,7 @@ async def test_pressure_sensor():
 
 async def test_switch_sensor():
     """Verify that temperature sensor works."""
-    sensor = create_sensor("0", FIXTURE_HUE_DIMMER, None, None)
+    sensor = create_sensor("0", FIXTURE_HUE_DIMMER, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -522,7 +522,7 @@ async def test_switch_sensor():
 
 async def test_temperature_sensor():
     """Verify that temperature sensor works."""
-    sensor = create_sensor("0", FIXTURE_TEMPERATURE, None, None)
+    sensor = create_sensor("0", FIXTURE_TEMPERATURE, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
@@ -558,7 +558,7 @@ async def test_temperature_sensor():
 
 async def test_thermostat_sensor():
     """Verify that thermostat sensor works."""
-    sensor = create_sensor("0", FIXTURE_THERMOSTAT, None, None)
+    sensor = create_sensor("0", FIXTURE_THERMOSTAT, None)
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
@@ -594,7 +594,7 @@ async def test_thermostat_sensor():
 
 async def test_vibration_sensor():
     """Verify that vibration sensor works."""
-    sensor = create_sensor("0", FIXTURE_VIBRATION, None, None)
+    sensor = create_sensor("0", FIXTURE_VIBRATION, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAVibration",)
@@ -644,7 +644,7 @@ async def test_vibration_sensor():
 
 async def test_water_sensor():
     """Verify that water sensor works."""
-    sensor = create_sensor("0", FIXTURE_WATER, None, None)
+    sensor = create_sensor("0", FIXTURE_WATER, None)
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAWater",)

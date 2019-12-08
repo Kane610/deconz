@@ -20,10 +20,8 @@ PORT = "80"
 @pytest.fixture
 def session() -> DeconzSession:
     """Returns the session object."""
-    loop = Mock()
     session = Mock()
-
-    return DeconzSession(loop, session, IP, PORT, API_KEY)
+    return DeconzSession(session, IP, PORT, API_KEY)
 
 
 async def test_initialize(session) -> None:

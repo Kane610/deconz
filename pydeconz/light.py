@@ -12,8 +12,8 @@ URL = "/lights"
 class Lights(APIItems):
     """Represent deCONZ lights."""
 
-    def __init__(self, raw, loop, request):
-        super().__init__(raw, loop, request, URL, DeconzLight)
+    def __init__(self, raw, request):
+        super().__init__(raw, request, URL, DeconzLight)
 
 
 class DeconzLight(DeconzDevice):
