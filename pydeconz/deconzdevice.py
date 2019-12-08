@@ -1,6 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
+from asyncio import get_event_loop
 from pprint import pformat
 
 from .errors import BridgeBusy
@@ -17,16 +18,15 @@ class DeconzDevice:
 
     DECONZ_TYPE = ""
 
-    def __init__(self, device_id, raw, loop, request):
+    def __init__(self, device_id, raw, request):
         """Set initial information common to all device types."""
         self.device_id = device_id
         self.raw = raw
         self.changed_keys = set()
 
-        self.loop = loop
+        self._loop = get_event_loop()
         self._request = request
         self._cancel_retry = None
-
         self._async_callbacks = []
         _LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
@@ -53,11 +53,11 @@ class DeconzDevice:
             def retry_set():
                 """Retry set state."""
                 self._cancel_retry = None
-                self.loop.create_task(self.async_set(field, data, tries + 1))
+                self._loop.create_task(self.async_set(field, data, tries + 1))
 
             if tries < 3:
                 retry_delay = 2 ** (tries + 1)
-                self._cancel_retry = self.loop.call_later(retry_delay, retry_set)
+                self._cancel_retry = self._loop.call_later(retry_delay, retry_set)
 
     def cancel_retry(self):
         """Cancel retry.

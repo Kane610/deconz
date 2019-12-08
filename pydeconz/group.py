@@ -13,8 +13,8 @@ URL = "/groups"
 class Groups(APIItems):
     """Represent deCONZ groups."""
 
-    def __init__(self, raw, loop, request):
-        super().__init__(raw, loop, request, URL, DeconzGroup)
+    def __init__(self, raw, request):
+        super().__init__(raw, request, URL, DeconzGroup)
 
 
 class DeconzGroup(DeconzDevice):
@@ -26,13 +26,13 @@ class DeconzGroup(DeconzDevice):
 
     DECONZ_TYPE = "groups"
 
-    def __init__(self, device_id, raw, loop, request):
+    def __init__(self, device_id, raw, request):
         """Set initial information about light group.
 
         Create scenes related to light group.
         """
-        super().__init__(device_id, raw, loop, request)
-        self._scenes = Scenes(self, loop, request)
+        super().__init__(device_id, raw, request)
+        self._scenes = Scenes(self, request)
 
     async def async_set_state(self, data):
         """Set state of light group."""
@@ -205,10 +205,10 @@ class DeconzGroup(DeconzDevice):
 class Scenes(APIItems):
     """Represent scenes of a deCONZ group."""
 
-    def __init__(self, group, loop, request):
+    def __init__(self, group, request):
         self.group = group
         url = f"{URL}/{group.device_id}/scenes"
-        super().__init__(group.raw["scenes"], loop, request, url, DeconzScene)
+        super().__init__(group.raw["scenes"], request, url, DeconzScene)
 
     def process_raw(self, raw: list) -> None:
         """"""

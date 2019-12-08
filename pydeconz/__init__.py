@@ -17,32 +17,33 @@ _LOGGER = logging.getLogger(__name__)
 class DeconzSession:
     """deCONZ representation that handles lights, groups, scenes and sensors."""
 
-    def __init__(self, loop, websession, host, port, api_key, **kwargs):
+    def __init__(self, session, host, port, api_key, **kwargs):
         """Setup session and host information."""
-        self.config = None
-        self.groups = None
-        self.lights = None
-        self.scenes = {}
-        self.sensors = None
-        self.loop = loop
-        self.session = websession
+        self.session = session
         self.host = host
         self.port = port
         self.api_key = api_key
+
+        self.async_add_device_callback = kwargs.get("async_add_device")
+        self.async_connection_status_callback = kwargs.get("connection_status")
+
         if "legacy_websocket" in kwargs:
             from .websocket import WSClient as ws_client
         else:
             from .websocket import AIOWSClient as ws_client
         self.ws_client = ws_client
+
+        self.config = None
+        self.groups = None
+        self.lights = None
+        self.scenes = {}
+        self.sensors = None
         self.websocket = None
-        self.async_add_device_callback = kwargs.get("async_add_device")
-        self.async_connection_status_callback = kwargs.get("connection_status")
 
     def start(self) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
             self.websocket = self.ws_client(
-                self.loop,
                 self.session,
                 self.host,
                 self.config.websocketport,
@@ -64,9 +65,9 @@ class DeconzSession:
 
         self.config = DeconzConfig(data["config"])
 
-        self.groups = Groups(data["groups"], self.loop, self.request)
-        self.lights = Lights(data["lights"], self.loop, self.request)
-        self.sensors = Sensors(data["sensors"], self.loop, self.request)
+        self.groups = Groups(data["groups"], self.request)
+        self.lights = Lights(data["lights"], self.request)
+        self.sensors = Sensors(data["sensors"], self.request)
 
         self.update_group_color(self.lights.keys())
         self.update_scenes()

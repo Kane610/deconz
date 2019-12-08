@@ -12,8 +12,8 @@ URL = "/sensors"
 class Sensors(APIItems):
     """Represent deCONZ sensors."""
 
-    def __init__(self, raw, loop, request):
-        super().__init__(raw, loop, request, URL, create_sensor)
+    def __init__(self, raw, request):
+        super().__init__(raw, request, URL, create_sensor)
 
 
 class DeconzSensor(DeconzDevice):
@@ -636,11 +636,11 @@ SENSOR_CLASSES = (
 )
 
 
-def create_sensor(sensor_id, raw, loop, request):
+def create_sensor(sensor_id, raw, request):
     """Simplify creating sensor by not needing to know type."""
     for sensor_class in SENSOR_CLASSES:
         if raw["type"] in sensor_class.ZHATYPE:
-            return sensor_class(sensor_id, raw, loop, request)
+            return sensor_class(sensor_id, raw, request)
 
     _LOGGER.info("Unsupported sensor type %s (%s)", raw["type"], raw["name"])
     return False

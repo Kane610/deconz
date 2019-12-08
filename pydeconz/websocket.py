@@ -22,13 +22,14 @@ RETRY_TIMER = 15
 class AIOWSClient:
     """Websocket transport, session handling, message generation."""
 
-    def __init__(self, loop, session, host, port, async_callback):
+    def __init__(self, session, host, port, async_callback):
         """Create resources for websocket communication."""
-        self.loop = loop
         self.session = session
         self.host = host
         self.port = port
         self.async_session_handler_callback = async_callback
+
+        self.loop = asyncio.get_event_loop()
         self._data = None
         self._state = None
 
@@ -104,12 +105,13 @@ class AIOWSClient:
 class WSClient(asyncio.Protocol):
     """Websocket transport, session handling, message generation."""
 
-    def __init__(self, loop, session, host, port, async_callback):
+    def __init__(self, session, host, port, async_callback):
         """Create resources for websocket communication."""
-        self.loop = loop
         self.host = host
         self.port = port
         self.async_session_handler_callback = async_callback
+
+        self.loop = asyncio.get_event_loop()
         self._data = None
         self._state = None
         self.transport = None
