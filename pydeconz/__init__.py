@@ -149,13 +149,12 @@ class DeconzSession:
             _LOGGER.debug("Unsupported resource %s", event)
             return
 
-        device_dict = {
-            "groups": ("group", self.groups),
-            "lights": ("light", self.lights),
-            "sensors": ("sensor", self.sensors),
-        }
-
-        resource, device_class = device_dict[event["r"]]
+        if event["r"] == "groups":
+            resource, device_class = ("group", self.groups)
+        elif event["r"] == "lights":
+            resource, device_class = ("light", self.lights)
+        elif event["r"] == "sensors":
+            resource, device_class = ("sensor", self.sensors)
 
         if event["e"] == "changed" and event["id"] in device_class:
             device_class.process_raw({event["id"]: event})
