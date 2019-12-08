@@ -145,28 +145,30 @@ class DeconzSession:
             _LOGGER.debug("Unsupported event %s", event)
             return
 
-        for resource, device_class in (
-            ("group", self.groups),
-            ("light", self.lights),
-            ("sensor", self.sensors),
-        ):
-            if event["r"] != f"{resource}s":
-                continue
+        if event["r"] not in ("groups", "lights", "sensors"):
+            _LOGGER.debug("Unsupported resource %s", event)
+            return
 
-            if event["e"] == "changed" and event["id"] in device_class:
-                device_class.process_raw({event["id"]: event})
-                if resource == "lights":
-                    self.update_group_color([event["id"]])
-                break
+        device_dict = {
+            "groups": ("group", self.groups),
+            "lights": ("light", self.lights),
+            "sensors": ("sensor", self.sensors),
+        }
 
-            if event["e"] == "added" and event["id"] not in device_class:
-                device_class.process_raw({event["id"]: event[resource]})
-                device = device_class[event["id"]]
-                if self.async_add_device_callback:
-                    self.async_add_device_callback(device.DECONZ_TYPE, device)
-                break
+        resource, device_class = device_dict[event["r"]]
 
-        return
+        if event["e"] == "changed" and event["id"] in device_class:
+            device_class.process_raw({event["id"]: event})
+            if event["r"] == "lights":
+                self.update_group_color([event["id"]])
+            return
+
+        if event["e"] == "added" and event["id"] not in device_class:
+            device_class.process_raw({event["id"]: event[resource]})
+            device = device_class[event["id"]]
+            if self.async_add_device_callback:
+                self.async_add_device_callback(device.DECONZ_TYPE, device)
+            return
 
     def update_group_color(self, lights: list) -> None:
         """Update group colors based on light states.
