@@ -4,18 +4,14 @@ import asyncio
 import logging
 import aiohttp
 
-from . import _raise_on_error
-from .config import DeconzConfig
-from .errors import ResponseError, RequestError
+from .errors import ResponseError, RequestError, raise_error
 
 _LOGGER = logging.getLogger(__name__)
 
 URL_DISCOVER = "https://phoscon.de/discover"
 
 
-async def async_get_api_key(
-    session, host, port, username=None, password=None, **kwargs
-):
+async def async_get_api_key(session, host, port, username=None, password=None):
     """Get a new API key for devicetype."""
     url = f"http://{host}:{port}/api"
 
@@ -52,48 +48,30 @@ async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
             await async_delete_api_key(session, host, port, key)
 
 
-async def async_get_gateway_config(session, host, port, api_key, **kwargs):
+async def async_get_bridge_id(session, host, port, api_key):
     """Get bridge id for bridge."""
     url = f"http://{host}:{port}/api/{api_key}/config"
 
     response = await async_request(session.get, url)
 
-    _LOGGER.info("Gateway config: %s", response)
-    return DeconzConfig(response)
-
-
-async def async_get_bridgeid(session, host, port, api_key, **kwargs):
-    """Get bridge id for bridge."""
-    url = f"http://{host}:{port}/api/{api_key}/config"
-
-    response = await async_request(session.get, url)
-
-    bridgeid = response["bridgeid"]
-    _LOGGER.info("Bridge id: %s", bridgeid)
-    return bridgeid
+    bridge_id = normalize_bridge_id(response["bridgeid"])
+    _LOGGER.info("Bridge id: %s", bridge_id)
+    return bridge_id
 
 
 async def async_discovery(session):
     """Find bridges allowing gateway discovery."""
-    bridges = []
     response = await async_request(session.get, URL_DISCOVER)
+    _LOGGER.info("Discovered the following bridges: %s.", response)
 
-    if not response:
-        _LOGGER.info("No discoverable bridges available.")
-        return bridges
-
-    for bridge in response:
-        bridges.append(
-            {
-                "bridgeid": bridge["id"],
-                "host": bridge["internalipaddress"],
-                "port": bridge["internalport"],
-            }
-        )
-
-    _LOGGER.info("Discovered the following bridges: %s.", bridges)
-
-    return bridges
+    return [
+        {
+            "bridgeid": normalize_bridge_id(bridge["id"]),
+            "host": bridge["internalipaddress"],
+            "port": bridge["internalport"],
+        }
+        for bridge in response
+    ]
 
 
 async def async_request(session, url, **kwargs):
@@ -117,3 +95,29 @@ async def async_request(session, url, **kwargs):
         raise RequestError(
             "Error requesting data from {}: {}".format(url, err)
         ) from None
+
+
+def _raise_on_error(data):
+    """Check response for error message."""
+    if isinstance(data, list) and data:
+        data = data[0]
+
+    if isinstance(data, dict) and "error" in data:
+        raise_error(data["error"])
+
+
+def normalize_bridge_id(bridge_id: str):
+    """Normalize a bridge identifier."""
+    bridge_id = bridge_id.upper()
+
+    # discovery: contains 4 extra characters in the middle: "FFFF"
+    if len(bridge_id) == 16 and bridge_id[6:10] == "FFFF":
+        return bridge_id[0:6] + bridge_id[-6:]
+
+    # deCONZ config API contains right ID.
+    if len(bridge_id) == 12:
+        return bridge_id
+
+    logging.getLogger(__name__).warn("Received unexpected bridge id: %s", bridge_id)
+
+    return bridge_id

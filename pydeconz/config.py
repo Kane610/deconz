@@ -2,6 +2,8 @@
 
 import logging
 
+from .utils import normalize_bridge_id
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -24,7 +26,7 @@ class DeconzConfig:
     @property
     def bridgeid(self):
         """Hardware ID."""
-        return self.raw.get("bridgeid")
+        return normalize_bridge_id(self.raw.get("bridgeid"))
 
     @property
     def linkbutton(self):

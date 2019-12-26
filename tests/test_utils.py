@@ -80,7 +80,7 @@ async def test_get_bridge_id() -> None:
         "pydeconz.utils.async_request",
         new=CoroutineMock(return_value={"bridgeid": "12345"}),
     ):
-        response = await utils.async_get_bridgeid(session, IP, PORT, API_KEY)
+        response = await utils.async_get_bridge_id(session, IP, PORT, API_KEY)
 
     assert response == "12345"
 
@@ -95,12 +95,12 @@ async def test_discovery() -> None:
         new=CoroutineMock(
             return_value=[
                 {
-                    "id": "bridgeid1",
+                    "id": "123456FFFFABCDEF",
                     "internalipaddress": "host1",
                     "internalport": "port1",
                 },
                 {
-                    "id": "bridgeid2",
+                    "id": "234567BCDEFG",
                     "internalipaddress": "host2",
                     "internalport": "port2",
                 },
@@ -110,8 +110,8 @@ async def test_discovery() -> None:
         response = await utils.async_discovery(session)
 
     assert [
-        {"bridgeid": "bridgeid1", "host": "host1", "port": "port1"},
-        {"bridgeid": "bridgeid2", "host": "host2", "port": "port2"},
+        {"bridgeid": "123456ABCDEF", "host": "host1", "port": "port1"},
+        {"bridgeid": "234567BCDEFG", "host": "host2", "port": "port2"},
     ] == response
 
 
