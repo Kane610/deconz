@@ -499,6 +499,7 @@ async def test_switch_sensor():
 
     assert sensor.state == 1002
     assert sensor.buttonevent == 1002
+    assert sensor.gesture is None
 
     # DeconzSensor
     assert sensor.battery == 90
@@ -518,6 +519,37 @@ async def test_switch_sensor():
     assert sensor.swversion == "5.45.1.17846"
     assert sensor.type == "ZHASwitch"
     assert sensor.uniqueid == "00:17:88:01:02:0e:32:a3-02-fc00"
+
+
+async def test_switch_sensor_cube():
+    """Verify that temperature sensor works."""
+    sensor = create_sensor("0", FIXTURE_MAGIC_CUBE, None)
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
+
+    assert sensor.state == 747
+    assert sensor.buttonevent == 747
+    assert sensor.gesture == 7
+
+    # DeconzSensor
+    assert sensor.battery == 90
+    assert sensor.ep == 3
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature == 11.0
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "e34fa1c7a19d960e35a1f4d56ac475af"
+    assert sensor.manufacturer == "LUMI"
+    assert sensor.modelid == "lumi.sensor_cube.aqgl01"
+    assert sensor.name == "Mi Magic Cube"
+    assert sensor.swversion == "20160704"
+    assert sensor.type == "ZHASwitch"
+    assert sensor.uniqueid == "00:15:8d:00:02:8b:3b:24-03-000c"
 
 
 async def test_temperature_sensor():
@@ -996,6 +1028,22 @@ FIXTURE_HUE_DIMMER = {
     "swversion": "5.45.1.17846",
     "type": "ZHASwitch",
     "uniqueid": "00:17:88:01:02:0e:32:a3-02-fc00",
+}
+
+
+FIXTURE_MAGIC_CUBE = {
+    "config": {"battery": 90, "on": True, "reachable": True, "temperature": 1100},
+    "ep": 3,
+    "etag": "e34fa1c7a19d960e35a1f4d56ac475af",
+    "manufacturername": "LUMI",
+    "mode": 1,
+    "modelid": "lumi.sensor_cube.aqgl01",
+    "name": "Mi Magic Cube",
+    "state": {"buttonevent": 747, "gesture": 7, "lastupdated": "2019-12-12T18:50:40"
+    },
+    "swversion": "20160704",
+    "type": "ZHASwitch",
+    "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c"
 }
 
 
