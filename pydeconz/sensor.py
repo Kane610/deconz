@@ -479,6 +479,7 @@ class Switch(DeconzSensor):
         """Gesture used for Xiaomi magic cube."""
         return self.raw["state"].get("gesture")
 
+
 class Temperature(DeconzSensor):
     """Temperature sensor."""
 

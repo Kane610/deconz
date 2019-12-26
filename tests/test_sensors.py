@@ -491,7 +491,7 @@ async def test_pressure_sensor():
 
 
 async def test_switch_sensor():
-    """Verify that temperature sensor works."""
+    """Verify that switch sensor works."""
     sensor = create_sensor("0", FIXTURE_HUE_DIMMER, None)
 
     assert sensor.BINARY is False
@@ -522,7 +522,7 @@ async def test_switch_sensor():
 
 
 async def test_switch_sensor_cube():
-    """Verify that temperature sensor works."""
+    """Verify that cube switch sensor works."""
     sensor = create_sensor("0", FIXTURE_MAGIC_CUBE, None)
 
     assert sensor.BINARY is False
@@ -1039,11 +1039,10 @@ FIXTURE_MAGIC_CUBE = {
     "mode": 1,
     "modelid": "lumi.sensor_cube.aqgl01",
     "name": "Mi Magic Cube",
-    "state": {"buttonevent": 747, "gesture": 7, "lastupdated": "2019-12-12T18:50:40"
-    },
+    "state": {"buttonevent": 747, "gesture": 7, "lastupdated": "2019-12-12T18:50:40"},
     "swversion": "20160704",
     "type": "ZHASwitch",
-    "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c"
+    "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c",
 }
 
 
