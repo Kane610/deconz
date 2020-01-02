@@ -90,6 +90,25 @@ class Alarm(DeconzSensor):
         return self.raw["state"].get("alarm")
 
 
+class Battery(DeconzSensor):
+    """Battery sensor."""
+
+    BINARY = False
+    ZHATYPE = ("ZHABattery",)
+
+    SENSOR_CLASS = "battery"
+
+    @property
+    def state(self):
+        """Main state of sensor."""
+        return self.battery
+
+    @property
+    def battery(self):
+        """Battery."""
+        return self.raw["state"].get("battery")
+
+
 class CarbonMonoxide(DeconzSensor):
     """Carbon monoxide sensor."""
 
@@ -621,6 +640,7 @@ class Water(DeconzSensor):
 
 SENSOR_CLASSES = (
     Alarm,
+    Battery,
     CarbonMonoxide,
     Consumption,
     Daylight,
@@ -648,4 +668,4 @@ def create_sensor(sensor_id, raw, request):
             return sensor_class(sensor_id, raw, request)
 
     _LOGGER.info("Unsupported sensor type %s (%s)", raw["type"], raw["name"])
-    return False
+    return DeconzSensor(sensor_id, raw, request)
