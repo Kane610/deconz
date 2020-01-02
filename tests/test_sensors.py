@@ -10,7 +10,7 @@ from pydeconz.sensor import SENSOR_CLASSES, create_sensor
 
 async def test_create_sensor():
     """Verify that create-sensor can create all types."""
-    assert len(SENSOR_CLASSES) == 18
+    assert len(SENSOR_CLASSES) == 19
 
     sensor_id = "0"
 
@@ -28,7 +28,8 @@ async def test_create_sensor_fails():
     sensor = {"type": "not supported", "name": "name"}
     result = create_sensor(sensor_id, sensor, None)
 
-    assert not result
+    assert result.BINARY is None
+    assert not result.ZHATYPE
 
 
 async def test_alarm_sensor():
@@ -60,6 +61,36 @@ async def test_alarm_sensor():
     assert sensor.swversion == "20170627"
     assert sensor.type == "ZHAAlarm"
     assert sensor.uniqueid == "00:15:8d:00:02:b5:d1:80-01-0500"
+
+
+async def test_battery_sensor():
+    """Verify that alarm sensor works."""
+    sensor = create_sensor("0", FIXTURE_BATTERY, None)
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHABattery",)
+    assert sensor.SENSOR_CLASS == "battery"
+
+    assert sensor.state == 100
+
+    # DeconzSensor
+    assert sensor.battery == 100
+    assert sensor.ep == 1
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "23a8659f1cb22df2f51bc2da0e241bb4"
+    assert sensor.manufacturer == "IKEA of Sweden"
+    assert sensor.modelid == "FYRTUR block-out roller blind"
+    assert sensor.name == "FYRTUR block-out roller blind"
+    assert sensor.swversion == "2.2.007"
+    assert sensor.type == "ZHABattery"
+    assert sensor.uniqueid == "00:0d:6f:ff:fe:01:23:45-01-0001"
 
 
 async def test_carbonmonoxide_sensor():
@@ -721,6 +752,20 @@ FIXTURE_ALARM = {
     "swversion": "20170627",
     "type": "ZHAAlarm",
     "uniqueid": "00:15:8d:00:02:b5:d1:80-01-0500",
+}
+
+
+FIXTURE_BATTERY = {
+    "config": {"alert": "none", "on": True, "reachable": True},
+    "ep": 1,
+    "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
+    "manufacturername": "IKEA of Sweden",
+    "modelid": "FYRTUR block-out roller blind",
+    "name": "FYRTUR block-out roller blind",
+    "state": {"battery": 100, "lastupdated": "none"},
+    "swversion": "2.2.007",
+    "type": "ZHABattery",
+    "uniqueid": "00:0d:6f:ff:fe:01:23:45-01-0001",
 }
 
 
