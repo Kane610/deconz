@@ -81,10 +81,11 @@ class DeconzDevice:
         if callback in self._async_callbacks:
             self._async_callbacks.remove(callback)
 
-    def async_update(self, raw):
+    def async_update(self, raw, **kwargs):
         """Update input attr in self.
 
         Store a set of keys with changed values.
+        Kwargs will be passed on to callbacks.
         """
         changed_keys = set()
 
@@ -101,7 +102,7 @@ class DeconzDevice:
         self.changed_keys = changed_keys
 
         for async_signal_update in self._async_callbacks:
-            async_signal_update()
+            async_signal_update(**kwargs)
 
     @property
     def deconz_id(self):
