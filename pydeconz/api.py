@@ -17,12 +17,12 @@ class APIItems:
         raw = self._request("get", self._path)
         self.process_raw(raw)
 
-    def process_raw(self, raw: dict) -> None:
+    def process_raw(self, raw: dict, **kwargs) -> None:
         for id, raw_item in raw.items():
             obj = self._items.get(id)
 
             if obj is not None:
-                obj.async_update(raw_item)
+                obj.async_update(raw_item, **kwargs)
             else:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 

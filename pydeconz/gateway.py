@@ -72,13 +72,13 @@ class DeconzSession:
         self.update_group_color(self.lights.keys())
         self.update_scenes()
 
-    async def refresh_state(self) -> None:
+    async def refresh_state(self, **kwargs) -> None:
         """Refresh deCONZ parameters"""
         data = await self.request("get")
 
-        self.groups.process_raw(data["groups"])
-        self.lights.process_raw(data["lights"])
-        self.sensors.process_raw(data["sensors"])
+        self.groups.process_raw(data["groups"], **kwargs)
+        self.lights.process_raw(data["lights"], **kwargs)
+        self.sensors.process_raw(data["sensors"], **kwargs)
 
         self.update_group_color(self.lights.keys())
         self.update_scenes()
