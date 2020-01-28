@@ -10,6 +10,7 @@ from .errors import raise_error, ResponseError, RequestError
 from .group import Groups
 from .light import Lights
 from .sensor import Sensors
+from .websocket import WSClient
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,21 +18,23 @@ _LOGGER = logging.getLogger(__name__)
 class DeconzSession:
     """deCONZ representation that handles lights, groups, scenes and sensors."""
 
-    def __init__(self, session, host, port, api_key, **kwargs):
+    def __init__(
+        self,
+        session,
+        host,
+        port,
+        api_key,
+        async_add_device=None,
+        connection_status=None,
+    ):
         """Setup session and host information."""
         self.session = session
         self.host = host
         self.port = port
         self.api_key = api_key
 
-        self.async_add_device_callback = kwargs.get("async_add_device")
-        self.async_connection_status_callback = kwargs.get("connection_status")
-
-        if "legacy_websocket" in kwargs:
-            from .websocket import WSClient as ws_client
-        else:
-            from .websocket import AIOWSClient as ws_client
-        self.ws_client = ws_client
+        self.async_add_device_callback = async_add_device
+        self.async_connection_status_callback = connection_status
 
         self.config = None
         self.groups = None
@@ -43,7 +46,7 @@ class DeconzSession:
     def start(self) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
-            self.websocket = self.ws_client(
+            self.websocket = WSClient(
                 self.session,
                 self.host,
                 self.config.websocketport,
