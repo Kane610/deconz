@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import asyncio
+from asyncio import get_running_loop
 import json
 import logging
 
@@ -18,14 +18,15 @@ RETRY_TIMER = 15
 class WSClient:
     """Websocket transport, session handling, message generation."""
 
-    def __init__(self, session, host, port, async_callback):
+    def __init__(self, session, host, port, callback):
         """Create resources for websocket communication."""
         self.session = session
         self.host = host
         self.port = port
-        self.async_session_handler_callback = async_callback
+        self.session_handler_callback = callback
 
-        self.loop = asyncio.get_event_loop()
+        self.loop = get_running_loop()
+
         self._data = None
         self._state = None
 
@@ -43,7 +44,7 @@ class WSClient:
         """"""
         self._state = value
         LOGGER.debug("Websocket %s", value)
-        self.async_session_handler_callback("state")
+        self.session_handler_callback("state")
 
     def start(self):
         if self.state != STATE_RUNNING:
@@ -65,7 +66,7 @@ class WSClient:
 
                     elif msg.type == aiohttp.WSMsgType.TEXT:
                         self._data = json.loads(msg.data)
-                        self.async_session_handler_callback("data")
+                        self.session_handler_callback("data")
                         LOGGER.debug(msg.data)
 
                     elif msg.type == aiohttp.WSMsgType.CLOSED:

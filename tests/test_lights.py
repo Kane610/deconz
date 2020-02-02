@@ -40,11 +40,11 @@ async def test_create_light():
     assert light.uniqueid == "00:21:2E:FF:FF:00:73:9F-0A"
 
     mock_callback = Mock()
-    light.register_async_callback(mock_callback)
-    assert light._async_callbacks
+    light.register_callback(mock_callback)
+    assert light._callbacks
 
     event = {"state": {"xy": [0.1, 0.1]}}
-    light.async_update(event)
+    light.update(event)
 
     assert light.brightness == 111
     assert light.xy == (0.1, 0.1)
@@ -52,7 +52,7 @@ async def test_create_light():
     assert light.changed_keys == {"state", "xy"}
 
     light.remove_callback(mock_callback)
-    assert not light._async_callbacks
+    assert not light._callbacks
 
     light.raw["state"]["xy"] = (65555, 65555)
     assert light.xy == (1, 1)

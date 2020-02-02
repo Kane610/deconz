@@ -6,7 +6,6 @@ from copy import deepcopy
 from unittest.mock import Mock
 
 from pydeconz.group import DeconzGroup
-from pydeconz.light import DeconzLight
 
 
 async def test_create_group():
@@ -49,11 +48,11 @@ async def test_create_group():
     assert group.uniqueid == None
 
     mock_callback = Mock()
-    group.register_async_callback(mock_callback)
-    assert group._async_callbacks
+    group.register_callback(mock_callback)
+    assert group._callbacks
 
     event = {"state": {"all_on": False, "any_on": False}}
-    group.async_update(event)
+    group.update(event)
 
     assert group.all_on == False
     assert group.any_on == False
@@ -61,7 +60,7 @@ async def test_create_group():
     assert group.changed_keys == {"state", "all_on", "any_on"}
 
     group.remove_callback(mock_callback)
-    assert not group._async_callbacks
+    assert not group._callbacks
 
     group.raw["action"]["xy"] = (65555, 65555)
     assert group.xy == (1, 1)

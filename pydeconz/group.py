@@ -188,7 +188,7 @@ class DeconzGroup(DeconzDevice):
 
     def update_color_state(self, light):
         """Sync color state with light."""
-        self.async_update(
+        self.update(
             {
                 "action": {
                     "bri": light.brightness,
@@ -229,6 +229,8 @@ class DeconzScene:
     http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
     """
 
+    DECONZ_TYPE = "scenes"
+
     def __init__(self, group, raw, request):
         """Set initial information about scene.
 
@@ -247,7 +249,7 @@ class DeconzScene:
     @property
     def deconz_id(self):
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group.deconz_id}/scenes/{self.id}"
+        return f"{self.group.deconz_id}/{self.DECONZ_TYPE}/{self.id}"
 
     @property
     def id(self):

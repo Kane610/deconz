@@ -1,12 +1,11 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import asyncio
 import logging
 import aiohttp
 
 from .errors import ResponseError, RequestError, raise_error
 
-_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 URL_DISCOVER = "https://phoscon.de/discover"
 
@@ -23,7 +22,7 @@ async def async_get_api_key(session, host, port, username=None, password=None):
     response = await async_request(session.post, url, auth=auth, data=data)
 
     api_key = response[0]["success"]["username"]
-    _LOGGER.info("API key: %s", api_key)
+    LOGGER.info("API key: %s", api_key)
     return api_key
 
 
@@ -33,7 +32,7 @@ async def async_delete_api_key(session, host, port, api_key):
 
     response = await async_request(session.delete, url)
 
-    _LOGGER.info(response)
+    LOGGER.info(response)
 
 
 async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
@@ -55,14 +54,14 @@ async def async_get_bridge_id(session, host, port, api_key):
     response = await async_request(session.get, url)
 
     bridge_id = normalize_bridge_id(response["bridgeid"])
-    _LOGGER.info("Bridge id: %s", bridge_id)
+    LOGGER.info("Bridge id: %s", bridge_id)
     return bridge_id
 
 
 async def async_discovery(session):
     """Find bridges allowing gateway discovery."""
     response = await async_request(session.get, URL_DISCOVER)
-    _LOGGER.info("Discovered the following bridges: %s.", response)
+    LOGGER.info("Discovered the following bridges: %s.", response)
 
     return [
         {
@@ -76,7 +75,7 @@ async def async_discovery(session):
 
 async def async_request(session, url, **kwargs):
     """Do a web request and manage response."""
-    _LOGGER.debug("Sending %s to %s", kwargs, url)
+    LOGGER.debug("Sending %s to %s", kwargs, url)
 
     try:
         res = await session(url, **kwargs)
@@ -85,7 +84,7 @@ async def async_request(session, url, **kwargs):
             raise ResponseError("Invalid content type: {}".format(res.content_type))
 
         response = await res.json()
-        _LOGGER.debug("HTTP request response: %s", response)
+        LOGGER.debug("HTTP request response: %s", response)
 
         _raise_on_error(response)
 
@@ -118,6 +117,6 @@ def normalize_bridge_id(bridge_id: str):
     if len(bridge_id) == 12:
         return bridge_id
 
-    logging.getLogger(__name__).warn("Received unexpected bridge id: %s", bridge_id)
+    LOGGER.warn("Received unexpected bridge id: %s", bridge_id)
 
     return bridge_id

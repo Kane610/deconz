@@ -12,7 +12,7 @@ from .light import Lights
 from .sensor import Sensors
 from .websocket import WSClient
 
-_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class DeconzSession:
@@ -50,16 +50,16 @@ class DeconzSession:
                 self.session,
                 self.host,
                 self.config.websocketport,
-                self.async_session_handler,
+                self.session_handler,
             )
             self.websocket.start()
         else:
-            _LOGGER.error("No deCONZ config available")
+            LOGGER.error("No deCONZ config available")
 
     def close(self) -> None:
         """Close websession and websocket to deCONZ."""
-        _LOGGER.info("Shutting down connections to deCONZ.")
         if self.websocket:
+            LOGGER.info("Shutting down connections to deCONZ")
             self.websocket.stop()
 
     async def initialize(self) -> None:
@@ -88,7 +88,7 @@ class DeconzSession:
 
     async def request(self, method, path="", json=None):
         """Make a request to the API."""
-        _LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
+        LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
 
         url = f"http://{self.host}:{self.port}/api/{self.api_key}{path}"
 
@@ -101,7 +101,7 @@ class DeconzSession:
                     )
 
                 response = await res.json()
-                _LOGGER.debug("HTTP request response: %s", pformat(response))
+                LOGGER.debug("HTTP request response: %s", pformat(response))
 
                 _raise_on_error(response)
 
@@ -112,20 +112,20 @@ class DeconzSession:
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    def async_session_handler(self, signal: str) -> None:
+    def session_handler(self, signal: str) -> None:
         """Signalling from websocket.
 
            data - new data available for processing.
            state - network state has changed.
         """
         if signal == "data":
-            self.async_event_handler(self.websocket.data)
+            self.event_handler(self.websocket.data)
 
         elif signal == "state":
             if self.async_connection_status_callback:
                 self.async_connection_status_callback(self.websocket.state == "running")
 
-    def async_event_handler(self, event: dict) -> None:
+    def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
 
         {
@@ -145,11 +145,11 @@ class DeconzSession:
         }
         """
         if event["e"] not in ("added", "changed"):
-            _LOGGER.debug("Unsupported event %s", event)
+            LOGGER.debug("Unsupported event %s", event)
             return
 
         if event["r"] not in ("groups", "lights", "sensors"):
-            _LOGGER.debug("Unsupported resource %s", event)
+            LOGGER.debug("Unsupported resource %s", event)
             return
 
         if event["r"] == "groups":
