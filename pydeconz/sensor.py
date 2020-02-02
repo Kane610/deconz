@@ -441,11 +441,6 @@ class Presence(DeconzSensor):
         return self.raw["state"].get("dark")
 
     @property
-    def daylight(self):
-        """If the area near the sensor is light or not."""
-        return self.raw["state"].get("daylight")
-
-    @property
     def duration(self):
         """Minimum duration which presence will be true."""
         return self.raw["config"].get("duration")

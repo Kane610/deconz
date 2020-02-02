@@ -50,7 +50,7 @@ class DeconzSession:
                 self.session,
                 self.host,
                 self.config.websocketport,
-                self.async_session_handler,
+                self.session_handler,
             )
             self.websocket.start()
         else:
@@ -112,20 +112,20 @@ class DeconzSession:
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    def async_session_handler(self, signal: str) -> None:
+    def session_handler(self, signal: str) -> None:
         """Signalling from websocket.
 
            data - new data available for processing.
            state - network state has changed.
         """
         if signal == "data":
-            self.async_event_handler(self.websocket.data)
+            self.event_handler(self.websocket.data)
 
         elif signal == "state":
             if self.async_connection_status_callback:
                 self.async_connection_status_callback(self.websocket.state == "running")
 
-    def async_event_handler(self, event: dict) -> None:
+    def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
 
         {
