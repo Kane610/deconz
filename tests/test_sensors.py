@@ -661,7 +661,7 @@ async def test_vibration_sensor():
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAVibration",)
-    assert sensor.SENSOR_CLASS == "motion"
+    assert sensor.SENSOR_CLASS == "vibration"
 
     assert sensor.state is True
     assert sensor.is_tripped is True
