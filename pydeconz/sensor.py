@@ -571,7 +571,7 @@ class Vibration(DeconzSensor):
     BINARY = True
     ZHATYPE = ("ZHAVibration",)
 
-    SENSOR_CLASS = "motion"
+    SENSOR_CLASS = "vibration"
 
     @property
     def state(self):
