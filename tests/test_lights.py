@@ -26,6 +26,8 @@ async def test_create_light():
     assert light.ct == 307
     assert light.xy == (0.421253, 0.39921)
     assert light.colormode == "ct"
+    assert light.ctmax == 500
+    assert light.ctmin == 153
     assert light.effect is None
     assert light.hascolor is True
     assert light.reachable is True
@@ -62,6 +64,8 @@ async def test_create_light():
 
 
 FIXTURE_RGB_LIGHT = {
+    "ctmax": 500,
+    "ctmin": 153,
     "etag": "026bcfe544ad76c7534e5ca8ed39047c",
     "hascolor": True,
     "manufacturername": "dresden elektronik",

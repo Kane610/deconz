@@ -105,6 +105,16 @@ class DeconzLight(DeconzDevice):
         return self.raw["state"].get("hascolor")
 
     @property
+    def ctmax(self) -> int:
+        """Max value for color temperature."""
+        return self.raw.get("ctmax")
+
+    @property
+    def ctmin(self) -> int:
+        """Min value for color temperature."""
+        return self.raw.get("ctmin")
+
+    @property
     def effect(self):
         """Effect of the light.
 
