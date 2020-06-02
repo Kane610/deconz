@@ -38,7 +38,6 @@ async def test_alarm_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAlarm",)
-    assert sensor.SENSOR_CLASS == "motion"
 
     assert sensor.state is None
     assert sensor.alarm is None
@@ -69,7 +68,6 @@ async def test_battery_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHABattery",)
-    assert sensor.SENSOR_CLASS == "battery"
 
     assert sensor.state == 100
 
@@ -99,7 +97,6 @@ async def test_carbonmonoxide_sensor():
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
-    assert sensor.SENSOR_CLASS == "carbon_monoxide"
 
     assert sensor.state is False
     assert sensor.is_tripped is False
@@ -131,7 +128,6 @@ async def test_consumption_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAConsumption",)
-    assert sensor.SENSOR_UNIT == "kWh"
 
     assert sensor.state == 11.342
     assert sensor.consumption == 11342
@@ -166,8 +162,6 @@ async def test_daylight_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("Daylight",)
-    assert sensor.SENSOR_CLASS == "daylight"
-    assert sensor.SENSOR_ICON == "mdi:white-balance-sunny"
 
     assert sensor.state == "solar_noon"
     assert sensor.configured is True
@@ -227,7 +221,6 @@ async def test_fire_sensor():
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
-    assert sensor.SENSOR_CLASS == "smoke"
 
     assert sensor.state is False
     assert sensor.is_tripped is False
@@ -320,8 +313,6 @@ async def test_humidity_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
-    assert sensor.SENSOR_CLASS == "humidity"
-    assert sensor.SENSOR_UNIT == "%"
 
     assert sensor.state == 35.5
     assert sensor.humidity == 3555
@@ -355,8 +346,6 @@ async def test_lightlevel_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
-    assert sensor.SENSOR_CLASS == "illuminance"
-    assert sensor.SENSOR_UNIT == "lux"
 
     assert sensor.state == 5
     assert sensor.dark is True
@@ -395,7 +384,6 @@ async def test_openclose_sensor():
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
-    assert sensor.SENSOR_CLASS == "opening"
 
     assert sensor.state is False
     assert sensor.is_tripped is False
@@ -427,7 +415,6 @@ async def test_power_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPower",)
-    assert sensor.SENSOR_UNIT == "W"
 
     assert sensor.state == 64
     assert sensor.current == 34
@@ -460,7 +447,6 @@ async def test_presence_sensor():
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
-    assert sensor.SENSOR_CLASS == "motion"
 
     assert sensor.state is False
     assert sensor.is_tripped is False
@@ -494,9 +480,6 @@ async def test_pressure_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
-    assert sensor.SENSOR_CLASS == "pressure"
-    assert sensor.SENSOR_ICON == "mdi:gauge"
-    assert sensor.SENSOR_UNIT == "hPa"
 
     assert sensor.state == 1010
     assert sensor.pressure == 1010
@@ -589,9 +572,6 @@ async def test_temperature_sensor():
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
-    assert sensor.SENSOR_CLASS == "temperature"
-    assert sensor.SENSOR_ICON == "mdi:thermometer"
-    assert sensor.SENSOR_UNIT == "°C"
 
     assert sensor.state == 21.8
     assert sensor.temperature == 21.8
@@ -661,7 +641,6 @@ async def test_vibration_sensor():
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAVibration",)
-    assert sensor.SENSOR_CLASS == "vibration"
 
     assert sensor.state is True
     assert sensor.is_tripped is True
