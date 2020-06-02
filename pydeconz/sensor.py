@@ -28,10 +28,6 @@ class DeconzSensor(DeconzDevice):
     BINARY = None
     ZHATYPE = set()
 
-    SENSOR_CLASS = None
-    SENSOR_ICON = None
-    SENSOR_UNIT = None
-
     @property
     def battery(self):
         """The battery status of the sensor."""
@@ -77,8 +73,6 @@ class Alarm(DeconzSensor):
     BINARY = False
     ZHATYPE = ("ZHAAlarm",)
 
-    SENSOR_CLASS = "motion"
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -96,8 +90,6 @@ class Battery(DeconzSensor):
     BINARY = False
     ZHATYPE = ("ZHABattery",)
 
-    SENSOR_CLASS = "battery"
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -114,8 +106,6 @@ class CarbonMonoxide(DeconzSensor):
 
     BINARY = True
     ZHATYPE = ("ZHACarbonMonoxide",)
-
-    SENSOR_CLASS = "carbon_monoxide"
 
     @property
     def state(self):
@@ -138,8 +128,6 @@ class Consumption(DeconzSensor):
 
     BINARY = False
     ZHATYPE = ("ZHAConsumption",)
-
-    SENSOR_UNIT = "kWh"
 
     @property
     def state(self):
@@ -171,9 +159,6 @@ class Daylight(DeconzSensor):
 
     BINARY = False
     ZHATYPE = ("Daylight",)
-
-    SENSOR_CLASS = "daylight"
-    SENSOR_ICON = "mdi:white-balance-sunny"
 
     @property
     def state(self):
@@ -241,8 +226,6 @@ class Fire(DeconzSensor):
     BINARY = True
     ZHATYPE = ("ZHAFire",)
 
-    SENSOR_CLASS = "smoke"
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -304,9 +287,6 @@ class Humidity(DeconzSensor):
     BINARY = False
     ZHATYPE = ("ZHAHumidity", "CLIPHumidity")
 
-    SENSOR_CLASS = "humidity"
-    SENSOR_UNIT = "%"
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -326,9 +306,6 @@ class LightLevel(DeconzSensor):
 
     BINARY = False
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")
-
-    SENSOR_CLASS = "illuminance"
-    SENSOR_UNIT = "lux"
 
     @property
     def state(self):
@@ -375,8 +352,6 @@ class OpenClose(DeconzSensor):
     BINARY = True
     ZHATYPE = ("ZHAOpenClose", "CLIPOpenClose")
 
-    SENSOR_CLASS = "opening"
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -398,8 +373,6 @@ class Power(DeconzSensor):
 
     BINARY = False
     ZHATYPE = ("ZHAPower",)
-
-    SENSOR_UNIT = "W"
 
     @property
     def state(self):
@@ -427,8 +400,6 @@ class Presence(DeconzSensor):
 
     BINARY = True
     ZHATYPE = ("ZHAPresence", "CLIPPresence")
-
-    SENSOR_CLASS = "motion"
 
     @property
     def state(self):
@@ -461,10 +432,6 @@ class Pressure(DeconzSensor):
 
     BINARY = False
     ZHATYPE = ("ZHAPressure", "CLIPPressure")
-
-    SENSOR_CLASS = "pressure"
-    SENSOR_ICON = "mdi:gauge"
-    SENSOR_UNIT = "hPa"
 
     @property
     def state(self):
@@ -504,10 +471,6 @@ class Temperature(DeconzSensor):
 
     BINARY = False
     ZHATYPE = ("ZHATemperature", "CLIPTemperature")
-
-    SENSOR_CLASS = "temperature"
-    SENSOR_ICON = "mdi:thermometer"
-    SENSOR_UNIT = "°C"
 
     @property
     def state(self):
@@ -571,8 +534,6 @@ class Vibration(DeconzSensor):
     BINARY = True
     ZHATYPE = ("ZHAVibration",)
 
-    SENSOR_CLASS = "vibration"
-
     @property
     def state(self):
         """Main state of sensor."""
@@ -619,8 +580,6 @@ class Water(DeconzSensor):
 
     BINARY = True
     ZHATYPE = ("ZHAWater",)
-
-    SENSOR_CLASS = "moisture"
 
     @property
     def state(self):
