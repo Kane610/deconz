@@ -161,7 +161,7 @@ class DeconzSession:
 
         if event["e"] == "changed" and event["id"] in device_class:
             device_class.process_raw({event["id"]: event})
-            if event["r"] == "lights":
+            if event["r"] == "lights" and "attr" not in event:
                 self.update_group_color([event["id"]])
             return
 
