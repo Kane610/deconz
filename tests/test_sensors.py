@@ -514,6 +514,8 @@ async def test_switch_sensor():
     assert sensor.state == 1002
     assert sensor.buttonevent == 1002
     assert sensor.gesture is None
+    assert sensor.angle is None
+    assert sensor.xy is None
 
     # DeconzSensor
     assert sensor.battery == 90
@@ -564,6 +566,36 @@ async def test_switch_sensor_cube():
     assert sensor.swversion == "20160704"
     assert sensor.type == "ZHASwitch"
     assert sensor.uniqueid == "00:15:8d:00:02:8b:3b:24-03-000c"
+
+
+async def test_switch_sensor_tint_remote():
+    """Verify that tint remote sensor works."""
+    sensor = create_sensor("0", FIXTURE_TINT_REMOTE, None)
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
+
+    assert sensor.state == 6002
+    assert sensor.buttonevent == 6002
+    assert sensor.angle == 10
+    assert sensor.xy == [0.3381, 0.1627]
+
+    # DeconzSensor
+    assert sensor.ep == 1
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "b1336f750d31300afa441a04f2c69b68"
+    assert sensor.manufacturer == "MLI"
+    assert sensor.modelid == "ZBT-Remote-ALL-RGBW"
+    assert sensor.name == "ZHA Remote 1"
+    assert sensor.swversion == "2.0"
+    assert sensor.type == "ZHASwitch"
+    assert sensor.uniqueid == "00:11:22:33:44:55:66:77-01-1000"
 
 
 async def test_temperature_sensor():
@@ -1090,6 +1122,24 @@ FIXTURE_TRADFRI_DIMMER = {
     "uniqueid": "00:0b:57:ff:fe:20:55:96-01-1000",
 }
 
+FIXTURE_TINT_REMOTE = {
+    "config": {"group": "16388,16389,16390", "on": True, "reachable": True},
+    "ep": 1,
+    "etag": "b1336f750d31300afa441a04f2c69b68",
+    "manufacturername": "MLI",
+    "mode": 1,
+    "modelid": "ZBT-Remote-ALL-RGBW",
+    "name": "ZHA Remote 1",
+    "state": {
+        "angle": 10,
+        "buttonevent": 6002,
+        "lastupdated": "2020-09-08T18:58:24.193",
+        "xy": [0.3381, 0.1627],
+    },
+    "swversion": "2.0",
+    "type": "ZHASwitch",
+    "uniqueid": "00:11:22:33:44:55:66:77-01-1000",
+}
 
 FIXTURE_HUE_MOTION_SENSOR_LIGHT = {
     "config": {

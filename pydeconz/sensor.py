@@ -465,6 +465,16 @@ class Switch(DeconzSensor):
         """Gesture used for Xiaomi magic cube."""
         return self.raw["state"].get("gesture")
 
+    @property
+    def angle(self):
+        """Angle representing color on a tint remote color wheel."""
+        return self.raw["state"].get("angle")
+
+    @property
+    def xy(self):
+        """Represents the x/y color coordinates selected on a tint remote color wheel."""
+        return self.raw["state"].get("xy")
+
 
 class Temperature(DeconzSensor):
     """Temperature sensor."""
