@@ -107,21 +107,42 @@ class DeconzLight(DeconzDevice):
     @property
     def ctmax(self) -> int:
         """Max value for color temperature."""
-        return self.raw.get("ctmax")
+        ctmax = self.raw.get("ctmax")
+        if ctmax is not None and ctmax > 650:
+            ctmax = 650
+        return ctmax
 
     @property
     def ctmin(self) -> int:
         """Min value for color temperature."""
-        return self.raw.get("ctmin")
+        ctmin = self.raw.get("ctmin")
+        if ctmin is not None and ctmin < 140:
+            ctmin = 140
+        return ctmin
 
     @property
-    def effect(self):
+    def effect(self) -> str:
         """Effect of the light.
 
         none - no effect
         colorloop
         """
         return self.raw["state"].get("effect")
+
+    @property
+    def speed(self) -> int:
+        """Speed of the fan connected to the light fixture.
+
+        Lights of type "Fan" report a speed attribute;
+        0 - fan is off
+        1 - 25%
+        2 - 50%
+        3 - 75%
+        4 - 100%
+        5 - Auto
+        6 - "comfort-breeze"
+        """
+        return self.raw["state"].get("speed")
 
     @property
     def reachable(self):

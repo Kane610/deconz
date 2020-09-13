@@ -31,6 +31,7 @@ async def test_create_light():
     assert light.effect is None
     assert light.hascolor is True
     assert light.reachable is True
+    assert light.speed is None
 
     assert light.deconz_id == "/lights/0"
     assert light.etag == "026bcfe544ad76c7534e5ca8ed39047c"
@@ -61,6 +62,15 @@ async def test_create_light():
 
     del light.raw["state"]["xy"]
     assert light.xy is None
+
+    light.raw["ctmax"] = 1000
+    assert light.ctmax == 650
+
+    light.raw["ctmin"] = 0
+    assert light.ctmin == 140
+
+    light.raw["state"]["speed"] = 3
+    assert light.speed == 3
 
 
 FIXTURE_RGB_LIGHT = {
