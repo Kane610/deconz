@@ -2,12 +2,10 @@
 
 pytest --cov-report term-missing --cov=pydeconz tests/test_init.py
 """
-import asyncio
-from unittest.mock import Mock, patch
-from asynctest import CoroutineMock
-import pytest
 
-import aiohttp
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 from pydeconz import DeconzSession
 from pydeconz.sensor import GenericStatus
@@ -28,7 +26,7 @@ async def test_initialize(session) -> None:
     """Test a successful call of load_parameters."""
     with patch(
         "pydeconz.DeconzSession.request",
-        new=CoroutineMock(
+        new=AsyncMock(
             return_value={
                 "config": {"bridgeid": "012345"},
                 "groups": {
