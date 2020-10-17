@@ -2,9 +2,9 @@
 
  pytest --cov-report term-missing --cov=pydeconz.utils tests/test_utils.py
 """
-import asyncio
-from unittest.mock import Mock, patch
-from asynctest import CoroutineMock
+
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
 
 import aiohttp
@@ -17,28 +17,26 @@ IP = "127.0.0.1"
 PORT = "80"
 
 
-@pytest.mark.asyncio
 async def test_get_api_key() -> None:
     """Test a successful call of get_api_key."""
     session = Mock()
 
     with patch(
         "pydeconz.utils.async_request",
-        new=CoroutineMock(return_value=[{"success": {"username": API_KEY}}]),
+        new=AsyncMock(return_value=[{"success": {"username": API_KEY}}]),
     ):
         response = await utils.async_get_api_key(session, IP, PORT)
 
     assert response == API_KEY
 
 
-@pytest.mark.asyncio
 async def test_get_api_key_with_credentials() -> None:
     """Test a successful call of get_api_key with user crendentials."""
     session = Mock()
 
     with patch(
         "pydeconz.utils.async_request",
-        new=CoroutineMock(return_value=[{"success": {"username": API_KEY}}]),
+        new=AsyncMock(return_value=[{"success": {"username": API_KEY}}]),
     ):
         response = await utils.async_get_api_key(
             session, IP, PORT, username="user", password="pass"
@@ -47,16 +45,14 @@ async def test_get_api_key_with_credentials() -> None:
     assert response == API_KEY
 
 
-@pytest.mark.asyncio
 async def test_delete_api_key() -> None:
     """Test a successful call of delete_api_key."""
     session = Mock()
 
-    with patch("pydeconz.utils.async_request", new=CoroutineMock(return_value=True)):
+    with patch("pydeconz.utils.async_request", new=AsyncMock(return_value=True)):
         await utils.async_delete_api_key(session, IP, PORT, API_KEY)
 
 
-@pytest.mark.asyncio
 async def test_delete_all_keys() -> None:
     """Test a successful call of delete_all_keys.
 
@@ -66,33 +62,31 @@ async def test_delete_all_keys() -> None:
 
     with patch(
         "pydeconz.utils.async_request",
-        new=CoroutineMock(return_value={"whitelist": {1: "123", 2: "456"}}),
+        new=AsyncMock(return_value={"whitelist": {1: "123", 2: "456"}}),
     ):
         await utils.async_delete_all_keys(session, IP, PORT, API_KEY)
 
 
-@pytest.mark.asyncio
 async def test_get_bridge_id() -> None:
     """Test a successful call of get_bridgeid."""
     session = Mock()
 
     with patch(
         "pydeconz.utils.async_request",
-        new=CoroutineMock(return_value={"bridgeid": "12345"}),
+        new=AsyncMock(return_value={"bridgeid": "12345"}),
     ):
         response = await utils.async_get_bridge_id(session, IP, PORT, API_KEY)
 
     assert response == "12345"
 
 
-@pytest.mark.asyncio
 async def test_discovery() -> None:
     """Test a successful call to discovery."""
     session = Mock()
 
     with patch(
         "pydeconz.utils.async_request",
-        new=CoroutineMock(
+        new=AsyncMock(
             return_value=[
                 {
                     "id": "123456FFFFABCDEF",
@@ -115,34 +109,31 @@ async def test_discovery() -> None:
     ] == response
 
 
-@pytest.mark.asyncio
 async def test_discovery_response_empty() -> None:
     """Test an empty discovery returns an empty list."""
     session = Mock()
 
-    with patch("pydeconz.utils.async_request", new=CoroutineMock(return_value={})):
+    with patch("pydeconz.utils.async_request", new=AsyncMock(return_value={})):
         response = await utils.async_discovery(session)
 
     assert not response
 
 
-@pytest.mark.asyncio
 async def test_request() -> None:
     """Test a successful call of request."""
     response = Mock()
     response.content_type = "application/json"
-    response.json = CoroutineMock(return_value={"json": "response"})
-    session = CoroutineMock(return_value=response)
+    response.json = AsyncMock(return_value={"json": "response"})
+    session = AsyncMock(return_value=response)
 
     result = await utils.async_request(session, "url")
 
     assert result == {"json": "response"}
 
 
-@pytest.mark.asyncio
 async def test_request_fails_client_error() -> None:
     """Test a successful call of request."""
-    session = CoroutineMock(side_effect=aiohttp.ClientError)
+    session = AsyncMock(side_effect=aiohttp.ClientError)
 
     with pytest.raises(errors.RequestError) as e_info:
         await utils.async_request(session, "url")
@@ -150,12 +141,11 @@ async def test_request_fails_client_error() -> None:
     assert str(e_info.value) == "Error requesting data from url: "
 
 
-@pytest.mark.asyncio
 async def test_request_fails_invalid_content() -> None:
     """Test a successful call of request."""
     response = Mock()
     response.content_type = "application/binary"
-    session = CoroutineMock(return_value=response)
+    session = AsyncMock(return_value=response)
 
     with pytest.raises(errors.ResponseError) as e_info:
         await utils.async_request(session, "url")
@@ -163,17 +153,16 @@ async def test_request_fails_invalid_content() -> None:
     assert str(e_info.value) == "Invalid content type: application/binary"
 
 
-@pytest.mark.asyncio
 async def test_request_fails_raise_error() -> None:
     """Test a successful call of request."""
     response = Mock()
     response.content_type = "application/json"
-    response.json = CoroutineMock(
+    response.json = AsyncMock(
         return_value=[
             {"error": {"type": 1, "address": "address", "description": "description"}}
         ]
     )
-    session = CoroutineMock(return_value=response)
+    session = AsyncMock(return_value=response)
 
     with pytest.raises(errors.Unauthorized) as e_info:
         await utils.async_request(session, "url")
