@@ -5,7 +5,7 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 
 from unittest.mock import Mock
 
-from pydeconz.sensor import SENSOR_CLASSES, create_sensor
+from pydeconz.sensor import SENSOR_CLASSES, Thermostat, create_sensor
 
 
 async def test_create_sensor():
@@ -665,6 +665,67 @@ async def test_thermostat_sensor():
     assert sensor.swversion == "15181120"
     assert sensor.type == "ZHAThermostat"
     assert sensor.uniqueid == "00:15:8d:00:01:92:d2:51-01-0201"
+
+
+async def test_tuya_thermostat_sensor():
+    """Verify that Tuya thermostat works."""
+    device_description = {
+        "config": {
+            "battery": 100,
+            "heatsetpoint": 1550,
+            "locked": None,
+            "offset": 0,
+            "on": True,
+            "preset": "auto",
+            "reachable": True,
+            "schedule": {},
+            "schedule_on": None,
+            "setvalve": True,
+            "windowopen_set": True,
+        },
+        "ep": 1,
+        "etag": "36850fc8521f7c23606c9304b2e1f7bb",
+        "lastseen": "2020-11-11T21:23Z",
+        "manufacturername": "_TYST11_kfvq6avy",
+        "modelid": "fvq6avy",
+        "name": "fvq6avy",
+        "state": {"lastupdated": "none", "on": None, "temperature": 2290},
+        "swversion": "20180727",
+        "type": "ZHAThermostat",
+        "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
+    }
+    sensor = create_sensor("0", device_description, None)
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == Thermostat.ZHATYPE
+
+    assert sensor.state == 22.9
+    assert sensor.heatsetpoint == 15.50
+    assert sensor.locked is None
+    assert sensor.mode == None
+    assert sensor.offset == 0
+    assert sensor.state_on is None
+    assert sensor.temperature == 22.9
+    assert sensor.valve is None
+
+    # DeconzSensor
+    assert sensor.battery == 100
+    assert sensor.ep == 1
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "36850fc8521f7c23606c9304b2e1f7bb"
+    assert sensor.manufacturer == "_TYST11_kfvq6avy"
+    assert sensor.modelid == "fvq6avy"
+    assert sensor.name == "fvq6avy"
+    assert sensor.swversion == "20180727"
+    assert sensor.type == "ZHAThermostat"
+    assert sensor.uniqueid == "bc:33:ac:ff:fe:47:a1:95-01-0201"
 
 
 async def test_vibration_sensor():

@@ -129,7 +129,7 @@ async def test_create_cover_without_lift():
     cover = create_light("0", deepcopy(FIXTURE_COVER_WITHOUT_LIFT), None)
 
     assert cover.state is False
-    assert cover.is_open is False
+    assert cover.is_open is True
     assert cover.position == 0
 
     assert cover.reachable is True
@@ -149,14 +149,14 @@ async def test_create_cover_without_lift():
 
     event = {"state": {"bri": 50, "on": True}}
     cover.update(event)
-    assert cover.is_open is True
+    assert cover.is_open is False
     assert cover.position == 19
     mock_callback.assert_called_once()
     assert cover.changed_keys == {"state", "bri", "on"}
 
     event = {"state": {"bri": 30, "on": False}}
     cover.update(event)
-    assert cover.is_open is False
+    assert cover.is_open is True
     assert cover.position == 11
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
