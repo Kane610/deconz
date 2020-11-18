@@ -508,13 +508,13 @@ class Thermostat(Temperature):
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
 
     @property
-    def heatsetpoint(self):
+    def heatsetpoint(self) -> int:
         """Heating setpoint"""
         return self.convert_temperature(self.raw["config"].get("heatsetpoint"))
 
     @property
-    def locked(self):
-        """"""
+    def locked(self) -> bool:
+        """Lock device."""
         return self.raw["config"].get("locked")
 
     @property
@@ -523,19 +523,33 @@ class Thermostat(Temperature):
         return self.raw["config"].get("mode")
 
     @property
-    def offset(self):
+    def offset(self) -> int:
         """Temperature offset."""
         return self.raw["config"].get("offset")
 
     @property
-    def state_on(self):
+    def preset(self) -> str:
+        """Temperature preset.
+
+        manual or auto.
+        Only for Tuya.
+        """
+        return self.raw["config"].get("preset", "")
+
+    @property
+    def state_on(self) -> bool:
         """Declare if the sensor is on or off."""
         return self.raw["state"].get("on")
 
     @property
-    def valve(self):
+    def valve(self) -> int:
         """How open the valve is."""
         return self.raw["state"].get("valve")
+
+    @property
+    def windowopen_set(self) -> bool:
+        """Window open is set."""
+        return self.raw["config"].get("windowopen_set")
 
 
 class Vibration(DeconzSensor):
