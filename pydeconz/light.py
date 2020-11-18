@@ -1,11 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
-
 from .api import APIItems
 from .deconzdevice import DeconzDevice
 
-_LOGGER = logging.getLogger(__name__)
 URL = "/lights"
 
 
@@ -13,7 +10,7 @@ class Lights(APIItems):
     """Represent deCONZ lights."""
 
     def __init__(self, raw, request):
-        super().__init__(raw, request, URL, DeconzLight)
+        super().__init__(raw, request, URL, create_light)
 
 
 class DeconzLight(DeconzDevice):
@@ -24,14 +21,28 @@ class DeconzLight(DeconzDevice):
     """
 
     DECONZ_TYPE = "lights"
+    ZHATYPE = set()
 
     @property
-    def state(self):
-        """True if the light is on."""
+    def state(self) -> bool:
+        """True if light is on."""
         return self.raw["state"].get("on")
 
     @property
-    def alert(self):
+    def reachable(self):
+        """True if light is reachable and accepts commands."""
+        return self.raw["state"]["reachable"]
+
+
+class Light(DeconzLight):
+    """deCONZ light representation.
+
+    Dresden Elektroniks documentation of lights in deCONZ
+    http://dresden-elektronik.github.io/deconz-rest-doc/lights/
+    """
+
+    @property
+    def alert(self) -> str:
         """Temporary alert effect.
 
         Following values are possible:
@@ -42,7 +53,7 @@ class DeconzLight(DeconzDevice):
         return self.raw["state"].get("alert")
 
     @property
-    def brightness(self):
+    def brightness(self) -> int:
         """Brightness of the light.
 
         Depending on the light type 0 might not mean visible "off"
@@ -51,12 +62,12 @@ class DeconzLight(DeconzDevice):
         return self.raw["state"].get("bri")
 
     @property
-    def ct(self):
+    def ct(self) -> int:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["state"].get("ct")
 
     @property
-    def hue(self):
+    def hue(self) -> int:
         """Color hue of the light.
 
         The hue parameter in the HSV color model is between 0°-360°
@@ -65,7 +76,7 @@ class DeconzLight(DeconzDevice):
         return self.raw["state"].get("hue")
 
     @property
-    def sat(self):
+    def sat(self) -> int:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -76,10 +87,10 @@ class DeconzLight(DeconzDevice):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if "xy" not in self.raw["state"] or self.raw["state"]["xy"] == (None, None):
-            return None
+        x, y = self.raw["state"].get("xy", (None, None))
 
-        x, y = self.raw["state"]["xy"]
+        if x is None or y is None:
+            return None
 
         if x > 1:
             x = x / 65555
@@ -90,8 +101,8 @@ class DeconzLight(DeconzDevice):
         return (x, y)
 
     @property
-    def colormode(self):
-        """The current color mode of the light.
+    def colormode(self) -> str:
+        """Current color mode of light.
 
         hs - hue and saturation
         xy - CIE xy values
@@ -129,22 +140,138 @@ class DeconzLight(DeconzDevice):
         """
         return self.raw["state"].get("effect")
 
+
+class cover(DeconzLight):
+    """Cover and Damper class.
+
+    Position 0 means open and 100 means closed.
+    """
+
+    ZHATYPE = (
+        "Level controllable output",
+        "Window covering controller",
+        "Window covering device",
+    )
+
+    @property
+    def is_open(self) -> bool:
+        """True if the cover is open."""
+        if "open" not in self.raw["state"]:
+            return self.state is False
+        return self.raw["state"]["open"]
+
+    @property
+    def position(self) -> int:
+        """Amount of lift.
+
+        0 is fully open.
+        100 is fully closed.
+        """
+        if "lift" not in self.raw["state"]:
+            return int(self.raw["state"].get("bri") / 2.54)
+        return self.raw["state"]["lift"]
+
+    async def set_position(self, position: int) -> None:
+        """Set lift of cover.
+
+        Lift [int] between 0-100.
+        Scale to brightness 0-254.
+        """
+        data = {"lift": position}
+        if "lift" not in self.raw["state"]:
+            data = {"bri": int(position * 2.54)}
+        await self.async_set_state(data)
+
+    async def open(self) -> None:
+        """Fully open cover."""
+        data = {"open": True}
+        if "open" not in self.raw["state"]:
+            data = {"on": False}
+        await self.async_set_state(data)
+
+    async def close(self) -> None:
+        """Folly close cover."""
+        data = {"open": False}
+        if "open" not in self.raw["state"]:
+            data = {"on": True}
+        await self.async_set_state(data)
+
+    async def stop(self) -> None:
+        """Stop cover motion."""
+        await self.async_set_state({"bri_inc": 0})
+
+
+class fan(Light):
+    """Light fixture with fan control.
+
+    0 - fan is off
+    1 - 25%
+    2 - 50%
+    3 - 75%
+    4 - 100%
+    5 - Auto
+    6 - "comfort-breeze"
+    """
+
+    ZHATYPE = ("Fan",)
+
     @property
     def speed(self) -> int:
-        """Speed of the fan connected to the light fixture.
-
-        Lights of type "Fan" report a speed attribute;
-        0 - fan is off
-        1 - 25%
-        2 - 50%
-        3 - 75%
-        4 - 100%
-        5 - Auto
-        6 - "comfort-breeze"
-        """
+        """Speed of the fan."""
         return self.raw["state"].get("speed")
 
+    async def set_speed(self, speed: int) -> None:
+        """Set speed.
+
+        Speed [int] between 0-6.
+        """
+        await self.async_set_state({"speed": speed})
+
+
+class lock(DeconzLight):
+    """Lock class."""
+
+    ZHATYPE = ("Door Lock",)
+
     @property
-    def reachable(self):
-        """True if the light is reachable and accepts commands."""
-        return self.raw["state"]["reachable"]
+    def is_locked(self) -> bool:
+        return self.state is True
+
+    async def lock(self) -> None:
+        """Lock the lock."""
+        await self.async_set_state({"on": True})
+
+    async def unlock(self) -> None:
+        """Unlock the lock."""
+        await self.async_set_state({"on": False})
+
+
+class siren(DeconzLight):
+    """Siren class."""
+
+    ZHATYPE = ("Warning device",)
+
+    @property
+    def is_on(self) -> bool:
+        """If device is sounding."""
+        return self.raw["state"]["alert"] == "lselect"
+
+    async def turn_on(self) -> None:
+        """Turn on device."""
+        await self.async_set_state({"alert": "lselect"})
+
+    async def turn_off(self) -> None:
+        """Turn off device."""
+        await self.async_set_state({"alert": "none"})
+
+
+NON_LIGHT_CLASSES = (cover, fan, lock, siren)
+
+
+def create_light(light_id: int, raw: dict, request: object) -> DeconzLight:
+    """Creating device out of a light resource."""
+    for non_light_class in NON_LIGHT_CLASSES:
+        if raw["type"] in non_light_class.ZHATYPE:
+            return non_light_class(light_id, raw, request)
+
+    return Light(light_id, raw, request)

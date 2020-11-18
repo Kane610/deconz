@@ -1,7 +1,6 @@
 """API base classes."""
 
 import logging
-
 from asyncio import get_running_loop
 
 from .errors import BridgeBusy

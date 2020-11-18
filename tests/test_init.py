@@ -38,7 +38,7 @@ async def test_initialize(session) -> None:
                         "lights": [],
                     }
                 },
-                "lights": {"l1": {"state": {}}},
+                "lights": {"l1": {"type": "light", "state": {}}},
                 "sensors": {
                     "s1": {"type": GenericStatus.ZHATYPE[0], "state": {}, "config": {}}
                 },
