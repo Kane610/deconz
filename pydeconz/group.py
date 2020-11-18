@@ -6,7 +6,7 @@ from pprint import pformat
 from .api import APIItems
 from .deconzdevice import DeconzDevice
 
-_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 URL = "/groups"
 
 
@@ -239,7 +239,7 @@ class DeconzScene:
         self.group = group
         self.raw = raw
         self._request = request
-        _LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
+        LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
     async def async_set_state(self, data):
         """Recall scene to group."""

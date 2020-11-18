@@ -4,9 +4,9 @@ pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 """
 
 from copy import deepcopy
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
-from pydeconz.light import DeconzLight
+from pydeconz.light import create_light
 
 
 async def test_create_light():
@@ -15,7 +15,7 @@ async def test_create_light():
     Just tests a subset right now;
         xy will also be signalled as a set from 0.61.
     """
-    light = DeconzLight("0", deepcopy(FIXTURE_RGB_LIGHT), None)
+    light = create_light("0", deepcopy(FIXTURE_RGB_LIGHT), None)
 
     assert light.state is False
     assert light.alert is None
@@ -31,7 +31,6 @@ async def test_create_light():
     assert light.effect is None
     assert light.hascolor is True
     assert light.reachable is True
-    assert light.speed is None
 
     assert light.deconz_id == "/lights/0"
     assert light.etag == "026bcfe544ad76c7534e5ca8ed39047c"
@@ -69,8 +68,255 @@ async def test_create_light():
     light.raw["ctmin"] = 0
     assert light.ctmin == 140
 
-    light.raw["state"]["speed"] = 3
-    assert light.speed == 3
+
+async def test_create_cover():
+    """Verify that covers work."""
+    cover = create_light("0", deepcopy(FIXTURE_COVER), None)
+
+    assert cover.state is False
+    assert cover.is_open is False
+    assert cover.position == 0
+
+    assert cover.reachable is True
+
+    assert cover.deconz_id == "/lights/0"
+    assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
+    assert cover.manufacturer == "AXIS"
+    assert cover.modelid == "Gear"
+    assert cover.name == "Covering device"
+    assert cover.swversion == "100-5.3.5.1122"
+    assert cover.type == "Window covering device"
+    assert cover.uniqueid == "00:24:46:00:00:12:34:56-01"
+
+    mock_callback = Mock()
+    cover.register_callback(mock_callback)
+    assert cover._callbacks
+
+    event = {"state": {"lift": 50, "open": True}}
+    cover.update(event)
+    assert cover.is_open is True
+    assert cover.position == 50
+    mock_callback.assert_called_once()
+    assert cover.changed_keys == {"state", "lift", "open"}
+
+    event = {"state": {"bri": 30, "on": False}}
+    cover.update(event)
+    assert cover.is_open is True
+    assert cover.position == 50
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.open()
+        set_state.assert_called_with({"open": True})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.close()
+        set_state.assert_called_with({"open": False})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.set_position(30)
+        set_state.assert_called_with({"lift": 30})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.stop()
+        set_state.assert_called_with({"bri_inc": 0})
+
+    cover.remove_callback(mock_callback)
+    assert not cover._callbacks
+
+
+async def test_create_cover_without_lift():
+    """Verify that covers work with older deconz versions."""
+    cover = create_light("0", deepcopy(FIXTURE_COVER_WITHOUT_LIFT), None)
+
+    assert cover.state is False
+    assert cover.is_open is False
+    assert cover.position == 0
+
+    assert cover.reachable is True
+
+    assert cover.deconz_id == "/lights/0"
+    assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
+    assert cover.manufacturer == "AXIS"
+    assert cover.modelid == "Gear"
+    assert cover.name == "Covering device"
+    assert cover.swversion == "100-5.3.5.1122"
+    assert cover.type == "Window covering device"
+    assert cover.uniqueid == "00:24:46:00:00:12:34:56-01"
+
+    mock_callback = Mock()
+    cover.register_callback(mock_callback)
+    assert cover._callbacks
+
+    event = {"state": {"bri": 50, "on": True}}
+    cover.update(event)
+    assert cover.is_open is True
+    assert cover.position == 19
+    mock_callback.assert_called_once()
+    assert cover.changed_keys == {"state", "bri", "on"}
+
+    event = {"state": {"bri": 30, "on": False}}
+    cover.update(event)
+    assert cover.is_open is False
+    assert cover.position == 11
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.open()
+        set_state.assert_called_with({"on": False})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.close()
+        set_state.assert_called_with({"on": True})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.set_position(30)
+        set_state.assert_called_with({"bri": 76})
+
+    cover.raw["state"]["lift"] = 0
+    cover.raw["state"]["open"] = True
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.open()
+        set_state.assert_called_with({"open": True})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.close()
+        set_state.assert_called_with({"open": False})
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.set_position(30)
+        set_state.assert_called_with({"lift": 30})
+
+    cover.remove_callback(mock_callback)
+    assert not cover._callbacks
+
+
+async def test_create_fan():
+    """Verify light fixture with fan work."""
+    fan = create_light("0", deepcopy(FIXTURE_LIGHT_WITH_FAN), None)
+
+    assert fan.state is False
+    assert fan.alert == "none"
+
+    assert fan.brightness == 254
+    assert fan.hue is None
+    assert fan.sat is None
+    assert fan.ct is None
+    assert fan.xy is None
+    assert fan.colormode is None
+    assert fan.ctmax is None
+    assert fan.ctmin is None
+    assert fan.effect is None
+    assert fan.hascolor is None
+    assert fan.reachable is True
+    assert fan.speed == 4
+
+    assert fan.deconz_id == "/lights/0"
+    assert fan.etag == "432f3de28965052961a99e3c5494daf4"
+    assert fan.manufacturer == "King Of Fans,  Inc."
+    assert fan.modelid == "HDC52EastwindFan"
+    assert fan.name == "Ceiling fan"
+    assert fan.swversion == "0000000F"
+    assert fan.type == "Fan"
+    assert fan.uniqueid == "00:22:a3:00:00:27:8b:81-01"
+
+    mock_callback = Mock()
+    fan.register_callback(mock_callback)
+    assert fan._callbacks
+
+    event = {"state": {"speed": 1}}
+    fan.update(event)
+
+    assert fan.brightness == 254
+    assert fan.speed == 1
+    mock_callback.assert_called_once()
+    assert fan.changed_keys == {"state", "speed"}
+
+    with patch.object(fan, "async_set_state", return_value=True) as set_state:
+        await fan.set_speed(4)
+        set_state.assert_called_with({"speed": 4})
+
+    fan.remove_callback(mock_callback)
+    assert not fan._callbacks
+
+
+async def test_create_lock():
+    """Verify that locks work."""
+    lock = create_light("0", deepcopy(FIXTURE_LOCK), None)
+
+    assert lock.state is False
+    assert lock.is_locked is False
+
+    assert lock.reachable is True
+
+    assert lock.deconz_id == "/lights/0"
+    assert lock.etag == "5c2ec06cde4bd654aef3a555fcd8ad12"
+    assert lock.manufacturer == "Danalock"
+    assert lock.modelid == "V3-BTZB"
+    assert lock.name == "Door lock"
+    assert lock.swversion == "19042019"
+    assert lock.type == "Door Lock"
+    assert lock.uniqueid == "00:00:00:00:00:00:00:00-00"
+
+    mock_callback = Mock()
+    lock.register_callback(mock_callback)
+    assert lock._callbacks
+
+    event = {"state": {"on": True}}
+    lock.update(event)
+    assert lock.is_locked is True
+    mock_callback.assert_called_once()
+    assert lock.changed_keys == {"state", "on"}
+
+    with patch.object(lock, "async_set_state", return_value=True) as set_state:
+        await lock.lock()
+        set_state.assert_called_with({"on": True})
+
+    with patch.object(lock, "async_set_state", return_value=True) as set_state:
+        await lock.unlock()
+        set_state.assert_called_with({"on": False})
+
+    lock.remove_callback(mock_callback)
+    assert not lock._callbacks
+
+
+async def test_create_siren():
+    """Verify that sirens work."""
+    siren = create_light("0", deepcopy(FIXTURE_SIREN), None)
+
+    assert siren.state is None
+    assert siren.is_on is False
+
+    assert siren.reachable is True
+
+    assert siren.deconz_id == "/lights/0"
+    assert siren.etag == "0667cb8fff2adc1bf22be0e6eece2a18"
+    assert siren.manufacturer == "Heiman"
+    assert siren.modelid == "WarningDevice"
+    assert siren.name == "alarm_tuin"
+    assert siren.swversion is None
+    assert siren.type == "Warning device"
+    assert siren.uniqueid == "00:0d:6f:00:0f:ab:12:34-01"
+
+    mock_callback = Mock()
+    siren.register_callback(mock_callback)
+    assert siren._callbacks
+
+    event = {"state": {"alert": "lselect"}}
+    siren.update(event)
+    assert siren.is_on is True
+    mock_callback.assert_called_once()
+    assert siren.changed_keys == {"state", "alert"}
+
+    with patch.object(siren, "async_set_state", return_value=True) as set_state:
+        await siren.turn_on()
+        set_state.assert_called_with({"alert": "lselect"})
+
+    with patch.object(siren, "async_set_state", return_value=True) as set_state:
+        await siren.turn_off()
+        set_state.assert_called_with({"alert": "none"})
+
+    siren.remove_callback(mock_callback)
+    assert not siren._callbacks
 
 
 FIXTURE_RGB_LIGHT = {
@@ -98,4 +344,79 @@ FIXTURE_RGB_LIGHT = {
     "swversion": "020C.201000A0",
     "type": "Extended color light",
     "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
+}
+
+
+FIXTURE_COVER = {
+    "etag": "87269755b9b3a046485fdae8d96b252c",
+    "hascolor": False,
+    "lastannounced": None,
+    "lastseen": "2020-08-01T16:22:05Z",
+    "manufacturername": "AXIS",
+    "modelid": "Gear",
+    "name": "Covering device",
+    "state": {"bri": 0, "lift": 0, "on": False, "open": False, "reachable": True},
+    "swversion": "100-5.3.5.1122",
+    "type": "Window covering device",
+    "uniqueid": "00:24:46:00:00:12:34:56-01",
+}
+
+
+FIXTURE_COVER_WITHOUT_LIFT = {
+    "etag": "87269755b9b3a046485fdae8d96b252c",
+    "hascolor": False,
+    "lastannounced": None,
+    "lastseen": "2020-08-01T16:22:05Z",
+    "manufacturername": "AXIS",
+    "modelid": "Gear",
+    "name": "Covering device",
+    "state": {"bri": 0, "on": False, "reachable": True},
+    "swversion": "100-5.3.5.1122",
+    "type": "Window covering device",
+    "uniqueid": "00:24:46:00:00:12:34:56-01",
+}
+
+FIXTURE_LIGHT_WITH_FAN = {
+    "etag": "432f3de28965052961a99e3c5494daf4",
+    "hascolor": False,
+    "manufacturername": "King Of Fans,  Inc.",
+    "modelid": "HDC52EastwindFan",
+    "name": "Ceiling fan",
+    "state": {
+        "alert": "none",
+        "bri": 254,
+        "on": False,
+        "reachable": True,
+        "speed": 4,
+    },
+    "swversion": "0000000F",
+    "type": "Fan",
+    "uniqueid": "00:22:a3:00:00:27:8b:81-01",
+}
+
+FIXTURE_LOCK = {
+    "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
+    "hascolor": False,
+    "lastannounced": None,
+    "lastseen": "2020-08-22T15:29:03Z",
+    "manufacturername": "Danalock",
+    "modelid": "V3-BTZB",
+    "name": "Door lock",
+    "state": {"alert": "none", "on": False, "reachable": True},
+    "swversion": "19042019",
+    "type": "Door Lock",
+    "uniqueid": "00:00:00:00:00:00:00:00-00",
+}
+
+
+FIXTURE_SIREN = {
+    "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
+    "hascolor": False,
+    "manufacturername": "Heiman",
+    "modelid": "WarningDevice",
+    "name": "alarm_tuin",
+    "state": {"alert": "none", "reachable": True},
+    "swversion": None,
+    "type": "Warning device",
+    "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
 }

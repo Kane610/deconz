@@ -5,7 +5,7 @@ import logging
 from .api import APIItems
 from .deconzdevice import DeconzDevice
 
-_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 URL = "/sensors"
 
 
@@ -636,5 +636,5 @@ def create_sensor(sensor_id, raw, request):
         if raw["type"] in sensor_class.ZHATYPE:
             return sensor_class(sensor_id, raw, request)
 
-    _LOGGER.info("Unsupported sensor type %s (%s)", raw["type"], raw["name"])
+    LOGGER.info("Unsupported sensor type %s (%s)", raw["type"], raw["name"])
     return DeconzSensor(sensor_id, raw, request)
