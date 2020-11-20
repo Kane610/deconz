@@ -650,5 +650,5 @@ def create_sensor(sensor_id, raw, request):
         if raw["type"] in sensor_class.ZHATYPE:
             return sensor_class(sensor_id, raw, request)
 
-    LOGGER.info("Unsupported sensor type %s (%s)", raw["type"], raw["name"])
+    LOGGER.info("Unsupported sensor type %s", raw)
     return DeconzSensor(sensor_id, raw, request)
