@@ -3,21 +3,19 @@
 pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 """
 
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
-from pydeconz.sensor import SENSOR_CLASSES, Thermostat, create_sensor
+from pydeconz.sensor import SENSOR_CLASSES, Thermostat, create_sensor, Sensors
 
 
 async def test_create_sensor():
     """Verify that create-sensor can create all types."""
-    assert len(SENSOR_CLASSES) == 19
-
-    sensor_id = "0"
+    assert len(SENSOR_CLASSES) == 20
 
     for sensor_class in SENSOR_CLASSES:
         for sensor_type in sensor_class.ZHATYPE:
             sensor = {"type": sensor_type, "config": {}, "state": {}}
-            result = create_sensor(sensor_id, sensor, None)
+            result = create_sensor("0", sensor, None)
 
             assert result
 
@@ -32,9 +30,92 @@ async def test_create_sensor_fails():
     assert not result.ZHATYPE
 
 
+async def test_air_quality_sensor():
+    """Verify that air quality sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "on": True,
+                    "reachable": True,
+                },
+                "ep": 1,
+                "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
+                "manufacturername": "unknown",
+                "modelid": "aq",
+                "name": "Air quality",
+                "state": {
+                    "airquality": "ok",
+                    "airqualityppb": 100,
+                    "lastupdated": "none",
+                },
+                "swversion": "1",
+                "type": "ZHAAirQuality",
+                "uniqueid": "00:00:00:00:00:00:00:80-01-0500",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHAAirQuality",)
+
+    assert sensor.state == "ok"
+    assert sensor.airquality == "ok"
+    assert sensor.airqualityppb == 100
+
+    # DeconzSensor
+    assert sensor.battery == 100
+    assert sensor.ep == 1
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "18c0f3c2100904e31a7f938db2ba9ba9"
+    assert sensor.manufacturer == "unknown"
+    assert sensor.modelid == "aq"
+    assert sensor.name == "Air quality"
+    assert sensor.swversion == "1"
+    assert sensor.type == "ZHAAirQuality"
+    assert sensor.uniqueid == "00:00:00:00:00:00:00:80-01-0500"
+
+
 async def test_alarm_sensor():
     """Verify that alarm sensor works."""
-    sensor = create_sensor("0", FIXTURE_ALARM, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "on": True,
+                    "reachable": True,
+                    "temperature": 2600,
+                },
+                "ep": 1,
+                "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
+                "manufacturername": "dresden elektronik",
+                "modelid": "lumi.sensor_motion.aq2",
+                "name": "Alarm 10",
+                "state": {
+                    "alarm": None,
+                    "lastupdated": "none",
+                    "lowbattery": None,
+                    "tampered": None,
+                },
+                "swversion": "20170627",
+                "type": "ZHAAlarm",
+                "uniqueid": "00:15:8d:00:02:b5:d1:80-01-0500",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAlarm",)
@@ -64,7 +145,25 @@ async def test_alarm_sensor():
 
 async def test_battery_sensor():
     """Verify that alarm sensor works."""
-    sensor = create_sensor("0", FIXTURE_BATTERY, None)
+    # sensor = create_sensor("0", FIXTURE_BATTERY, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"alert": "none", "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
+                "manufacturername": "IKEA of Sweden",
+                "modelid": "FYRTUR block-out roller blind",
+                "name": "FYRTUR block-out roller blind",
+                "state": {"battery": 100, "lastupdated": "none"},
+                "swversion": "2.2.007",
+                "type": "ZHABattery",
+                "uniqueid": "00:0d:6f:ff:fe:01:23:45-01-0001",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHABattery",)
@@ -93,7 +192,34 @@ async def test_battery_sensor():
 
 async def test_carbonmonoxide_sensor():
     """Verify that carbon monoxide sensor works."""
-    sensor = create_sensor("0", FIXTURE_CARBONMONOXIDE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "on": True,
+                    "pending": [],
+                    "reachable": True,
+                },
+                "ep": 1,
+                "etag": "b7599df551944df97b2aa87d160b9c45",
+                "manufacturername": "Heiman",
+                "modelid": "CO_V16",
+                "name": "Cave, CO",
+                "state": {
+                    "carbonmonoxide": False,
+                    "lastupdated": "none",
+                    "lowbattery": False,
+                    "tampered": False,
+                },
+                "swversion": "20150330",
+                "type": "ZHACarbonMonoxide",
+                "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
@@ -124,7 +250,27 @@ async def test_carbonmonoxide_sensor():
 
 async def test_consumption_sensor():
     """Verify that consumption sensor works."""
-    sensor = create_sensor("0", FIXTURE_CONSUMPTION, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"on": True, "reachable": True},
+                "ep": 1,
+                "etag": "a99e5bc463d15c23af7e89946e784cca",
+                "manufacturername": "Heiman",
+                "modelid": "SmartPlug",
+                "name": "Consumption 15",
+                "state": {
+                    "consumption": 11342,
+                    "lastupdated": "2018-03-12T19:19:08",
+                    "power": 123,
+                },
+                "type": "ZHAConsumption",
+                "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0702",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAConsumption",)
@@ -158,7 +304,31 @@ async def test_consumption_sensor():
 
 async def test_daylight_sensor():
     """Verify that daylight sensor works."""
-    sensor = create_sensor("0", FIXTURE_DAYLIGHT, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "configured": True,
+                    "on": True,
+                    "sunriseoffset": 30,
+                    "sunsetoffset": -30,
+                },
+                "etag": "55047cf652a7e594d0ee7e6fae01dd38",
+                "manufacturername": "Philips",
+                "modelid": "PHDL00",
+                "name": "Daylight",
+                "state": {
+                    "daylight": True,
+                    "lastupdated": "2018-03-24T17:26:12",
+                    "status": 170,
+                },
+                "swversion": "1.0",
+                "type": "Daylight",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("Daylight",)
@@ -217,7 +387,23 @@ async def test_daylight_sensor():
 
 async def test_fire_sensor():
     """Verify that fire sensor works."""
-    sensor = create_sensor("0", FIXTURE_FIRE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"on": True, "reachable": True},
+                "ep": 1,
+                "etag": "2b585d2c016bfd665ba27a8fdad28670",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.sensor_smoke",
+                "name": "sensor_kitchen_smoke",
+                "state": {"fire": False, "lastupdated": "2018-02-20T11:25:02"},
+                "type": "ZHAFire",
+                "uniqueid": "00:15:8d:00:01:d9:3e:7c-01-0500",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
@@ -248,7 +434,21 @@ async def test_fire_sensor():
 
 async def test_genericflag_sensor():
     """Verify that generic flag sensor works."""
-    sensor = create_sensor("0", FIXTURE_GENERICFLAG, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"on": True, "reachable": True},
+                "modelid": "Switch",
+                "name": "Kitchen Switch",
+                "state": {"flag": True, "lastupdated": "2018-07-01T10:40:35"},
+                "swversion": "1.0.0",
+                "type": "CLIPGenericFlag",
+                "uniqueid": "kitchen-switch",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("CLIPGenericFlag",)
@@ -279,7 +479,23 @@ async def test_genericflag_sensor():
 
 async def test_genericstatus_sensor():
     """Verify that generic flag sensor works."""
-    sensor = create_sensor("0", FIXTURE_GENERICSTATUS, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"on": True, "reachable": True},
+                "etag": "aacc83bc7d6e4af7e44014e9f776b206",
+                "manufacturername": "Phoscon",
+                "modelid": "PHOSCON_FSM_STATE",
+                "name": "FSM_STATE Motion stair",
+                "state": {"lastupdated": "2019-04-24T00:00:25", "status": 0},
+                "swversion": "1.0",
+                "type": "CLIPGenericStatus",
+                "uniqueid": "fsm-state-1520195376277",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("CLIPGenericStatus",)
@@ -309,7 +525,24 @@ async def test_genericstatus_sensor():
 
 async def test_humidity_sensor():
     """Verify that humidity sensor works."""
-    sensor = create_sensor("0", FIXTURE_HUMIDITY, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "1220e5d026493b6e86207993703a8a71",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.weather",
+                "name": "Mi temperature 1",
+                "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
+                "swversion": "20161129",
+                "type": "ZHAHumidity",
+                "uniqueid": "00:15:8d:00:02:45:dc:53-01-0405",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
@@ -342,7 +575,40 @@ async def test_humidity_sensor():
 
 async def test_lightlevel_sensor():
     """Verify that light level sensor works."""
-    sensor = create_sensor("0", FIXTURE_LIGHTLEVEL, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "alert": "none",
+                    "battery": 100,
+                    "ledindication": False,
+                    "on": True,
+                    "pending": [],
+                    "reachable": True,
+                    "tholddark": 12000,
+                    "tholdoffset": 7000,
+                    "usertest": False,
+                },
+                "ep": 2,
+                "etag": "5cfb81765e86aa53ace427cfd52c6d52",
+                "manufacturername": "Philips",
+                "modelid": "SML001",
+                "name": "Motion sensor 4",
+                "state": {
+                    "dark": True,
+                    "daylight": False,
+                    "lastupdated": "2019-05-05T14:37:06",
+                    "lightlevel": 6955,
+                    "lux": 5,
+                },
+                "swversion": "6.1.0.18912",
+                "type": "ZHALightLevel",
+                "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
@@ -380,7 +646,29 @@ async def test_lightlevel_sensor():
 
 async def test_openclose_sensor():
     """Verify that open/close sensor works."""
-    sensor = create_sensor("0", FIXTURE_OPENCLOSE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 95,
+                    "on": True,
+                    "reachable": True,
+                    "temperature": 3300,
+                },
+                "ep": 1,
+                "etag": "66cc641d0368110da6882b50090174ac",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.sensor_magnet.aq2",
+                "name": "Back Door",
+                "state": {"lastupdated": "2019-05-05T14:54:32", "open": False},
+                "swversion": "20161128",
+                "type": "ZHAOpenClose",
+                "uniqueid": "00:15:8d:00:02:2b:96:b4-01-0006",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
@@ -411,7 +699,28 @@ async def test_openclose_sensor():
 
 async def test_power_sensor():
     """Verify that power sensor works."""
-    sensor = create_sensor("0", FIXTURE_POWER, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"on": True, "reachable": True},
+                "ep": 1,
+                "etag": "96e71c7db4685b334d3d0decc3f11868",
+                "manufacturername": "Heiman",
+                "modelid": "SmartPlug",
+                "name": "Power 16",
+                "state": {
+                    "current": 34,
+                    "lastupdated": "2018-03-12T19:22:13",
+                    "power": 64,
+                    "voltage": 231,
+                },
+                "type": "ZHAPower",
+                "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0b04",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPower",)
@@ -443,7 +752,35 @@ async def test_power_sensor():
 
 async def test_presence_sensor():
     """Verify that presence sensor works."""
-    sensor = create_sensor("0", FIXTURE_PRESENCE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "alert": "none",
+                    "battery": 100,
+                    "delay": 0,
+                    "ledindication": False,
+                    "on": True,
+                    "pending": [],
+                    "reachable": True,
+                    "sensitivity": 2,
+                    "sensitivitymax": 2,
+                    "usertest": False,
+                },
+                "ep": 2,
+                "etag": "5cfb81765e86aa53ace427cfd52c6d52",
+                "manufacturername": "Philips",
+                "modelid": "SML001",
+                "name": "Motion sensor 4",
+                "state": {"lastupdated": "2019-05-05T14:37:06", "presence": False},
+                "swversion": "6.1.0.18912",
+                "type": "ZHAPresence",
+                "uniqueid": "00:17:88:01:03:28:8c:9b-02-0406",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
@@ -476,7 +813,24 @@ async def test_presence_sensor():
 
 async def test_pressure_sensor():
     """Verify that pressure sensor works."""
-    sensor = create_sensor("0", FIXTURE_PRESSURE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"battery": 100, "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "1220e5d026493b6e86207993703a8a71",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.weather",
+                "name": "Mi temperature 1",
+                "state": {"lastupdated": "2019-05-05T14:39:00", "pressure": 1010},
+                "swversion": "20161129",
+                "type": "ZHAPressure",
+                "uniqueid": "00:15:8d:00:02:45:dc:53-01-0403",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
@@ -506,7 +860,30 @@ async def test_pressure_sensor():
 
 async def test_switch_sensor():
     """Verify that switch sensor works."""
-    sensor = create_sensor("0", FIXTURE_HUE_DIMMER, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 90,
+                    "group": "201",
+                    "on": True,
+                    "reachable": True,
+                },
+                "ep": 2,
+                "etag": "233ae541bbb7ac98c42977753884b8d2",
+                "manufacturername": "Philips",
+                "mode": 1,
+                "modelid": "RWL021",
+                "name": "Dimmer switch 3",
+                "state": {"buttonevent": 1002, "lastupdated": "2019-04-28T20:29:13"},
+                "swversion": "5.45.1.17846",
+                "type": "ZHASwitch",
+                "uniqueid": "00:17:88:01:02:0e:32:a3-02-fc00",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -539,7 +916,34 @@ async def test_switch_sensor():
 
 async def test_switch_sensor_cube():
     """Verify that cube switch sensor works."""
-    sensor = create_sensor("0", FIXTURE_MAGIC_CUBE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 90,
+                    "on": True,
+                    "reachable": True,
+                    "temperature": 1100,
+                },
+                "ep": 3,
+                "etag": "e34fa1c7a19d960e35a1f4d56ac475af",
+                "manufacturername": "LUMI",
+                "mode": 1,
+                "modelid": "lumi.sensor_cube.aqgl01",
+                "name": "Mi Magic Cube",
+                "state": {
+                    "buttonevent": 747,
+                    "gesture": 7,
+                    "lastupdated": "2019-12-12T18:50:40",
+                },
+                "swversion": "20160704",
+                "type": "ZHASwitch",
+                "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -570,7 +974,30 @@ async def test_switch_sensor_cube():
 
 async def test_switch_sensor_tint_remote():
     """Verify that tint remote sensor works."""
-    sensor = create_sensor("0", FIXTURE_TINT_REMOTE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"group": "16388,16389,16390", "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "b1336f750d31300afa441a04f2c69b68",
+                "manufacturername": "MLI",
+                "mode": 1,
+                "modelid": "ZBT-Remote-ALL-RGBW",
+                "name": "ZHA Remote 1",
+                "state": {
+                    "angle": 10,
+                    "buttonevent": 6002,
+                    "lastupdated": "2020-09-08T18:58:24.193",
+                    "xy": [0.3381, 0.1627],
+                },
+                "swversion": "2.0",
+                "type": "ZHASwitch",
+                "uniqueid": "00:11:22:33:44:55:66:77-01-1000",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -598,9 +1025,82 @@ async def test_switch_sensor_tint_remote():
     assert sensor.uniqueid == "00:11:22:33:44:55:66:77-01-1000"
 
 
+async def test_switch_ubisys_j1():
+    """Verify that tint remote sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "mode": "momentary",
+                    "on": True,
+                    "reachable": False,
+                    "windowcoveringtype": 0,
+                },
+                "ep": 2,
+                "etag": "da5fbb89eca4133b6949537e73b31f77",
+                "lastseen": "2020-11-21T15:47Z",
+                "manufacturername": "ubisys",
+                "mode": 1,
+                "modelid": "J1 (5502)",
+                "name": "J1",
+                "state": {"buttonevent": None, "lastupdated": "none"},
+                "swversion": "20190129-DE-FB0",
+                "type": "ZHASwitch",
+                "uniqueid": "00:1f:ee:00:00:00:00:09-02-0102",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
+
+    assert sensor.state is None
+    assert sensor.buttonevent is None
+    assert sensor.angle is None
+    assert sensor.xy is None
+    assert sensor.mode == "momentary"
+    assert sensor.windowcoveringtype == 0
+
+    # DeconzSensor
+    assert sensor.ep == 2
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is False
+    assert sensor.tampered is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "da5fbb89eca4133b6949537e73b31f77"
+    assert sensor.manufacturer == "ubisys"
+    assert sensor.modelid == "J1 (5502)"
+    assert sensor.name == "J1"
+    assert sensor.swversion == "20190129-DE-FB0"
+    assert sensor.type == "ZHASwitch"
+    assert sensor.uniqueid == "00:1f:ee:00:00:00:00:09-02-0102"
+
+
 async def test_temperature_sensor():
     """Verify that temperature sensor works."""
-    sensor = create_sensor("0", FIXTURE_TEMPERATURE, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "1220e5d026493b6e86207993703a8a71",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.weather",
+                "name": "Mi temperature 1",
+                "state": {"lastupdated": "2019-05-05T14:39:00", "temperature": 2182},
+                "swversion": "20161129",
+                "type": "ZHATemperature",
+                "uniqueid": "00:15:8d:00:02:45:dc:53-01-0402",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
@@ -633,19 +1133,61 @@ async def test_temperature_sensor():
 
 async def test_thermostat_sensor():
     """Verify that thermostat sensor works."""
-    sensor = create_sensor("0", FIXTURE_THERMOSTAT, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "displayflipped": True,
+                    "heatsetpoint": 2100,
+                    "locked": False,
+                    "mode": "auto",
+                    "offset": 0,
+                    "on": True,
+                    "reachable": True,
+                },
+                "ep": 1,
+                "etag": "25aac331bc3c4b465cfb2197f6243ea4",
+                "manufacturername": "Eurotronic",
+                "modelid": "SPZB0001",
+                "name": "Living Room Radiator",
+                "state": {
+                    "lastupdated": "2019-02-10T22:41:32",
+                    "on": False,
+                    "temperature": 2149,
+                    "valve": 0,
+                },
+                "swversion": "15181120",
+                "type": "ZHAThermostat",
+                "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
     assert sensor.state == 21.5
+    assert sensor.coolsetpoint is None
+    assert sensor.errorcode is None
+    assert sensor.fanmode is None
+    assert sensor.floortemperature is None
+    assert sensor.heating is None
     assert sensor.heatsetpoint == 21.00
     assert sensor.locked is False
     assert sensor.mode == "auto"
+    assert sensor.mountingmode is None
+    assert sensor.mountingmodeactive is None
     assert sensor.offset == 0
+    assert sensor.preset is None
     assert sensor.state_on is False
+    assert sensor.swingmode is None
     assert sensor.temperature == 21.5
+    assert sensor.temperaturemeasurement is None
     assert sensor.valve == 0
+    assert sensor.windowopen_set is None
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -669,32 +1211,37 @@ async def test_thermostat_sensor():
 
 async def test_tuya_thermostat_sensor():
     """Verify that Tuya thermostat works."""
-    device_description = {
-        "config": {
-            "battery": 100,
-            "heatsetpoint": 1550,
-            "locked": None,
-            "offset": 0,
-            "on": True,
-            "preset": "auto",
-            "reachable": True,
-            "schedule": {},
-            "schedule_on": None,
-            "setvalve": True,
-            "windowopen_set": True,
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "heatsetpoint": 1550,
+                    "locked": None,
+                    "offset": 0,
+                    "on": True,
+                    "preset": "auto",
+                    "reachable": True,
+                    "schedule": {},
+                    "schedule_on": None,
+                    "setvalve": True,
+                    "windowopen_set": True,
+                },
+                "ep": 1,
+                "etag": "36850fc8521f7c23606c9304b2e1f7bb",
+                "lastseen": "2020-11-11T21:23Z",
+                "manufacturername": "_TYST11_kfvq6avy",
+                "modelid": "fvq6avy",
+                "name": "fvq6avy",
+                "state": {"lastupdated": "none", "on": None, "temperature": 2290},
+                "swversion": "20180727",
+                "type": "ZHAThermostat",
+                "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
+            },
         },
-        "ep": 1,
-        "etag": "36850fc8521f7c23606c9304b2e1f7bb",
-        "lastseen": "2020-11-11T21:23Z",
-        "manufacturername": "_TYST11_kfvq6avy",
-        "modelid": "fvq6avy",
-        "name": "fvq6avy",
-        "state": {"lastupdated": "none", "on": None, "temperature": 2290},
-        "swversion": "20180727",
-        "type": "ZHAThermostat",
-        "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
-    }
-    sensor = create_sensor("0", device_description, None)
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == Thermostat.ZHATYPE
@@ -702,7 +1249,7 @@ async def test_tuya_thermostat_sensor():
     assert sensor.state == 22.9
     assert sensor.heatsetpoint == 15.50
     assert sensor.locked is None
-    assert sensor.mode == None
+    assert sensor.mode is None
     assert sensor.offset == 0
     assert sensor.state_on is None
     assert sensor.temperature == 22.9
@@ -730,7 +1277,38 @@ async def test_tuya_thermostat_sensor():
 
 async def test_vibration_sensor():
     """Verify that vibration sensor works."""
-    sensor = create_sensor("0", FIXTURE_VIBRATION, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 91,
+                    "on": True,
+                    "pending": [],
+                    "reachable": True,
+                    "sensitivity": 21,
+                    "sensitivitymax": 21,
+                    "temperature": 3200,
+                },
+                "ep": 1,
+                "etag": "b7599df551944df97b2aa87d160b9c45",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.vibration.aq1",
+                "name": "Vibration 1",
+                "state": {
+                    "lastupdated": "2019-03-09T15:53:07",
+                    "orientation": [10, 1059, 0],
+                    "tiltangle": 83,
+                    "vibration": True,
+                    "vibrationstrength": 114,
+                },
+                "swversion": "20180130",
+                "type": "ZHAVibration",
+                "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAVibration",)
@@ -779,7 +1357,34 @@ async def test_vibration_sensor():
 
 async def test_water_sensor():
     """Verify that water sensor works."""
-    sensor = create_sensor("0", FIXTURE_WATER, None)
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "on": True,
+                    "reachable": True,
+                    "temperature": 2500,
+                },
+                "ep": 1,
+                "etag": "fae893708dfe9b358df59107d944fa1c",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.sensor_wleak.aq1",
+                "name": "water2",
+                "state": {
+                    "lastupdated": "2019-01-29T07:13:20",
+                    "lowbattery": False,
+                    "tampered": False,
+                    "water": False,
+                },
+                "swversion": "20170721",
+                "type": "ZHAWater",
+                "uniqueid": "00:15:8d:00:02:2f:07:db-01-0500",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAWater",)
@@ -806,475 +1411,3 @@ async def test_water_sensor():
     assert sensor.swversion == "20170721"
     assert sensor.type == "ZHAWater"
     assert sensor.uniqueid == "00:15:8d:00:02:2f:07:db-01-0500"
-
-
-FIXTURE_ALARM = {
-    "config": {"battery": 100, "on": True, "reachable": True, "temperature": 2600},
-    "ep": 1,
-    "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
-    "manufacturername": "dresden elektronik",
-    "modelid": "lumi.sensor_motion.aq2",
-    "name": "Alarm 10",
-    "state": {
-        "alarm": None,
-        "lastupdated": "none",
-        "lowbattery": None,
-        "tampered": None,
-    },
-    "swversion": "20170627",
-    "type": "ZHAAlarm",
-    "uniqueid": "00:15:8d:00:02:b5:d1:80-01-0500",
-}
-
-
-FIXTURE_BATTERY = {
-    "config": {"alert": "none", "on": True, "reachable": True},
-    "ep": 1,
-    "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
-    "manufacturername": "IKEA of Sweden",
-    "modelid": "FYRTUR block-out roller blind",
-    "name": "FYRTUR block-out roller blind",
-    "state": {"battery": 100, "lastupdated": "none"},
-    "swversion": "2.2.007",
-    "type": "ZHABattery",
-    "uniqueid": "00:0d:6f:ff:fe:01:23:45-01-0001",
-}
-
-
-FIXTURE_CARBONMONOXIDE = {
-    "config": {"battery": 100, "on": True, "pending": [], "reachable": True},
-    "ep": 1,
-    "etag": "b7599df551944df97b2aa87d160b9c45",
-    "manufacturername": "Heiman",
-    "modelid": "CO_V16",
-    "name": "Cave, CO",
-    "state": {
-        "carbonmonoxide": False,
-        "lastupdated": "none",
-        "lowbattery": False,
-        "tampered": False,
-    },
-    "swversion": "20150330",
-    "type": "ZHACarbonMonoxide",
-    "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
-}
-
-FIXTURE_CONSUMPTION = {
-    "config": {"on": True, "reachable": True},
-    "ep": 1,
-    "etag": "a99e5bc463d15c23af7e89946e784cca",
-    "manufacturername": "Heiman",
-    "modelid": "SmartPlug",
-    "name": "Consumption 15",
-    "state": {"consumption": 11342, "lastupdated": "2018-03-12T19:19:08", "power": 123},
-    "type": "ZHAConsumption",
-    "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0702",
-}
-
-
-FIXTURE_DAYLIGHT = {
-    "config": {
-        "configured": True,
-        "on": True,
-        "sunriseoffset": 30,
-        "sunsetoffset": -30,
-    },
-    "etag": "55047cf652a7e594d0ee7e6fae01dd38",
-    "manufacturername": "Philips",
-    "modelid": "PHDL00",
-    "name": "Daylight",
-    "state": {"daylight": True, "lastupdated": "2018-03-24T17:26:12", "status": 170},
-    "swversion": "1.0",
-    "type": "Daylight",
-}
-
-
-FIXTURE_FIRE = {
-    "config": {"on": True, "reachable": True},
-    "ep": 1,
-    "etag": "2b585d2c016bfd665ba27a8fdad28670",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.sensor_smoke",
-    "name": "sensor_kitchen_smoke",
-    "state": {"fire": False, "lastupdated": "2018-02-20T11:25:02"},
-    "type": "ZHAFire",
-    "uniqueid": "00:15:8d:00:01:d9:3e:7c-01-0500",
-}
-
-
-FIXTURE_GENERICFLAG = {
-    "config": {"on": True, "reachable": True},
-    "modelid": "Switch",
-    "name": "Kitchen Switch",
-    "state": {"flag": True, "lastupdated": "2018-07-01T10:40:35"},
-    "swversion": "1.0.0",
-    "type": "CLIPGenericFlag",
-    "uniqueid": "kitchen-switch",
-}
-
-
-FIXTURE_GENERICSTATUS = {
-    "config": {"on": True, "reachable": True},
-    "etag": "aacc83bc7d6e4af7e44014e9f776b206",
-    "manufacturername": "Phoscon",
-    "modelid": "PHOSCON_FSM_STATE",
-    "name": "FSM_STATE Motion stair",
-    "state": {"lastupdated": "2019-04-24T00:00:25", "status": 0},
-    "swversion": "1.0",
-    "type": "CLIPGenericStatus",
-    "uniqueid": "fsm-state-1520195376277",
-}
-
-
-FIXTURE_HUMIDITY = {
-    "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-    "ep": 1,
-    "etag": "1220e5d026493b6e86207993703a8a71",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.weather",
-    "name": "Mi temperature 1",
-    "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
-    "swversion": "20161129",
-    "type": "ZHAHumidity",
-    "uniqueid": "00:15:8d:00:02:45:dc:53-01-0405",
-}
-
-
-FIXTURE_LIGHTLEVEL = {
-    "config": {
-        "alert": "none",
-        "battery": 100,
-        "ledindication": False,
-        "on": True,
-        "pending": [],
-        "reachable": True,
-        "tholddark": 12000,
-        "tholdoffset": 7000,
-        "usertest": False,
-    },
-    "ep": 2,
-    "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-    "manufacturername": "Philips",
-    "modelid": "SML001",
-    "name": "Motion sensor 4",
-    "state": {
-        "dark": True,
-        "daylight": False,
-        "lastupdated": "2019-05-05T14:37:06",
-        "lightlevel": 6955,
-        "lux": 5,
-    },
-    "swversion": "6.1.0.18912",
-    "type": "ZHALightLevel",
-    "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
-}
-
-
-FIXTURE_OPENCLOSE = {
-    "config": {"battery": 95, "on": True, "reachable": True, "temperature": 3300},
-    "ep": 1,
-    "etag": "66cc641d0368110da6882b50090174ac",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.sensor_magnet.aq2",
-    "name": "Back Door",
-    "state": {"lastupdated": "2019-05-05T14:54:32", "open": False},
-    "swversion": "20161128",
-    "type": "ZHAOpenClose",
-    "uniqueid": "00:15:8d:00:02:2b:96:b4-01-0006",
-}
-
-
-FIXTURE_POWER = {
-    "config": {"on": True, "reachable": True},
-    "ep": 1,
-    "etag": "96e71c7db4685b334d3d0decc3f11868",
-    "manufacturername": "Heiman",
-    "modelid": "SmartPlug",
-    "name": "Power 16",
-    "state": {
-        "current": 34,
-        "lastupdated": "2018-03-12T19:22:13",
-        "power": 64,
-        "voltage": 231,
-    },
-    "type": "ZHAPower",
-    "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0b04",
-}
-
-
-FIXTURE_PRESENCE = {
-    "config": {
-        "alert": "none",
-        "battery": 100,
-        "delay": 0,
-        "ledindication": False,
-        "on": True,
-        "pending": [],
-        "reachable": True,
-        "sensitivity": 2,
-        "sensitivitymax": 2,
-        "usertest": False,
-    },
-    "ep": 2,
-    "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-    "manufacturername": "Philips",
-    "modelid": "SML001",
-    "name": "Motion sensor 4",
-    "state": {"lastupdated": "2019-05-05T14:37:06", "presence": False},
-    "swversion": "6.1.0.18912",
-    "type": "ZHAPresence",
-    "uniqueid": "00:17:88:01:03:28:8c:9b-02-0406",
-}
-
-
-FIXTURE_PRESSURE = {
-    "config": {"battery": 100, "on": True, "reachable": True},
-    "ep": 1,
-    "etag": "1220e5d026493b6e86207993703a8a71",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.weather",
-    "name": "Mi temperature 1",
-    "state": {"lastupdated": "2019-05-05T14:39:00", "pressure": 1010},
-    "swversion": "20161129",
-    "type": "ZHAPressure",
-    "uniqueid": "00:15:8d:00:02:45:dc:53-01-0403",
-}
-
-
-FIXTURE_SWITCH = {}
-
-
-FIXTURE_TEMPERATURE = {
-    "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-    "ep": 1,
-    "etag": "1220e5d026493b6e86207993703a8a71",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.weather",
-    "name": "Mi temperature 1",
-    "state": {"lastupdated": "2019-05-05T14:39:00", "temperature": 2182},
-    "swversion": "20161129",
-    "type": "ZHATemperature",
-    "uniqueid": "00:15:8d:00:02:45:dc:53-01-0402",
-}
-
-
-FIXTURE_THERMOSTAT = {
-    "config": {
-        "battery": 100,
-        "displayflipped": True,
-        "heatsetpoint": 2100,
-        "locked": False,
-        "mode": "auto",
-        "offset": 0,
-        "on": True,
-        "reachable": True,
-    },
-    "ep": 1,
-    "etag": "25aac331bc3c4b465cfb2197f6243ea4",
-    "manufacturername": "Eurotronic",
-    "modelid": "SPZB0001",
-    "name": "Living Room Radiator",
-    "state": {
-        "lastupdated": "2019-02-10T22:41:32",
-        "on": False,
-        "temperature": 2149,
-        "valve": 0,
-    },
-    "swversion": "15181120",
-    "type": "ZHAThermostat",
-    "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201",
-}
-
-
-FIXTURE_VIBRATION = {
-    "config": {
-        "battery": 91,
-        "on": True,
-        "pending": [],
-        "reachable": True,
-        "sensitivity": 21,
-        "sensitivitymax": 21,
-        "temperature": 3200,
-    },
-    "ep": 1,
-    "etag": "b7599df551944df97b2aa87d160b9c45",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.vibration.aq1",
-    "name": "Vibration 1",
-    "state": {
-        "lastupdated": "2019-03-09T15:53:07",
-        "orientation": [10, 1059, 0],
-        "tiltangle": 83,
-        "vibration": True,
-        "vibrationstrength": 114,
-    },
-    "swversion": "20180130",
-    "type": "ZHAVibration",
-    "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
-}
-
-
-FIXTURE_WATER = {
-    "config": {"battery": 100, "on": True, "reachable": True, "temperature": 2500},
-    "ep": 1,
-    "etag": "fae893708dfe9b358df59107d944fa1c",
-    "manufacturername": "LUMI",
-    "modelid": "lumi.sensor_wleak.aq1",
-    "name": "water2",
-    "state": {
-        "lastupdated": "2019-01-29T07:13:20",
-        "lowbattery": False,
-        "tampered": False,
-        "water": False,
-    },
-    "swversion": "20170721",
-    "type": "ZHAWater",
-    "uniqueid": "00:15:8d:00:02:2f:07:db-01-0500",
-}
-
-
-FIXTURE_HUE_DIMMER = {
-    "config": {"battery": 90, "group": "201", "on": True, "reachable": True},
-    "ep": 2,
-    "etag": "233ae541bbb7ac98c42977753884b8d2",
-    "manufacturername": "Philips",
-    "mode": 1,
-    "modelid": "RWL021",
-    "name": "Dimmer switch 3",
-    "state": {"buttonevent": 1002, "lastupdated": "2019-04-28T20:29:13"},
-    "swversion": "5.45.1.17846",
-    "type": "ZHASwitch",
-    "uniqueid": "00:17:88:01:02:0e:32:a3-02-fc00",
-}
-
-
-FIXTURE_MAGIC_CUBE = {
-    "config": {"battery": 90, "on": True, "reachable": True, "temperature": 1100},
-    "ep": 3,
-    "etag": "e34fa1c7a19d960e35a1f4d56ac475af",
-    "manufacturername": "LUMI",
-    "mode": 1,
-    "modelid": "lumi.sensor_cube.aqgl01",
-    "name": "Mi Magic Cube",
-    "state": {"buttonevent": 747, "gesture": 7, "lastupdated": "2019-12-12T18:50:40"},
-    "swversion": "20160704",
-    "type": "ZHASwitch",
-    "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c",
-}
-
-
-FIXTURE_TRADFRI_DIMMER = {
-    "config": {
-        "alert": "none",
-        "battery": 60,
-        "group": None,
-        "on": True,
-        "reachable": True,
-    },
-    "ep": 1,
-    "etag": "1c239453450a839a7da81fa7a5ef7460",
-    "manufacturername": "IKEA of Sweden",
-    "mode": 4,
-    "modelid": "TRADFRI wireless dimmer",
-    "name": "TRÅDFRI wireless dimmer 1",
-    "state": {"buttonevent": 2002, "lastupdated": "2019-04-07T06:51:17"},
-    "swversion": "1.2.248",
-    "type": "ZHASwitch",
-    "uniqueid": "00:0b:57:ff:fe:20:55:96-01-1000",
-}
-
-FIXTURE_TINT_REMOTE = {
-    "config": {"group": "16388,16389,16390", "on": True, "reachable": True},
-    "ep": 1,
-    "etag": "b1336f750d31300afa441a04f2c69b68",
-    "manufacturername": "MLI",
-    "mode": 1,
-    "modelid": "ZBT-Remote-ALL-RGBW",
-    "name": "ZHA Remote 1",
-    "state": {
-        "angle": 10,
-        "buttonevent": 6002,
-        "lastupdated": "2020-09-08T18:58:24.193",
-        "xy": [0.3381, 0.1627],
-    },
-    "swversion": "2.0",
-    "type": "ZHASwitch",
-    "uniqueid": "00:11:22:33:44:55:66:77-01-1000",
-}
-
-FIXTURE_HUE_MOTION_SENSOR_LIGHT = {
-    "config": {
-        "alert": "none",
-        "battery": 100,
-        "ledindication": False,
-        "on": True,
-        "pending": [],
-        "reachable": True,
-        "tholddark": 12000,
-        "tholdoffset": 7000,
-        "usertest": False,
-    },
-    "ep": 2,
-    "etag": "b82d39cbbb2564a5009d39ee6126af04",
-    "manufacturername": "Philips",
-    "modelid": "SML001",
-    "name": "Motion sensor 1",
-    "state": {
-        "dark": True,
-        "daylight": False,
-        "lastupdated": "2019-04-29T20:34:18",
-        "lightlevel": 0,
-        "lux": 0,
-    },
-    "swversion": "6.1.0.18912",
-    "type": "ZHALightLevel",
-    "uniqueid": "00:17:88:01:03:28:8b:9a-02-0400",
-}
-
-
-FIXTURE_HUE_MOTION_SENSOR = {
-    "config": {
-        "alert": "none",
-        "battery": 100,
-        "delay": 0,
-        "ledindication": False,
-        "on": True,
-        "pending": [],
-        "reachable": True,
-        "sensitivity": 2,
-        "sensitivitymax": 2,
-        "usertest": False,
-    },
-    "ep": 2,
-    "etag": "f3a5c58edae03b9097cb2cacff2532c5",
-    "manufacturername": "Philips",
-    "modelid": "SML001",
-    "name": "Motion sensor 1",
-    "state": {"lastupdated": "2019-04-29T20:32:41", "presence": False},
-    "swversion": "6.1.0.18912",
-    "type": "ZHAPresence",
-    "uniqueid": "00:17:88:01:03:28:8b:9a-02-0406",
-}
-
-
-FIXTURE_HUE_MOTION_SENSOR_TEMP = {
-    "config": {
-        "alert": "none",
-        "battery": 100,
-        "ledindication": False,
-        "offset": 0,
-        "on": True,
-        "pending": [],
-        "reachable": True,
-        "usertest": False,
-    },
-    "ep": 2,
-    "etag": "1e8f456e5e3bc7fe326b805fb8a2b08a",
-    "manufacturername": "Philips",
-    "modelid": "SML001",
-    "name": "Motion sensor 1",
-    "state": {"lastupdated": "2019-04-29T20:35:17", "temperature": 1975},
-    "swversion": "6.1.0.18912",
-    "type": "ZHATemperature",
-    "uniqueid": "00:17:88:01:03:28:8b:9a-02-0402",
-}
