@@ -29,7 +29,7 @@ def mock_aioresponse():
 
 
 async def test_websocket(mock_aioresponse):
-    """Test a successful call of load_parameters."""
+    """Test websocket methods work."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
 
     session.start()
@@ -55,7 +55,7 @@ async def test_websocket(mock_aioresponse):
 
 
 async def test_initialize(mock_aioresponse):
-    """Test a successful call of load_parameters."""
+    """Test initialize creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
         "config": {"bridgeid": "012345"},
@@ -78,6 +78,8 @@ async def test_initialize(mock_aioresponse):
 
     await session.initialize()
 
+    assert session.config.bridgeid == "012345"
+
     assert "g1" in session.groups
     assert "sc1" in session.groups["g1"].scenes
     assert "l1" in session.lights
@@ -95,10 +97,10 @@ async def test_initialize(mock_aioresponse):
 
 
 async def test_refresh_state(mock_aioresponse):
-    """Test a successful call of load_parameters."""
+    """Test refresh_state creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
-        "config": {"bridgeid": "012345"},
+        "config": {},
         "groups": {},
         "lights": {},
         "sensors": {},
@@ -112,6 +114,7 @@ async def test_refresh_state(mock_aioresponse):
 
     await session.initialize()
 
+    assert session.config.bridgeid == "0000000000000000"
     assert len(session.groups.values()) == 0
     assert len(session.lights.values()) == 0
     assert len(session.sensors.values()) == 0
@@ -138,6 +141,8 @@ async def test_refresh_state(mock_aioresponse):
 
     await session.refresh_state()
 
+    assert session.config.bridgeid == "0000000000000000"
+
     assert "g1" in session.groups
     assert "sc1" in session.groups["g1"].scenes
     assert "l1" in session.lights
@@ -155,7 +160,7 @@ async def test_refresh_state(mock_aioresponse):
 
 
 async def test_request(mock_aioresponse):
-    """Test a successful call of load_parameters."""
+    """Test request method and all its exceptions."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
 
     mock_aioresponse.get(
@@ -213,7 +218,7 @@ async def test_request(mock_aioresponse):
 
 
 async def test_session_handler():
-    """Test a successful call of load_parameters."""
+    """Test session_handler works."""
     session = DeconzSession(Mock(), HOST, PORT, API_KEY, connection_status=Mock())
     session.websocket = Mock()
     session.websocket.data = {}
@@ -232,12 +237,12 @@ async def test_session_handler():
 
 
 async def test_event_handler(mock_aioresponse):
-    """Test a successful call of load_parameters."""
+    """Test event_handler works."""
     session = DeconzSession(
         aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
     )
     init_response = {
-        "config": {"bridgeid": "012345"},
+        "config": {},
         "groups": {},
         "lights": {},
         "sensors": {},
@@ -363,10 +368,10 @@ async def test_event_handler(mock_aioresponse):
 
 
 async def test_update_group_color(mock_aioresponse):
-    """Test a successful call of load_parameters."""
+    """Test update_group_color works as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
-        "config": {"bridgeid": "012345"},
+        "config": {},
         "groups": {
             "g1": {
                 "action": {

@@ -26,7 +26,7 @@ class DeconzConfig:
     @property
     def bridgeid(self):
         """Hardware ID."""
-        return normalize_bridge_id(self.raw.get("bridgeid"))
+        return normalize_bridge_id(self.raw.get("bridgeid", "0000000000000000"))
 
     @property
     def linkbutton(self):
