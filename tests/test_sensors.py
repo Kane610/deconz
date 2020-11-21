@@ -26,7 +26,7 @@ async def test_create_sensor_fails():
     sensor = {"type": "not supported", "name": "name"}
     result = create_sensor(sensor_id, sensor, None)
 
-    assert result.BINARY is None
+    assert result.BINARY is False
     assert not result.ZHATYPE
 
 
@@ -100,7 +100,7 @@ async def test_alarm_sensor():
                 "modelid": "lumi.sensor_motion.aq2",
                 "name": "Alarm 10",
                 "state": {
-                    "alarm": None,
+                    "alarm": False,
                     "lastupdated": "none",
                     "lowbattery": None,
                     "tampered": None,
@@ -114,11 +114,11 @@ async def test_alarm_sensor():
     )
     sensor = sensors["0"]
 
-    assert sensor.BINARY is False
+    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAAlarm",)
 
-    assert sensor.state is None
-    assert sensor.alarm is None
+    assert sensor.state is False
+    assert sensor.alarm is False
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -222,7 +222,6 @@ async def test_carbonmonoxide_sensor():
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
 
     assert sensor.state is False
-    assert sensor.is_tripped is False
     assert sensor.carbonmonoxide is False
 
     # DeconzSensor
@@ -406,7 +405,6 @@ async def test_fire_sensor():
     assert sensor.ZHATYPE == ("ZHAFire",)
 
     assert sensor.state is False
-    assert sensor.is_tripped is False
     assert sensor.fire is False
 
     # DeconzSensor
@@ -451,7 +449,6 @@ async def test_genericflag_sensor():
     assert sensor.ZHATYPE == ("CLIPGenericFlag",)
 
     assert sensor.state is True
-    assert sensor.is_tripped is True
     assert sensor.flag is True
 
     # DeconzSensor
@@ -671,7 +668,6 @@ async def test_openclose_sensor():
     assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
 
     assert sensor.state is False
-    assert sensor.is_tripped is False
     assert sensor.open is False
 
     # DeconzSensor
@@ -783,7 +779,6 @@ async def test_presence_sensor():
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
 
     assert sensor.state is False
-    assert sensor.is_tripped is False
     assert sensor.presence is False
     assert sensor.dark is None
     assert sensor.duration is None
@@ -1311,7 +1306,6 @@ async def test_vibration_sensor():
     assert sensor.ZHATYPE == ("ZHAVibration",)
 
     assert sensor.state is True
-    assert sensor.is_tripped is True
     assert sensor.orientation == [10, 1059, 0]
     assert sensor.sensitivity == 21
     assert sensor.sensitivitymax == 21
@@ -1387,7 +1381,6 @@ async def test_water_sensor():
     assert sensor.ZHATYPE == ("ZHAWater",)
 
     assert sensor.state is False
-    assert sensor.is_tripped is False
     assert sensor.water is False
 
     # DeconzSensor
