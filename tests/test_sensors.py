@@ -35,24 +35,21 @@ async def test_air_quality_sensor():
     sensors = Sensors(
         {
             "0": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
-                "manufacturername": "unknown",
-                "modelid": "aq",
-                "name": "Air quality",
+                "config": {"on": True, "reachable": True},
+                "ep": 2,
+                "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
+                "lastseen": "2020-11-20T22:48Z",
+                "manufacturername": "BOSCH",
+                "modelid": "AIR",
+                "name": "BOSCH Air quality sensor",
                 "state": {
-                    "airquality": "ok",
-                    "airqualityppb": 100,
-                    "lastupdated": "none",
+                    "airquality": "poor",
+                    "airqualityppb": 809,
+                    "lastupdated": "2020-11-20T22:48:00.209",
                 },
-                "swversion": "1",
+                "swversion": "20200402",
                 "type": "ZHAAirQuality",
-                "uniqueid": "00:00:00:00:00:00:00:80-01-0500",
+                "uniqueid": "00:12:4b:00:14:4d:00:07-02-fdef",
             },
         },
         AsyncMock(),
@@ -62,13 +59,13 @@ async def test_air_quality_sensor():
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
-    assert sensor.state == "ok"
-    assert sensor.airquality == "ok"
-    assert sensor.airqualityppb == 100
+    assert sensor.state == "poor"
+    assert sensor.airquality == "poor"
+    assert sensor.airqualityppb == 809
 
     # DeconzSensor
-    assert sensor.battery == 100
-    assert sensor.ep == 1
+    assert sensor.battery is None
+    assert sensor.ep == 2
     assert sensor.lowbattery is None
     assert sensor.on is True
     assert sensor.reachable is True
@@ -77,13 +74,13 @@ async def test_air_quality_sensor():
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
-    assert sensor.etag == "18c0f3c2100904e31a7f938db2ba9ba9"
-    assert sensor.manufacturer == "unknown"
-    assert sensor.modelid == "aq"
-    assert sensor.name == "Air quality"
-    assert sensor.swversion == "1"
+    assert sensor.etag == "c2d2e42396f7c78e11e46c66e2ec0200"
+    assert sensor.manufacturer == "BOSCH"
+    assert sensor.modelid == "AIR"
+    assert sensor.name == "BOSCH Air quality sensor"
+    assert sensor.swversion == "20200402"
     assert sensor.type == "ZHAAirQuality"
-    assert sensor.uniqueid == "00:00:00:00:00:00:00:80-01-0500"
+    assert sensor.uniqueid == "00:12:4b:00:14:4d:00:07-02-fdef"
 
 
 async def test_alarm_sensor():

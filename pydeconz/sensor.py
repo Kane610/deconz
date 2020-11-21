@@ -81,7 +81,16 @@ class AirQuality(DeconzSensor):
 
     @property
     def airquality(self) -> str:
-        """Air quality."""
+        """Air quality.
+
+        Supported values:
+        - excellent
+        - good
+        - moderate
+        - poor
+        - unhealthy
+        - out of scale
+        """
         return self.raw["state"]["airquality"]
 
     @property
