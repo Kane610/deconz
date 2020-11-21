@@ -8,7 +8,7 @@ from aiohttp import client_exceptions
 from .config import DeconzConfig
 from .errors import raise_error, ResponseError, RequestError
 from .group import Groups
-from .light import Lights
+from .light import Light, Lights
 from .sensor import Sensors
 from .websocket import WSClient
 
@@ -75,13 +75,13 @@ class DeconzSession:
         self.update_group_color(self.lights.keys())
         self.update_scenes()
 
-    async def refresh_state(self, **kwargs) -> None:
+    async def refresh_state(self) -> None:
         """Refresh deCONZ parameters"""
         data = await self.request("get")
 
-        self.groups.process_raw(data["groups"], **kwargs)
-        self.lights.process_raw(data["lights"], **kwargs)
-        self.sensors.process_raw(data["sensors"], **kwargs)
+        self.groups.process_raw(data["groups"])
+        self.lights.process_raw(data["lights"])
+        self.sensors.process_raw(data["sensors"])
 
         self.update_group_color(self.lights.keys())
         self.update_scenes()
@@ -115,8 +115,8 @@ class DeconzSession:
     def session_handler(self, signal: str) -> None:
         """Signalling from websocket.
 
-           data - new data available for processing.
-           state - network state has changed.
+        data - new data available for processing.
+        state - network state has changed.
         """
         if signal == "data":
             self.event_handler(self.websocket.data)
@@ -144,7 +144,7 @@ class DeconzSession:
             'uniqueid': '00:17:88:01:02:03:04:fc-0b'
         }
         """
-        if event["e"] not in ("added", "changed"):
+        if event.get("e") not in ("added", "changed"):
             LOGGER.debug("Unsupported event %s", event)
             return
 
@@ -195,8 +195,10 @@ class DeconzSession:
                 light_ids = group.lights
 
             for light_id in light_ids:
-                if self.lights[light_id].reachable:
-                    group.update_color_state(self.lights[light_id])
+                light = self.lights[light_id]
+
+                if light.ZHATYPE == Light.ZHATYPE and light.reachable:
+                    group.update_color_state(light)
                     break
 
     def update_scenes(self) -> None:
