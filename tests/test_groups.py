@@ -35,7 +35,6 @@ async def test_create_group():
         },
         AsyncMock(),
     )
-
     group = groups["0"]
 
     assert group.state is True
@@ -108,26 +107,3 @@ async def test_create_group():
 
     assert scene.name == "coldlight"
     assert scene.full_name == "Hall coldlight"
-
-
-FIXTURE_GROUP = {
-    "action": {
-        "bri": 132,
-        "colormode": "hs",
-        "ct": 0,
-        "effect": "none",
-        "hue": 0,
-        "on": False,
-        "sat": 127,
-        "scene": None,
-        "xy": [0, 0],
-    },
-    "devicemembership": [],
-    "etag": "e31c23b3bd9ece918f23ee17ef430304",
-    "id": "11",
-    "lights": ["14", "15", "12"],
-    "name": "Hall",
-    "scenes": [{"id": "1", "name": "warmlight"}],
-    "state": {"all_on": False, "any_on": True},
-    "type": "LightGroup",
-}

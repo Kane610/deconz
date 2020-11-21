@@ -3,19 +3,45 @@
 pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 """
 
-from copy import deepcopy
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
-from pydeconz.light import create_light
+from pydeconz.light import Lights
 
 
 async def test_create_light():
-    """Verify that creating a light works.
-
-    Just tests a subset right now;
-        xy will also be signalled as a set from 0.61.
-    """
-    light = create_light("0", deepcopy(FIXTURE_RGB_LIGHT), None)
+    """Verify that creating a light works."""
+    lights = Lights(
+        {
+            "0": {
+                "ctmax": 500,
+                "ctmin": 153,
+                "etag": "026bcfe544ad76c7534e5ca8ed39047c",
+                "hascolor": True,
+                "manufacturername": "dresden elektronik",
+                "modelid": "FLS-PP3",
+                "name": "Light 1",
+                "pointsymbol": {},
+                "state": {
+                    "alert": None,
+                    "bri": 111,
+                    "colormode": "ct",
+                    "ct": 307,
+                    "effect": None,
+                    "hascolor": True,
+                    "hue": 7998,
+                    "on": False,
+                    "reachable": True,
+                    "sat": 172,
+                    "xy": [0.421253, 0.39921],
+                },
+                "swversion": "020C.201000A0",
+                "type": "Extended color light",
+                "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
+            }
+        },
+        AsyncMock(),
+    )
+    light = lights["0"]
 
     assert light.state is False
     assert light.alert is None
@@ -68,10 +94,43 @@ async def test_create_light():
     light.raw["ctmin"] = 0
     assert light.ctmin == 140
 
+    await light.async_set_state({"on": True})
+    light._request.assert_called_with("put", "/lights/0/state", json={"on": True})
+
+    await light.async_set_config({"on": True})
+    light._request.assert_called_with("put", "/lights/0/config", json={"on": True})
+
+    lights.process_raw({"0": {"state": {"bri": 2}}})
+    assert light.brightness == 2
+
 
 async def test_create_cover():
     """Verify that covers work."""
-    cover = create_light("0", deepcopy(FIXTURE_COVER), None)
+    lights = Lights(
+        {
+            "0": {
+                "etag": "87269755b9b3a046485fdae8d96b252c",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-08-01T16:22:05Z",
+                "manufacturername": "AXIS",
+                "modelid": "Gear",
+                "name": "Covering device",
+                "state": {
+                    "bri": 0,
+                    "lift": 0,
+                    "on": False,
+                    "open": False,
+                    "reachable": True,
+                },
+                "swversion": "100-5.3.5.1122",
+                "type": "Window covering device",
+                "uniqueid": "00:24:46:00:00:12:34:56-01",
+            }
+        },
+        AsyncMock(),
+    )
+    cover = lights["0"]
 
     assert cover.state is False
     assert cover.is_open is False
@@ -126,7 +185,25 @@ async def test_create_cover():
 
 async def test_create_cover_without_lift():
     """Verify that covers work with older deconz versions."""
-    cover = create_light("0", deepcopy(FIXTURE_COVER_WITHOUT_LIFT), None)
+    lights = Lights(
+        {
+            "0": {
+                "etag": "87269755b9b3a046485fdae8d96b252c",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-08-01T16:22:05Z",
+                "manufacturername": "AXIS",
+                "modelid": "Gear",
+                "name": "Covering device",
+                "state": {"bri": 0, "on": False, "reachable": True},
+                "swversion": "100-5.3.5.1122",
+                "type": "Window covering device",
+                "uniqueid": "00:24:46:00:00:12:34:56-01",
+            }
+        },
+        AsyncMock(),
+    )
+    cover = lights["0"]
 
     assert cover.state is False
     assert cover.is_open is True
@@ -192,7 +269,29 @@ async def test_create_cover_without_lift():
 
 async def test_create_fan():
     """Verify light fixture with fan work."""
-    fan = create_light("0", deepcopy(FIXTURE_LIGHT_WITH_FAN), None)
+    lights = Lights(
+        {
+            "0": {
+                "etag": "432f3de28965052961a99e3c5494daf4",
+                "hascolor": False,
+                "manufacturername": "King Of Fans,  Inc.",
+                "modelid": "HDC52EastwindFan",
+                "name": "Ceiling fan",
+                "state": {
+                    "alert": "none",
+                    "bri": 254,
+                    "on": False,
+                    "reachable": True,
+                    "speed": 4,
+                },
+                "swversion": "0000000F",
+                "type": "Fan",
+                "uniqueid": "00:22:a3:00:00:27:8b:81-01",
+            }
+        },
+        AsyncMock(),
+    )
+    fan = lights["0"]
 
     assert fan.state is False
     assert fan.alert == "none"
@@ -241,7 +340,25 @@ async def test_create_fan():
 
 async def test_create_lock():
     """Verify that locks work."""
-    lock = create_light("0", deepcopy(FIXTURE_LOCK), None)
+    lights = Lights(
+        {
+            "0": {
+                "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-08-22T15:29:03Z",
+                "manufacturername": "Danalock",
+                "modelid": "V3-BTZB",
+                "name": "Door lock",
+                "state": {"alert": "none", "on": False, "reachable": True},
+                "swversion": "19042019",
+                "type": "Door Lock",
+                "uniqueid": "00:00:00:00:00:00:00:00-00",
+            }
+        },
+        AsyncMock(),
+    )
+    lock = lights["0"]
 
     assert lock.state is False
     assert lock.is_locked is False
@@ -281,7 +398,23 @@ async def test_create_lock():
 
 async def test_create_siren():
     """Verify that sirens work."""
-    siren = create_light("0", deepcopy(FIXTURE_SIREN), None)
+    lights = Lights(
+        {
+            "0": {
+                "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
+                "hascolor": False,
+                "manufacturername": "Heiman",
+                "modelid": "WarningDevice",
+                "name": "alarm_tuin",
+                "state": {"alert": "none", "reachable": True},
+                "swversion": None,
+                "type": "Warning device",
+                "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
+            }
+        },
+        AsyncMock(),
+    )
+    siren = lights["0"]
 
     assert siren.state is None
     assert siren.is_on is False
@@ -317,106 +450,3 @@ async def test_create_siren():
 
     siren.remove_callback(mock_callback)
     assert not siren._callbacks
-
-
-FIXTURE_RGB_LIGHT = {
-    "ctmax": 500,
-    "ctmin": 153,
-    "etag": "026bcfe544ad76c7534e5ca8ed39047c",
-    "hascolor": True,
-    "manufacturername": "dresden elektronik",
-    "modelid": "FLS-PP3",
-    "name": "Light 1",
-    "pointsymbol": {},
-    "state": {
-        "alert": None,
-        "bri": 111,
-        "colormode": "ct",
-        "ct": 307,
-        "effect": None,
-        "hascolor": True,
-        "hue": 7998,
-        "on": False,
-        "reachable": True,
-        "sat": 172,
-        "xy": [0.421253, 0.39921],
-    },
-    "swversion": "020C.201000A0",
-    "type": "Extended color light",
-    "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
-}
-
-
-FIXTURE_COVER = {
-    "etag": "87269755b9b3a046485fdae8d96b252c",
-    "hascolor": False,
-    "lastannounced": None,
-    "lastseen": "2020-08-01T16:22:05Z",
-    "manufacturername": "AXIS",
-    "modelid": "Gear",
-    "name": "Covering device",
-    "state": {"bri": 0, "lift": 0, "on": False, "open": False, "reachable": True},
-    "swversion": "100-5.3.5.1122",
-    "type": "Window covering device",
-    "uniqueid": "00:24:46:00:00:12:34:56-01",
-}
-
-
-FIXTURE_COVER_WITHOUT_LIFT = {
-    "etag": "87269755b9b3a046485fdae8d96b252c",
-    "hascolor": False,
-    "lastannounced": None,
-    "lastseen": "2020-08-01T16:22:05Z",
-    "manufacturername": "AXIS",
-    "modelid": "Gear",
-    "name": "Covering device",
-    "state": {"bri": 0, "on": False, "reachable": True},
-    "swversion": "100-5.3.5.1122",
-    "type": "Window covering device",
-    "uniqueid": "00:24:46:00:00:12:34:56-01",
-}
-
-FIXTURE_LIGHT_WITH_FAN = {
-    "etag": "432f3de28965052961a99e3c5494daf4",
-    "hascolor": False,
-    "manufacturername": "King Of Fans,  Inc.",
-    "modelid": "HDC52EastwindFan",
-    "name": "Ceiling fan",
-    "state": {
-        "alert": "none",
-        "bri": 254,
-        "on": False,
-        "reachable": True,
-        "speed": 4,
-    },
-    "swversion": "0000000F",
-    "type": "Fan",
-    "uniqueid": "00:22:a3:00:00:27:8b:81-01",
-}
-
-FIXTURE_LOCK = {
-    "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
-    "hascolor": False,
-    "lastannounced": None,
-    "lastseen": "2020-08-22T15:29:03Z",
-    "manufacturername": "Danalock",
-    "modelid": "V3-BTZB",
-    "name": "Door lock",
-    "state": {"alert": "none", "on": False, "reachable": True},
-    "swversion": "19042019",
-    "type": "Door Lock",
-    "uniqueid": "00:00:00:00:00:00:00:00-00",
-}
-
-
-FIXTURE_SIREN = {
-    "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
-    "hascolor": False,
-    "manufacturername": "Heiman",
-    "modelid": "WarningDevice",
-    "name": "alarm_tuin",
-    "state": {"alert": "none", "reachable": True},
-    "swversion": None,
-    "type": "Warning device",
-    "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
-}
