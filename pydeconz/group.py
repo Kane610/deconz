@@ -13,7 +13,7 @@ URL = "/groups"
 class Groups(APIItems):
     """Represent deCONZ groups."""
 
-    def __init__(self, raw, request):
+    def __init__(self, raw: dict, request: object) -> None:
         super().__init__(raw, request, URL, DeconzGroup)
 
 
@@ -26,7 +26,7 @@ class DeconzGroup(DeconzDevice):
 
     DECONZ_TYPE = "groups"
 
-    def __init__(self, device_id, raw, request):
+    def __init__(self, device_id: str, raw: dict, request: object) -> None:
         """Set initial information about light group.
 
         Create scenes related to light group.
@@ -34,18 +34,18 @@ class DeconzGroup(DeconzDevice):
         super().__init__(device_id, raw, request)
         self._scenes = Scenes(self, request)
 
-    async def async_set_state(self, data):
+    async def async_set_state(self, data: dict) -> None:
         """Set state of light group."""
         field = f"{self.deconz_id}/action"
         await self.async_set(field, data)
 
     @property
-    def state(self):
+    def state(self) -> bool:
         """True if any light in light group is on."""
         return self.any_on
 
     @property
-    def brightness(self):
+    def brightness(self) -> int:
         """Brightness of the light.
 
         Depending on the light type 0 might not mean visible "off"
@@ -54,12 +54,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("bri")
 
     @property
-    def ct(self):
+    def ct(self) -> int:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["action"].get("ct")
 
     @property
-    def hue(self):
+    def hue(self) -> int:
         """Color hue of the light.
 
         The hue parameter in the HSV color model is between 0°-360°
@@ -68,7 +68,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("hue")
 
     @property
-    def sat(self):
+    def sat(self) -> int:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -93,7 +93,7 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def colormode(self):
+    def colormode(self) -> str:
         """The current color mode of the light.
 
         hs - hue and saturation
@@ -103,8 +103,8 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("colormode")
 
     @property
-    def effect(self):
-        """Effect of the light.
+    def effect(self) -> str:
+        """Effect of the group.
 
         none - no effect
         colorloop
@@ -112,32 +112,32 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("effect")
 
     @property
-    def reachable(self):
-        """True if the light is reachable and accepts commands."""
+    def reachable(self) -> bool:
+        """True if the group is reachable and accepts commands."""
         return True
 
     @property
-    def groupclass(self):
+    def groupclass(self) -> str:
         """"""
         return self.raw.get("class")
 
     @property
-    def all_on(self):
+    def all_on(self) -> bool:
         """True if all lights in light group are on"""
         return self.raw["state"].get("all_on")
 
     @property
-    def any_on(self):
+    def any_on(self) -> bool:
         """True if any lights in light group are on"""
         return self.raw["state"].get("any_on")
 
     @property
-    def devicemembership(self):
+    def devicemembership(self) -> list:
         """List of device ids (sensors) when group was created by a device."""
         return self.raw.get("devicemembership")
 
     @property
-    def hidden(self):
+    def hidden(self) -> bool:
         """Indicate the hidden status of the group.
 
         Has no effect at the gateway but apps can uses this to hide groups.
@@ -145,12 +145,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("hidden")
 
     @property
-    def id(self):
+    def id(self) -> str:
         """The id of the group."""
         return self.raw.get("id")
 
     @property
-    def lights(self):
+    def lights(self) -> list:
         """A list of all light ids of this group.
 
         Sequence is defined by the gateway.
@@ -158,7 +158,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lights")
 
     @property
-    def lightsequence(self):
+    def lightsequence(self) -> list:
         """A list of light ids of this group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
@@ -166,7 +166,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lightsequence")
 
     @property
-    def multideviceids(self):
+    def multideviceids(self) -> list:
         """A list of light ids of this group.
 
         Subsequent ids from multidevices with multiple endpoints.
@@ -178,15 +178,7 @@ class DeconzGroup(DeconzDevice):
         """A list of scenes of the group."""
         return self._scenes
 
-    def async_add_scenes(self, scenes, request):
-        """Add scenes belonging to group."""
-        self._scenes = {
-            scene["id"]: DeconzScene(self, scene, request)
-            for scene in scenes
-            if scene["id"] not in self._scenes
-        }
-
-    def update_color_state(self, light):
+    def update_color_state(self, light) -> None:
         """Sync color state with light."""
         self.update(
             {
@@ -205,13 +197,13 @@ class DeconzGroup(DeconzDevice):
 class Scenes(APIItems):
     """Represent scenes of a deCONZ group."""
 
-    def __init__(self, group, request):
+    def __init__(self, group: DeconzGroup, request: object) -> None:
         self.group = group
         url = f"{URL}/{group.device_id}/scenes"
         super().__init__(group.raw["scenes"], request, url, DeconzScene)
 
     def process_raw(self, raw: list) -> None:
-        """"""
+        """Process raw scene data."""
         for raw_item in raw:
             id = raw_item["id"]
             obj = self._items.get(id)
@@ -231,7 +223,7 @@ class DeconzScene:
 
     DECONZ_TYPE = "scenes"
 
-    def __init__(self, group, raw, request):
+    def __init__(self, group: DeconzGroup, raw: dict, request: object):
         """Set initial information about scene.
 
         Set callback to set state of device.
@@ -241,27 +233,27 @@ class DeconzScene:
         self._request = request
         LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
-    async def async_set_state(self, data):
+    async def async_set_state(self, data: dict) -> None:
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
         await self._request("put", field, json=data)
 
     @property
-    def deconz_id(self):
+    def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
         return f"{self.group.deconz_id}/{self.DECONZ_TYPE}/{self.id}"
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Scene ID."""
         return self.raw["id"]
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Scene name."""
         return self.raw["name"]
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         """Full name."""
         return f"{self.group.name} {self.name}"
