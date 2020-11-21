@@ -75,13 +75,13 @@ class DeconzSession:
         self.update_group_color(self.lights.keys())
         self.update_scenes()
 
-    async def refresh_state(self, **kwargs) -> None:
+    async def refresh_state(self) -> None:
         """Refresh deCONZ parameters"""
         data = await self.request("get")
 
-        self.groups.process_raw(data["groups"], **kwargs)
-        self.lights.process_raw(data["lights"], **kwargs)
-        self.sensors.process_raw(data["sensors"], **kwargs)
+        self.groups.process_raw(data["groups"])
+        self.lights.process_raw(data["lights"])
+        self.sensors.process_raw(data["sensors"])
 
         self.update_group_color(self.lights.keys())
         self.update_scenes()
@@ -144,7 +144,7 @@ class DeconzSession:
             'uniqueid': '00:17:88:01:02:03:04:fc-0b'
         }
         """
-        if event["e"] not in ("added", "changed"):
+        if event.get("e") not in ("added", "changed"):
             LOGGER.debug("Unsupported event %s", event)
             return
 

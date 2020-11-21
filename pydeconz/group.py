@@ -79,10 +79,10 @@ class DeconzGroup(DeconzDevice):
     @property
     def xy(self):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        if "xy" not in self.raw["action"] or self.raw["action"]["xy"] == (None, None):
-            return None
+        x, y = self.raw["action"].get("xy", (None, None))
 
-        x, y = self.raw["action"]["xy"]
+        if x is None or y is None:
+            return None
 
         if x > 1:
             x = x / 65555
