@@ -3,13 +3,19 @@
 from .api import APIItems
 from .deconzdevice import DeconzDevice
 
+from typing import Callable, Optional, Tuple, Union
+
 URL = "/lights"
 
 
 class Lights(APIItems):
     """Represent deCONZ lights."""
 
-    def __init__(self, raw, request):
+    def __init__(
+        self,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
+    ) -> None:
         super().__init__(raw, request, URL, create_light)
 
 
@@ -24,12 +30,12 @@ class DeconzLight(DeconzDevice):
     ZHATYPE = set()
 
     @property
-    def state(self) -> bool:
-        """True if light is on."""
+    def state(self) -> Optional[bool]:
+        """True if device is on."""
         return self.raw["state"].get("on")
 
     @property
-    def reachable(self):
+    def reachable(self) -> bool:
         """True if light is reachable and accepts commands."""
         return self.raw["state"]["reachable"]
 
@@ -42,7 +48,7 @@ class Light(DeconzLight):
     """
 
     @property
-    def alert(self) -> str:
+    def alert(self) -> Optional[str]:
         """Temporary alert effect.
 
         Following values are possible:
@@ -53,7 +59,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("alert")
 
     @property
-    def brightness(self) -> int:
+    def brightness(self) -> Optional[int]:
         """Brightness of the light.
 
         Depending on the light type 0 might not mean visible "off"
@@ -62,12 +68,12 @@ class Light(DeconzLight):
         return self.raw["state"].get("bri")
 
     @property
-    def ct(self) -> int:
+    def ct(self) -> Optional[int]:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["state"].get("ct")
 
     @property
-    def hue(self) -> int:
+    def hue(self) -> Optional[int]:
         """Color hue of the light.
 
         The hue parameter in the HSV color model is between 0°-360°
@@ -76,7 +82,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("hue")
 
     @property
-    def sat(self) -> int:
+    def sat(self) -> Optional[int]:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -85,11 +91,11 @@ class Light(DeconzLight):
         return self.raw["state"].get("sat")
 
     @property
-    def xy(self):
+    def xy(self) -> Optional[Tuple[float, float]]:
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
         x, y = self.raw["state"].get("xy", (None, None))
 
-        if x is None or y is None:
+        if not x or not y:
             return None
 
         if x > 1:
@@ -101,7 +107,7 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def colormode(self) -> str:
+    def colormode(self) -> Optional[str]:
         """Current color mode of light.
 
         hs - hue and saturation
@@ -111,7 +117,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("colormode")
 
     @property
-    def hascolor(self) -> bool:
+    def hascolor(self) -> Optional[bool]:
         """Tells if light has color support."""
         return self.raw["state"].get("hascolor")
 
@@ -132,7 +138,7 @@ class Light(DeconzLight):
         return ctmin
 
     @property
-    def effect(self) -> str:
+    def effect(self) -> Optional[str]:
         """Effect of the light.
 
         none - no effect
@@ -141,7 +147,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("effect")
 
 
-class cover(DeconzLight):
+class Cover(DeconzLight):
     """Cover and Damper class.
 
     Position 0 means open and 100 means closed.
@@ -201,7 +207,7 @@ class cover(DeconzLight):
         await self.async_set_state({"bri_inc": 0})
 
 
-class fan(Light):
+class Fan(Light):
     """Light fixture with fan control.
 
     0 - fan is off
@@ -218,17 +224,17 @@ class fan(Light):
     @property
     def speed(self) -> int:
         """Speed of the fan."""
-        return self.raw["state"].get("speed")
+        return self.raw["state"]["speed"]
 
     async def set_speed(self, speed: int) -> None:
-        """Set speed.
+        """Sets the speed of fans/ventilators.
 
         Speed [int] between 0-6.
         """
         await self.async_set_state({"speed": speed})
 
 
-class lock(DeconzLight):
+class Lock(DeconzLight):
     """Lock class."""
 
     ZHATYPE = ("Door Lock",)
@@ -246,7 +252,7 @@ class lock(DeconzLight):
         await self.async_set_state({"on": False})
 
 
-class siren(DeconzLight):
+class Siren(DeconzLight):
     """Siren class."""
 
     ZHATYPE = ("Warning device",)
@@ -265,10 +271,12 @@ class siren(DeconzLight):
         await self.async_set_state({"alert": "none"})
 
 
-NON_LIGHT_CLASSES = (cover, fan, lock, siren)
+NON_LIGHT_CLASSES = (Cover, Fan, Lock, Siren)
 
 
-def create_light(light_id: int, raw: dict, request: object) -> DeconzLight:
+def create_light(
+    light_id: str, raw: dict, request: Callable[..., Optional[dict]]
+) -> Union[Light, Cover, Fan, Lock, Siren]:
     """Creating device out of a light resource."""
     for non_light_class in NON_LIGHT_CLASSES:
         if raw["type"] in non_light_class.ZHATYPE:
