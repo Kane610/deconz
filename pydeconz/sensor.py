@@ -634,7 +634,7 @@ class Time(DeconzSensor):
     ZHATYPE = ("ZHATime",)
 
     @property
-    def lastset(self) -> Optional[str]:
+    def lastset(self) -> str:
         """Last time time was set."""
         return self.raw["state"]["lastset"]
 

@@ -104,6 +104,42 @@ async def test_create_light():
     assert light.brightness == 2
 
 
+async def test_configuration_tool():
+    """Verify that locks work."""
+    lights = Lights(
+        {
+            "0": {
+                "etag": "26839cb118f5bf7ba1f2108256644010",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-11-22T11:27Z",
+                "manufacturername": "dresden elektronik",
+                "modelid": "ConBee II",
+                "name": "Configuration tool 1",
+                "state": {"reachable": True},
+                "swversion": "0x264a0700",
+                "type": "Configuration tool",
+                "uniqueid": "00:21:2e:ff:ff:05:a7:a3-01",
+            }
+        },
+        AsyncMock(),
+    )
+    configuration_tool = lights["0"]
+
+    assert configuration_tool.state is None
+
+    assert configuration_tool.reachable is True
+
+    assert configuration_tool.deconz_id == "/lights/0"
+    assert configuration_tool.etag == "26839cb118f5bf7ba1f2108256644010"
+    assert configuration_tool.manufacturer == "dresden elektronik"
+    assert configuration_tool.modelid == "ConBee II"
+    assert configuration_tool.name == "Configuration tool 1"
+    assert configuration_tool.swversion == "0x264a0700"
+    assert configuration_tool.type == "Configuration tool"
+    assert configuration_tool.uniqueid == "00:21:2e:ff:ff:05:a7:a3-01"
+
+
 async def test_create_cover():
     """Verify that covers work."""
     lights = Lights(
