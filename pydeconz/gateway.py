@@ -1,5 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from typing import Any, Callable, Optional, Union
 import logging
 from pprint import pformat
 
@@ -20,12 +21,12 @@ class DeconzSession:
 
     def __init__(
         self,
-        session,
-        host,
-        port,
-        api_key,
-        async_add_device=None,
-        connection_status=None,
+        session: Any,
+        host: str,
+        port: str,
+        api_key: str,
+        async_add_device: Optional[Callable[[str, Any], None]] = None,
+        connection_status: Optional[Callable[[bool], None]] = None,
     ):
         """Setup session and host information."""
         self.session = session
@@ -86,7 +87,9 @@ class DeconzSession:
         self.update_group_color(self.lights.keys())
         self.update_scenes()
 
-    async def request(self, method, path="", json=None):
+    async def request(
+        self, method: str, path: Optional[str] = "", json: Optional[dict] = None
+    ):
         """Make a request to the API."""
         LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
 
@@ -213,7 +216,7 @@ class DeconzSession:
         )
 
 
-def _raise_on_error(data):
+def _raise_on_error(data: Union[list, dict]) -> None:
     """Check response for error message."""
     if isinstance(data, list) and data:
         data = data[0]
