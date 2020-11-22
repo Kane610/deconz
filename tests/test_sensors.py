@@ -1320,9 +1320,6 @@ async def test_time_sensor():
     assert sensor.type == "ZHATime"
     assert sensor.uniqueid == "cc:cc:cc:ff:fe:38:4d:b3-01-000a"
 
-    del sensor.raw["state"]["lastset"]
-    assert sensor.state is None
-
 
 async def test_vibration_sensor():
     """Verify that vibration sensor works."""

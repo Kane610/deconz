@@ -147,6 +147,12 @@ class Light(DeconzLight):
         return self.raw["state"].get("effect")
 
 
+class ConfigurationTool(DeconzLight):
+    """deCONZ hardware antenna."""
+
+    ZHATYPE = ("Configuration tool",)
+
+
 class Cover(DeconzLight):
     """Cover and Damper class.
 
@@ -271,12 +277,12 @@ class Siren(DeconzLight):
         await self.async_set_state({"alert": "none"})
 
 
-NON_LIGHT_CLASSES = (Cover, Fan, Lock, Siren)
+NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
 
 
 def create_light(
     light_id: str, raw: dict, request: Callable[..., Optional[dict]]
-) -> Union[Light, Cover, Fan, Lock, Siren]:
+) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
     """Creating device out of a light resource."""
     for non_light_class in NON_LIGHT_CLASSES:
         if raw["type"] in non_light_class.ZHATYPE:
