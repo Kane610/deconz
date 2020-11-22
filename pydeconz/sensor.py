@@ -627,6 +627,18 @@ class Thermostat(Temperature):
         return self.raw["config"].get("windowopen_set")
 
 
+class Time(DeconzSensor):
+    """Time sensor."""
+
+    STATE_PROPERTY = "lastset"
+    ZHATYPE = ("ZHATime",)
+
+    @property
+    def lastset(self) -> Optional[str]:
+        """Last time time was set."""
+        return self.raw["state"]["lastset"]
+
+
 class Vibration(DeconzBinarySensor):
     """Vibration sensor."""
 
@@ -695,6 +707,7 @@ SENSOR_CLASSES = (
     Switch,
     Temperature,
     Thermostat,
+    Time,
     Vibration,
     Water,
 )
@@ -722,6 +735,7 @@ def create_sensor(
     Switch,
     Temperature,
     Thermostat,
+    Time,
     Vibration,
     Water,
 ]:

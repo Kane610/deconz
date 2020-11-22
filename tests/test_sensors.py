@@ -10,7 +10,7 @@ from pydeconz.sensor import SENSOR_CLASSES, Thermostat, create_sensor, Sensors
 
 async def test_create_sensor():
     """Verify that create-sensor can create all types."""
-    assert len(SENSOR_CLASSES) == 20
+    assert len(SENSOR_CLASSES) == 21
 
     for sensor_class in SENSOR_CLASSES:
         for sensor_type in sensor_class.ZHATYPE:
@@ -1266,6 +1266,62 @@ async def test_tuya_thermostat_sensor():
     assert sensor.swversion == "20180727"
     assert sensor.type == "ZHAThermostat"
     assert sensor.uniqueid == "bc:33:ac:ff:fe:47:a1:95-01-0201"
+
+
+async def test_time_sensor():
+    """Verify that time sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"battery": 40, "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "28e796678d9a24712feef59294343bb6",
+                "lastseen": "2020-11-22T11:26Z",
+                "manufacturername": "Danfoss",
+                "modelid": "eTRV0100",
+                "name": "eTRV Séjour",
+                "state": {
+                    "lastset": "2020-11-19T08:07:08Z",
+                    "lastupdated": "2020-11-22T10:51:03.444",
+                    "localtime": "2020-11-22T10:51:01",
+                    "utc": "2020-11-22T10:51:01Z",
+                },
+                "swversion": "20200429",
+                "type": "ZHATime",
+                "uniqueid": "cc:cc:cc:ff:fe:38:4d:b3-01-000a",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHATime",)
+
+    assert sensor.state == "2020-11-19T08:07:08Z"
+    assert sensor.lastset == "2020-11-19T08:07:08Z"
+
+    # DeconzSensor
+    assert sensor.battery == 40
+    assert sensor.ep == 1
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "28e796678d9a24712feef59294343bb6"
+    assert sensor.manufacturer == "Danfoss"
+    assert sensor.modelid == "eTRV0100"
+    assert sensor.name == "eTRV Séjour"
+    assert sensor.swversion == "20200429"
+    assert sensor.type == "ZHATime"
+    assert sensor.uniqueid == "cc:cc:cc:ff:fe:38:4d:b3-01-000a"
+
+    del sensor.raw["state"]["lastset"]
+    assert sensor.state is None
 
 
 async def test_vibration_sensor():
