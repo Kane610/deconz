@@ -1,9 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from typing import Callable, Optional, Tuple, Union
+
 from .api import APIItems
 from .deconzdevice import DeconzDevice
-
-from typing import Callable, Optional, Tuple, Union
 
 URL = "/lights"
 
@@ -95,7 +95,7 @@ class Light(DeconzLight):
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
         x, y = self.raw["state"].get("xy", (None, None))
 
-        if not x or not y:
+        if x is None or y is None:
             return None
 
         if x > 1:
