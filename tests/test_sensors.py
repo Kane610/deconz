@@ -23,11 +23,12 @@ async def test_create_sensor():
 async def test_create_sensor_fails():
     """Verify failing behavior for create_sensor."""
     sensor_id = "0"
-    sensor = {"type": "not supported", "name": "name"}
+    sensor = {"type": "not supported", "name": "name", "state": {}, "config": {}}
     result = create_sensor(sensor_id, sensor, None)
 
     assert result.BINARY is False
     assert not result.ZHATYPE
+    assert result.state is None
 
 
 async def test_air_quality_sensor():

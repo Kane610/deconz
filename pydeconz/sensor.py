@@ -28,7 +28,7 @@ class DeconzSensor(DeconzDevice):
     BINARY = False
     ZHATYPE = set()
 
-    STATE_PROPERTY = ""
+    STATE_PROPERTY = "on"
 
     @property
     def state(self) -> Union[bool, int, str, None]:
@@ -56,7 +56,7 @@ class DeconzSensor(DeconzDevice):
         return self.raw["config"].get("on")
 
     @property
-    def reachable(self) -> Optional[bool]:
+    def reachable(self) -> bool:
         """Declare if the sensor is reachable."""
         return self.raw["config"].get("reachable", True)
 
