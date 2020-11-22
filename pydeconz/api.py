@@ -1,7 +1,8 @@
 """API base classes."""
 
-import logging
 from asyncio import get_running_loop
+import logging
+from typing import Any, Callable, Optional
 
 from .errors import BridgeBusy
 
@@ -11,44 +12,50 @@ LOGGER = logging.getLogger(__name__)
 class APIItems:
     """Base class for a map of API Items."""
 
-    def __init__(self, raw, request, path, item_cls) -> None:
+    def __init__(
+        self,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
+        path: str,
+        item_cls: Any,
+    ) -> None:
         self._request = request
         self._path = path
         self._item_cls = item_cls
         self._items = {}
         self.process_raw(raw)
 
-    def update(self) -> None:
-        raw = self._request("get", self._path)
+    async def update(self) -> None:
+        raw = await self._request("get", self._path)
         self.process_raw(raw)
 
-    def process_raw(self, raw: dict, **kwargs) -> None:
+    def process_raw(self, raw: dict) -> None:
         for id, raw_item in raw.items():
             obj = self._items.get(id)
 
             if obj is not None:
-                obj.update(raw_item, **kwargs)
+                obj.update(raw_item)
             else:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 
-    def items(self):
+    def items(self) -> Any:
         return self._items.items()
 
-    def keys(self):
+    def keys(self) -> Any:
         return self._items.keys()
 
-    def values(self):
+    def values(self) -> Any:
         return self._items.values()
 
-    def __getitem__(self, obj_id: str):
+    def __getitem__(self, obj_id: str) -> Any:
         return self._items[obj_id]
 
-    def __iter__(self):
+    def __iter__(self) -> Any:
         return iter(self._items)
 
 
 class APIItem:
-    def __init__(self, raw, request):
+    def __init__(self, raw: dict, request: Callable[..., Optional[dict]]) -> None:
         self._raw = raw
         self._request = request
 
@@ -59,28 +66,28 @@ class APIItem:
         self._changed_keys = set()
 
     @property
-    def raw(self):
+    def raw(self) -> dict:
         """Read only raw data."""
         return self._raw
 
     @property
-    def changed_keys(self):
+    def changed_keys(self) -> set:
         """Read only changed keys data."""
         return self._changed_keys
 
-    def register_callback(self, callback):
+    def register_callback(self, callback: Callable[..., None]) -> None:
         """Register callback for signalling.
 
         Callback will be called at the end of updating device information in self.async_update.
         """
         self._callbacks.append(callback)
 
-    def remove_callback(self, callback):
+    def remove_callback(self, callback: Callable[..., None]) -> None:
         """Remove callback previously registered."""
         if callback in self._callbacks:
             self._callbacks.remove(callback)
 
-    def update(self, raw, **kwargs):
+    def update(self, raw: dict) -> None:
         """Update input attr in self.
 
         Store a set of keys with changed values.
@@ -101,9 +108,9 @@ class APIItem:
         self._changed_keys = changed_keys
 
         for async_signal_update in self._callbacks:
-            async_signal_update(**kwargs)
+            async_signal_update()
 
-    async def async_set(self, field, data, tries=0):
+    async def async_set(self, field: str, data: dict, tries=0) -> None:
         """Set state of device."""
         self.cancel_retry()
 
@@ -113,7 +120,7 @@ class APIItem:
         except BridgeBusy:
             LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
 
-            def retry_set():
+            def retry_set() -> None:
                 """Retry set state."""
                 self._cancel_retry = None
                 self._loop.create_task(self.async_set(field, data, tries + 1))
@@ -122,7 +129,7 @@ class APIItem:
                 retry_delay = 2 ** (tries + 1)
                 self._cancel_retry = self._loop.call_later(retry_delay, retry_set)
 
-    def cancel_retry(self):
+    def cancel_retry(self) -> None:
         """Cancel retry.
 
         Called at the start of async_set.
