@@ -11,7 +11,7 @@ async def test_create_config():
     config = DeconzConfig(FIXTURE_CONFIG)
 
     assert config.apiversion == "1.0.4"
-    assert config.bridgeid == "0123456789ABCDEF"
+    assert config.bridgeid == "0123456789AB"
     assert config.linkbutton is False
     assert config.mac == "00:11:22:33:44:55"
     assert config.modelid == "deCONZ"
@@ -23,12 +23,18 @@ async def test_create_config():
     assert config.websocketport == 443
     assert config.zigbeechannel == 11
 
+    del config.raw["bridgeid"]
+    assert config.bridgeid == "0000000000000000"
+
+    config.raw["bridgeid"] = "00212EFFFF012345"
+    assert config.bridgeid == "00212E012345"
+
 
 FIXTURE_CONFIG = {
     "UTC": "2017-11-04T12:01:19",
     "apiversion": "1.0.4",
     "backup": {"errorcode": 0, "status": "idle"},
-    "bridgeid": "0123456789ABCDEF",
+    "bridgeid": "0123456789AB",
     "datastoreversion": "60",
     "dhcp": True,
     "factorynew": False,

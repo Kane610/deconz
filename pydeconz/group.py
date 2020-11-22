@@ -2,9 +2,11 @@
 
 import logging
 from pprint import pformat
+from typing import Callable, Optional, Tuple
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
+from .light import Light
 
 LOGGER = logging.getLogger(__name__)
 URL = "/groups"
@@ -13,7 +15,7 @@ URL = "/groups"
 class Groups(APIItems):
     """Represent deCONZ groups."""
 
-    def __init__(self, raw: dict, request: object) -> None:
+    def __init__(self, raw: dict, request: Callable[..., Optional[dict]]) -> None:
         super().__init__(raw, request, URL, DeconzGroup)
 
 
@@ -26,7 +28,9 @@ class DeconzGroup(DeconzDevice):
 
     DECONZ_TYPE = "groups"
 
-    def __init__(self, device_id: str, raw: dict, request: object) -> None:
+    def __init__(
+        self, device_id: str, raw: dict, request: Callable[..., Optional[dict]]
+    ) -> None:
         """Set initial information about light group.
 
         Create scenes related to light group.
@@ -45,7 +49,7 @@ class DeconzGroup(DeconzDevice):
         return self.any_on
 
     @property
-    def brightness(self) -> int:
+    def brightness(self) -> Optional[int]:
         """Brightness of the light.
 
         Depending on the light type 0 might not mean visible "off"
@@ -54,12 +58,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("bri")
 
     @property
-    def ct(self) -> int:
+    def ct(self) -> Optional[int]:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["action"].get("ct")
 
     @property
-    def hue(self) -> int:
+    def hue(self) -> Optional[int]:
         """Color hue of the light.
 
         The hue parameter in the HSV color model is between 0°-360°
@@ -68,7 +72,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("hue")
 
     @property
-    def sat(self) -> int:
+    def sat(self) -> Optional[int]:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -77,7 +81,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("sat")
 
     @property
-    def xy(self):
+    def xy(self) -> Optional[Tuple[float, float]]:
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
         x, y = self.raw["action"].get("xy", (None, None))
 
@@ -93,7 +97,7 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def colormode(self) -> str:
+    def colormode(self) -> Optional[str]:
         """The current color mode of the light.
 
         hs - hue and saturation
@@ -103,7 +107,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("colormode")
 
     @property
-    def effect(self) -> str:
+    def effect(self) -> Optional[str]:
         """Effect of the group.
 
         none - no effect
@@ -112,32 +116,32 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("effect")
 
     @property
-    def reachable(self) -> bool:
+    def reachable(self) -> Optional[bool]:
         """True if the group is reachable and accepts commands."""
         return True
 
     @property
-    def groupclass(self) -> str:
+    def groupclass(self) -> Optional[str]:
         """"""
         return self.raw.get("class")
 
     @property
-    def all_on(self) -> bool:
+    def all_on(self) -> Optional[bool]:
         """True if all lights in light group are on"""
         return self.raw["state"].get("all_on")
 
     @property
-    def any_on(self) -> bool:
+    def any_on(self) -> Optional[bool]:
         """True if any lights in light group are on"""
         return self.raw["state"].get("any_on")
 
     @property
-    def devicemembership(self) -> list:
+    def devicemembership(self) -> Optional[list]:
         """List of device ids (sensors) when group was created by a device."""
         return self.raw.get("devicemembership")
 
     @property
-    def hidden(self) -> bool:
+    def hidden(self) -> Optional[bool]:
         """Indicate the hidden status of the group.
 
         Has no effect at the gateway but apps can uses this to hide groups.
@@ -145,12 +149,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("hidden")
 
     @property
-    def id(self) -> str:
+    def id(self) -> Optional[str]:
         """The id of the group."""
         return self.raw.get("id")
 
     @property
-    def lights(self) -> list:
+    def lights(self) -> Optional[list]:
         """A list of all light ids of this group.
 
         Sequence is defined by the gateway.
@@ -158,7 +162,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lights")
 
     @property
-    def lightsequence(self) -> list:
+    def lightsequence(self) -> Optional[list]:
         """A list of light ids of this group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
@@ -166,7 +170,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lightsequence")
 
     @property
-    def multideviceids(self) -> list:
+    def multideviceids(self) -> Optional[list]:
         """A list of light ids of this group.
 
         Subsequent ids from multidevices with multiple endpoints.
@@ -174,11 +178,11 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("multideviceids")
 
     @property
-    def scenes(self):
+    def scenes(self) -> list:
         """A list of scenes of the group."""
         return self._scenes
 
-    def update_color_state(self, light) -> None:
+    def update_color_state(self, light: Light) -> None:
         """Sync color state with light."""
         self.update(
             {
@@ -197,7 +201,9 @@ class DeconzGroup(DeconzDevice):
 class Scenes(APIItems):
     """Represent scenes of a deCONZ group."""
 
-    def __init__(self, group: DeconzGroup, request: object) -> None:
+    def __init__(
+        self, group: DeconzGroup, request: Callable[..., Optional[dict]]
+    ) -> None:
         self.group = group
         url = f"{URL}/{group.device_id}/scenes"
         super().__init__(group.raw["scenes"], request, url, DeconzScene)
@@ -223,7 +229,9 @@ class DeconzScene:
 
     DECONZ_TYPE = "scenes"
 
-    def __init__(self, group: DeconzGroup, raw: dict, request: object):
+    def __init__(
+        self, group: DeconzGroup, raw: dict, request: Callable[..., Optional[dict]]
+    ):
         """Set initial information about scene.
 
         Set callback to set state of device.
