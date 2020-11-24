@@ -141,8 +141,8 @@ class Light(DeconzLight):
     def effect(self) -> Optional[str]:
         """Effect of the light.
 
-        none - no effect
-        colorloop
+        none — no effect.
+        colorloop — the light will cycle continously through all colors with the speed specified by colorloopspeed.
         """
         return self.raw["state"].get("effect")
 
@@ -173,8 +173,8 @@ class Cover(DeconzLight):
         return self.raw["state"]["open"]
 
     @property
-    def position(self) -> int:
-        """Amount of lift.
+    def lift(self) -> int:
+        """Amount of closed position.
 
         0 is fully open.
         100 is fully closed.
@@ -183,16 +183,44 @@ class Cover(DeconzLight):
             return int(self.raw["state"].get("bri") / 2.54)
         return self.raw["state"]["lift"]
 
-    async def set_position(self, position: int) -> None:
-        """Set lift of cover.
+    @property
+    def tilt(self) -> int:
+        """Amount of tilt.
+
+        0 is fully open.
+        100 is fully closed.
+        """
+        if "tilt" in self.raw["state"]:
+            return self.raw["state"]["tilt"]
+        elif "sat" in self.raw["state"]:
+            return int(self.raw["state"]["sat"] / 2.54)
+
+    async def set_position(
+        self, *, lift: Optional[int] = None, tilt: Optional[int] = None
+    ) -> None:
+        """Set amount of closed position and/or tilt of cover.
 
         Lift [int] between 0-100.
         Scale to brightness 0-254.
+        Tilt [int] between 0-100.
+        Scale to saturation 0-254.
         """
-        data = {"lift": position}
-        if "lift" not in self.raw["state"]:
-            data = {"bri": int(position * 2.54)}
-        await self.async_set_state(data)
+        data = {}
+
+        if lift is not None:
+            if "lift" in self.raw["state"]:
+                data["lift"] = lift
+            elif "bri" in self.raw["state"]:
+                data["bri"] = int(lift * 2.54)
+
+        if tilt is not None:
+            if "tilt" in self.raw["state"]:
+                data["tilt"] = tilt
+            elif "sat" in self.raw["state"]:
+                data["sat"] = int(tilt * 2.54)
+
+        if data:
+            await self.async_set_state(data)
 
     async def open(self) -> None:
         """Fully open cover."""
@@ -202,7 +230,7 @@ class Cover(DeconzLight):
         await self.async_set_state(data)
 
     async def close(self) -> None:
-        """Folly close cover."""
+        """Fully close cover."""
         data = {"open": False}
         if "open" not in self.raw["state"]:
             data = {"on": True}
@@ -210,7 +238,10 @@ class Cover(DeconzLight):
 
     async def stop(self) -> None:
         """Stop cover motion."""
-        await self.async_set_state({"bri_inc": 0})
+        data = {"stop": True}
+        if "lift" not in self.raw["state"]:
+            data = {"bri_inc": 0}
+        await self.async_set_state(data)
 
 
 class Fan(Light):

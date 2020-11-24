@@ -156,7 +156,7 @@ async def test_create_cover():
                     "bri": 0,
                     "lift": 0,
                     "on": False,
-                    "open": False,
+                    "open": True,
                     "reachable": True,
                 },
                 "swversion": "100-5.3.5.1122",
@@ -169,8 +169,9 @@ async def test_create_cover():
     cover = lights["0"]
 
     assert cover.state is False
-    assert cover.is_open is False
-    assert cover.position == 0
+    assert cover.is_open is True
+    assert cover.lift == 0
+    assert cover.tilt is None
 
     assert cover.reachable is True
 
@@ -190,14 +191,14 @@ async def test_create_cover():
     event = {"state": {"lift": 50, "open": True}}
     cover.update(event)
     assert cover.is_open is True
-    assert cover.position == 50
+    assert cover.lift == 50
     mock_callback.assert_called_once()
     assert cover.changed_keys == {"state", "lift", "open"}
 
     event = {"state": {"bri": 30, "on": False}}
     cover.update(event)
     assert cover.is_open is True
-    assert cover.position == 50
+    assert cover.lift == 50
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
         await cover.open()
@@ -208,12 +209,21 @@ async def test_create_cover():
         set_state.assert_called_with({"open": False})
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(30)
-        set_state.assert_called_with({"lift": 30})
+        await cover.set_position(lift=30, tilt=60)
+        set_state.assert_called_with({"lift": 30})  # Tilt not supported
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
         await cover.stop()
-        set_state.assert_called_with({"bri_inc": 0})
+        set_state.assert_called_with({"stop": True})
+
+    # Verify tilt works as well
+
+    cover.raw["state"]["tilt"] = 40
+    assert cover.tilt == 40
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.set_position(lift=20, tilt=60)
+        set_state.assert_called_with({"lift": 20, "tilt": 60})
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
@@ -243,7 +253,8 @@ async def test_create_cover_without_lift():
 
     assert cover.state is False
     assert cover.is_open is True
-    assert cover.position == 0
+    assert cover.lift == 0
+    assert cover.tilt is None
 
     assert cover.reachable is True
 
@@ -263,14 +274,14 @@ async def test_create_cover_without_lift():
     event = {"state": {"bri": 50, "on": True}}
     cover.update(event)
     assert cover.is_open is False
-    assert cover.position == 19
+    assert cover.lift == 19
     mock_callback.assert_called_once()
     assert cover.changed_keys == {"state", "bri", "on"}
 
     event = {"state": {"bri": 30, "on": False}}
     cover.update(event)
     assert cover.is_open is True
-    assert cover.position == 11
+    assert cover.lift == 11
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
         await cover.open()
@@ -281,11 +292,27 @@ async def test_create_cover_without_lift():
         set_state.assert_called_with({"on": True})
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(30)
+        await cover.set_position(lift=30)
         set_state.assert_called_with({"bri": 76})
 
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.stop()
+        set_state.assert_called_with({"bri_inc": 0})
+
+    # Verify sat (for tilt) works as well
+
+    cover.raw["state"]["sat"] = 40
+    assert cover.tilt == 15
+
+    with patch.object(cover, "async_set_state", return_value=True) as set_state:
+        await cover.set_position(lift=20, tilt=60)
+        set_state.assert_called_with({"bri": 50, "sat": 152})
+
     cover.raw["state"]["lift"] = 0
+    cover.raw["state"]["tilt"] = 0
     cover.raw["state"]["open"] = True
+
+    assert cover.tilt == 0
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
         await cover.open()
@@ -296,8 +323,8 @@ async def test_create_cover_without_lift():
         set_state.assert_called_with({"open": False})
 
     with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(30)
-        set_state.assert_called_with({"lift": 30})
+        await cover.set_position(lift=20, tilt=60)
+        set_state.assert_called_with({"lift": 20, "tilt": 60})
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
