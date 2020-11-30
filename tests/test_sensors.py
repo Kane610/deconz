@@ -1124,7 +1124,110 @@ async def test_temperature_sensor():
     assert sensor.state is None
 
 
-async def test_thermostat_sensor():
+async def test_danfoss_thermostat():
+    """Verify that Danfoss thermostat works.
+
+    Danfoss thermostat is the simplest kind with only control over temperature.
+    """
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 59,
+                    "displayflipped": None,
+                    "heatsetpoint": 2100,
+                    "locked": None,
+                    "mountingmode": None,
+                    "offset": 0,
+                    "on": True,
+                    "reachable": True,
+                },
+                "ep": 1,
+                "etag": "6130553ac247174809bae47144ee23f8",
+                "lastseen": "2020-11-29T19:31Z",
+                "manufacturername": "Danfoss",
+                "modelid": "eTRV0100",
+                "name": "Thermostat_stue_sofa",
+                "state": {
+                    "errorcode": None,
+                    "lastupdated": "2020-11-29T19:28:40.665",
+                    "mountingmodeactive": False,
+                    "on": True,
+                    "temperature": 2102,
+                    "valve": 24,
+                    "windowopen": "Closed",
+                },
+                "swversion": "01.02.0008 01.02",
+                "type": "ZHAThermostat",
+                "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-0201",
+            },
+            "1": {
+                "config": {"battery": 59, "on": True, "reachable": True},
+                "ep": 1,
+                "etag": "05f880e68da6c1fcadbc471c632e85c8",
+                "lastseen": "2020-11-29T19:31Z",
+                "manufacturername": "Danfoss",
+                "modelid": "eTRV0100",
+                "name": "Thermostat_stue_sofa",
+                "state": {
+                    "lastset": "2020-11-24T21:03:15Z",
+                    "lastupdated": "2020-11-29T16:25:50.359",
+                    "localtime": "2020-11-29T17:25:45",
+                    "utc": "2020-11-29T16:25:45Z",
+                },
+                "swversion": "01.02.0008 01.02",
+                "type": "ZHATime",
+                "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-000a",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
+
+    assert sensor.state == 21.0
+    assert sensor.coolsetpoint is None
+    assert sensor.errorcode is None
+    assert sensor.fanmode is None
+    assert sensor.floortemperature is None
+    assert sensor.heating is None
+    assert sensor.heatsetpoint == 21.00
+    assert sensor.locked is None
+    assert sensor.mode is None
+    assert sensor.mountingmode is None
+    assert sensor.mountingmodeactive is False
+    assert sensor.offset == 0
+    assert sensor.preset is None
+    assert sensor.state_on is True
+    assert sensor.swingmode is None
+    assert sensor.temperature == 21.0
+    assert sensor.temperaturemeasurement is None
+    assert sensor.valve == 24
+    assert sensor.windowopen_set is None
+
+    # DeconzSensor
+    assert sensor.battery == 59
+    assert sensor.ep == 1
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "6130553ac247174809bae47144ee23f8"
+    assert sensor.manufacturer == "Danfoss"
+    assert sensor.modelid == "eTRV0100"
+    assert sensor.name == "Thermostat_stue_sofa"
+    assert sensor.swversion == "01.02.0008 01.02"
+    assert sensor.type == "ZHAThermostat"
+    assert sensor.uniqueid == "14:b4:57:ff:fe:d5:4e:77-01-0201"
+
+
+async def test_eurotronic_thermostat():
     """Verify that thermostat sensor works."""
     sensors = Sensors(
         {
@@ -1202,7 +1305,7 @@ async def test_thermostat_sensor():
     assert sensor.uniqueid == "00:15:8d:00:01:92:d2:51-01-0201"
 
 
-async def test_tuya_thermostat_sensor():
+async def test_tuya_thermostat():
     """Verify that Tuya thermostat works."""
     sensors = Sensors(
         {
