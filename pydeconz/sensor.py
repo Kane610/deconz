@@ -509,7 +509,7 @@ class Thermostat(Temperature):
         - "smart"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.raw["state"].get("fanmode")
+        return self.raw["config"].get("fanmode")
 
     @property
     def floortemperature(self) -> Optional[int]:
