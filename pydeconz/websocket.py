@@ -83,17 +83,12 @@ class WSClient:
 
         except aiohttp.ClientConnectorError:
             LOGGER.error("Client connection error")
-            if self.state != STATE_STOPPED:
-                self.retry()
 
         except Exception as err:
             LOGGER.error("Unexpected error %s", err)
-            if self.state != STATE_STOPPED:
-                self.retry()
 
-        else:
-            if self.state != STATE_STOPPED:
-                self.retry()
+        if self.state != STATE_STOPPED:
+            self.retry()
 
     def stop(self):
         """Close websocket connection."""
