@@ -57,7 +57,7 @@ class WSClient:
         """Start websocket and update its state."""
         if self.state != STATE_RUNNING:
             self.state = STATE_STARTING
-            self.loop.create_task(self.running())
+            create_task(self.running())
 
     async def running(self) -> None:
         """Start websocket connection."""
