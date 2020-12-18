@@ -1,6 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 from asyncio import get_running_loop
+from collections import deque
 import json
 import logging
 
@@ -27,12 +28,15 @@ class WSClient:
 
         self.loop = get_running_loop()
 
-        self._data = None
+        self._data = deque()
         self._state = None
 
     @property
     def data(self):
-        return self._data
+        try:
+            return self._data.popleft()
+        except IndexError:
+            return None
 
     @property
     def state(self):
@@ -65,7 +69,7 @@ class WSClient:
                         break
 
                     elif msg.type == aiohttp.WSMsgType.TEXT:
-                        self._data = json.loads(msg.data)
+                        self._data.append(json.loads(msg.data))
                         self.session_handler_callback("data")
                         LOGGER.debug(msg.data)
 
