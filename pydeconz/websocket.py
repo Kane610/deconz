@@ -1,6 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from asyncio import get_running_loop
+from asyncio import create_task, get_running_loop
+from collections import deque
 import json
 import logging
 
@@ -18,7 +19,9 @@ RETRY_TIMER = 15
 class WSClient:
     """Websocket transport, session handling, message generation."""
 
-    def __init__(self, session, host, port, callback):
+    def __init__(
+        self, session: aiohttp.ClientSession, host: str, port: str, callback: object
+    ) -> None:
         """Create resources for websocket communication."""
         self.session = session
         self.host = host
@@ -27,31 +30,36 @@ class WSClient:
 
         self.loop = get_running_loop()
 
-        self._data = None
+        self._data = deque()
         self._state = None
 
     @property
-    def data(self):
-        return self._data
+    def data(self) -> dict:
+        """Return data from data queue."""
+        try:
+            return self._data.popleft()
+        except IndexError:
+            return {}
 
     @property
-    def state(self):
-        """"""
+    def state(self) -> str:
+        """State of websocket."""
         return self._state
 
     @state.setter
-    def state(self, value):
-        """"""
+    def state(self, value: str) -> None:
+        """Set state of websocket and signal state change to session handler."""
         self._state = value
         LOGGER.debug("Websocket %s", value)
-        self.session_handler_callback("state")
+        create_task(self.session_handler_callback("state"))
 
-    def start(self):
+    def start(self) -> None:
+        """Start websocket and update its state."""
         if self.state != STATE_RUNNING:
             self.state = STATE_STARTING
-            self.loop.create_task(self.running())
+            create_task(self.running())
 
-    async def running(self):
+    async def running(self) -> None:
         """Start websocket connection."""
         url = f"http://{self.host}:{self.port}"
 
@@ -65,8 +73,8 @@ class WSClient:
                         break
 
                     elif msg.type == aiohttp.WSMsgType.TEXT:
-                        self._data = json.loads(msg.data)
-                        self.session_handler_callback("data")
+                        self._data.append(json.loads(msg.data))
+                        create_task(self.session_handler_callback("data"))
                         LOGGER.debug(msg.data)
 
                     elif msg.type == aiohttp.WSMsgType.CLOSED:
@@ -79,23 +87,18 @@ class WSClient:
 
         except aiohttp.ClientConnectorError:
             LOGGER.error("Client connection error")
-            if self.state != STATE_STOPPED:
-                self.retry()
 
         except Exception as err:
             LOGGER.error("Unexpected error %s", err)
-            if self.state != STATE_STOPPED:
-                self.retry()
 
-        else:
-            if self.state != STATE_STOPPED:
-                self.retry()
+        if self.state != STATE_STOPPED:
+            self.retry()
 
-    def stop(self):
+    def stop(self) -> None:
         """Close websocket connection."""
         self.state = STATE_STOPPED
 
-    def retry(self):
+    def retry(self) -> None:
         """Retry to connect to deCONZ."""
         self.state = STATE_STARTING
         self.loop.call_later(RETRY_TIMER, self.start)

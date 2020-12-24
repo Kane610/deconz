@@ -115,7 +115,7 @@ class DeconzSession:
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    def session_handler(self, signal: str) -> None:
+    async def session_handler(self, signal: str) -> None:
         """Signalling from websocket.
 
         data - new data available for processing.
