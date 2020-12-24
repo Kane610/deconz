@@ -227,12 +227,12 @@ async def test_session_handler():
     # Event data
 
     with patch.object(session, "event_handler", return_value=True) as event_handler:
-        session.session_handler(signal="data")
+        await session.session_handler(signal="data")
         event_handler.assert_called()
 
     # Connection status changed
 
-    session.session_handler(signal="state")
+    await session.session_handler(signal="state")
     session.async_connection_status_callback.assert_called_with(True)
 
 
