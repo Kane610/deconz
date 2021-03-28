@@ -3,14 +3,14 @@
 pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 """
 
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 from pydeconz.sensor import SENSOR_CLASSES, Thermostat, create_sensor, Sensors
 
 
 async def test_create_sensor():
     """Verify that create-sensor can create all types."""
-    assert len(SENSOR_CLASSES) == 21
+    assert len(SENSOR_CLASSES) == 22
 
     for sensor_class in SENSOR_CLASSES:
         for sensor_type in sensor_class.ZHATYPE:
@@ -380,6 +380,72 @@ async def test_daylight_sensor():
 
         assert sensor.state == v
         assert sensor.changed_keys == {"state", "status"}
+
+
+async def test_door_lock_sensor():
+    """Verify that door lock sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "lock": False,
+                    "on": True,
+                    "reachable": True,
+                },
+                "ep": 11,
+                "etag": "a43862f76b7fa48b0fbb9107df123b0e",
+                "lastseen": "2021-03-06T22:25Z",
+                "manufacturername": "Onesti Products AS",
+                "modelid": "easyCodeTouch_v1",
+                "name": "easyCodeTouch_v1",
+                "state": {
+                    "lastupdated": "2021-03-06T21:25:45.624",
+                    "lockstate": "unlocked",
+                },
+                "swversion": "20201211",
+                "type": "ZHADoorLock",
+                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHADoorLock",)
+
+    assert sensor.state == "unlocked"
+    assert sensor.is_locked is False
+    assert sensor.lockstate == "unlocked"
+    assert sensor.lockconfig is False
+
+    # DeconzSensor
+    assert sensor.battery == 100
+    assert sensor.ep == 11
+    assert sensor.lowbattery is None
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "a43862f76b7fa48b0fbb9107df123b0e"
+    assert sensor.manufacturer == "Onesti Products AS"
+    assert sensor.modelid == "easyCodeTouch_v1"
+    assert sensor.name == "easyCodeTouch_v1"
+    assert sensor.swversion == "20201211"
+    assert sensor.type == "ZHADoorLock"
+    assert sensor.uniqueid == "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101"
+
+    with patch.object(sensor, "async_set_config", return_value=True) as set_config:
+        await sensor.lock()
+        set_config.assert_called_with({"lock": True})
+
+    with patch.object(sensor, "async_set_config", return_value=True) as set_config:
+        await sensor.unlock()
+        set_config.assert_called_with({"lock": False})
 
 
 async def test_fire_sensor():

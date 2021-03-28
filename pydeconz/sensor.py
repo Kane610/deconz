@@ -233,6 +233,42 @@ class Daylight(DeconzSensor):
         return self.raw["config"]["sunsetoffset"]
 
 
+class DoorLock(DeconzSensor):
+    """Door lock sensor."""
+
+    STATE_PROPERTY = "lockstate"
+    ZHATYPE = ("ZHADoorLock",)
+
+    @property
+    def is_locked(self) -> bool:
+        """Return True if lock is locked."""
+        return self.lockstate == "locked"
+
+    @property
+    def lockstate(self) -> str:
+        """State the lock is in.
+
+        locked
+        unlocked
+        undefined
+        not fully locked
+        """
+        return self.raw["state"]["lockstate"]
+
+    @property
+    def lockconfig(self) -> bool:
+        """Lock configuration."""
+        return self.raw["config"]["lock"]
+
+    async def lock(self) -> None:
+        """Lock the lock."""
+        await self.async_set_config({"lock": True})
+
+    async def unlock(self) -> None:
+        """Unlock the lock."""
+        await self.async_set_config({"lock": False})
+
+
 class Fire(DeconzBinarySensor):
     """Fire sensor."""
 
@@ -695,6 +731,7 @@ SENSOR_CLASSES = (
     CarbonMonoxide,
     Consumption,
     Daylight,
+    DoorLock,
     Fire,
     GenericFlag,
     GenericStatus,
@@ -723,6 +760,7 @@ def create_sensor(
     Consumption,
     Daylight,
     DeconzSensor,
+    DoorLock,
     Fire,
     GenericFlag,
     GenericStatus,
