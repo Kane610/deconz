@@ -11,7 +11,7 @@ from .errors import raise_error, ResponseError, RequestError
 from .group import Groups
 from .light import Light, Lights
 from .sensor import Sensors
-from .websocket import WSClient
+from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,7 +60,6 @@ class DeconzSession:
     def close(self) -> None:
         """Close websession and websocket to deCONZ."""
         if self.websocket:
-            LOGGER.info("Shutting down connections to deCONZ")
             self.websocket.stop()
 
     async def initialize(self) -> None:
@@ -121,10 +120,10 @@ class DeconzSession:
         data - new data available for processing.
         state - network state has changed.
         """
-        if signal == "data":
+        if signal == SIGNAL_DATA:
             self.event_handler(self.websocket.data)
 
-        elif signal == "state":
+        elif signal == SIGNAL_CONNECTION_STATE:
             if self.async_connection_status_callback:
                 self.async_connection_status_callback(self.websocket.state == "running")
 
