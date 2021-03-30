@@ -2,14 +2,16 @@
 
 from asyncio import create_task, get_running_loop
 from collections import deque
-import json
 import logging
 
 import aiohttp
 
 LOGGER = logging.getLogger(__name__)
 
-STATE_STARTING = "starting"
+SIGNAL_CONNECTION_STATE = "state"
+SIGNAL_DATA = "data"
+
+STATE_RETRYING = "retrying"
 STATE_RUNNING = "running"
 STATE_STOPPED = "stopped"
 
@@ -32,6 +34,7 @@ class WSClient:
 
         self._data = deque()
         self._state = None
+        self._previous_state = None
 
     @property
     def data(self) -> dict:
@@ -48,48 +51,58 @@ class WSClient:
 
     @state.setter
     def state(self, value: str) -> None:
-        """Set state of websocket and signal state change to session handler."""
+        """Set state of websocket and store previous state."""
+        self._previous_state = self._state
         self._state = value
-        LOGGER.debug("Websocket %s", value)
-        create_task(self.session_handler_callback("state"))
+
+    def state_changed(self) -> None:
+        """Signal state change."""
+        create_task(self.session_handler_callback(SIGNAL_CONNECTION_STATE))
 
     def start(self) -> None:
         """Start websocket and update its state."""
-        if self.state != STATE_RUNNING:
-            self.state = STATE_STARTING
-            create_task(self.running())
+        create_task(self.running())
 
     async def running(self) -> None:
         """Start websocket connection."""
+        if self.state == STATE_RUNNING:
+            return
+
         url = f"http://{self.host}:{self.port}"
 
         try:
-            async with self.session.ws_connect(url, heartbeat=15) as ws:
+            async with self.session.ws_connect(url, heartbeat=60) as ws:
+                LOGGER.info("Connected to deCONZ (%s)", self.host)
                 self.state = STATE_RUNNING
+                self.state_changed()
 
                 async for msg in ws:
 
                     if self.state == STATE_STOPPED:
+                        await ws.close()
                         break
 
-                    elif msg.type == aiohttp.WSMsgType.TEXT:
-                        self._data.append(json.loads(msg.data))
-                        create_task(self.session_handler_callback("data"))
+                    if msg.type == aiohttp.WSMsgType.TEXT:
+                        self._data.append(msg.json())
+                        create_task(self.session_handler_callback(SIGNAL_DATA))
                         LOGGER.debug(msg.data)
+                        continue
 
-                    elif msg.type == aiohttp.WSMsgType.CLOSED:
-                        LOGGER.warning("pydeCONZ websocket connection closed")
+                    if msg.type == aiohttp.WSMsgType.CLOSED:
+                        LOGGER.warning("Connection closed (%s)", self.host)
                         break
 
-                    elif msg.type == aiohttp.WSMsgType.ERROR:
-                        LOGGER.error("pydeCONZ websocket error")
+                    if msg.type == aiohttp.WSMsgType.ERROR:
+                        LOGGER.error("Websocket error (%s)", self.host)
                         break
 
         except aiohttp.ClientConnectorError:
-            LOGGER.error("Client connection error")
+            if self.state != STATE_RETRYING:
+                LOGGER.error("Websocket is not accessible (%s)", self.host)
 
         except Exception as err:
-            LOGGER.error("Unexpected error %s", err)
+            if self.state != STATE_RETRYING:
+                LOGGER.error("Unexpected error (%s) %s", self.host, err)
 
         if self.state != STATE_STOPPED:
             self.retry()
@@ -97,9 +110,27 @@ class WSClient:
     def stop(self) -> None:
         """Close websocket connection."""
         self.state = STATE_STOPPED
+        LOGGER.info("Shutting down connection to deCONZ (%s)", self.host)
 
     def retry(self) -> None:
-        """Retry to connect to deCONZ."""
-        self.state = STATE_STARTING
+        """Retry to connect to deCONZ.
+
+        Do an immediate retry without timer and without signalling state change.
+        Signal state change only after first retry fails.
+        """
+        if self.state == STATE_RETRYING and self._previous_state == STATE_RUNNING:
+            LOGGER.info(
+                "Reconnecting to deCONZ (%s) failed, scheduling retry at an interval of %i seconds",
+                self.host,
+                RETRY_TIMER,
+            )
+            self.state_changed()
+
+        self.state = STATE_RETRYING
+
+        if self._previous_state == STATE_RUNNING:
+            LOGGER.info("Reconnecting to deCONZ (%s)", self.host)
+            self.start()
+            return
+
         self.loop.call_later(RETRY_TIMER, self.start)
-        LOGGER.debug("Reconnecting to deCONZ in %i.", RETRY_TIMER)
