@@ -5,7 +5,13 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 
 from unittest.mock import AsyncMock, Mock, patch
 
-from pydeconz.sensor import SENSOR_CLASSES, Thermostat, create_sensor, Sensors
+from pydeconz.sensor import (
+    DEVICE_MODE_DUAL_ROCKER,
+    SENSOR_CLASSES,
+    Thermostat,
+    create_sensor,
+    Sensors,
+)
 
 
 async def test_create_sensor():
@@ -1029,6 +1035,73 @@ async def test_switch_sensor_cube():
     assert sensor.swversion == "20160704"
     assert sensor.type == "ZHASwitch"
     assert sensor.uniqueid == "00:15:8d:00:02:8b:3b:24-03-000c"
+
+
+async def test_switch_sensor_hue_wall_switch_module():
+    """Verify that cube switch sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "battery": 100,
+                    "devicemode": "dualrocker",
+                    "on": True,
+                    "pending": [],
+                    "reachable": True,
+                },
+                "ep": 1,
+                "etag": "01173dc5b19bb0a976006eee8d0d3718",
+                "lastseen": "2021-03-12T22:55Z",
+                "manufacturername": "Signify Netherlands B.V.",
+                "mode": 1,
+                "modelid": "RDM001",
+                "name": "RDM001 15",
+                "state": {
+                    "buttonevent": 1002,
+                    "eventduration": 1,
+                    "lastupdated": "2021-03-12T22:21:20.017",
+                },
+                "swversion": "20210115",
+                "type": "ZHASwitch",
+                "uniqueid": "00:17:88:01:0b:00:05:5d-01-fc00",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is False
+    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
+
+    assert sensor.state == 1002
+    assert sensor.buttonevent == 1002
+    assert sensor.eventduration == 1
+    assert sensor.devicemode == DEVICE_MODE_DUAL_ROCKER
+    assert not sensor.angle
+    assert not sensor.gesture
+    assert not sensor.mode
+    assert not sensor.windowcoveringtype
+    assert not sensor.xy
+
+    # DeconzSensor
+    assert sensor.battery == 100
+    assert not sensor.config_pending
+    assert sensor.ep == 1
+    assert not sensor.lowbattery
+    assert sensor.on
+    assert sensor.reachable
+    assert not sensor.tampered
+    assert not sensor.secondary_temperature
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "01173dc5b19bb0a976006eee8d0d3718"
+    assert sensor.manufacturer == "Signify Netherlands B.V."
+    assert sensor.modelid == "RDM001"
+    assert sensor.name == "RDM001 15"
+    assert sensor.swversion == "20210115"
+    assert sensor.type == "ZHASwitch"
+    assert sensor.uniqueid == "00:17:88:01:0b:00:05:5d-01-fc00"
 
 
 async def test_switch_sensor_tint_remote():

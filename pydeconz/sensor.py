@@ -9,6 +9,11 @@ from .deconzdevice import DeconzDevice
 LOGGER = logging.getLogger(__name__)
 URL = "/sensors"
 
+DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
+DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
+DEVICE_MODE_DUAL_ROCKER = "dualrocker"
+DEVICE_MODE_DUAL_PUSH_BUTTON = "dualpushbutton"
+
 
 class Sensors(APIItems):
     """Represent deCONZ sensors."""
@@ -39,6 +44,14 @@ class DeconzSensor(DeconzDevice):
     def battery(self) -> Optional[int]:
         """Battery status of sensor."""
         return self.raw["config"].get("battery")
+
+    @property
+    def config_pending(self) -> list:
+        """List of configurations pending device acceptance.
+
+        Only supported by Hue devices.
+        """
+        return self.raw["config"].get("pending", [])
 
     @property
     def ep(self) -> Optional[int]:
@@ -465,6 +478,36 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("xy")
 
     @property
+    def eventduration(self) -> Optional[int]:
+        """Duration of a push button event for the Hue wall switch module.
+
+        Increased with 8 for each x001, and they are issued pretty much every 800ms.
+        """
+        return self.raw["state"].get("eventduration")
+
+    @property
+    def devicemode(self) -> Optional[str]:
+        """Different modes for the Hue wall switch module.
+
+        Behavior as rocker:
+          Issues a x000/x002 each time you flip the rocker (to either position).
+          The event duration for the x002 is 1 (for 100ms),
+          but lastupdated suggests it follows the x000 faster than that.
+
+        Behavior as pushbutton:
+          Issues a x000/x002 sequence on press/release.
+          Issues a x000/x001/.../x001/x003 on press/hold/release.
+          Similar to Hue remotes.
+
+        Supported values:
+        - "singlerocker"
+        - "singlepushbutton"
+        - "dualrocker"
+        - "dualpushbutton"
+        """
+        return self.raw["config"].get("devicemode")
+
+    @property
     def mode(self) -> Optional[str]:
         """For Ubisys S1/S2, operation mode of the switch.
 
@@ -476,7 +519,7 @@ class Switch(DeconzSensor):
 
     @property
     def windowcoveringtype(self) -> Optional[int]:
-        """Sets the covering type and starts calibration for ubisys J1.
+        """Sets the covering type and starts calibration for Ubisys J1.
 
         Supported values:
         - 0 = Roller Shade
