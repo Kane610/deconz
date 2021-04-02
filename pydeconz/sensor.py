@@ -9,6 +9,23 @@ from .deconzdevice import DeconzDevice
 LOGGER = logging.getLogger(__name__)
 URL = "/sensors"
 
+DAYLIGHT_STATUS = {
+    100: "nadir",
+    110: "night_end",
+    120: "nautical_dawn",
+    130: "dawn",
+    140: "sunrise_start",
+    150: "sunrise_end",
+    160: "golden_hour_1",
+    170: "solar_noon",
+    180: "golden_hour_2",
+    190: "sunset_start",
+    200: "sunset_end",
+    210: "dusk",
+    220: "nautical_dusk",
+    230: "night_start",
+}
+
 DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
 DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
 DEVICE_MODE_DUAL_ROCKER = "dualrocker"
@@ -46,12 +63,12 @@ class DeconzSensor(DeconzDevice):
         return self.raw["config"].get("battery")
 
     @property
-    def config_pending(self) -> list:
+    def config_pending(self) -> Optional[list]:
         """List of configurations pending device acceptance.
 
         Only supported by Hue devices.
         """
-        return self.raw["config"].get("pending", [])
+        return self.raw["config"].get("pending")
 
     @property
     def ep(self) -> Optional[int]:
@@ -198,36 +215,7 @@ class Daylight(DeconzSensor):
     @property
     def status(self) -> str:
         """Return the daylight status string."""
-        status = self.raw["state"]["status"]
-        if status == 100:
-            return "nadir"
-        if status == 110:
-            return "night_end"
-        if status == 120:
-            return "nautical_dawn"
-        if status == 130:
-            return "dawn"
-        if status == 140:
-            return "sunrise_start"
-        if status == 150:
-            return "sunrise_end"
-        if status == 160:
-            return "golden_hour_1"
-        if status == 170:
-            return "solar_noon"
-        if status == 180:
-            return "golden_hour_2"
-        if status == 190:
-            return "sunset_start"
-        if status == 200:
-            return "sunset_end"
-        if status == 210:
-            return "dusk"
-        if status == 220:
-            return "nautical_dusk"
-        if status == 230:
-            return "night_start"
-        return "unknown"
+        return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
 
     @property
     def sunriseoffset(self) -> int:
