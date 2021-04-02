@@ -1,6 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
+from typing import Optional
 
 from .utils import normalize_bridge_id
 
@@ -16,67 +17,67 @@ class DeconzConfig:
     http://dresden-elektronik.github.io/deconz-rest-doc/config/
     """
 
-    def __init__(self, raw):
+    def __init__(self, raw: Optional[dict]) -> None:
         """Set configuration about deCONZ gateway."""
         self.raw = raw
 
     @property
-    def apiversion(self):
+    def apiversion(self) -> Optional[str]:
         """deCONZ Rest API version."""
         return self.raw.get("apiversion")
 
     @property
-    def bridgeid(self):
+    def bridgeid(self) -> str:
         """Hardware ID."""
         return normalize_bridge_id(self.raw.get("bridgeid", UNINITIALIZED_BRIDGE_ID))
 
     @property
-    def linkbutton(self):
+    def linkbutton(self) -> Optional[bool]:
         """True if gateway is unlocked."""
         return self.raw.get("linkbutton")
 
     @property
-    def mac(self):
+    def mac(self) -> Optional[str]:
         """MAC address of gateway."""
         return self.raw.get("mac")
 
     @property
-    def modelid(self):
+    def modelid(self) -> Optional[str]:
         """Model describing either conbee or raspbee."""
         return self.raw.get("modelid")
 
     @property
-    def name(self):
+    def name(self) -> Optional[str]:
         """Name of the gateway."""
         return self.raw.get("name")
 
     @property
-    def networkopenduration(self):
+    def networkopenduration(self) -> Optional[int]:
         """Can be used to store the permitjoin value permanently."""
         return self.raw.get("networkopenduration")
 
     @property
-    def panid(self):
+    def panid(self) -> Optional[int]:
         """The ZigBee pan ID of the gateway."""
         return self.raw.get("panid")
 
     @property
-    def swversion(self):
+    def swversion(self) -> Optional[str]:
         """The software version of the gateway."""
         return self.raw.get("swversion")
 
     @property
-    def uuid(self):
+    def uuid(self) -> Optional[str]:
         """UPNP Unique Id of the gateway."""
         return self.raw.get("uuid")
 
     @property
-    def websocketport(self):
+    def websocketport(self) -> Optional[int]:
         """Websocket port."""
         return self.raw.get("websocketport")
 
     @property
-    def zigbeechannel(self):
+    def zigbeechannel(self) -> Optional[int]:
         """The current wireless frequency channel used by the Gateway.
 
         Supported channels: 11, 15, 20, 25."""
