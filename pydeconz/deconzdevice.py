@@ -16,8 +16,6 @@ class DeconzDevice(APIItem):
     http://dresden-elektronik.github.io/deconz-rest-doc/
     """
 
-    DECONZ_TYPE = ""
-
     def __init__(
         self, device_id: str, raw: dict, request: Callable[..., Optional[dict]]
     ) -> None:
@@ -26,6 +24,15 @@ class DeconzDevice(APIItem):
         self.device_id = device_id
 
         LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
+
+    @property
+    def resource_type(self) -> str:
+        """Resource type, e.g. groups/lights/sensors."""
+
+    @property
+    def deconz_id(self) -> str:
+        """Id to call device over API e.g. /sensors/1."""
+        return f"/{self.resource_type}/{self.device_id}"
 
     async def async_set_config(self, data: dict) -> None:
         """Set config of device."""
@@ -36,11 +43,6 @@ class DeconzDevice(APIItem):
         """Set state of device."""
         field = f"{self.deconz_id}/state"
         await self.async_set(field, data)
-
-    @property
-    def deconz_id(self) -> str:
-        """Id to call device over API e.g. /sensors/1."""
-        return f"/{self.DECONZ_TYPE}/{self.device_id}"
 
     @property
     def etag(self) -> Optional[str]:

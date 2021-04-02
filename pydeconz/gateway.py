@@ -8,12 +8,15 @@ from aiohttp import client_exceptions
 
 from .config import DeconzConfig
 from .errors import raise_error, ResponseError, RequestError
-from .group import Groups
-from .light import Light, Lights
-from .sensor import Sensors
+from .group import Groups, RESOURCE_TYPE as GROUP_RESOURCE
+from .light import Light, Lights, RESOURCE_TYPE as LIGHT_RESOURCE
+from .sensor import Sensors, RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
 
 LOGGER = logging.getLogger(__name__)
+
+EVENT_ADDED = "added"
+EVENT_CHANGED = "changed"
 
 
 class DeconzSession:
@@ -147,32 +150,32 @@ class DeconzSession:
             'uniqueid': '00:17:88:01:02:03:04:fc-0b'
         }
         """
-        if event.get("e") not in ("added", "changed"):
+        if (event_type := event["e"]) not in (EVENT_ADDED, EVENT_CHANGED):
             LOGGER.debug("Unsupported event %s", event)
             return
 
-        if event["r"] not in ("groups", "lights", "sensors"):
+        if (resource_type := event["r"]) not in (
+            GROUP_RESOURCE,
+            LIGHT_RESOURCE,
+            SENSOR_RESOURCE,
+        ):
             LOGGER.debug("Unsupported resource %s", event)
             return
 
-        if event["r"] == "groups":
-            resource, device_class = ("group", self.groups)
-        elif event["r"] == "lights":
-            resource, device_class = ("light", self.lights)
-        elif event["r"] == "sensors":
-            resource, device_class = ("sensor", self.sensors)
+        device_class = getattr(self, resource_type)
+        device_id = event["id"]
 
-        if event["e"] == "changed" and event["id"] in device_class:
-            device_class.process_raw({event["id"]: event})
-            if event["r"] == "lights" and "attr" not in event:
-                self.update_group_color([event["id"]])
+        if event_type == EVENT_CHANGED and device_id in device_class:
+            device_class.process_raw({device_id: event})
+            if resource_type == LIGHT_RESOURCE and "attr" not in event:
+                self.update_group_color([device_id])
             return
 
-        if event["e"] == "added" and event["id"] not in device_class:
-            device_class.process_raw({event["id"]: event[resource]})
-            device = device_class[event["id"]]
+        if event_type == EVENT_ADDED and device_id not in device_class:
+            device_class.process_raw({device_id: event[resource_type[:-1]]})
+            device = device_class[device_id]
             if self.async_add_device_callback:
-                self.async_add_device_callback(device.DECONZ_TYPE, device)
+                self.async_add_device_callback(resource_type, device)
             return
 
     def update_group_color(self, lights: list) -> None:

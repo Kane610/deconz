@@ -5,6 +5,7 @@ from typing import Callable, Optional, Tuple, Union
 from .api import APIItems
 from .deconzdevice import DeconzDevice
 
+RESOURCE_TYPE = "lights"
 URL = "/lights"
 
 
@@ -26,8 +27,12 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    DECONZ_TYPE = "lights"
     ZHATYPE = set()
+
+    @property
+    def resource_type(self) -> str:
+        """Resource type."""
+        return RESOURCE_TYPE
 
     @property
     def state(self) -> Optional[bool]:

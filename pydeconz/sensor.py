@@ -7,6 +7,7 @@ from .api import APIItems
 from .deconzdevice import DeconzDevice
 
 LOGGER = logging.getLogger(__name__)
+RESOURCE_TYPE = "sensors"
 URL = "/sensors"
 
 DAYLIGHT_STATUS = {
@@ -46,11 +47,15 @@ class DeconzSensor(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
-    DECONZ_TYPE = "sensors"
     BINARY = False
     ZHATYPE = set()
 
     STATE_PROPERTY = "on"
+
+    @property
+    def resource_type(self) -> str:
+        """Resource type."""
+        return RESOURCE_TYPE
 
     @property
     def state(self) -> Union[bool, int, str, None]:
