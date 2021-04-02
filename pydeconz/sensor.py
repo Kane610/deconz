@@ -152,6 +152,28 @@ class Alarm(DeconzBinarySensor):
         return self.raw["state"]["alarm"]
 
 
+class AncillaryControl(DeconzSensor):
+    """Ancillary control sensor."""
+
+    STATE_PROPERTY = "action"
+    ZHATYPE = ("ZHAAncillaryControlSensor",)
+
+    @property
+    def action(self) -> str:
+        """Action."""
+        return self.raw["state"]["action"]
+
+    @property
+    def panel(self) -> str:
+        """Panel."""
+        return self.raw["state"]["panel"]
+
+    @property
+    def armed(self) -> str:
+        """Armed."""
+        return self.raw["config"]["armed"]
+
+
 class Battery(DeconzSensor):
     """Battery sensor."""
 
@@ -763,6 +785,7 @@ class Water(DeconzBinarySensor):
 SENSOR_CLASSES = (
     AirQuality,
     Alarm,
+    AncillaryControl,
     Battery,
     CarbonMonoxide,
     Consumption,
@@ -791,6 +814,7 @@ def create_sensor(
 ) -> Union[
     AirQuality,
     Alarm,
+    AncillaryControl,
     Battery,
     CarbonMonoxide,
     Consumption,

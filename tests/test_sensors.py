@@ -16,7 +16,7 @@ from pydeconz.sensor import (
 
 async def test_create_sensor():
     """Verify that create-sensor can create all types."""
-    assert len(SENSOR_CLASSES) == 22
+    assert len(SENSOR_CLASSES) == 23
 
     for sensor_class in SENSOR_CLASSES:
         for sensor_type in sensor_class.ZHATYPE:
@@ -145,6 +145,67 @@ async def test_alarm_sensor():
     assert sensor.swversion == "20170627"
     assert sensor.type == "ZHAAlarm"
     assert sensor.uniqueid == "00:15:8d:00:02:b5:d1:80-01-0500"
+
+
+async def test_ancillary_control_sensor():
+    """Verify that ancillary control sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {
+                    "armed": "disarmed",
+                    "enrolled": 0,
+                    "on": True,
+                    "pending": [],
+                    "reachable": True,
+                },
+                "ep": 1,
+                "etag": "3c4008d74035dfaa1f0bb30d24468b12",
+                "lastseen": "2021-04-02T13:07Z",
+                "manufacturername": "Universal Electronics Inc",
+                "modelid": "URC4450BC0-X-R",
+                "name": "Keypad",
+                "state": {
+                    "action": "armed_away,1111,55",
+                    "lastupdated": "2021-04-02T13:08:18.937",
+                    "lowbattery": False,
+                    "panel": "disarmed",
+                    "tampered": True,
+                },
+                "type": "ZHAAncillaryControlSensor",
+                "uniqueid": "00:0d:6f:00:13:4f:61:39-01-0501",
+            },
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert not sensor.BINARY
+    assert sensor.ZHATYPE == ("ZHAAncillaryControlSensor",)
+
+    assert sensor.state == "armed_away,1111,55"
+    assert sensor.action == "armed_away,1111,55"
+    assert sensor.panel == "disarmed"
+    assert sensor.armed == "disarmed"
+
+    # DeconzSensor
+    assert not sensor.battery
+    assert sensor.ep == 1
+    assert not sensor.lowbattery
+    assert sensor.on
+    assert sensor.reachable
+    assert sensor.tampered
+    assert not sensor.secondary_temperature
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "3c4008d74035dfaa1f0bb30d24468b12"
+    assert sensor.manufacturer == "Universal Electronics Inc"
+    assert sensor.modelid == "URC4450BC0-X-R"
+    assert sensor.name == "Keypad"
+    assert not sensor.swversion
+    assert sensor.type == "ZHAAncillaryControlSensor"
+    assert sensor.uniqueid == "00:0d:6f:00:13:4f:61:39-01-0501"
 
 
 async def test_battery_sensor():
