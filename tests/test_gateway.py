@@ -28,17 +28,44 @@ def mock_aioresponse():
         yield m
 
 
-async def test_websocket(mock_aioresponse):
+async def test_websocket_not_setup():
+    """Test websocket method is not set up if websocket port is not provided."""
+    session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
+
+    with patch("pydeconz.gateway.WSClient") as mock_wsclient:
+        session.start()
+        assert not session.websocket
+        mock_wsclient.assert_not_called()
+
+        session.close()
+
+
+async def test_websocket_setup(mock_aioresponse):
     """Test websocket methods work."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
 
-    session.start()
+    with patch("pydeconz.gateway.WSClient") as mock_wsclient:
+        session.start(websocketport=443)
+        assert session.websocket
+        mock_wsclient.assert_called()
+        session.websocket.start.assert_called()
+
     session.close()
-    assert session.websocket is None
+    session.websocket.stop.assert_called()
+
+
+async def test_websocket_config_provided_websocket_port(mock_aioresponse):
+    """Test websocket methods work."""
+    session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
 
     mock_aioresponse.get(
         f"http://{HOST}:{PORT}/api/{API_KEY}",
-        payload={"config": {}, "groups": {}, "lights": {}, "sensors": {}},
+        payload={
+            "config": {"websocketport": 8080},
+            "groups": {},
+            "lights": {},
+            "sensors": {},
+        },
         content_type="application/json",
         status=200,
     )

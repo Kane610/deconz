@@ -44,18 +44,19 @@ class DeconzSession:
         self.sensors = None
         self.websocket = None
 
-    def start(self) -> None:
+    def start(self, websocketport: Optional[int] = None) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
-            self.websocket = WSClient(
-                self.session,
-                self.host,
-                self.config.websocketport,
-                self.session_handler,
-            )
-            self.websocket.start()
-        else:
-            LOGGER.error("No deCONZ config available")
+            websocketport = self.config.websocketport
+
+        if not websocketport:
+            LOGGER.error("No websocket port specified")
+            return
+
+        self.websocket = WSClient(
+            self.session, self.host, websocketport, self.session_handler
+        )
+        self.websocket.start()
 
     def close(self) -> None:
         """Close websession and websocket to deCONZ."""

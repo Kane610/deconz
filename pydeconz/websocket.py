@@ -22,7 +22,7 @@ class WSClient:
     """Websocket transport, session handling, message generation."""
 
     def __init__(
-        self, session: aiohttp.ClientSession, host: str, port: str, callback: object
+        self, session: aiohttp.ClientSession, host: str, port: int, callback: object
     ) -> None:
         """Create resources for websocket communication."""
         self.session = session
