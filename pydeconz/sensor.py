@@ -7,7 +7,25 @@ from .api import APIItems
 from .deconzdevice import DeconzDevice
 
 LOGGER = logging.getLogger(__name__)
+RESOURCE_TYPE = "sensors"
 URL = "/sensors"
+
+DAYLIGHT_STATUS = {
+    100: "nadir",
+    110: "night_end",
+    120: "nautical_dawn",
+    130: "dawn",
+    140: "sunrise_start",
+    150: "sunrise_end",
+    160: "golden_hour_1",
+    170: "solar_noon",
+    180: "golden_hour_2",
+    190: "sunset_start",
+    200: "sunset_end",
+    210: "dusk",
+    220: "nautical_dusk",
+    230: "night_start",
+}
 
 DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
 DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
@@ -29,11 +47,15 @@ class DeconzSensor(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
-    DECONZ_TYPE = "sensors"
     BINARY = False
     ZHATYPE = set()
 
     STATE_PROPERTY = "on"
+
+    @property
+    def resource_type(self) -> str:
+        """Resource type."""
+        return RESOURCE_TYPE
 
     @property
     def state(self) -> Union[bool, int, str, None]:
@@ -46,12 +68,12 @@ class DeconzSensor(DeconzDevice):
         return self.raw["config"].get("battery")
 
     @property
-    def config_pending(self) -> list:
+    def config_pending(self) -> Optional[list]:
         """List of configurations pending device acceptance.
 
         Only supported by Hue devices.
         """
-        return self.raw["config"].get("pending", [])
+        return self.raw["config"].get("pending")
 
     @property
     def ep(self) -> Optional[int]:
@@ -198,36 +220,7 @@ class Daylight(DeconzSensor):
     @property
     def status(self) -> str:
         """Return the daylight status string."""
-        status = self.raw["state"]["status"]
-        if status == 100:
-            return "nadir"
-        if status == 110:
-            return "night_end"
-        if status == 120:
-            return "nautical_dawn"
-        if status == 130:
-            return "dawn"
-        if status == 140:
-            return "sunrise_start"
-        if status == 150:
-            return "sunrise_end"
-        if status == 160:
-            return "golden_hour_1"
-        if status == 170:
-            return "solar_noon"
-        if status == 180:
-            return "golden_hour_2"
-        if status == 190:
-            return "sunset_start"
-        if status == 200:
-            return "sunset_end"
-        if status == 210:
-            return "dusk"
-        if status == 220:
-            return "nautical_dusk"
-        if status == 230:
-            return "night_start"
-        return "unknown"
+        return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
 
     @property
     def sunriseoffset(self) -> int:
@@ -794,7 +787,7 @@ SENSOR_CLASSES = (
 
 
 def create_sensor(
-    sensor_id: str, raw: dict, request: Callable[..., Optional[dict]]
+    resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
 ) -> Union[
     AirQuality,
     Alarm,
@@ -823,7 +816,7 @@ def create_sensor(
     """Simplify creating sensor by not needing to know type."""
     for sensor_class in SENSOR_CLASSES:
         if raw["type"] in sensor_class.ZHATYPE:
-            return sensor_class(sensor_id, raw, request)
+            return sensor_class(resource_id, raw, request)
 
     LOGGER.info("Unsupported sensor type %s", raw)
-    return DeconzSensor(sensor_id, raw, request)
+    return DeconzSensor(resource_id, raw, request)

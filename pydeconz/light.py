@@ -5,6 +5,7 @@ from typing import Callable, Optional, Tuple, Union
 from .api import APIItems
 from .deconzdevice import DeconzDevice
 
+RESOURCE_TYPE = "lights"
 URL = "/lights"
 
 
@@ -26,8 +27,12 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    DECONZ_TYPE = "lights"
     ZHATYPE = set()
+
+    @property
+    def resource_type(self) -> str:
+        """Resource type."""
+        return RESOURCE_TYPE
 
     @property
     def state(self) -> Optional[bool]:
@@ -122,18 +127,16 @@ class Light(DeconzLight):
         return self.raw["state"].get("hascolor")
 
     @property
-    def ctmax(self) -> int:
+    def ctmax(self) -> Optional[int]:
         """Max value for color temperature."""
-        ctmax = self.raw.get("ctmax")
-        if ctmax is not None and ctmax > 650:
+        if (ctmax := self.raw.get("ctmax")) is not None and ctmax > 650:
             ctmax = 650
         return ctmax
 
     @property
-    def ctmin(self) -> int:
+    def ctmin(self) -> Optional[int]:
         """Min value for color temperature."""
-        ctmin = self.raw.get("ctmin")
-        if ctmin is not None and ctmin < 140:
+        if (ctmin := self.raw.get("ctmin")) is not None and ctmin < 140:
             ctmin = 140
         return ctmin
 
@@ -142,7 +145,7 @@ class Light(DeconzLight):
         """Effect of the light.
 
         none — no effect.
-        colorloop — the light will cycle continously through all colors with the speed specified by colorloopspeed.
+        colorloop — the light will cycle continuously through all colors with the speed specified by colorloopspeed.
         """
         return self.raw["state"].get("effect")
 
@@ -168,7 +171,7 @@ class Cover(DeconzLight):
     @property
     def is_open(self) -> bool:
         """True if the cover is open."""
-        if "open" not in self.raw["state"]:
+        if "open" not in self.raw["state"]:  # Legacy support
             return self.state is False
         return self.raw["state"]["open"]
 
@@ -179,7 +182,7 @@ class Cover(DeconzLight):
         0 is fully open.
         100 is fully closed.
         """
-        if "lift" not in self.raw["state"]:
+        if "lift" not in self.raw["state"]:  # Legacy support
             return int(self.raw["state"].get("bri") / 2.54)
         return self.raw["state"]["lift"]
 
@@ -192,7 +195,7 @@ class Cover(DeconzLight):
         """
         if "tilt" in self.raw["state"]:
             return self.raw["state"]["tilt"]
-        elif "sat" in self.raw["state"]:
+        elif "sat" in self.raw["state"]:  # Legacy support
             return int(self.raw["state"]["sat"] / 2.54)
 
     async def set_position(
@@ -210,13 +213,13 @@ class Cover(DeconzLight):
         if lift is not None:
             if "lift" in self.raw["state"]:
                 data["lift"] = lift
-            elif "bri" in self.raw["state"]:
+            elif "bri" in self.raw["state"]:  # Legacy support
                 data["bri"] = int(lift * 2.54)
 
         if tilt is not None:
             if "tilt" in self.raw["state"]:
                 data["tilt"] = tilt
-            elif "sat" in self.raw["state"]:
+            elif "sat" in self.raw["state"]:  # Legacy support
                 data["sat"] = int(tilt * 2.54)
 
         if data:
@@ -225,21 +228,21 @@ class Cover(DeconzLight):
     async def open(self) -> None:
         """Fully open cover."""
         data = {"open": True}
-        if "open" not in self.raw["state"]:
+        if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": False}
         await self.async_set_state(data)
 
     async def close(self) -> None:
         """Fully close cover."""
         data = {"open": False}
-        if "open" not in self.raw["state"]:
+        if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": True}
         await self.async_set_state(data)
 
     async def stop(self) -> None:
         """Stop cover motion."""
         data = {"stop": True}
-        if "lift" not in self.raw["state"]:
+        if "lift" not in self.raw["state"]:  # Legacy support
             data = {"bri_inc": 0}
         await self.async_set_state(data)
 

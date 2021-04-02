@@ -9,6 +9,9 @@ from .deconzdevice import DeconzDevice
 from .light import Light
 
 LOGGER = logging.getLogger(__name__)
+
+RESOURCE_TYPE = "groups"
+RESOURCE_TYPE_SCENE = "scenes"
 URL = "/groups"
 
 
@@ -26,17 +29,20 @@ class DeconzGroup(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
 
-    DECONZ_TYPE = "groups"
-
     def __init__(
-        self, device_id: str, raw: dict, request: Callable[..., Optional[dict]]
+        self, resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
     ) -> None:
         """Set initial information about light group.
 
         Create scenes related to light group.
         """
-        super().__init__(device_id, raw, request)
+        super().__init__(resource_id, raw, request)
         self._scenes = Scenes(self, request)
+
+    @property
+    def resource_type(self) -> str:
+        """Resource type."""
+        return RESOURCE_TYPE
 
     async def async_set_state(self, data: dict) -> None:
         """Set state of light group."""
@@ -205,7 +211,7 @@ class Scenes(APIItems):
         self, group: DeconzGroup, request: Callable[..., Optional[dict]]
     ) -> None:
         self.group = group
-        url = f"{URL}/{group.device_id}/scenes"
+        url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
         super().__init__(group.raw["scenes"], request, url, DeconzScene)
 
     def process_raw(self, raw: list) -> None:
@@ -227,8 +233,6 @@ class DeconzScene:
     http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
     """
 
-    DECONZ_TYPE = "scenes"
-
     def __init__(
         self, group: DeconzGroup, raw: dict, request: Callable[..., Optional[dict]]
     ):
@@ -241,6 +245,11 @@ class DeconzScene:
         self._request = request
         LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
+    @property
+    def resource_type(self) -> str:
+        """Resource type."""
+        return RESOURCE_TYPE_SCENE
+
     async def async_set_state(self, data: dict) -> None:
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
@@ -249,7 +258,7 @@ class DeconzScene:
     @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group.deconz_id}/{self.DECONZ_TYPE}/{self.id}"
+        return f"{self.group.deconz_id}/{self.resource_type}/{self.id}"
 
     @property
     def id(self) -> str:
