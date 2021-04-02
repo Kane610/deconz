@@ -17,11 +17,11 @@ class DeconzDevice(APIItem):
     """
 
     def __init__(
-        self, device_id: str, raw: dict, request: Callable[..., Optional[dict]]
+        self, resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
     ) -> None:
         """Set initial information common to all device types."""
         super().__init__(raw, request)
-        self.device_id = device_id
+        self.resource_id = resource_id
 
         LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
@@ -32,7 +32,7 @@ class DeconzDevice(APIItem):
     @property
     def deconz_id(self) -> str:
         """Id to call device over API e.g. /sensors/1."""
-        return f"/{self.resource_type}/{self.device_id}"
+        return f"/{self.resource_type}/{self.resource_id}"
 
     async def async_set_config(self, data: dict) -> None:
         """Set config of device."""

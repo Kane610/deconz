@@ -787,7 +787,7 @@ SENSOR_CLASSES = (
 
 
 def create_sensor(
-    sensor_id: str, raw: dict, request: Callable[..., Optional[dict]]
+    resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
 ) -> Union[
     AirQuality,
     Alarm,
@@ -816,7 +816,7 @@ def create_sensor(
     """Simplify creating sensor by not needing to know type."""
     for sensor_class in SENSOR_CLASSES:
         if raw["type"] in sensor_class.ZHATYPE:
-            return sensor_class(sensor_id, raw, request)
+            return sensor_class(resource_id, raw, request)
 
     LOGGER.info("Unsupported sensor type %s", raw)
-    return DeconzSensor(sensor_id, raw, request)
+    return DeconzSensor(resource_id, raw, request)

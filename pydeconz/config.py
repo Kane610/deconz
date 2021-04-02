@@ -17,7 +17,7 @@ class DeconzConfig:
     http://dresden-elektronik.github.io/deconz-rest-doc/config/
     """
 
-    def __init__(self, raw: Optional[dict]) -> None:
+    def __init__(self, raw: dict) -> None:
         """Set configuration about deCONZ gateway."""
         self.raw = raw
 

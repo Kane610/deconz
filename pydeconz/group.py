@@ -30,13 +30,13 @@ class DeconzGroup(DeconzDevice):
     """
 
     def __init__(
-        self, device_id: str, raw: dict, request: Callable[..., Optional[dict]]
+        self, resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
     ) -> None:
         """Set initial information about light group.
 
         Create scenes related to light group.
         """
-        super().__init__(device_id, raw, request)
+        super().__init__(resource_id, raw, request)
         self._scenes = Scenes(self, request)
 
     @property
@@ -211,7 +211,7 @@ class Scenes(APIItems):
         self, group: DeconzGroup, request: Callable[..., Optional[dict]]
     ) -> None:
         self.group = group
-        url = f"{URL}/{group.device_id}/{RESOURCE_TYPE_SCENE}"
+        url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
         super().__init__(group.raw["scenes"], request, url, DeconzScene)
 
     def process_raw(self, raw: list) -> None:
