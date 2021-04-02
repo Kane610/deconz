@@ -94,6 +94,12 @@ async def test_create_light():
     light.raw["ctmin"] = 0
     assert light.ctmin == 140
 
+    del light.raw["ctmax"]
+    assert light.ctmax is None
+
+    del light.raw["ctmin"]
+    assert light.ctmin is None
+
     await light.async_set_state({"on": True})
     light._request.assert_called_with("put", "/lights/0/state", json={"on": True})
 
