@@ -172,7 +172,7 @@ async def test_ancillary_control_sensor():
                     "panel": "disarmed",
                     "tampered": True,
                 },
-                "type": "ZHAAncillaryControlSensor",
+                "type": "ZHAAncillaryControl",
                 "uniqueid": "00:0d:6f:00:13:4f:61:39-01-0501",
             },
         },
@@ -181,7 +181,7 @@ async def test_ancillary_control_sensor():
     sensor = sensors["0"]
 
     assert not sensor.BINARY
-    assert sensor.ZHATYPE == ("ZHAAncillaryControlSensor",)
+    assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
 
     assert sensor.state == "armed_away,1111,55"
     assert sensor.action == "armed_away,1111,55"
@@ -204,7 +204,7 @@ async def test_ancillary_control_sensor():
     assert sensor.modelid == "URC4450BC0-X-R"
     assert sensor.name == "Keypad"
     assert not sensor.swversion
-    assert sensor.type == "ZHAAncillaryControlSensor"
+    assert sensor.type == "ZHAAncillaryControl"
     assert sensor.uniqueid == "00:0d:6f:00:13:4f:61:39-01-0501"
 
 
