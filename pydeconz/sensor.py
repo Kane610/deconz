@@ -168,7 +168,7 @@ class Alarm(DeconzBinarySensor):
 class AncillaryControl(DeconzSensor):
     """Ancillary control sensor."""
 
-    STATE_PROPERTY = "action"
+    STATE_PROPERTY = "panel"
     ZHATYPE = ("ZHAAncillaryControl",)
 
     @property

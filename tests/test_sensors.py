@@ -6,6 +6,17 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 from unittest.mock import AsyncMock, Mock, patch
 
 from pydeconz.sensor import (
+    ANCILLARY_CONTROL_ARMED_AWAY,
+    ANCILLARY_CONTROL_ARMED_NIGHT,
+    ANCILLARY_CONTROL_ARMED_STAY,
+    ANCILLARY_CONTROL_ARMING_AWAY,
+    ANCILLARY_CONTROL_ARMING_NIGHT,
+    ANCILLARY_CONTROL_ARMING_STAY,
+    ANCILLARY_CONTROL_DISARMED,
+    ANCILLARY_CONTROL_ENTRY_DELAY,
+    ANCILLARY_CONTROL_EXIT_DELAY,
+    ANCILLARY_CONTROL_IN_ALARM,
+    ANCILLARY_CONTROL_NOT_READY,
     DEVICE_MODE_DUAL_ROCKER,
     SENSOR_CLASSES,
     Thermostat,
@@ -183,7 +194,7 @@ async def test_ancillary_control_sensor():
     assert not sensor.BINARY
     assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
 
-    assert sensor.state == "armed_away,1111,55"
+    assert sensor.state == "disarmed"
     assert sensor.action == "armed_away,1111,55"
     assert sensor.panel == "disarmed"
     assert sensor.armed == "disarmed"
@@ -206,6 +217,61 @@ async def test_ancillary_control_sensor():
     assert not sensor.swversion
     assert sensor.type == "ZHAAncillaryControl"
     assert sensor.uniqueid == "00:0d:6f:00:13:4f:61:39-01-0501"
+
+    await sensor.arm_away()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMED_AWAY}
+    )
+
+    await sensor.arm_night()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMED_NIGHT}
+    )
+
+    await sensor.arm_stay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMED_STAY}
+    )
+
+    await sensor.arming_away()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMING_AWAY}
+    )
+
+    await sensor.arming_night()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMING_NIGHT}
+    )
+
+    await sensor.arming_stay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMING_STAY}
+    )
+
+    await sensor.disarm()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_DISARMED}
+    )
+
+    await sensor.entry_delay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ENTRY_DELAY}
+    )
+
+    await sensor.exit_delay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_EXIT_DELAY}
+    )
+
+    await sensor.in_alarm()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_IN_ALARM}
+    )
+
+    await sensor.not_ready()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_NOT_READY}
+    )
 
 
 async def test_battery_sensor():
