@@ -177,14 +177,14 @@ class AncillaryControl(DeconzSensor):
         return self.raw["state"]["action"]
 
     @property
-    def panel(self) -> str:
-        """Panel."""
-        return self.raw["state"]["panel"]
-
-    @property
     def armed(self) -> str:
         """Armed."""
         return self.raw["config"]["armed"]
+
+    @property
+    def panel(self) -> str:
+        """Panel."""
+        return self.raw["config"]["panel"]
 
     async def arm_away(self) -> None:
         """Set the alarm to away."""
