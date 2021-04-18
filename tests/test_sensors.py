@@ -6,6 +6,7 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 from unittest.mock import AsyncMock, Mock, patch
 
 from pydeconz.sensor import (
+    ANCILLARY_CONTROL_ALREADY_DISARMED,
     ANCILLARY_CONTROL_ARMED_AWAY,
     ANCILLARY_CONTROL_ARMED_NIGHT,
     ANCILLARY_CONTROL_ARMED_STAY,
@@ -16,7 +17,9 @@ from pydeconz.sensor import (
     ANCILLARY_CONTROL_ENTRY_DELAY,
     ANCILLARY_CONTROL_EXIT_DELAY,
     ANCILLARY_CONTROL_IN_ALARM,
+    ANCILLARY_CONTROL_INVALID_CODE,
     ANCILLARY_CONTROL_NOT_READY,
+    ANCILLARY_CONTROL_NOT_READY_TO_ARM,
     DEVICE_MODE_DUAL_ROCKER,
     SENSOR_CLASSES,
     Thermostat,
@@ -220,57 +223,93 @@ async def test_ancillary_control_sensor():
 
     await sensor.arm_away()
     sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMED_AWAY}
+        "put",
+        "/sensors/0/config",
+        json={
+            "armed": ANCILLARY_CONTROL_ARMED_AWAY,
+            "panel": ANCILLARY_CONTROL_ARMED_AWAY,
+        },
     )
 
     await sensor.arm_night()
     sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMED_NIGHT}
+        "put",
+        "/sensors/0/config",
+        json={
+            "armed": ANCILLARY_CONTROL_ARMED_NIGHT,
+            "panel": ANCILLARY_CONTROL_ARMED_NIGHT,
+        },
     )
 
     await sensor.arm_stay()
     sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMED_STAY}
-    )
-
-    await sensor.arming_away()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMING_AWAY}
-    )
-
-    await sensor.arming_night()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMING_NIGHT}
-    )
-
-    await sensor.arming_stay()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ARMING_STAY}
+        "put",
+        "/sensors/0/config",
+        json={
+            "armed": ANCILLARY_CONTROL_ARMED_STAY,
+            "panel": ANCILLARY_CONTROL_ARMED_STAY,
+        },
     )
 
     await sensor.disarm()
     sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_DISARMED}
+        "put",
+        "/sensors/0/config",
+        json={"armed": ANCILLARY_CONTROL_DISARMED, "panel": ANCILLARY_CONTROL_DISARMED},
     )
 
-    await sensor.entry_delay()
+    # Armed only
+
+    await sensor.already_disarmed()
     sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ENTRY_DELAY}
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ALREADY_DISARMED}
     )
 
-    await sensor.exit_delay()
+    await sensor.invalid_code()
     sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_EXIT_DELAY}
-    )
-
-    await sensor.in_alarm()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_IN_ALARM}
+        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_INVALID_CODE}
     )
 
     await sensor.not_ready()
     sensor._request.assert_called_with(
         "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_NOT_READY}
+    )
+
+    # Panel only
+
+    await sensor.arming_away()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ARMING_AWAY}
+    )
+
+    await sensor.arming_night()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ARMING_NIGHT}
+    )
+
+    await sensor.arming_stay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ARMING_STAY}
+    )
+
+    await sensor.entry_delay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ENTRY_DELAY}
+    )
+
+    await sensor.exit_delay()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_EXIT_DELAY}
+    )
+
+    await sensor.in_alarm()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_IN_ALARM}
+    )
+
+    await sensor.not_ready_to_arm()
+    sensor._request.assert_called_with(
+        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_NOT_READY_TO_ARM}
     )
 
 

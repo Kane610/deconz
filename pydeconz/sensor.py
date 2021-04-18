@@ -10,18 +10,25 @@ LOGGER = logging.getLogger(__name__)
 RESOURCE_TYPE = "sensors"
 URL = "/sensors"
 
+# Armed and Panel
 ANCILLARY_CONTROL_ARMED_AWAY = "armed_away"
 ANCILLARY_CONTROL_ARMED_NIGHT = "armed_night"
 ANCILLARY_CONTROL_ARMED_STAY = "armed_stay"
 ANCILLARY_CONTROL_DISARMED = "disarmed"
+
+# Armed only
+ANCILLARY_CONTROL_ALREADY_DISARMED = "already_disarmed"
+ANCILLARY_CONTROL_INVALID_CODE = "invalid_code"
+ANCILLARY_CONTROL_NOT_READY = "not_ready"
+
+# Panel only
 ANCILLARY_CONTROL_ARMING_AWAY = "arming_away"
 ANCILLARY_CONTROL_ARMING_NIGHT = "arming_night"
 ANCILLARY_CONTROL_ARMING_STAY = "arming_stay"
 ANCILLARY_CONTROL_ENTRY_DELAY = "entry_delay"
 ANCILLARY_CONTROL_EXIT_DELAY = "exit_delay"
 ANCILLARY_CONTROL_IN_ALARM = "in_alarm"
-ANCILLARY_CONTROL_NOT_READY = "not_ready"
-
+ANCILLARY_CONTROL_NOT_READY_TO_ARM = "not_ready_to_arm"
 
 DAYLIGHT_STATUS = {
     100: "nadir",
@@ -168,7 +175,7 @@ class Alarm(DeconzBinarySensor):
 class AncillaryControl(DeconzSensor):
     """Ancillary control sensor."""
 
-    STATE_PROPERTY = "panel"
+    STATE_PROPERTY = "armed"
     ZHATYPE = ("ZHAAncillaryControl",)
 
     @property
@@ -178,57 +185,104 @@ class AncillaryControl(DeconzSensor):
 
     @property
     def armed(self) -> str:
-        """Armed."""
+        """Armed mode.
+
+        Supported values:
+        - "already_disarmed"
+        - "armed_away"
+        - "armed_night"
+        - "armed_stay"
+        - "disarmed"
+        - "invalid_code"
+        - "not_ready"
+        """
         return self.raw["config"]["armed"]
 
     @property
-    def panel(self) -> str:
-        """Panel."""
-        return self.raw["config"]["panel"]
+    def panel(self) -> Optional[str]:
+        """Panel mode.
+
+        Supported values:
+        - "armed_away"
+        - "armed_night"
+        - "armed_stay"
+        - "arming_away
+        - "arming_night"
+        - "arming_stay"
+        - "disarmed"
+        - "entry_delay"
+        - "exit_delay"
+        - "in_alarm"
+        - "not_ready_to_arm"
+        """
+        return self.raw["config"].get("panel")
+
+    async def _set_config_armed_and_panel(self, command: str) -> None:
+        """Set armed and if applicable panel configuration."""
+        data = {"armed": command}
+        if self.panel:
+            data["panel"] = command
+        await self.async_set_config(data)
 
     async def arm_away(self) -> None:
         """Set the alarm to away."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ARMED_AWAY})
+        await self._set_config_armed_and_panel(ANCILLARY_CONTROL_ARMED_AWAY)
 
     async def arm_night(self) -> None:
         """Set the alarm to night."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ARMED_NIGHT})
+        await self._set_config_armed_and_panel(ANCILLARY_CONTROL_ARMED_NIGHT)
 
     async def arm_stay(self) -> None:
         """Set the alarm to stay."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ARMED_STAY})
-
-    async def arming_away(self) -> None:
-        """Set the alarm to indicate it is going to away mode."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ARMING_AWAY})
-
-    async def arming_night(self) -> None:
-        """Set the alarm to indicate it is going to night mode."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ARMING_NIGHT})
-
-    async def arming_stay(self) -> None:
-        """Set the alarm to indicate it is going to stay mode."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ARMING_STAY})
+        await self._set_config_armed_and_panel(ANCILLARY_CONTROL_ARMED_STAY)
 
     async def disarm(self) -> None:
         """Disarm alarm."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_DISARMED})
+        await self._set_config_armed_and_panel(ANCILLARY_CONTROL_DISARMED)
+
+    # Armed only
+
+    async def already_disarmed(self) -> None:
+        """Set armed state to that it is already disarmed."""
+        await self.async_set_config({"armed": ANCILLARY_CONTROL_ALREADY_DISARMED})
+
+    async def invalid_code(self) -> None:
+        """Set armed state to that code is invalid."""
+        await self.async_set_config({"armed": ANCILLARY_CONTROL_INVALID_CODE})
+
+    async def not_ready(self) -> None:
+        """Set armed state to that it is not ready."""
+        await self.async_set_config({"armed": ANCILLARY_CONTROL_NOT_READY})
+
+    # Panel only - audible notifications
+
+    async def arming_away(self) -> None:
+        """Set the panel to indicate it is going to away mode."""
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_ARMING_AWAY})
+
+    async def arming_night(self) -> None:
+        """Set the panel to indicate it is going to night mode."""
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_ARMING_NIGHT})
+
+    async def arming_stay(self) -> None:
+        """Set the panel to indicate it is going to stay mode."""
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_ARMING_STAY})
 
     async def entry_delay(self) -> None:
         """Make panel signal that it is in entry delay mode."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_ENTRY_DELAY})
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_ENTRY_DELAY})
 
     async def exit_delay(self) -> None:
         """Make panel signal that it is in exit delay mode."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_EXIT_DELAY})
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_EXIT_DELAY})
 
     async def in_alarm(self) -> None:
         """Make panel sound the alarm."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_IN_ALARM})
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_IN_ALARM})
 
-    async def not_ready(self) -> None:
-        """Make panel signal that it is not ready."""
-        await self.async_set_config({"armed": ANCILLARY_CONTROL_NOT_READY})
+    async def not_ready_to_arm(self) -> None:
+        """Make panel signal it is not ready to arm."""
+        await self.async_set_config({"panel": ANCILLARY_CONTROL_NOT_READY_TO_ARM})
 
 
 class Battery(DeconzSensor):
