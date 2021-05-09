@@ -1,0 +1,6 @@
+pytest
+pytest-cov
+pytest-aiohttp
+aioresponses
+flake8==3.9.1
+black==21.5b0
