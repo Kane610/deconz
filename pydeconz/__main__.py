@@ -4,12 +4,11 @@ import aiohttp
 import asyncio
 
 from pydeconz import DeconzSession
-from pydeconz.utils import async_get_api_key, async_delete_all_keys
+from pydeconz.utils import async_get_api_key
 
 
 async def main(loop, **kwargs):
-    """
-    """
+    """"""
     if "api_key" not in kwargs:
         api_key = await async_get_api_key(loop, **kwargs)
         kwargs["api_key"] = api_key
@@ -36,8 +35,8 @@ kw = {
     "host": "10.0.0.10",
     "port": 8088,
     "api_key": "8BA2DD354B",
-    #'username': 'delight',
-    #'password': 'delight'
+    # 'username': 'delight',
+    # 'password': 'delight'
 }
 
 loop = asyncio.get_event_loop()
