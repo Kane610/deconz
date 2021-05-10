@@ -5,5 +5,5 @@ template: |
 
   $CHANGES
 
-tag-template: "$NEXT_MAJOR_VERSION"
+tag-template: "v$NEXT_MAJOR_VERSION"
 version-template: "$MAJOR"
