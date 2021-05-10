@@ -1,2 +1,2 @@
-from .gateway import DeconzSession
-from .errors import *
+from .gateway import DeconzSession  # noqa
+from .errors import *  # noqa

@@ -128,7 +128,7 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def groupclass(self) -> Optional[str]:
-        """"""
+        """ """
         return self.raw.get("class")
 
     @property
