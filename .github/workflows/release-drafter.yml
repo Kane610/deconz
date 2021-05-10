@@ -1,7 +1,6 @@
 # https://github.com/release-drafter/release-drafter
 
 name: Release Drafter
-version-template: "$MAJOR"
 
 on:
   push:
