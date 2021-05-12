@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 import logging
 from pprint import pformat
 
@@ -8,7 +8,7 @@ from aiohttp import client_exceptions
 
 from .config import DeconzConfig
 from .errors import raise_error, ResponseError, RequestError
-from .group import Groups, RESOURCE_TYPE as GROUP_RESOURCE
+from .group import DeconzScene, Groups, RESOURCE_TYPE as GROUP_RESOURCE
 from .light import Light, Lights, RESOURCE_TYPE as LIGHT_RESOURCE
 from .sensor import Sensors, RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
@@ -40,12 +40,12 @@ class DeconzSession:
         self.async_add_device_callback = async_add_device
         self.async_connection_status_callback = connection_status
 
-        self.config = None
-        self.groups = None
-        self.lights = None
-        self.scenes = {}
-        self.sensors = None
-        self.websocket = None
+        self.config: Optional[DeconzConfig] = None
+        self.groups: Optional[Groups] = None
+        self.lights: Optional[Lights] = None
+        self.scenes: Dict[str, DeconzScene] = {}
+        self.sensors: Optional[Sensors] = None
+        self.websocket: Optional[WSClient] = None
 
     def start(self, websocketport: Optional[int] = None) -> None:
         """Connect websocket to deCONZ."""
@@ -72,9 +72,9 @@ class DeconzSession:
 
         self.config = DeconzConfig(data["config"])
 
-        self.groups = Groups(data["groups"], self.request)
-        self.lights = Lights(data["lights"], self.request)
-        self.sensors = Sensors(data["sensors"], self.request)
+        self.groups = Groups(data["groups"], self.request)  # type: ignore
+        self.lights = Lights(data["lights"], self.request)  # type: ignore
+        self.sensors = Sensors(data["sensors"], self.request)  # type: ignore
 
         self.update_group_color(self.lights.keys())
         self.update_scenes()
@@ -83,16 +83,16 @@ class DeconzSession:
         """Refresh deCONZ parameters"""
         data = await self.request("get")
 
-        self.groups.process_raw(data["groups"])
-        self.lights.process_raw(data["lights"])
-        self.sensors.process_raw(data["sensors"])
+        self.groups.process_raw(data["groups"])  # type: ignore
+        self.lights.process_raw(data["lights"])  # type: ignore
+        self.sensors.process_raw(data["sensors"])  # type: ignore
 
-        self.update_group_color(self.lights.keys())
+        self.update_group_color(self.lights.keys())  # type: ignore
         self.update_scenes()
 
     async def request(
         self, method: str, path: Optional[str] = "", json: Optional[dict] = None
-    ) -> Optional[dict]:
+    ) -> dict:
         """Make a request to the API."""
         LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
 
@@ -125,11 +125,11 @@ class DeconzSession:
         state - network state has changed.
         """
         if signal == SIGNAL_DATA:
-            self.event_handler(self.websocket.data)
+            self.event_handler(self.websocket.data)  # type: ignore
 
         elif signal == SIGNAL_CONNECTION_STATE:
             if self.async_connection_status_callback:
-                self.async_connection_status_callback(self.websocket.state == "running")
+                self.async_connection_status_callback(self.websocket.state == "running")  # type: ignore
 
     def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
@@ -189,7 +189,7 @@ class DeconzSession:
         For groups where the lights have different colors the group color will
         only reflect the color of the latest changed light in the group.
         """
-        for group in self.groups.values():
+        for group in self.groups.values():  # type: ignore
             # Skip group if there are no common light ids.
             if not any({*lights} & {*group.lights}):
                 continue
@@ -201,7 +201,7 @@ class DeconzSession:
                 light_ids = group.lights
 
             for light_id in light_ids:
-                light = self.lights[light_id]
+                light = self.lights[light_id]  # type: ignore
 
                 if light.ZHATYPE == Light.ZHATYPE and light.reachable:
                     group.update_color_state(light)
@@ -212,7 +212,7 @@ class DeconzSession:
         self.scenes.update(
             {
                 f"{group.id}_{scene.id}": scene
-                for group in self.groups.values()
+                for group in self.groups.values()  # type: ignore
                 for scene in group.scenes.values()
                 if f"{group.id}_{scene.id}" not in self.scenes
             }
