@@ -29,6 +29,9 @@ jobs:
       - name: Check formatting with black
         run: |
           black pydeconz --check
+      - name: Check typing with mypy
+        run: |
+          mypy pydeconz
       - name: Test with pytest
         run: |
           pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=pydeconz --cov-report=xml --cov-report=html
