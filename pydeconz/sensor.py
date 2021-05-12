@@ -68,7 +68,7 @@ class DeconzSensor(DeconzDevice):
     """
 
     BINARY = False
-    ZHATYPE = set()
+    ZHATYPE: tuple = ()
 
     STATE_PROPERTY = "on"
 
@@ -121,7 +121,7 @@ class DeconzSensor(DeconzDevice):
         return self.raw["state"].get("tampered")
 
     @property
-    def secondary_temperature(self) -> Optional[int]:
+    def secondary_temperature(self) -> Optional[float]:
         """Extra temperature available on some Xiaomi devices."""
         if "temperature" not in self.raw["config"]:
             return None
@@ -316,7 +316,7 @@ class Consumption(DeconzSensor):
     ZHATYPE = ("ZHAConsumption",)
 
     @property
-    def scaled_consumption(self) -> Optional[int]:
+    def scaled_consumption(self) -> Optional[float]:
         """Main state of sensor."""
         if self.consumption is None:
             return None
@@ -451,7 +451,7 @@ class Humidity(DeconzSensor):
     ZHATYPE = ("ZHAHumidity", "CLIPHumidity")
 
     @property
-    def scaled_humidity(self) -> Optional[int]:
+    def scaled_humidity(self) -> Optional[float]:
         """Scaled humidity level."""
         if self.humidity is None:
             return None
@@ -471,7 +471,7 @@ class LightLevel(DeconzSensor):
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")
 
     @property
-    def scaled_lightlevel(self) -> Optional[int]:
+    def scaled_lightlevel(self) -> Optional[float]:
         """Scaled light level."""
         if self.lightlevel is None:
             return None
@@ -528,19 +528,19 @@ class Power(DeconzSensor):
     ZHATYPE = ("ZHAPower",)
 
     @property
-    def current(self) -> Optional[int]:
+    def current(self) -> int:
         """Current."""
-        return self.raw["state"].get("current")
+        return self.raw["state"]["current"]
 
     @property
-    def power(self) -> Optional[int]:
+    def power(self) -> int:
         """Power."""
-        return self.raw["state"].get("power")
+        return self.raw["state"]["power"]
 
     @property
-    def voltage(self) -> Optional[int]:
+    def voltage(self) -> int:
         """Voltage."""
-        return self.raw["state"].get("voltage")
+        return self.raw["state"]["voltage"]
 
 
 class Presence(DeconzBinarySensor):
@@ -669,12 +669,12 @@ class Temperature(DeconzSensor):
     ZHATYPE = ("ZHATemperature", "CLIPTemperature")
 
     @property
-    def temperature(self) -> Optional[int]:
+    def temperature(self) -> Optional[float]:
         """Temperature."""
         return self.convert_temperature(self.raw["state"].get("temperature"))
 
     @staticmethod
-    def convert_temperature(temperature) -> Optional[int]:
+    def convert_temperature(temperature) -> Optional[float]:
         """Convert temperature to celsius"""
         if temperature is None:
             return None
@@ -688,7 +688,7 @@ class Thermostat(Temperature):
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
 
     @property
-    def coolsetpoint(self) -> Optional[int]:
+    def coolsetpoint(self) -> Optional[float]:
         """Cooling setpoint
 
         700-3500.
@@ -717,7 +717,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("fanmode")
 
     @property
-    def floortemperature(self) -> Optional[int]:
+    def floortemperature(self) -> Optional[float]:
         """Floor temperature."""
         return self.convert_temperature(self.raw["state"].get("floortemperature"))
 
@@ -727,7 +727,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("heating")
 
     @property
-    def heatsetpoint(self) -> Optional[int]:
+    def heatsetpoint(self) -> Optional[float]:
         """Heating setpoint
 
         500-3200.
