@@ -3,6 +3,7 @@
 from asyncio import create_task, get_running_loop
 from collections import deque
 import logging
+from typing import Awaitable, Callable
 
 import aiohttp
 
@@ -22,7 +23,11 @@ class WSClient:
     """Websocket transport, session handling, message generation."""
 
     def __init__(
-        self, session: aiohttp.ClientSession, host: str, port: int, callback: object
+        self,
+        session: aiohttp.ClientSession,
+        host: str,
+        port: int,
+        callback: Callable[[str], Awaitable[None]],
     ) -> None:
         """Create resources for websocket communication."""
         self.session = session
@@ -32,9 +37,9 @@ class WSClient:
 
         self.loop = get_running_loop()
 
-        self._data = deque()
-        self._state = None
-        self._previous_state = None
+        self._data: deque = deque()
+        self._state: str = ""
+        self._previous_state: str = ""
 
     @property
     def data(self) -> dict:
