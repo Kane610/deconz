@@ -56,7 +56,11 @@ DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
 class Sensors(APIItems):
     """Represent deCONZ sensors."""
 
-    def __init__(self, raw: dict, request: Callable[..., Optional[dict]]) -> None:
+    def __init__(
+        self,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
+    ) -> None:
         super().__init__(raw, request, URL, create_sensor)
 
 
@@ -921,7 +925,9 @@ SENSOR_CLASSES = (
 
 
 def create_sensor(
-    resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
+    resource_id: str,
+    raw: dict,
+    request: Callable[..., Optional[dict]],
 ) -> Union[
     AirQuality,
     Alarm,

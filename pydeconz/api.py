@@ -55,7 +55,11 @@ class APIItems:
 
 
 class APIItem:
-    def __init__(self, raw: dict, request: Callable[..., Optional[dict]]) -> None:
+    def __init__(
+        self,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
+    ) -> None:
         self._raw = raw
         self._request = request
 
@@ -110,7 +114,7 @@ class APIItem:
         for async_signal_update in self._callbacks:
             async_signal_update()
 
-    async def async_set(self, field: str, data: dict, tries=0) -> None:
+    async def async_set(self, field: str, data: dict, tries: int = 0) -> None:
         """Set state of device."""
         self.cancel_retry()
 

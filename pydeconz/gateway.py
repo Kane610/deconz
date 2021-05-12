@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Callable, Optional, Union
+from typing import Any, Awaitable, Callable, Optional, Union
 import logging
 from pprint import pformat
 
@@ -92,7 +92,7 @@ class DeconzSession:
 
     async def request(
         self, method: str, path: Optional[str] = "", json: Optional[dict] = None
-    ):
+    ) -> Optional[dict]:
         """Make a request to the API."""
         LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
 

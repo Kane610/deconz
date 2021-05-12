@@ -18,7 +18,11 @@ URL = "/groups"
 class Groups(APIItems):
     """Represent deCONZ groups."""
 
-    def __init__(self, raw: dict, request: Callable[..., Optional[dict]]) -> None:
+    def __init__(
+        self,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
+    ) -> None:
         super().__init__(raw, request, URL, DeconzGroup)
 
 
@@ -30,7 +34,10 @@ class DeconzGroup(DeconzDevice):
     """
 
     def __init__(
-        self, resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
+        self,
+        resource_id: str,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
     ) -> None:
         """Set initial information about light group.
 
@@ -183,11 +190,6 @@ class DeconzGroup(DeconzDevice):
         """
         return self.raw.get("multideviceids")
 
-    # @property
-    # def scenes(self) -> Scenes:
-    #     """A list of scenes of the group."""
-    #     return self._scenes
-
     def update_color_state(self, light: Light) -> None:
         """Sync color state with light."""
         self.update(
@@ -208,7 +210,9 @@ class Scenes(APIItems):
     """Represent scenes of a deCONZ group."""
 
     def __init__(
-        self, group: DeconzGroup, request: Callable[..., Optional[dict]]
+        self,
+        group: DeconzGroup,
+        request: Callable[..., Optional[dict]],
     ) -> None:
         self.group = group
         url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
@@ -234,7 +238,10 @@ class DeconzScene:
     """
 
     def __init__(
-        self, group: DeconzGroup, raw: dict, request: Callable[..., Optional[dict]]
+        self,
+        group: DeconzGroup,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
     ) -> None:
         """Set initial information about scene.
 
@@ -250,10 +257,10 @@ class DeconzScene:
         """Resource type."""
         return RESOURCE_TYPE_SCENE
 
-    async def async_set_state(self, data: dict) -> None:
+    async def async_set_state(self, data: dict) -> Optional[dict]:
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
-        await self._request("put", field, json=data)  # type: ignore
+        return await self._request("put", field, json=data)  # type: ignore
 
     @property
     def deconz_id(self) -> str:

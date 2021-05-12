@@ -317,7 +317,9 @@ NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
 
 
 def create_light(
-    light_id: str, raw: dict, request: Callable[..., Optional[dict]]
+    light_id: str,
+    raw: dict,
+    request: Callable[..., Optional[dict]],
 ) -> DeconzLight:
     # ) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
     """Creating device out of a light resource."""
