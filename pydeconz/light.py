@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -27,7 +27,7 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    ZHATYPE = set()
+    ZHATYPE: tuple = ()
 
     @property
     def resource_type(self) -> str:
@@ -187,7 +187,7 @@ class Cover(DeconzLight):
         return self.raw["state"]["lift"]
 
     @property
-    def tilt(self) -> int:
+    def tilt(self) -> Optional[int]:
         """Amount of tilt.
 
         0 is fully open.
@@ -197,6 +197,7 @@ class Cover(DeconzLight):
             return self.raw["state"]["tilt"]
         elif "sat" in self.raw["state"]:  # Legacy support
             return int(self.raw["state"]["sat"] / 2.54)
+        return None
 
     async def set_position(
         self, *, lift: Optional[int] = None, tilt: Optional[int] = None
@@ -241,6 +242,7 @@ class Cover(DeconzLight):
 
     async def stop(self) -> None:
         """Stop cover motion."""
+        data: Dict[str, Union[bool, int]]
         data = {"stop": True}
         if "lift" not in self.raw["state"]:  # Legacy support
             data = {"bri_inc": 0}
@@ -315,8 +317,11 @@ NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
 
 
 def create_light(
-    light_id: str, raw: dict, request: Callable[..., Optional[dict]]
-) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
+    light_id: str,
+    raw: dict,
+    request: Callable[..., Optional[dict]],
+) -> DeconzLight:
+    # ) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
     """Creating device out of a light resource."""
     for non_light_class in NON_LIGHT_CLASSES:
         if raw["type"] in non_light_class.ZHATYPE:

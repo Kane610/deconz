@@ -1,6 +1,6 @@
 """API base classes."""
 
-from asyncio import get_running_loop
+from asyncio import TimerHandle, get_running_loop
 import logging
 from typing import Any, Callable, Optional
 
@@ -22,11 +22,11 @@ class APIItems:
         self._request = request
         self._path = path
         self._item_cls = item_cls
-        self._items = {}
+        self._items: dict = {}
         self.process_raw(raw)
 
     async def update(self) -> None:
-        raw = await self._request("get", self._path)
+        raw = await self._request("get", self._path)  # type: ignore
         self.process_raw(raw)
 
     def process_raw(self, raw: dict) -> None:
@@ -55,15 +55,19 @@ class APIItems:
 
 
 class APIItem:
-    def __init__(self, raw: dict, request: Callable[..., Optional[dict]]) -> None:
+    def __init__(
+        self,
+        raw: dict,
+        request: Callable[..., Optional[dict]],
+    ) -> None:
         self._raw = raw
         self._request = request
 
         self._loop = get_running_loop()
 
-        self._callbacks = []
-        self._cancel_retry = None
-        self._changed_keys = set()
+        self._callbacks: list = []
+        self._cancel_retry: Optional[TimerHandle] = None
+        self._changed_keys: set = set()
 
     @property
     def raw(self) -> dict:
@@ -110,12 +114,12 @@ class APIItem:
         for async_signal_update in self._callbacks:
             async_signal_update()
 
-    async def async_set(self, field: str, data: dict, tries=0) -> None:
+    async def async_set(self, field: str, data: dict, tries: int = 0) -> None:
         """Set state of device."""
         self.cancel_retry()
 
         try:
-            await self._request("put", field, json=data)
+            await self._request("put", field, json=data)  # type: ignore
 
         except BridgeBusy:
             LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
