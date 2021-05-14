@@ -31,7 +31,7 @@ class DeconzSession:
         async_add_device: Optional[Callable[[str, Any], None]] = None,
         connection_status: Optional[Callable[[bool], None]] = None,
     ):
-        """Setup session and host information."""
+        """Session setup."""
         self.session = session
         self.host = host
         self.port = port
@@ -67,7 +67,7 @@ class DeconzSession:
             self.websocket.stop()
 
     async def initialize(self) -> None:
-        """Load deCONZ parameters"""
+        """Load deCONZ parameters."""
         data = await self.request("get")
 
         self.config = DeconzConfig(data["config"])
@@ -80,7 +80,7 @@ class DeconzSession:
         self.update_scenes()
 
     async def refresh_state(self) -> None:
-        """Refresh deCONZ parameters"""
+        """Refresh deCONZ parameters."""
         data = await self.request("get")
 
         self.groups.process_raw(data["groups"])  # type: ignore

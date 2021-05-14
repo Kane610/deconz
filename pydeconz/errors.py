@@ -53,6 +53,7 @@ ERRORS = {
 
 
 def raise_error(error):
+    """Raise error."""
     if error:
         cls = ERRORS.get(error["type"], pydeconzException)
         raise cls("{} {}".format(error["address"], error["description"]))

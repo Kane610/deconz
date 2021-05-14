@@ -1,4 +1,4 @@
-""""""
+"""Main function."""
 
 import aiohttp
 import asyncio
@@ -8,7 +8,7 @@ from pydeconz.utils import async_get_api_key
 
 
 async def main(loop, **kwargs):
-    """ """
+    """CLI method for library."""
     if "api_key" not in kwargs:
         api_key = await async_get_api_key(loop, **kwargs)
         kwargs["api_key"] = api_key
