@@ -2,6 +2,8 @@ pytest
 pytest-cov
 pytest-aiohttp
 aioresponses
-flake8==3.9.2
 black==21.5b0
+flake8==3.9.2
+flake8-docstrings==1.6.0
+pydocstyle==6.0.0
 mypy
