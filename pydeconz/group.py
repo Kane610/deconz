@@ -23,6 +23,7 @@ class Groups(APIItems):
         raw: dict,
         request: Callable[..., Optional[dict]],
     ) -> None:
+        """Initialize group manager."""
         super().__init__(raw, request, URL, DeconzGroup)
 
 
@@ -58,7 +59,7 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def state(self) -> Optional[bool]:
-        """True if any light in light group is on."""
+        """Is any light in light group on."""
         return self.any_on
 
     @property
@@ -111,7 +112,7 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def colormode(self) -> Optional[str]:
-        """The current color mode of the light.
+        """Color mode of the light.
 
         hs - hue and saturation
         xy - CIE xy values
@@ -130,22 +131,22 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def reachable(self) -> Optional[bool]:
-        """True if the group is reachable and accepts commands."""
+        """Is group reachable."""
         return True
 
     @property
     def groupclass(self) -> Optional[str]:
-        """ """
+        """Type of class."""
         return self.raw.get("class")
 
     @property
     def all_on(self) -> Optional[bool]:
-        """True if all lights in light group are on"""
+        """Is all lights in light group on."""
         return self.raw["state"].get("all_on")
 
     @property
     def any_on(self) -> Optional[bool]:
-        """True if any lights in light group are on"""
+        """Is any lights in light group on."""
         return self.raw["state"].get("any_on")
 
     @property
@@ -163,12 +164,12 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def id(self) -> Optional[str]:
-        """The id of the group."""
+        """Group ID."""
         return self.raw.get("id")
 
     @property
     def lights(self) -> Optional[list]:
-        """A list of all light ids of this group.
+        """List of all light IDs in group.
 
         Sequence is defined by the gateway.
         """
@@ -176,7 +177,7 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def lightsequence(self) -> Optional[list]:
-        """A list of light ids of this group that can be sorted by the user.
+        """List of light IDs in group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
         """
@@ -184,7 +185,7 @@ class DeconzGroup(DeconzDevice):
 
     @property
     def multideviceids(self) -> Optional[list]:
-        """A list of light ids of this group.
+        """List of light IDs in group.
 
         Subsequent ids from multidevices with multiple endpoints.
         """
@@ -214,6 +215,7 @@ class Scenes(APIItems):
         group: DeconzGroup,
         request: Callable[..., Optional[dict]],
     ) -> None:
+        """Initialize scene manager."""
         self.group = group
         url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
         super().__init__(group.raw["scenes"], request, url, DeconzScene)

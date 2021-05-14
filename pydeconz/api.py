@@ -19,6 +19,7 @@ class APIItems:
         path: str,
         item_cls: Any,
     ) -> None:
+        """Initialize API items."""
         self._request = request
         self._path = path
         self._item_cls = item_cls
@@ -26,10 +27,12 @@ class APIItems:
         self.process_raw(raw)
 
     async def update(self) -> None:
+        """Refresh data."""
         raw = await self._request("get", self._path)  # type: ignore
         self.process_raw(raw)
 
     def process_raw(self, raw: dict) -> None:
+        """Process data."""
         for id, raw_item in raw.items():
             obj = self._items.get(id)
 
@@ -39,27 +42,35 @@ class APIItems:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 
     def items(self) -> Any:
+        """Return items."""
         return self._items.items()
 
     def keys(self) -> Any:
+        """Return item keys."""
         return self._items.keys()
 
     def values(self) -> Any:
+        """Return item values."""
         return self._items.values()
 
     def __getitem__(self, obj_id: str) -> Any:
+        """Get item value based on key."""
         return self._items[obj_id]
 
     def __iter__(self) -> Any:
+        """Allow iterate over items."""
         return iter(self._items)
 
 
 class APIItem:
+    """Base class for an API item."""
+
     def __init__(
         self,
         raw: dict,
         request: Callable[..., Optional[dict]],
     ) -> None:
+        """Initialize API item."""
         self._raw = raw
         self._request = request
 

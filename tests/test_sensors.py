@@ -702,7 +702,7 @@ async def test_genericflag_sensor():
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag is None
-    assert sensor.manufacturer is ""
+    assert sensor.manufacturer == ""
     assert sensor.modelid == "Switch"
     assert sensor.name == "Kitchen Switch"
     assert sensor.swversion == "1.0.0"

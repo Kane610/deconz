@@ -61,6 +61,7 @@ class Sensors(APIItems):
         raw: dict,
         request: Callable[..., Optional[dict]],
     ) -> None:
+        """Initialize sensor manager."""
         super().__init__(raw, request, URL, create_sensor)
 
 
@@ -134,6 +135,10 @@ class DeconzSensor(DeconzDevice):
 
 
 class DeconzBinarySensor(DeconzSensor):
+    """Binary sensor base class.
+
+    Used to mark if sensor state is a boolean.
+    """
 
     BINARY = True
 
@@ -184,7 +189,11 @@ class AncillaryControl(DeconzSensor):
 
     @property
     def action(self) -> str:
-        """Action."""
+        """Keypad action.
+
+        User interaction from keypad.
+        "mode,code,area"
+        """
         return self.raw["state"]["action"]
 
     @property
@@ -321,7 +330,7 @@ class Consumption(DeconzSensor):
 
     @property
     def scaled_consumption(self) -> Optional[float]:
-        """Main state of sensor."""
+        """State of sensor."""
         if self.consumption is None:
             return None
 
@@ -351,7 +360,7 @@ class Daylight(DeconzSensor):
 
     @property
     def daylight(self) -> bool:
-        """True if daylight, false if not."""
+        """Is daylight."""
         return self.raw["state"]["daylight"]
 
     @property
@@ -533,17 +542,17 @@ class Power(DeconzSensor):
 
     @property
     def current(self) -> int:
-        """Current."""
+        """Ampere load of device."""
         return self.raw["state"]["current"]
 
     @property
     def power(self) -> int:
-        """Power."""
+        """Power load of device."""
         return self.raw["state"]["power"]
 
     @property
     def voltage(self) -> int:
-        """Voltage."""
+        """Voltage draw of device."""
         return self.raw["state"]["voltage"]
 
 
@@ -604,7 +613,7 @@ class Switch(DeconzSensor):
 
     @property
     def xy(self) -> Optional[Tuple[float, float]]:
-        """Represents the x/y color coordinates selected on a tint remote color wheel."""
+        """X/Y color coordinates selected on a tint remote color wheel."""
         return self.raw["state"].get("xy")
 
     @property
@@ -649,7 +658,7 @@ class Switch(DeconzSensor):
 
     @property
     def windowcoveringtype(self) -> Optional[int]:
-        """Sets the covering type and starts calibration for Ubisys J1.
+        """Set the covering type and starts calibration for Ubisys J1.
 
         Supported values:
         - 0 = Roller Shade
@@ -679,7 +688,7 @@ class Temperature(DeconzSensor):
 
     @staticmethod
     def convert_temperature(temperature) -> Optional[float]:
-        """Convert temperature to celsius"""
+        """Convert temperature to celsius."""
         if temperature is None:
             return None
 
@@ -693,7 +702,7 @@ class Thermostat(Temperature):
 
     @property
     def coolsetpoint(self) -> Optional[float]:
-        """Cooling setpoint
+        """Cooling setpoint.
 
         700-3500.
         """
@@ -727,12 +736,12 @@ class Thermostat(Temperature):
 
     @property
     def heating(self) -> Optional[bool]:
-        """Heating setpoint"""
+        """Heating setpoint."""
         return self.raw["state"].get("heating")
 
     @property
     def heatsetpoint(self) -> Optional[float]:
-        """Heating setpoint
+        """Heating setpoint.
 
         500-3200.
         """
@@ -745,7 +754,7 @@ class Thermostat(Temperature):
 
     @property
     def mode(self) -> Optional[str]:
-        """Sets the current operating mode of a thermostat.
+        """Set the current operating mode of a thermostat.
 
         Supported values:
         - "off"
@@ -763,7 +772,7 @@ class Thermostat(Temperature):
 
     @property
     def mountingmode(self) -> Optional[bool]:
-        """Sets a TRV into mounting mode if supported (valve fully open position)."""
+        """Set a TRV into mounting mode if supported (valve fully open position)."""
         return self.raw["config"].get("mountingmode")
 
     @property
@@ -773,12 +782,12 @@ class Thermostat(Temperature):
 
     @property
     def offset(self) -> Optional[int]:
-        """Adds a signed offset value to measured temperature and humidity state values. Values send by the REST-API are already amended by the offset."""
+        """Add a signed offset value to measured temperature and humidity state values. Values send by the REST-API are already amended by the offset."""
         return self.raw["config"].get("offset")
 
     @property
     def preset(self) -> Optional[str]:
-        """Sets the current operating mode for Tuya thermostats.
+        """Set the current operating mode for Tuya thermostats.
 
         Supported values:
         - "holiday"
@@ -799,7 +808,7 @@ class Thermostat(Temperature):
 
     @property
     def swingmode(self) -> Optional[str]:
-        """Sets the AC louvers position.
+        """Set the AC louvers position.
 
         Supported values:
         - "fully closed"
@@ -813,7 +822,7 @@ class Thermostat(Temperature):
 
     @property
     def temperaturemeasurement(self) -> Optional[str]:
-        """Sets the mode of operation for Elko Super TR thermostat.
+        """Set the mode of operation for Elko Super TR thermostat.
 
         Supported values:
         - "air sensor"
@@ -829,7 +838,7 @@ class Thermostat(Temperature):
 
     @property
     def windowopen_set(self) -> Optional[bool]:
-        """Sets if window open detection shall be active or inactive for Tuya thermostats.
+        """Set if window open detection shall be active or inactive for Tuya thermostats.
 
         (Support is device dependent).
         """
@@ -861,12 +870,12 @@ class Vibration(DeconzBinarySensor):
 
     @property
     def sensitivity(self) -> Optional[int]:
-        """Configured sensitivity"""
+        """Vibration sensitivity."""
         return self.raw["config"].get("sensitivity")
 
     @property
     def sensitivitymax(self) -> Optional[int]:
-        """Configured max sensitivity."""
+        """Vibration max sensitivity."""
         return self.raw["config"].get("sensitivitymax")
 
     @property

@@ -23,7 +23,7 @@ class DeconzConfig:
 
     @property
     def apiversion(self) -> Optional[str]:
-        """deCONZ Rest API version."""
+        """Rest API version."""
         return self.raw.get("apiversion")
 
     @property
@@ -33,7 +33,7 @@ class DeconzConfig:
 
     @property
     def linkbutton(self) -> Optional[bool]:
-        """True if gateway is unlocked."""
+        """Is gateway unlocked."""
         return self.raw.get("linkbutton")
 
     @property
@@ -58,12 +58,12 @@ class DeconzConfig:
 
     @property
     def panid(self) -> Optional[int]:
-        """The ZigBee pan ID of the gateway."""
+        """Zigbee pan ID."""
         return self.raw.get("panid")
 
     @property
     def swversion(self) -> Optional[str]:
-        """The software version of the gateway."""
+        """Software version."""
         return self.raw.get("swversion")
 
     @property
@@ -78,7 +78,8 @@ class DeconzConfig:
 
     @property
     def zigbeechannel(self) -> Optional[int]:
-        """The current wireless frequency channel used by the Gateway.
+        """Wireless frequency channel.
 
-        Supported channels: 11, 15, 20, 25."""
+        Supported channels: 11, 15, 20, 25.
+        """
         return self.raw.get("zigbeechannel")

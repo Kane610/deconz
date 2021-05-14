@@ -17,6 +17,7 @@ class Lights(APIItems):
         raw: dict,
         request: Callable[..., Optional[dict]],
     ) -> None:
+        """Initialize light manager."""
         super().__init__(raw, request, URL, create_light)
 
 
@@ -36,12 +37,12 @@ class DeconzLight(DeconzDevice):
 
     @property
     def state(self) -> Optional[bool]:
-        """True if device is on."""
+        """Device state."""
         return self.raw["state"].get("on")
 
     @property
     def reachable(self) -> bool:
-        """True if light is reachable and accepts commands."""
+        """Is light reachable."""
         return self.raw["state"]["reachable"]
 
 
@@ -113,7 +114,7 @@ class Light(DeconzLight):
 
     @property
     def colormode(self) -> Optional[str]:
-        """Current color mode of light.
+        """Color mode of light.
 
         hs - hue and saturation
         xy - CIE xy values
@@ -170,7 +171,7 @@ class Cover(DeconzLight):
 
     @property
     def is_open(self) -> bool:
-        """True if the cover is open."""
+        """Is cover open."""
         if "open" not in self.raw["state"]:  # Legacy support
             return self.state is False
         return self.raw["state"]["open"]
@@ -269,7 +270,7 @@ class Fan(Light):
         return self.raw["state"]["speed"]
 
     async def set_speed(self, speed: int) -> None:
-        """Sets the speed of fans/ventilators.
+        """Set speed of fans/ventilators.
 
         Speed [int] between 0-6.
         """
@@ -283,6 +284,7 @@ class Lock(DeconzLight):
 
     @property
     def is_locked(self) -> bool:
+        """State of lock."""
         return self.state is True
 
     async def lock(self) -> None:
@@ -322,7 +324,7 @@ def create_light(
     request: Callable[..., Optional[dict]],
 ) -> DeconzLight:
     # ) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
-    """Creating device out of a light resource."""
+    """Create device out of a light resource."""
     for non_light_class in NON_LIGHT_CLASSES:
         if raw["type"] in non_light_class.ZHATYPE:
             return non_light_class(light_id, raw, request)
