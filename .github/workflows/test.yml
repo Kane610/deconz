@@ -31,7 +31,7 @@ jobs:
           black pydeconz --check
       - name: Check import order with isort
         run: |
-          isort pydeconz --diff
+          isort pydeconz --check-only
       - name: Check typing with mypy
         run: |
           mypy pydeconz
