@@ -1,7 +1,7 @@
 """API base classes."""
 
-from asyncio import TimerHandle, get_running_loop
 import logging
+from asyncio import TimerHandle, get_running_loop
 from typing import Any, Callable, Optional
 
 from .errors import BridgeBusy
