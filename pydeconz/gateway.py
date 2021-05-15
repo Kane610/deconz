@@ -1,16 +1,19 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Callable, Dict, Optional, Union
 import logging
 from pprint import pformat
+from typing import Any, Callable, Dict, Optional, Union
 
 from aiohttp import client_exceptions
 
 from .config import DeconzConfig
-from .errors import raise_error, ResponseError, RequestError
-from .group import DeconzScene, Groups, RESOURCE_TYPE as GROUP_RESOURCE
-from .light import Light, Lights, RESOURCE_TYPE as LIGHT_RESOURCE
-from .sensor import Sensors, RESOURCE_TYPE as SENSOR_RESOURCE
+from .errors import RequestError, ResponseError, raise_error
+from .group import RESOURCE_TYPE as GROUP_RESOURCE
+from .group import DeconzScene, Groups
+from .light import RESOURCE_TYPE as LIGHT_RESOURCE
+from .light import Light, Lights
+from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE
+from .sensor import Sensors
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
 
 LOGGER = logging.getLogger(__name__)

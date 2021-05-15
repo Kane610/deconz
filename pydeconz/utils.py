@@ -1,9 +1,10 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
+
 import aiohttp
 
-from .errors import ResponseError, RequestError, raise_error
+from .errors import RequestError, ResponseError, raise_error
 
 LOGGER = logging.getLogger(__name__)
 

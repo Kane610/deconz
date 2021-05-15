@@ -1,7 +1,8 @@
 """Main function."""
 
-import aiohttp
 import asyncio
+
+import aiohttp
 
 from pydeconz import DeconzSession
 from pydeconz.utils import async_get_api_key

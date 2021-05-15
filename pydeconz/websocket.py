@@ -1,8 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+import logging
 from asyncio import create_task, get_running_loop
 from collections import deque
-import logging
 from typing import Awaitable, Callable
 
 import aiohttp

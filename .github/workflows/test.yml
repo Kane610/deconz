@@ -23,12 +23,15 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r requirements-test.txt
-      - name: Lint with flake8
+      - name: Lint with Flake8
         run: |
           flake8 pydeconz
-      - name: Check formatting with black
+      - name: Check formatting with Black
         run: |
           black pydeconz --check
+      - name: Check import order with isort
+        run: |
+          isort pydeconz --check-only
       - name: Check typing with mypy
         run: |
           mypy pydeconz
