@@ -8,12 +8,9 @@ from aiohttp import client_exceptions
 
 from .config import DeconzConfig
 from .errors import RequestError, ResponseError, raise_error
-from .group import RESOURCE_TYPE as GROUP_RESOURCE
-from .group import DeconzScene, Groups
-from .light import RESOURCE_TYPE as LIGHT_RESOURCE
-from .light import Light, Lights
-from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE
-from .sensor import Sensors
+from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
+from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
+from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE, Sensors
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
 
 LOGGER = logging.getLogger(__name__)
