@@ -76,7 +76,7 @@ class DeconzSession:
         self.lights = Lights(data["lights"], self.request)  # type: ignore
         self.sensors = Sensors(data["sensors"], self.request)  # type: ignore
 
-        self.update_group_color(self.lights.keys())
+        self.update_group_color(list(self.lights.keys()))
         self.update_scenes()
 
     async def refresh_state(self) -> None:
@@ -87,7 +87,7 @@ class DeconzSession:
         self.lights.process_raw(data["lights"])  # type: ignore
         self.sensors.process_raw(data["sensors"])  # type: ignore
 
-        self.update_group_color(self.lights.keys())  # type: ignore
+        self.update_group_color(list(self.lights.keys()))  # type: ignore
         self.update_scenes()
 
     async def request(
@@ -194,18 +194,15 @@ class DeconzSession:
             if not any({*lights} & {*group.lights}):
                 continue
 
-            # More than one light means initialize called this method.
-            # Then we take first best light to be available.
-            light_ids = lights
-            if len(light_ids) > 1:
+            # More than one light means self.initialize called this method.
+            if len(light_ids := lights) > 1:
                 light_ids = group.lights
 
-            for light_id in light_ids:
+            for light_id in reversed(light_ids):
                 light = self.lights[light_id]  # type: ignore
 
                 if light.ZHATYPE == Light.ZHATYPE and light.reachable:
                     group.update_color_state(light)
-                    break
 
     def update_scenes(self) -> None:
         """Update scenes to hold all known scenes from existing groups."""

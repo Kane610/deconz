@@ -168,12 +168,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("id")
 
     @property
-    def lights(self) -> Optional[list]:
+    def lights(self) -> list:
         """List of all light IDs in group.
 
         Sequence is defined by the gateway.
         """
-        return self.raw.get("lights")
+        return self.raw.get("lights", [])
 
     @property
     def lightsequence(self) -> Optional[list]:
@@ -193,6 +193,22 @@ class DeconzGroup(DeconzDevice):
 
     def update_color_state(self, light: Light) -> None:
         """Sync color state with light."""
+        # data = {}
+
+        # if light.brightness is not None:
+        #     data["bri"] = light.brightness
+        # if light.hue is not None:
+        #     data["hue"] = light.hue
+        # if light.sat is not None:
+        #     data["sat"] = light.sat
+        # if light.ct is not None:
+        #     data["ct"] = light.ct
+        # if light.xy is not None:
+        #     data["xy"] = light.xy
+        # if light.colormode is not None:
+        #     data["colormode"] = light.colormode
+
+        # self.update({"action": data})
         self.update(
             {
                 "action": {
