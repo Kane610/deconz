@@ -410,7 +410,8 @@ async def test_update_group_color(mock_aioresponse):
                     "colormode": "hs",
                 },
                 "id": "gid",
-                "lights": ["l1", "l2", "l3", "l4"],
+                # "lights": ["l1", "l2", "l3", "l4"],
+                "lights": ["l4", "l3", "l2", "l1"],
                 "scenes": [],
             }
         },
@@ -431,6 +432,8 @@ async def test_update_group_color(mock_aioresponse):
                 "type": "light",
                 "state": {
                     "bri": 2,
+                    "ct": 2,
+                    "colormode": "ct",
                     "reachable": True,
                 },
             },
@@ -438,8 +441,6 @@ async def test_update_group_color(mock_aioresponse):
                 "type": "light",
                 "state": {
                     "bri": 3,
-                    "ct": 3,
-                    "colormode": "ct",
                     "reachable": True,
                 },
             },
@@ -473,11 +474,11 @@ async def test_update_group_color(mock_aioresponse):
 
     await session.initialize()
 
-    assert session.groups["g1"].brightness == 1
+    assert session.groups["g1"].brightness == 3
     assert session.groups["g1"].hue == 1
     assert session.groups["g1"].sat == 1
     assert session.groups["g1"].xy == (0.1, 0.1)
-    assert session.groups["g1"].colormode == "xy"
-    assert session.groups["g1"].ct == 1
+    assert session.groups["g1"].colormode == "ct"
+    assert session.groups["g1"].ct == 2
 
     await session.session.close()

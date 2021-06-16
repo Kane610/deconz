@@ -193,34 +193,24 @@ class DeconzGroup(DeconzDevice):
 
     def update_color_state(self, light: Light) -> None:
         """Sync color state with light."""
-        # data = {}
+        data = {}
 
-        # if light.brightness is not None:
-        #     data["bri"] = light.brightness
-        # if light.hue is not None:
-        #     data["hue"] = light.hue
-        # if light.sat is not None:
-        #     data["sat"] = light.sat
-        # if light.ct is not None:
-        #     data["ct"] = light.ct
-        # if light.xy is not None:
-        #     data["xy"] = light.xy
-        # if light.colormode is not None:
-        #     data["colormode"] = light.colormode
+        if light.brightness is not None:
+            data["bri"] = light.brightness
+        if light.hue is not None:
+            data["hue"] = light.hue
+        if light.sat is not None:
+            data["sat"] = light.sat
+        if light.ct is not None:
+            data["ct"] = light.ct
+        if light.xy is not None:
+            data["xy"] = light.xy
+        if light.colormode is not None:
+            data["colormode"] = light.colormode
+        if light.effect is not None:
+            data["effect"] = light.effect
 
-        # self.update({"action": data})
-        self.update(
-            {
-                "action": {
-                    "bri": light.brightness,
-                    "hue": light.hue,
-                    "sat": light.sat,
-                    "ct": light.ct,
-                    "xy": light.xy or (None, None),
-                    "colormode": light.colormode,
-                }
-            }
-        )
+        self.update({"action": data})
 
 
 class Scenes(APIItems):
