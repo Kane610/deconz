@@ -410,8 +410,7 @@ async def test_update_group_color(mock_aioresponse):
                     "colormode": "hs",
                 },
                 "id": "gid",
-                # "lights": ["l1", "l2", "l3", "l4"],
-                "lights": ["l4", "l3", "l2", "l1"],
+                "lights": ["l1", "l2", "l3", "l4"],
                 "scenes": [],
             }
         },

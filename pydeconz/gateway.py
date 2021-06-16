@@ -198,7 +198,7 @@ class DeconzSession:
             if len(light_ids := lights) > 1:
                 light_ids = group.lights
 
-            for light_id in reversed(light_ids):
+            for light_id in light_ids:
                 light = self.lights[light_id]  # type: ignore
 
                 if light.ZHATYPE == Light.ZHATYPE and light.reachable:
