@@ -2,7 +2,7 @@
 
 import logging
 from pprint import pformat
-from typing import Callable, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -193,7 +193,7 @@ class DeconzGroup(DeconzDevice):
 
     def update_color_state(self, light: Light) -> None:
         """Sync color state with light."""
-        data = {}
+        data: Dict[str, Union[float, int, str, tuple]] = {}
 
         if light.brightness is not None:
             data["bri"] = light.brightness
