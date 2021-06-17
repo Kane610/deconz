@@ -2,7 +2,7 @@
 
 import logging
 from pprint import pformat
-from typing import Callable, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -168,12 +168,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("id")
 
     @property
-    def lights(self) -> Optional[list]:
+    def lights(self) -> list:
         """List of all light IDs in group.
 
         Sequence is defined by the gateway.
         """
-        return self.raw.get("lights")
+        return self.raw.get("lights", [])
 
     @property
     def lightsequence(self) -> Optional[list]:
@@ -193,18 +193,24 @@ class DeconzGroup(DeconzDevice):
 
     def update_color_state(self, light: Light) -> None:
         """Sync color state with light."""
-        self.update(
-            {
-                "action": {
-                    "bri": light.brightness,
-                    "hue": light.hue,
-                    "sat": light.sat,
-                    "ct": light.ct,
-                    "xy": light.xy or (None, None),
-                    "colormode": light.colormode,
-                }
-            }
-        )
+        data: Dict[str, Union[float, int, str, tuple]] = {}
+
+        if light.brightness is not None:
+            data["bri"] = light.brightness
+        if light.hue is not None:
+            data["hue"] = light.hue
+        if light.sat is not None:
+            data["sat"] = light.sat
+        if light.ct is not None:
+            data["ct"] = light.ct
+        if light.xy is not None:
+            data["xy"] = light.xy
+        if light.colormode is not None:
+            data["colormode"] = light.colormode
+        if light.effect is not None:
+            data["effect"] = light.effect
+
+        self.update({"action": data})
 
 
 class Scenes(APIItems):
