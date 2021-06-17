@@ -1,7 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
-from pprint import pformat
 from typing import Callable, Optional
 
 from .api import APIItem
@@ -22,8 +21,6 @@ class DeconzDevice(APIItem):
         """Set initial information common to all device types."""
         super().__init__(raw, request)
         self.resource_id = resource_id
-
-        LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
     @property
     def resource_type(self) -> str:

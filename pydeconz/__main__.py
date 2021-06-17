@@ -1,46 +1,105 @@
-"""Main function."""
+"""Read attributes from your deCONZ gateway."""
 
+import argparse
 import asyncio
+import logging
+from typing import Any, Callable, Optional
 
 import aiohttp
+import async_timeout
 
-from pydeconz import DeconzSession
-from pydeconz.utils import async_get_api_key
+from pydeconz import DeconzSession, errors
+
+LOGGER = logging.getLogger(__name__)
 
 
-async def main(loop, **kwargs):
+def new_device_callback(resource: str, device: Any):
+    """Signal new device is available."""
+    LOGGER.info(f"{resource}, {device._raw}")
+
+
+async def deconz_gateway(
+    session: aiohttp.ClientSession,
+    host: str,
+    port: int,
+    api_key: str,
+    callback: Callable,
+) -> Optional[DeconzSession]:
+    """Create a gateway object and verify configuration."""
+    deconz = DeconzSession(session, host, port, api_key, async_add_device=callback)
+
+    try:
+        with async_timeout.timeout(5):
+            await deconz.initialize()
+        return deconz
+
+    except errors.Unauthorized:
+        LOGGER.exception("Invalid API key for deCONZ gateway")
+
+    except (asyncio.TimeoutError, errors.RequestError):
+        LOGGER.error("Error connecting to deCONZ gateway")
+
+    return None
+
+
+async def main(host: str, port: int, api_key: str) -> None:
     """CLI method for library."""
-    if "api_key" not in kwargs:
-        api_key = await async_get_api_key(loop, **kwargs)
-        kwargs["api_key"] = api_key
-        print(api_key)
-    websession = aiohttp.ClientSession(loop=loop)
-    deconz = DeconzSession(loop, websession, **kwargs)
-    result = await deconz.async_load_parameters()
-    if result is False:
-        print("Failed to setup deCONZ")
-        return False
-    deconz.start()
-    from pprint import pprint
+    LOGGER.info("Starting deCONZ gateway")
 
-    pprint(deconz.__dict__)
-    # await deconz.async_delete_state('/lights/2/groups', {'reset':'true'})
-    # for dev_id, dev in deconz.config.values():
-    #    pprint(dev.__dict__)
-    # await deconz.close()
-    # await async_delete_api_key(loop, **kwargs)
-    # await async_delete_all_keys(loop, **kwargs)
+    session = aiohttp.ClientSession()
+
+    gateway = await deconz_gateway(
+        session=session,
+        host=host,
+        port=port,
+        api_key=api_key,
+        callback=new_device_callback,
+    )
+
+    if not gateway:
+        LOGGER.error("Couldn't connect to deCONZ gateway")
+        await session.close()
+        return
+
+    await gateway.initialize()
+    # gateway.start()
+
+    try:
+        while True:
+            await asyncio.sleep(1)
+            break
+
+    except asyncio.CancelledError:
+        pass
+
+    finally:
+        gateway.close()
+        await session.close()
 
 
-kw = {
-    "host": "10.0.0.10",
-    "port": 8088,
-    "api_key": "8BA2DD354B",
-    # 'username': 'delight',
-    # 'password': 'delight'
-}
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("host", type=str)
+    parser.add_argument("api_key", type=str)
+    parser.add_argument("-p", "--port", type=int, default=80)
+    parser.add_argument("-D", "--debug", action="store_true")
+    args = parser.parse_args()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main(loop, **kw))
-loop.run_forever()
-loop.close()
+    loglevel = logging.INFO
+    if args.debug:
+        loglevel = logging.DEBUG
+    logging.basicConfig(format="%(message)s", level=loglevel)
+
+    LOGGER.info(f"{args.host}, {args.port}, {args.api_key}")
+
+    try:
+        asyncio.run(
+            main(
+                host=args.host,
+                port=args.port,
+                api_key=args.api_key,
+            )
+        )
+
+    except KeyboardInterrupt:
+        pass
