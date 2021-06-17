@@ -26,7 +26,7 @@ class DeconzSession:
         self,
         session: Any,
         host: str,
-        port: str,
+        port: int,
         api_key: str,
         async_add_device: Optional[Callable[[str, Any], None]] = None,
         connection_status: Optional[Callable[[bool], None]] = None,
