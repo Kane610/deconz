@@ -541,9 +541,9 @@ class Power(DeconzSensor):
     ZHATYPE = ("ZHAPower",)
 
     @property
-    def current(self) -> int:
+    def current(self) -> Optional[int]:
         """Ampere load of device."""
-        return self.raw["state"]["current"]
+        return self.raw["state"].get("current")
 
     @property
     def power(self) -> int:
@@ -551,9 +551,9 @@ class Power(DeconzSensor):
         return self.raw["state"]["power"]
 
     @property
-    def voltage(self) -> int:
+    def voltage(self) -> Optional[int]:
         """Voltage draw of device."""
-        return self.raw["state"]["voltage"]
+        return self.raw["state"].get("voltage")
 
 
 class Presence(DeconzBinarySensor):
