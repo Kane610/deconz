@@ -5,6 +5,8 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 
 from unittest.mock import AsyncMock, Mock, patch
 
+import pytest
+
 from pydeconz.sensor import (
     ANCILLARY_CONTROL_ALREADY_DISARMED,
     ANCILLARY_CONTROL_ARMED_AWAY,
@@ -929,11 +931,11 @@ async def test_openclose_sensor():
     assert sensor.uniqueid == "00:15:8d:00:02:2b:96:b4-01-0006"
 
 
-async def test_power_sensor():
-    """Verify that power sensor works."""
-    sensors = Sensors(
-        {
-            "0": {
+@pytest.mark.parametrize(
+    "input,expected",
+    [
+        (
+            {
                 "config": {"on": True, "reachable": True},
                 "ep": 1,
                 "etag": "96e71c7db4685b334d3d0decc3f11868",
@@ -949,37 +951,77 @@ async def test_power_sensor():
                 "type": "ZHAPower",
                 "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0b04",
             },
-        },
-        AsyncMock(),
-    )
-    sensor = sensors["0"]
+            {
+                "BINARY": False,
+                "ZHATYPE": ("ZHAPower",),
+                "battery": None,
+                "current": 34,
+                "deconz_id": "/sensors/0",
+                "ep": 1,
+                "etag": "96e71c7db4685b334d3d0decc3f11868",
+                "lowbattery": None,
+                "manufacturer": "Heiman",
+                "modelid": "SmartPlug",
+                "name": "Power 16",
+                "on": True,
+                "power": 64,
+                "reachable": True,
+                "resource_type": "sensors",
+                "secondary_temperature": None,
+                "state": 64,
+                "swversion": None,
+                "tampered": None,
+                "type": "ZHAPower",
+                "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0b04",
+                "voltage": 231,
+            },
+        ),
+        (
+            {
+                "config": {"on": True, "reachable": True, "temperature": 3400},
+                "ep": 2,
+                "etag": "77ab6ddae6dd81469080ad62118d81b6",
+                "lastseen": "2021-07-07T19:30Z",
+                "manufacturername": "LUMI",
+                "modelid": "lumi.plug.maus01",
+                "name": "Power 27",
+                "state": {"lastupdated": "2021-07-07T19:24:59.664", "power": 1},
+                "swversion": "05-02-2018",
+                "type": "ZHAPower",
+                "uniqueid": "00:15:8d:00:02:82:d3:56-02-000c",
+            },
+            {
+                "BINARY": False,
+                "ZHATYPE": ("ZHAPower",),
+                "battery": None,
+                "current": None,
+                "deconz_id": "/sensors/0",
+                "ep": 2,
+                "etag": "77ab6ddae6dd81469080ad62118d81b6",
+                "lowbattery": None,
+                "manufacturer": "LUMI",
+                "modelid": "lumi.plug.maus01",
+                "name": "Power 27",
+                "on": True,
+                "power": 1,
+                "reachable": True,
+                "secondary_temperature": 34.0,
+                "state": 1,
+                "swversion": "05-02-2018",
+                "tampered": None,
+                "type": "ZHAPower",
+                "uniqueid": "00:15:8d:00:02:82:d3:56-02-000c",
+                "voltage": None,
+            },
+        ),
+    ],
+)
+async def test_power_sensor(input, expected):
+    """Verify that power sensor works."""
+    sensor = Sensors({"0": input}, AsyncMock())["0"]
 
-    assert sensor.BINARY is False
-    assert sensor.ZHATYPE == ("ZHAPower",)
-
-    assert sensor.state == 64
-    assert sensor.current == 34
-    assert sensor.power == 64
-    assert sensor.voltage == 231
-
-    # DeconzSensor
-    assert sensor.battery is None
-    assert sensor.ep == 1
-    assert sensor.lowbattery is None
-    assert sensor.on is True
-    assert sensor.reachable is True
-    assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
-
-    # DeconzDevice
-    assert sensor.deconz_id == "/sensors/0"
-    assert sensor.etag == "96e71c7db4685b334d3d0decc3f11868"
-    assert sensor.manufacturer == "Heiman"
-    assert sensor.modelid == "SmartPlug"
-    assert sensor.name == "Power 16"
-    assert sensor.swversion is None
-    assert sensor.type == "ZHAPower"
-    assert sensor.uniqueid == "00:0d:6f:00:0b:7a:64:29-01-0b04"
+    for attr, value in expected.items():
+        assert getattr(sensor, attr) == value
 
 
 async def test_presence_sensor():
