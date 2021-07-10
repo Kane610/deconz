@@ -8,6 +8,11 @@ from .deconzdevice import DeconzDevice
 RESOURCE_TYPE = "lights"
 URL = "/lights"
 
+ALERT_KEY = "alert"
+ALERT_LONG = "lselect"
+ALERT_NONE = "none"
+ALERT_SHORT = "select"
+
 
 class Lights(APIItems):
     """Represent deCONZ lights."""
@@ -304,15 +309,15 @@ class Siren(DeconzLight):
     @property
     def is_on(self) -> bool:
         """If device is sounding."""
-        return self.raw["state"]["alert"] == "lselect"
+        return self.raw["state"][ALERT_KEY] == ALERT_LONG
 
     async def turn_on(self) -> None:
         """Turn on device."""
-        await self.async_set_state({"alert": "lselect"})
+        await self.async_set_state({ALERT_KEY: ALERT_LONG})
 
     async def turn_off(self) -> None:
         """Turn off device."""
-        await self.async_set_state({"alert": "none"})
+        await self.async_set_state({ALERT_KEY: ALERT_NONE})
 
 
 NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
