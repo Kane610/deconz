@@ -5,7 +5,7 @@ pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 
 from unittest.mock import AsyncMock, Mock, patch
 
-from pydeconz.light import Lights
+from pydeconz.light import ALERT_KEY, ALERT_LONG, ALERT_NONE, ALERT_SHORT, Lights
 
 
 async def test_create_light():
@@ -503,19 +503,19 @@ async def test_create_siren():
     siren.register_callback(mock_callback)
     assert siren._callbacks
 
-    event = {"state": {"alert": "lselect"}}
+    event = {"state": {"alert": ALERT_LONG}}
     siren.update(event)
     assert siren.is_on is True
     mock_callback.assert_called_once()
-    assert siren.changed_keys == {"state", "alert"}
+    assert siren.changed_keys == {"state", ALERT_KEY}
 
     with patch.object(siren, "async_set_state", return_value=True) as set_state:
         await siren.turn_on()
-        set_state.assert_called_with({"alert": "lselect"})
+        set_state.assert_called_with({ALERT_KEY: ALERT_LONG})
 
     with patch.object(siren, "async_set_state", return_value=True) as set_state:
         await siren.turn_off()
-        set_state.assert_called_with({"alert": "none"})
+        set_state.assert_called_with({ALERT_KEY: ALERT_NONE})
 
     siren.remove_callback(mock_callback)
     assert not siren._callbacks
