@@ -16,6 +16,13 @@ ALERT_LONG: Final = "lselect"
 ALERT_NONE: Final = "none"
 ALERT_SHORT: Final = "select"
 
+# Bit field of features supported by a light device
+COLOR_CAPABILITY_HUE_SATURATION_SUPPORTED: Final = 0
+COLOR_CAPABILITY_ENHANCED_HUE_SUPPORTED: Final = 1
+COLOR_CAPABILITY_COLOR_LOOP_SUPPORTED: Final = 2
+COLOR_CAPABILITY_XY_ATTRIBUTES_SUPPORTED: Final = 4
+COLOR_CAPABILITY_COLOR_TEMPERATURE_SUPPORTED: Final = 8
+
 EFFECT_NONE: Final = "none"
 EFFECT_COLOR_LOOP: Final = "colorloop"
 
@@ -73,6 +80,20 @@ class Light(DeconzLight):
     Dresden Elektroniks documentation of lights in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
+
+    @property
+    def color_capabilities(self) -> int:
+        """Bit field to specify color capabilities of light.
+
+        If a bit is set to 0, the corresponding attributes are not supported.
+        Following positions are supported:
+        0 - Hue/saturation supported
+        1 - Enhanced hue support
+        2 - Color loop supported
+        3 - XY attributes supported
+        4 - Color temperature supported
+        """
+        return self.raw.get("colorcapabilities", 0)
 
     @property
     def alert(self) -> Literal["none", "select", "lselect"] | None:
