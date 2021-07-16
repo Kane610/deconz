@@ -208,7 +208,7 @@ class DeconzGroup(DeconzDevice):
         write light attributes with the value None to the group.
         This is used to not keep any bad values from the group.
         """
-        data: Dict[str, Union[float, int, str, tuple]] = {}
+        data: Dict[str, Union[float, int, str, tuple, None]] = {}
 
         for group_key, light_attribute_key in group_to_light_attributes.items():
             light_attribute = getattr(light, light_attribute_key)
