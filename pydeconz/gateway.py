@@ -185,9 +185,6 @@ class DeconzSession:
         state of the lights in the group. This method updates the color
         properties of the group to the current color of the lights in the
         group.
-
-        For groups where the lights have different colors the group color will
-        only reflect the color of the latest changed light in the group.
         """
         for group in self.groups.values():  # type: ignore
             # Skip group if there are no common light ids.
@@ -198,11 +195,13 @@ class DeconzSession:
             if len(light_ids := lights) > 1:
                 light_ids = group.lights
 
+            first = True
             for light_id in light_ids:
                 light = self.lights[light_id]  # type: ignore
 
                 if light.ZHATYPE == Light.ZHATYPE and light.reachable:
-                    group.update_color_state(light)
+                    group.update_color_state(light, update_all_attributes=first)
+                    first = False
 
     def update_scenes(self) -> None:
         """Update scenes to hold all known scenes from existing groups."""
