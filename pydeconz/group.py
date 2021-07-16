@@ -14,6 +14,16 @@ RESOURCE_TYPE = "groups"
 RESOURCE_TYPE_SCENE = "scenes"
 URL = "/groups"
 
+group_to_light_attributes = {
+    "bri": "brightness",
+    "ct": "ct",
+    "hue": "hue",
+    "sat": "sat",
+    "xy": "xy",
+    "colormode": "colormode",
+    "effect": "effect",
+}
+
 
 class Groups(APIItems):
     """Represent deCONZ groups."""
@@ -191,24 +201,24 @@ class DeconzGroup(DeconzDevice):
         """
         return self.raw.get("multideviceids")
 
-    def update_color_state(self, light: Light) -> None:
-        """Sync color state with light."""
-        data: Dict[str, Union[float, int, str, tuple]] = {}
+    def update_color_state(self, light: Light, update_all_attributes=False) -> None:
+        """Sync color state with light.
 
-        if light.brightness is not None:
-            data["bri"] = light.brightness
-        if light.hue is not None:
-            data["hue"] = light.hue
-        if light.sat is not None:
-            data["sat"] = light.sat
-        if light.ct is not None:
-            data["ct"] = light.ct
-        if light.xy is not None:
-            data["xy"] = light.xy
-        if light.colormode is not None:
-            data["colormode"] = light.colormode
-        if light.effect is not None:
-            data["effect"] = light.effect
+          update_all_attributes is used to control whether or not to
+        write light attributes with the value None to the group.
+        This is used to not keep any bad values from the group.
+        """
+        data: Dict[str, Union[float, int, str, tuple, None]] = {}
+
+        for group_key, light_attribute_key in group_to_light_attributes.items():
+            light_attribute = getattr(light, light_attribute_key)
+
+            if light_attribute is not None:
+                data[group_key] = light_attribute
+                continue
+
+            if update_all_attributes:
+                data[group_key] = None if group_key != "xy" else (None, None)
 
         self.update({"action": data})
 

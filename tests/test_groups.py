@@ -4,7 +4,10 @@ pytest --cov-report term-missing --cov=pydeconz.group tests/test_groups.py
 """
 from unittest.mock import AsyncMock, Mock
 
+import pytest
+
 from pydeconz.group import Groups
+from pydeconz.light import Light
 
 
 async def test_create_group():
@@ -107,3 +110,90 @@ async def test_create_group():
 
     assert scene.name == "coldlight"
     assert scene.full_name == "Hall coldlight"
+
+
+@pytest.mark.parametrize(
+    "light_state,update_all,expected_group_state",
+    [
+        (
+            {
+                "bri": 1,
+                "ct": 1,
+                "hue": 1,
+                "sat": 1,
+                "xy": (0.1, 0.1),
+                "colormode": "xy",
+                "reachable": True,
+            },
+            False,
+            {
+                "brightness": 1,
+                "ct": 1,
+                "hue": 1,
+                "sat": 1,
+                "xy": (0.1, 0.1),
+                "colormode": "xy",
+                "effect": "none",
+            },
+        ),
+        (
+            {
+                "bri": 1,
+                "ct": 1,
+                "colormode": "ct",
+                "reachable": True,
+            },
+            True,
+            {
+                "brightness": 1,
+                "ct": 1,
+                "hue": None,
+                "sat": None,
+                "xy": None,
+                "colormode": "ct",
+                "effect": None,
+            },
+        ),
+    ],
+)
+async def test_update_color_state(light_state, update_all, expected_group_state):
+    """Verify that groups works."""
+    groups = Groups(
+        {
+            "0": {
+                "action": {
+                    "bri": 132,
+                    "colormode": "hs",
+                    "ct": 0,
+                    "effect": "none",
+                    "hue": 0,
+                    "on": False,
+                    "sat": 127,
+                    "scene": None,
+                    "xy": [0, 0],
+                },
+                "devicemembership": [],
+                "etag": "e31c23b3bd9ece918f23ee17ef430304",
+                "id": "11",
+                "lights": ["14", "15", "12"],
+                "name": "Hall",
+                "scenes": [{"id": "1", "name": "warmlight"}],
+                "state": {"all_on": False, "any_on": True},
+                "type": "LightGroup",
+            }
+        },
+        AsyncMock(),
+    )
+    group = groups["0"]
+
+    light = Light("0", {"type": "light", "state": light_state}, AsyncMock())
+
+    group.update_color_state(light, update_all_attributes=update_all)
+
+    assert group.brightness == expected_group_state["brightness"]
+    assert group.ct == expected_group_state["ct"]
+    assert group.hue == expected_group_state["hue"]
+    assert group.sat == expected_group_state["sat"]
+    assert group.xy == expected_group_state["xy"]
+    assert group.colormode == expected_group_state["colormode"]
+    assert group.effect == expected_group_state["effect"]

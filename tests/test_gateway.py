@@ -3,7 +3,7 @@
 pytest --cov-report term-missing --cov=pydeconz.gateway tests/test_gateway.py
 """
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 import pytest
 
 from pydeconz import (
@@ -394,7 +394,60 @@ async def test_event_handler(mock_aioresponse):
     await session.session.close()
 
 
-async def test_update_group_color(mock_aioresponse):
+@pytest.mark.parametrize(
+    "light_ids,expected_group_state",
+    [
+        (
+            ["l1", "l2", "l3", "l4"],
+            {
+                "brightness": 3,
+                "ct": 2,
+                "hue": 1,
+                "sat": 1,
+                "xy": (0.1, 0.1),
+                "colormode": "ct",
+                "effect": None,
+            },
+        ),
+        (
+            ["l1"],
+            {
+                "brightness": 1,
+                "ct": 1,
+                "hue": 1,
+                "sat": 1,
+                "xy": (0.1, 0.1),
+                "colormode": "xy",
+                "effect": None,
+            },
+        ),
+        (
+            ["l2"],
+            {
+                "brightness": 2,
+                "ct": 2,
+                "hue": None,
+                "sat": None,
+                "xy": None,
+                "colormode": "ct",
+                "effect": None,
+            },
+        ),
+        (
+            ["l3"],
+            {
+                "brightness": 3,
+                "ct": None,
+                "hue": None,
+                "sat": None,
+                "xy": None,
+                "colormode": None,
+                "effect": None,
+            },
+        ),
+    ],
+)
+async def test_update_group_color(mock_aioresponse, light_ids, expected_group_state):
     """Test update_group_color works as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
@@ -410,7 +463,7 @@ async def test_update_group_color(mock_aioresponse):
                     "colormode": "hs",
                 },
                 "id": "gid",
-                "lights": ["l1", "l2", "l3", "l4"],
+                "lights": light_ids,
                 "scenes": [],
             }
         },
@@ -473,11 +526,12 @@ async def test_update_group_color(mock_aioresponse):
 
     await session.initialize()
 
-    assert session.groups["g1"].brightness == 3
-    assert session.groups["g1"].hue == 1
-    assert session.groups["g1"].sat == 1
-    assert session.groups["g1"].xy == (0.1, 0.1)
-    assert session.groups["g1"].colormode == "ct"
-    assert session.groups["g1"].ct == 2
+    assert session.groups["g1"].brightness == expected_group_state["brightness"]
+    assert session.groups["g1"].ct == expected_group_state["ct"]
+    assert session.groups["g1"].hue == expected_group_state["hue"]
+    assert session.groups["g1"].sat == expected_group_state["sat"]
+    assert session.groups["g1"].xy == expected_group_state["xy"]
+    assert session.groups["g1"].colormode == expected_group_state["colormode"]
+    assert session.groups["g1"].effect == expected_group_state["effect"]
 
     await session.session.close()
