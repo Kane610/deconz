@@ -8,20 +8,6 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz.sensor import (
-    ANCILLARY_CONTROL_ALREADY_DISARMED,
-    ANCILLARY_CONTROL_ARMED_AWAY,
-    ANCILLARY_CONTROL_ARMED_NIGHT,
-    ANCILLARY_CONTROL_ARMED_STAY,
-    ANCILLARY_CONTROL_ARMING_AWAY,
-    ANCILLARY_CONTROL_ARMING_NIGHT,
-    ANCILLARY_CONTROL_ARMING_STAY,
-    ANCILLARY_CONTROL_DISARMED,
-    ANCILLARY_CONTROL_ENTRY_DELAY,
-    ANCILLARY_CONTROL_EXIT_DELAY,
-    ANCILLARY_CONTROL_IN_ALARM,
-    ANCILLARY_CONTROL_INVALID_CODE,
-    ANCILLARY_CONTROL_NOT_READY,
-    ANCILLARY_CONTROL_NOT_READY_TO_ARM,
     DEVICE_MODE_DUAL_ROCKER,
     SENSOR_CLASSES,
     Thermostat,
@@ -169,27 +155,29 @@ async def test_ancillary_control_sensor():
         {
             "0": {
                 "config": {
-                    "armed": "disarmed",
-                    "enrolled": 0,
+                    "battery": 95,
+                    "enrolled": 1,
                     "on": True,
-                    "panel": "disarmed",
                     "pending": [],
                     "reachable": True,
                 },
                 "ep": 1,
-                "etag": "3c4008d74035dfaa1f0bb30d24468b12",
-                "lastseen": "2021-04-02T13:07Z",
-                "manufacturername": "Universal Electronics Inc",
-                "modelid": "URC4450BC0-X-R",
+                "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
+                "lastseen": "2021-07-25T18:07Z",
+                "manufacturername": "lk",
+                "modelid": "ZB-KeypadGeneric-D0002",
                 "name": "Keypad",
                 "state": {
-                    "action": "armed_away,1111,55",
-                    "lastupdated": "2021-04-02T13:08:18.937",
+                    "action": "armed_stay",
+                    "lastupdated": "2021-07-25T18:02:51.172",
                     "lowbattery": False,
-                    "tampered": True,
+                    "panel": "exit_delay",
+                    "seconds_remaining": 55,
+                    "tampered": False,
                 },
+                "swversion": "3.13",
                 "type": "ZHAAncillaryControl",
-                "uniqueid": "00:0d:6f:00:13:4f:61:39-01-0501",
+                "uniqueid": "ec:1b:bd:ff:fe:6f:c3:4d-01-0501",
             },
         },
         AsyncMock(),
@@ -199,120 +187,28 @@ async def test_ancillary_control_sensor():
     assert not sensor.BINARY
     assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
 
-    assert sensor.state == "disarmed"
-    assert sensor.action == "armed_away,1111,55"
-    assert sensor.panel == "disarmed"
-    assert sensor.armed == "disarmed"
+    assert sensor.state == "exit_delay"
+    assert sensor.action == "armed_stay"
+    assert sensor.panel == "exit_delay"
 
     # DeconzSensor
-    assert not sensor.battery
+    assert sensor.battery == 95
     assert sensor.ep == 1
     assert not sensor.lowbattery
     assert sensor.on
     assert sensor.reachable
-    assert sensor.tampered
+    assert not sensor.tampered
     assert not sensor.secondary_temperature
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
-    assert sensor.etag == "3c4008d74035dfaa1f0bb30d24468b12"
-    assert sensor.manufacturer == "Universal Electronics Inc"
-    assert sensor.modelid == "URC4450BC0-X-R"
+    assert sensor.etag == "5aaa1c6bae8501f59929539c6e8f44d6"
+    assert sensor.manufacturer == "lk"
+    assert sensor.modelid == "ZB-KeypadGeneric-D0002"
     assert sensor.name == "Keypad"
-    assert not sensor.swversion
+    assert sensor.swversion == "3.13"
     assert sensor.type == "ZHAAncillaryControl"
-    assert sensor.uniqueid == "00:0d:6f:00:13:4f:61:39-01-0501"
-
-    await sensor.arm_away()
-    sensor._request.assert_called_with(
-        "put",
-        "/sensors/0/config",
-        json={
-            "armed": ANCILLARY_CONTROL_ARMED_AWAY,
-            "panel": ANCILLARY_CONTROL_ARMED_AWAY,
-        },
-    )
-
-    await sensor.arm_night()
-    sensor._request.assert_called_with(
-        "put",
-        "/sensors/0/config",
-        json={
-            "armed": ANCILLARY_CONTROL_ARMED_NIGHT,
-            "panel": ANCILLARY_CONTROL_ARMED_NIGHT,
-        },
-    )
-
-    await sensor.arm_stay()
-    sensor._request.assert_called_with(
-        "put",
-        "/sensors/0/config",
-        json={
-            "armed": ANCILLARY_CONTROL_ARMED_STAY,
-            "panel": ANCILLARY_CONTROL_ARMED_STAY,
-        },
-    )
-
-    await sensor.disarm()
-    sensor._request.assert_called_with(
-        "put",
-        "/sensors/0/config",
-        json={"armed": ANCILLARY_CONTROL_DISARMED, "panel": ANCILLARY_CONTROL_DISARMED},
-    )
-
-    # Armed only
-
-    await sensor.already_disarmed()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_ALREADY_DISARMED}
-    )
-
-    await sensor.invalid_code()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_INVALID_CODE}
-    )
-
-    await sensor.not_ready()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"armed": ANCILLARY_CONTROL_NOT_READY}
-    )
-
-    # Panel only
-
-    await sensor.arming_away()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ARMING_AWAY}
-    )
-
-    await sensor.arming_night()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ARMING_NIGHT}
-    )
-
-    await sensor.arming_stay()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ARMING_STAY}
-    )
-
-    await sensor.entry_delay()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_ENTRY_DELAY}
-    )
-
-    await sensor.exit_delay()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_EXIT_DELAY}
-    )
-
-    await sensor.in_alarm()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_IN_ALARM}
-    )
-
-    await sensor.not_ready_to_arm()
-    sensor._request.assert_called_with(
-        "put", "/sensors/0/config", json={"panel": ANCILLARY_CONTROL_NOT_READY_TO_ARM}
-    )
+    assert sensor.uniqueid == "ec:1b:bd:ff:fe:6f:c3:4d-01-0501"
 
 
 async def test_battery_sensor():
