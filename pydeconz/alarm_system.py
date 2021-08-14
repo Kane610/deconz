@@ -1,7 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
-from typing import Callable, Dict, Optional, Tuple, Union
+from typing import Awaitable, Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItem, APIItems
 from .deconzdevice import DeconzDevice
@@ -28,13 +28,16 @@ class AlarmSystems(APIItems):
         """Initialize alarm system manager."""
         super().__init__(raw, request, URL, AlarmSystem)
 
-    async def create_alarm_system(self, name: str) -> None:
+    async def create_alarm_system(self, name: str) -> dict:
         """Create a new alarm system.
 
         After creation the arm mode is set to disarmed.
         """
-        data = {"name": name}
-        await self._request("post", self._path, json=data)
+        return await self._request(
+            "post",
+            path=self._path,
+            json={"name": name},
+        )  # type: ignore
 
 
 class AlarmSystem(APIItem):
@@ -58,33 +61,80 @@ class AlarmSystem(APIItem):
 
     @property
     def deconz_id(self) -> str:
-        """Id to call device over API e.g. /sensors/1."""
+        """Id to call alarm system over API e.g. /alarmsystems/1."""
         return f"/{self.resource_type}/{self.resource_id}"
 
-    async def async_set_config(self, data: dict, path="config") -> None:
+    async def set_alarm_system_configuration(
+        self,
+        code0: Optional[int] = None,
+        armed_away_entry_delay: Optional[int] = None,
+        armed_away_exit_delay: Optional[int] = None,
+        armed_away_trigger_duration: Optional[int] = None,
+        armed_night_entry_delay: Optional[int] = None,
+        armed_night_exit_delay: Optional[int] = None,
+        armed_night_trigger_duration: Optional[int] = None,
+        armed_stay_entry_delay: Optional[int] = None,
+        armed_stay_exit_delay: Optional[int] = None,
+        armed_stay_trigger_duration: Optional[int] = None,
+        disarmed_entry_delay: Optional[int] = None,
+        disarmed_exit_delay: Optional[int] = None,
+    ) -> Awaitable:
         """Set config of alarm system."""
-        field = f"{self.deconz_id}/{path}"
-        await self.async_set(field, data)
+        data = {
+            key: value
+            for key, value in {
+                "code0": code0,
+                "armed_away_entry_delay": armed_away_entry_delay,
+                "armed_away_exit_delay": armed_away_exit_delay,
+                "armed_away_trigger_duration": armed_away_trigger_duration,
+                "armed_night_entry_delay": armed_night_entry_delay,
+                "armed_night_exit_delay": armed_night_exit_delay,
+                "armed_night_trigger_duration": armed_night_trigger_duration,
+                "armed_stay_entry_delay": armed_stay_entry_delay,
+                "armed_stay_exit_delay": armed_stay_exit_delay,
+                "armed_stay_trigger_duration": armed_stay_trigger_duration,
+                "disarmed_entry_delay": disarmed_entry_delay,
+                "disarmed_exit_delay": disarmed_exit_delay,
+            }.items()
+            if value is not None
+        }
+        return await self._request(
+            "put",
+            path=f"{self.deconz_id}/config",
+            json=data,
+        )  # type: ignore
 
-    async def arm_away(self, pin_code: int) -> None:
+    async def arm_away(self, pin_code: int) -> dict:
         """Set the alarm to away."""
-        data = {"code0": pin_code}
-        await self.async_set_config(data, ARM_AWAY_PATH)
+        return await self._request(
+            "put",
+            path=f"{self.deconz_id}/{ARM_AWAY_PATH}",
+            json={"code0": pin_code},
+        )  # type: ignore
 
-    async def arm_night(self, pin_code: int) -> None:
+    async def arm_night(self, pin_code: int) -> dict:
         """Set the alarm to night."""
-        data = {"code0": pin_code}
-        await self.async_set_config(data, ARM_AWAY_PATH)
+        return await self._request(
+            "put",
+            path=f"{self.deconz_id}/{ARM_NIGHT_PATH}",
+            json={"code0": pin_code},
+        )  # type: ignore
 
-    async def arm_stay(self, pin_code: int) -> None:
+    async def arm_stay(self, pin_code: int) -> dict:
         """Set the alarm to stay."""
-        data = {"code0": pin_code}
-        await self.async_set_config(data, ARM_AWAY_PATH)
+        return await self._request(
+            "put",
+            path=f"{self.deconz_id}/{ARM_STAY_PATH}",
+            json={"code0": pin_code},
+        )  # type: ignore
 
-    async def disarm(self, pin_code: int) -> None:
+    async def disarm(self, pin_code: int) -> dict:
         """Disarm alarm."""
-        data = {"code0": pin_code}
-        await self.async_set_config(data, ARM_AWAY_PATH)
+        return await self._request(
+            "put",
+            path=f"{self.deconz_id}/{DISARM_PATH}",
+            json={"code0": pin_code},
+        )  # type: ignore
 
     def arm_state(self) -> str:
         """Alarm system state.
@@ -217,3 +267,65 @@ class AlarmSystem(APIItem):
           0-255.
         """
         return self.raw["config"]["disarmed_exit_delay"]
+
+    def devices(self) -> dict:
+        """Devices associated with the alarm system.
+
+        The keys refer to the uniqueid of a light, sensor, or keypad.
+        Dictionary values:
+        - armmask - A combination of arm modes in which the device triggers alarms.
+          A — armed_away
+          N — armed_night
+          S — armed_stay
+          "none" — for keypads and keyfobs
+        - trigger - Specifies arm modes in which the device triggers alarms.
+          "state/presence"
+          "state/open"
+          "state/vibration"
+          "state/buttonevent"
+          "state/on"
+        """
+        return self.raw["devices"]
+
+    async def add_device(
+        self,
+        unique_id: str,
+        armed_away: bool = False,
+        armed_night: bool = False,
+        armed_stay: bool = False,
+        trigger: Optional[str] = None,
+        is_keypad: bool = False,
+    ) -> dict:
+        """Link device with alarm system.
+
+        A device can be linked to exactly one alarm system.
+          If it is added to another alarm system, it is automatically removed
+          from the prior one.
+        This request is used for adding and also for updating a device entry.
+        The uniqueid refers to sensors, lights or keypads.
+          Adding a light can be useful, e.g. when an alarm should be triggered,
+          after a light is powered or switched on in the basement.
+        """
+        data = {"armmask": ""}
+        data["armmask"] += "A" if armed_away else ""
+        data["armmask"] += "N" if armed_night else ""
+        data["armmask"] += "S" if armed_stay else ""
+
+        if trigger:
+            data["trigger"] = trigger
+
+        if is_keypad:
+            data = {}
+
+        return await self._request(
+            "put",
+            path=f"{self.deconz_id}/device/{unique_id}",
+            json=data,
+        )  # type: ignore
+
+    async def remove_device(self, unique_id: str) -> dict:
+        """Unlink device with alarm system."""
+        return await self._request(
+            "delete",
+            path=f"{self.deconz_id}/device/{unique_id}",
+        )  # type: ignore
