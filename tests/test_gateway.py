@@ -85,6 +85,28 @@ async def test_initialize(mock_aioresponse):
     """Test initialize creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
+        "alarmsystems": {
+            "1": {
+                "name": "default",
+                "config": {
+                    "armmode": "armed_away",
+                    "configured": True,
+                    "disarmed_entry_delay": 0,
+                    "disarmed_exit_delay": 0,
+                    "armed_away_entry_delay": 120,
+                    "armed_away_exit_delay": 120,
+                    "armed_away_trigger_duration": 120,
+                    "armed_stay_entry_delay": 120,
+                    "armed_stay_exit_delay": 120,
+                    "armed_stay_trigger_duration": 120,
+                    "armed_night_entry_delay": 120,
+                    "armed_night_exit_delay": 120,
+                    "armed_night_trigger_duration": 120,
+                },
+                "state": {"armstate": "armed_away", "seconds_remaining": 0},
+                "devices": {},
+            },
+        },
         "config": {"bridgeid": "012345"},
         "groups": {
             "g1": {
@@ -107,6 +129,7 @@ async def test_initialize(mock_aioresponse):
 
     assert session.config.bridgeid == "012345"
 
+    assert "1" in session.alarm_systems
     assert "g1" in session.groups
     assert "sc1" in session.groups["g1"].scenes
     assert "l1" in session.lights

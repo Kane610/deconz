@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, Optional, Union
 
 from aiohttp import client_exceptions
 
+from .alarm_system import AlarmSystems, RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
 from .config import DeconzConfig
 from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
@@ -40,6 +41,7 @@ class DeconzSession:
         self.async_add_device_callback = async_add_device
         self.async_connection_status_callback = connection_status
 
+        self.alarm_systems = AlarmSystems({}, self.request)  # type: ignore
         self.config: Optional[DeconzConfig] = None
         self.groups: Optional[Groups] = None
         self.lights: Optional[Lights] = None
@@ -72,6 +74,7 @@ class DeconzSession:
 
         self.config = DeconzConfig(data["config"])
 
+        self.alarm_systems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
         self.groups = Groups(data["groups"], self.request)  # type: ignore
         self.lights = Lights(data["lights"], self.request)  # type: ignore
         self.sensors = Sensors(data["sensors"], self.request)  # type: ignore
@@ -83,6 +86,7 @@ class DeconzSession:
         """Refresh deCONZ parameters."""
         data = await self.request("get")
 
+        self.alarm_systems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
         self.groups.process_raw(data["groups"])  # type: ignore
         self.lights.process_raw(data["lights"])  # type: ignore
         self.sensors.process_raw(data["sensors"])  # type: ignore
