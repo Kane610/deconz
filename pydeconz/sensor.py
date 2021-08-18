@@ -196,6 +196,7 @@ class AncillaryControl(DeconzSensor):
         - "armed_away"
         - "armed_night"
         - "armed_stay"
+        - "disarmed"
         - "emergency"
         - "fire"
         - "invalid_code"

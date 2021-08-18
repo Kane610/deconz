@@ -15,6 +15,11 @@ PATH_ARM_NIGHT = "arm_night"
 PATH_ARM_STAY = "arm_stay"
 PATH_DISARM = "disarm"
 
+ARM_MODE_ARMED_AWAY = "armed_away"
+ARM_MODE_ARMED_NIGHT = "armed_night"
+ARM_MODE_ARMED_STAY = "armed_stay"
+ARM_MODE_DISARMED = "disarmed"
+
 ARM_STATE_ARMED_AWAY = "armed_away"
 ARM_STATE_ARMED_NIGHT = "armed_night"
 ARM_STATE_ARMED_STAY = "armed_stay"

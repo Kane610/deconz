@@ -5,6 +5,7 @@ pytest --cov-report term-missing --cov=pydeconz.alarm_system tests/test_alarm_sy
 from unittest.mock import AsyncMock
 
 from pydeconz.alarm_system import (
+    ARM_MODE_ARMED_AWAY,
     ARM_STATE_ARMED_AWAY,
     AlarmSystems,
     DEVICE_TRIGGER_ON,
@@ -60,7 +61,7 @@ async def test_create_alarm_system():
     assert alarm_system_0.arm_state == ARM_STATE_ARMED_AWAY
     assert alarm_system_0.seconds_remaining == 0
     assert alarm_system_0.pin_configured
-    assert alarm_system_0.arm_mode == ARM_STATE_ARMED_AWAY
+    assert alarm_system_0.arm_mode == ARM_MODE_ARMED_AWAY
     assert alarm_system_0.armed_away_entry_delay == 120
     assert alarm_system_0.armed_away_exit_delay == 120
     assert alarm_system_0.armed_away_trigger_duration == 120
@@ -167,6 +168,7 @@ async def test_create_alarm_system():
 
     await alarm_system_0.add_device(
         unique_id="00:00:00:00:00:00:00:01-01-0101",
+        armed_stay=True,
         is_keypad=True,
     )
     alarm_system_0._request.assert_called_with(
