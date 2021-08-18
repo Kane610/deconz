@@ -85,28 +85,7 @@ async def test_initialize(mock_aioresponse):
     """Test initialize creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
-        "alarmsystems": {
-            "1": {
-                "name": "default",
-                "config": {
-                    "armmode": "armed_away",
-                    "configured": True,
-                    "disarmed_entry_delay": 0,
-                    "disarmed_exit_delay": 0,
-                    "armed_away_entry_delay": 120,
-                    "armed_away_exit_delay": 120,
-                    "armed_away_trigger_duration": 120,
-                    "armed_stay_entry_delay": 120,
-                    "armed_stay_exit_delay": 120,
-                    "armed_stay_trigger_duration": 120,
-                    "armed_night_entry_delay": 120,
-                    "armed_night_exit_delay": 120,
-                    "armed_night_trigger_duration": 120,
-                },
-                "state": {"armstate": "armed_away", "seconds_remaining": 0},
-                "devices": {},
-            },
-        },
+        "alarmsystems": {"1": {}},
         "config": {"bridgeid": "012345"},
         "groups": {
             "g1": {
@@ -150,6 +129,7 @@ async def test_refresh_state(mock_aioresponse):
     """Test refresh_state creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
+        "alarmsystems": {},
         "config": {},
         "groups": {},
         "lights": {},
@@ -165,12 +145,14 @@ async def test_refresh_state(mock_aioresponse):
     await session.initialize()
 
     assert session.config.bridgeid == "0000000000000000"
+    assert len(session.alarm_systems.values()) == 0
     assert len(session.groups.values()) == 0
     assert len(session.lights.values()) == 0
     assert len(session.sensors.values()) == 0
     assert len(session.scenes.values()) == 0
 
     refresh_response = {
+        "alarmsystems": {"1": {}},
         "config": {"bridgeid": "012345"},
         "groups": {
             "g1": {
@@ -193,12 +175,14 @@ async def test_refresh_state(mock_aioresponse):
 
     assert session.config.bridgeid == "0000000000000000"
 
+    assert "1" in session.alarm_systems
     assert "g1" in session.groups
     assert "sc1" in session.groups["g1"].scenes
     assert "l1" in session.lights
     assert "s1" in session.sensors
     assert "gid_sc1" in session.scenes
 
+    assert session.alarm_systems["1"].deconz_id == "/alarmsystems/1"
     assert session.groups["g1"].id == "gid"
     assert session.groups["g1"].deconz_id == "/groups/g1"
     assert session.groups["g1"].scenes["sc1"].id == "sc1"
