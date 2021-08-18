@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Optional, Union
 
 from aiohttp import client_exceptions
 
-from .alarm_system import AlarmSystems, RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
+from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
 from .config import DeconzConfig
 from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
