@@ -190,6 +190,7 @@ async def test_ancillary_control_sensor():
     assert sensor.state == "exit_delay"
     assert sensor.action == "armed_stay"
     assert sensor.panel == "exit_delay"
+    assert sensor.seconds_remaining == 55
 
     # DeconzSensor
     assert sensor.battery == 95

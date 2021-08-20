@@ -196,6 +196,7 @@ class AncillaryControl(DeconzSensor):
         - "armed_away"
         - "armed_night"
         - "armed_stay"
+        - "disarmed"
         - "emergency"
         - "fire"
         - "invalid_code"
@@ -223,6 +224,14 @@ class AncillaryControl(DeconzSensor):
         - "not_ready"
         """
         return self.raw["state"].get("panel")
+
+    @property
+    def seconds_remaining(self) -> int:
+        """Remaining time of "exit_delay" and "entry_delay" states.
+
+        In all other states the value is 0.
+        """
+        return self.raw["state"].get("seconds_remaining", 0)
 
 
 class Battery(DeconzSensor):
