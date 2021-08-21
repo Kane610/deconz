@@ -1,7 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
-from typing import Awaitable, Callable, Optional
+from typing import Any, Awaitable, Callable, Dict, Optional
 
 from .api import APIItem, APIItems
 
@@ -45,7 +45,10 @@ class AlarmSystems(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[str, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Initialize alarm system manager."""
         super().__init__(raw, request, URL, AlarmSystem)
@@ -70,7 +73,13 @@ class AlarmSystem(APIItem):
     """
 
     def __init__(
-        self, resource_id: str, raw: dict, request: Callable[..., Optional[dict]]
+        self,
+        resource_id: str,
+        raw: dict,
+        request: Callable[
+            [str, Optional[str], Optional[Dict[str, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Set initial information common to all device types."""
         super().__init__(raw, request)

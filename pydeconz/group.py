@@ -2,7 +2,7 @@
 
 import logging
 from pprint import pformat
-from typing import Callable, Dict, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -31,7 +31,10 @@ class Groups(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[str, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Initialize group manager."""
         super().__init__(raw, request, URL, DeconzGroup)
@@ -48,7 +51,10 @@ class DeconzGroup(DeconzDevice):
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[Any, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Set initial information about light group.
 
@@ -229,7 +235,10 @@ class Scenes(APIItems):
     def __init__(
         self,
         group: DeconzGroup,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[Any, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Initialize scene manager."""
         self.group = group
@@ -259,7 +268,10 @@ class DeconzScene:
         self,
         group: DeconzGroup,
         raw: dict,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[str, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Set initial information about scene.
 

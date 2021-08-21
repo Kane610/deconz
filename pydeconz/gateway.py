@@ -41,7 +41,7 @@ class DeconzSession:
         self.async_add_device_callback = async_add_device
         self.async_connection_status_callback = connection_status
 
-        self.alarm_systems = AlarmSystems({}, self.request)  # type: ignore
+        self.alarm_systems = AlarmSystems({}, self.request)
         self.config: Optional[DeconzConfig] = None
         self.groups: Optional[Groups] = None
         self.lights: Optional[Lights] = None
@@ -95,8 +95,11 @@ class DeconzSession:
         self.update_scenes()
 
     async def request(
-        self, method: str, path: Optional[str] = "", json: Optional[dict] = None
-    ) -> dict:
+        self,
+        method: str,
+        path: Optional[str] = "",
+        json: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """Make a request to the API."""
         LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
 

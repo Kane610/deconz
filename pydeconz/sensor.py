@@ -1,7 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
-from typing import Callable, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -60,7 +60,10 @@ class Sensors(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[str, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Initialize sensor manager."""
         super().__init__(raw, request, URL, create_sensor)
@@ -872,7 +875,10 @@ SENSOR_CLASSES = (
 def create_sensor(
     resource_id: str,
     raw: dict,
-    request: Callable[..., Optional[dict]],
+    request: Callable[
+        [str, Optional[str], Optional[Dict[str, Any]]],
+        Awaitable[Dict[str, Any]],
+    ],
 ) -> Union[
     AirQuality,
     Alarm,
