@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Callable, Dict, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -20,7 +20,10 @@ class Lights(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Optional[dict]],
+        request: Callable[
+            [str, Optional[str], Optional[Dict[str, Any]]],
+            Awaitable[Dict[str, Any]],
+        ],
     ) -> None:
         """Initialize light manager."""
         super().__init__(raw, request, URL, create_light)
@@ -326,7 +329,10 @@ NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
 def create_light(
     light_id: str,
     raw: dict,
-    request: Callable[..., Optional[dict]],
+    request: Callable[
+        [str, Optional[str], Optional[Dict[str, Any]]],
+        Awaitable[Dict[str, Any]],
+    ],
 ) -> DeconzLight:
     # ) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
     """Create device out of a light resource."""
