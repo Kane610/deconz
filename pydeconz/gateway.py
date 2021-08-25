@@ -16,14 +16,23 @@ from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSCl
 
 LOGGER = logging.getLogger(__name__)
 
-EVENT_TYPE = "e"
+EVENT_ID = "id"
 EVENT_RESOURCE = "r"
 
-EVENT_ADDED = "added"
-EVENT_CHANGED = "changed"
+EVENT_TYPE = "e"
+EVENT_TYPE_ADDED = "added"
+EVENT_TYPE_CHANGED = "changed"
+EVENT_TYPE_DELETED = "deleted"
+EVENT_TYPE_SCENE_CALLED = "scene-called"
 
-SUPPORTED_EVENT_TYPES = (EVENT_ADDED, EVENT_CHANGED)
+SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
 SUPPORTED_EVENT_RESOURCES = (GROUP_RESOURCE, LIGHT_RESOURCE, SENSOR_RESOURCE)
+
+RESOURCE_TYPE_TO_DEVICE_TYPE = {
+    GROUP_RESOURCE: "group",
+    LIGHT_RESOURCE: "light",
+    SENSOR_RESOURCE: "sensor",
+}
 
 
 class DeconzSession:
@@ -135,7 +144,10 @@ class DeconzSession:
             self.async_connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
 
     def event_handler(self, event: dict) -> None:
-        """Receive event from websocket and identifies where the event belong."""
+        """Receive event from websocket and identifies where the event belong.
+
+        Note that only one of config, name, or state will be present per changed event.
+        """
         if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
             LOGGER.debug("Unsupported event %s", event)
             return
@@ -145,16 +157,17 @@ class DeconzSession:
             return
 
         device_class = getattr(self, resource_type)
-        device_id = event["id"]
+        device_id = event[EVENT_ID]
 
-        if event_type == EVENT_CHANGED and device_id in device_class:
+        if event_type == EVENT_TYPE_CHANGED and device_id in device_class:
             device_class.process_raw({device_id: event})
             if resource_type == LIGHT_RESOURCE and "attr" not in event:
                 self.update_group_color([device_id])
             return
 
-        if event_type == EVENT_ADDED and device_id not in device_class:
-            device_class.process_raw({device_id: event[resource_type[:-1]]})
+        if event_type == EVENT_TYPE_ADDED and device_id not in device_class:
+            device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
+            device_class.process_raw({device_id: event[device_type]})
             device = device_class[device_id]
             if self.async_add_device_callback:
                 self.async_add_device_callback(resource_type, device)

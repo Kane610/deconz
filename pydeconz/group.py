@@ -14,7 +14,7 @@ RESOURCE_TYPE = "groups"
 RESOURCE_TYPE_SCENE = "scenes"
 URL = "/groups"
 
-group_to_light_attributes = {
+GROUP_TO_LIGHT_ATTRIBUTES = {
     "bri": "brightness",
     "ct": "ct",
     "hue": "hue",
@@ -216,7 +216,7 @@ class DeconzGroup(DeconzDevice):
         """
         data: Dict[str, Union[float, int, str, tuple, None]] = {}
 
-        for group_key, light_attribute_key in group_to_light_attributes.items():
+        for group_key, light_attribute_key in GROUP_TO_LIGHT_ATTRIBUTES.items():
             light_attribute = getattr(light, light_attribute_key)
 
             if light_attribute is not None:
