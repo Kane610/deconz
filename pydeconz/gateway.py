@@ -12,12 +12,18 @@ from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
 from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
 from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE, Sensors
-from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
+from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
 
+EVENT_TYPE = "e"
+EVENT_RESOURCE = "r"
+
 EVENT_ADDED = "added"
 EVENT_CHANGED = "changed"
+
+SUPPORTED_EVENT_TYPES = (EVENT_ADDED, EVENT_CHANGED)
+SUPPORTED_EVENT_RESOURCES = (GROUP_RESOURCE, LIGHT_RESOURCE, SENSOR_RESOURCE)
 
 
 class DeconzSession:
@@ -123,38 +129,18 @@ class DeconzSession:
         if signal == SIGNAL_DATA:
             self.event_handler(self.websocket.data)  # type: ignore
 
-        elif signal == SIGNAL_CONNECTION_STATE:
-            if self.async_connection_status_callback:
-                self.async_connection_status_callback(self.websocket.state == "running")  # type: ignore
+        elif (
+            signal == SIGNAL_CONNECTION_STATE and self.async_connection_status_callback
+        ):
+            self.async_connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
 
     def event_handler(self, event: dict) -> None:
-        """Receive event from websocket and identifies where the event belong.
-
-        {
-            "e": "changed",
-            "id": "12",
-            "r": "sensors",
-            "t": "event",
-            "state": { "buttonevent": 2002 }
-        }
-        {
-            'e': 'changed',
-            'id': '1',
-            'name': 'Spot 1',
-            'r': 'lights',
-            't': 'event',
-            'uniqueid': '00:17:88:01:02:03:04:fc-0b'
-        }
-        """
-        if (event_type := event["e"]) not in (EVENT_ADDED, EVENT_CHANGED):
+        """Receive event from websocket and identifies where the event belong."""
+        if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
             LOGGER.debug("Unsupported event %s", event)
             return
 
-        if (resource_type := event["r"]) not in (
-            GROUP_RESOURCE,
-            LIGHT_RESOURCE,
-            SENSOR_RESOURCE,
-        ):
+        if (resource_type := event[EVENT_RESOURCE]) not in SUPPORTED_EVENT_RESOURCES:
             LOGGER.debug("Unsupported resource %s", event)
             return
 

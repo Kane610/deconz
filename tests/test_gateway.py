@@ -81,7 +81,7 @@ async def test_websocket_config_provided_websocket_port(mock_aioresponse):
     session.websocket.stop.assert_called()
 
 
-async def test_refresh_state(mock_aioresponse):
+async def test_initial_state(mock_aioresponse):
     """Test refresh_state creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
