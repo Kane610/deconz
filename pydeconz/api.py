@@ -1,6 +1,6 @@
 """API base classes."""
 
-from asyncio import TimerHandle, get_running_loop
+from asyncio import sleep
 import logging
 from typing import Any, Awaitable, Callable, Dict, Optional
 
@@ -82,11 +82,9 @@ class APIItem:
         self._raw = raw
         self._request = request
 
-        self._loop = get_running_loop()
-
         self._callbacks: list = []
-        self._cancel_retry: Optional[TimerHandle] = None
         self._changed_keys: set = set()
+        self._retrying = False
 
     @property
     def resource_id(self) -> str:
@@ -138,30 +136,25 @@ class APIItem:
         for async_signal_update in self._callbacks:
             async_signal_update()
 
-    async def async_set(self, field: str, data: dict, tries: int = 0) -> None:
+    async def async_set(self, field: str, data: dict, tries: int = 0) -> dict:
         """Set state of device."""
-        self.cancel_retry()
+        self._retrying = False
 
         try:
-            await self._request("put", field, json=data)  # type: ignore
+            return await self._request("put", path=field, json=data)  # type: ignore
 
         except BridgeBusy:
-            LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
+            LOGGER.debug("Bridge is busy, schedule retry %s %s", field, str(data))
 
-            def retry_set() -> None:
-                """Retry set state."""
-                self._cancel_retry = None
-                self._loop.create_task(self.async_set(field, data, tries + 1))
+            self._retrying = True
 
             if tries < 3:
                 retry_delay = 2 ** (tries + 1)
-                self._cancel_retry = self._loop.call_later(retry_delay, retry_set)
+                await sleep(retry_delay)
 
-    def cancel_retry(self) -> None:
-        """Cancel retry.
+                if self._retrying:
+                    return await self.async_set(field, data, tries + 1)
+                else:
+                    return {}
 
-        Called at the start of async_set.
-        """
-        if self._cancel_retry is not None:
-            self._cancel_retry.cancel()
-            self._cancel_retry = None
+        raise BridgeBusy

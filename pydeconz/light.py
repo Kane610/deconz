@@ -220,7 +220,7 @@ class Cover(DeconzLight):
 
     async def set_position(
         self, *, lift: Optional[int] = None, tilt: Optional[int] = None
-    ) -> None:
+    ) -> dict:
         """Set amount of closed position and/or tilt of cover.
 
         Lift [int] between 0-100.
@@ -242,30 +242,29 @@ class Cover(DeconzLight):
             elif "sat" in self.raw["state"]:  # Legacy support
                 data["sat"] = int(tilt * 2.54)
 
-        if data:
-            await self.async_set_state(data)
+        return await self.async_set_state(data)
 
-    async def open(self) -> None:
+    async def open(self) -> dict:
         """Fully open cover."""
         data = {"open": True}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": False}
-        await self.async_set_state(data)
+        return await self.async_set_state(data)
 
-    async def close(self) -> None:
+    async def close(self) -> dict:
         """Fully close cover."""
         data = {"open": False}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": True}
-        await self.async_set_state(data)
+        return await self.async_set_state(data)
 
-    async def stop(self) -> None:
+    async def stop(self) -> dict:
         """Stop cover motion."""
         data: Dict[str, Union[bool, int]]
         data = {"stop": True}
         if "lift" not in self.raw["state"]:  # Legacy support
             data = {"bri_inc": 0}
-        await self.async_set_state(data)
+        return await self.async_set_state(data)
 
 
 class Fan(Light):
@@ -287,12 +286,12 @@ class Fan(Light):
         """Speed of the fan."""
         return self.raw["state"]["speed"]
 
-    async def set_speed(self, speed: int) -> None:
+    async def set_speed(self, speed: int) -> dict:
         """Set speed of fans/ventilators.
 
         Speed [int] between 0-6.
         """
-        await self.async_set_state({"speed": speed})
+        return await self.async_set_state({"speed": speed})
 
 
 class Lock(DeconzLight):
@@ -305,13 +304,13 @@ class Lock(DeconzLight):
         """State of lock."""
         return self.state is True
 
-    async def lock(self) -> None:
+    async def lock(self) -> dict:
         """Lock the lock."""
-        await self.async_set_state({"on": True})
+        return await self.async_set_state({"on": True})
 
-    async def unlock(self) -> None:
+    async def unlock(self) -> dict:
         """Unlock the lock."""
-        await self.async_set_state({"on": False})
+        return await self.async_set_state({"on": False})
 
 
 class Siren(DeconzLight):
@@ -324,7 +323,7 @@ class Siren(DeconzLight):
         """If device is sounding."""
         return self.raw["state"][ALERT_KEY] == ALERT_LONG
 
-    async def turn_on(self, duration: Optional[int] = None) -> None:
+    async def turn_on(self, duration: Optional[int] = None) -> dict:
         """Turn on device.
 
         Duration is counted as a tenth of a second.
@@ -332,11 +331,11 @@ class Siren(DeconzLight):
         data: Dict[str, Union[int, str]] = {ALERT_KEY: ALERT_LONG}
         if duration:
             data[ON_TIME_KEY] = duration
-        await self.async_set_state(data)
+        return await self.async_set_state(data)
 
-    async def turn_off(self) -> None:
+    async def turn_off(self) -> dict:
         """Turn off device."""
-        await self.async_set_state({ALERT_KEY: ALERT_NONE})
+        return await self.async_set_state({ALERT_KEY: ALERT_NONE})
 
 
 NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)

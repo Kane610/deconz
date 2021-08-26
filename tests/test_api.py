@@ -5,6 +5,8 @@ pytest --cov-report term-missing --cov=pydeconz.api tests/test_api.py
 from asyncio import sleep
 from unittest.mock import AsyncMock, Mock, patch
 
+import pytest
+
 from pydeconz.api import APIItems
 from pydeconz.deconzdevice import DeconzDevice
 from pydeconz.errors import BridgeBusy
@@ -28,9 +30,29 @@ async def test_api_items():
     item_1._callbacks[0].assert_called()
     item_1.changed_keys == ("key1")
 
-    with patch.object(item_1, "_request", side_effect=BridgeBusy):
-        await item_1.async_set("field", {"key1": "on"})
-        assert item_1._cancel_retry
-
     await item_1.async_set("field", {"key2": "on"})
-    assert not item_1._cancel_retry
+
+
+@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+async def test_retry_on_bridge_busy(mock_sleep):
+    """"""
+    apiitems = APIItems({"1": {}, "2": {}}, AsyncMock(), "string_path", DeconzDevice)
+    item_1 = apiitems["1"]
+    with patch.object(
+        item_1, "_request", side_effect=BridgeBusy
+    ) as mock_request, pytest.raises(BridgeBusy):
+        await item_1.async_set("field", {"key1": "on"})
+
+        assert mock_request.call_count == 3
+
+
+@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+async def test_retry_on_bridge_busy_pass_on_third_retry(mock_sleep):
+    """"""
+    apiitems = APIItems({"1": {}, "2": {}}, AsyncMock(), "string_path", DeconzDevice)
+    item_1 = apiitems["1"]
+    with patch.object(
+        item_1, "_request", side_effect=(BridgeBusy, BridgeBusy, {"response": "ok"})
+    ) as mock_request:
+        assert await item_1.async_set("field", {"key1": "on"}) == {"response": "ok"}
+        assert mock_request.call_count == 3

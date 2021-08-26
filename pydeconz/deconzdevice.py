@@ -24,15 +24,15 @@ class DeconzDevice(APIItem):
         """Id to call device over API e.g. /sensors/1."""
         return f"/{self.resource_type}/{self.resource_id}"
 
-    async def async_set_config(self, data: dict) -> None:
+    async def async_set_config(self, data: dict) -> dict:
         """Set config of device."""
         field = f"{self.deconz_id}/config"
-        await self.async_set(field, data)
+        return await self.async_set(field, data)
 
-    async def async_set_state(self, data: dict) -> None:
+    async def async_set_state(self, data: dict) -> dict:
         """Set state of device."""
         field = f"{self.deconz_id}/state"
-        await self.async_set(field, data)
+        return await self.async_set(field, data)
 
     @property
     def etag(self) -> Optional[str]:
