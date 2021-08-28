@@ -520,21 +520,21 @@ async def test_create_siren():
     await siren.turn_on()
     request_mock.assert_called_with(
         "put",
-        "/lights/0/state",
+        path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG},
     )
 
     await siren.turn_on(duration=10)
     request_mock.assert_called_with(
         "put",
-        "/lights/0/state",
+        path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
     )
 
     await siren.turn_off()
     request_mock.assert_called_with(
         "put",
-        "/lights/0/state",
+        path="/lights/0/state",
         json={ALERT_KEY: ALERT_NONE},
     )
 
