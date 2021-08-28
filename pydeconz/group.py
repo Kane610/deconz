@@ -32,7 +32,7 @@ class Groups(APIItems):
         self,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
     ) -> None:
@@ -269,7 +269,7 @@ class DeconzScene:
         group: DeconzGroup,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
     ) -> None:

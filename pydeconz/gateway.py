@@ -97,7 +97,7 @@ class DeconzSession:
     async def request(
         self,
         method: str,
-        path: Optional[str] = "",
+        path: str = "",
         json: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Make a request to the API."""
