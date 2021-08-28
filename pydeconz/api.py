@@ -70,6 +70,7 @@ class APIItem:
 
     def __init__(
         self,
+        resource_id: str,
         raw: dict,
         request: Callable[
             [str, Optional[str], Optional[Dict[str, Any]]],
@@ -77,6 +78,7 @@ class APIItem:
         ],
     ) -> None:
         """Initialize API item."""
+        self._resource_id = resource_id
         self._raw = raw
         self._request = request
 
@@ -85,6 +87,11 @@ class APIItem:
         self._callbacks: list = []
         self._cancel_retry: Optional[TimerHandle] = None
         self._changed_keys: set = set()
+
+    @property
+    def resource_id(self) -> str:
+        """Read only resource ID."""
+        return self._resource_id
 
     @property
     def raw(self) -> dict:

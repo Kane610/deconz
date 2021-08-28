@@ -1,7 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import Optional
 
 from .api import APIItem
 
@@ -15,22 +15,9 @@ class DeconzDevice(APIItem):
     http://dresden-elektronik.github.io/deconz-rest-doc/
     """
 
-    def __init__(
-        self,
-        resource_id: str,
-        raw: dict,
-        request: Callable[
-            [str, Optional[str], Optional[Dict[Any, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
-    ) -> None:
-        """Set initial information common to all device types."""
-        super().__init__(raw, request)
-        self.resource_id = resource_id
-
     @property
     def resource_type(self) -> str:
-        """Resource type, e.g. groups/lights/sensors."""
+        """Resource type, e.g. alarmsystems/groups/lights/scenes/sensors."""
 
     @property
     def deconz_id(self) -> str:
