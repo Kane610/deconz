@@ -13,6 +13,8 @@ ALERT_LONG = "lselect"
 ALERT_NONE = "none"
 ALERT_SHORT = "select"
 
+ON_TIME_KEY = "ontime"
+
 
 class Lights(APIItems):
     """Represent deCONZ lights."""
@@ -314,9 +316,15 @@ class Siren(DeconzLight):
         """If device is sounding."""
         return self.raw["state"][ALERT_KEY] == ALERT_LONG
 
-    async def turn_on(self) -> None:
-        """Turn on device."""
-        await self.async_set_state({ALERT_KEY: ALERT_LONG})
+    async def turn_on(self, duration: Optional[int] = None) -> None:
+        """Turn on device.
+
+        Duration is counted as a tenth of a second.
+        """
+        data = {ALERT_KEY: ALERT_LONG}
+        if duration:
+            data[ON_TIME_KEY] = duration
+        await self.async_set_state(data)
 
     async def turn_off(self) -> None:
         """Turn off device."""
