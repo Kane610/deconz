@@ -321,7 +321,7 @@ class Siren(DeconzLight):
 
         Duration is counted as a tenth of a second.
         """
-        data = {ALERT_KEY: ALERT_LONG}
+        data: Dict[str, Union[int, str]] = {ALERT_KEY: ALERT_LONG}
         if duration:
             data[ON_TIME_KEY] = duration
         await self.async_set_state(data)
