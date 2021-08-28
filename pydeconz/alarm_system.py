@@ -72,19 +72,6 @@ class AlarmSystem(APIItem):
     https://dresden-elektronik.github.io/deconz-rest-doc/endpoints/alarmsystems/
     """
 
-    def __init__(
-        self,
-        resource_id: str,
-        raw: dict,
-        request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
-    ) -> None:
-        """Set initial information common to all device types."""
-        super().__init__(raw, request)
-        self.resource_id = resource_id
-
     @property
     def resource_type(self) -> str:
         """Resource type."""

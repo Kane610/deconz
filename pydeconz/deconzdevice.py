@@ -25,12 +25,11 @@ class DeconzDevice(APIItem):
         ],
     ) -> None:
         """Set initial information common to all device types."""
-        super().__init__(raw, request)
-        self.resource_id = resource_id
+        super().__init__(resource_id, raw, request)
 
     @property
     def resource_type(self) -> str:
-        """Resource type, e.g. groups/lights/sensors."""
+        """Resource type, e.g. alarmsystems/groups/lights/scenes/sensors."""
 
     @property
     def deconz_id(self) -> str:
