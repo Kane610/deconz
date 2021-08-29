@@ -13,6 +13,9 @@ ALERT_LONG = "lselect"
 ALERT_NONE = "none"
 ALERT_SHORT = "select"
 
+EFFECT_NONE = "none"
+EFFECT_COLOR_LOOP = "colorloop"
+
 FAN_SPEED_OFF = 0
 FAN_SPEED_25_PERCENT = 1
 FAN_SPEED_50_PERCENT = 2
@@ -185,7 +188,7 @@ class Light(DeconzLight):
         """Change state of a light.
 
         Supported values:
-        - alert [int]
+        - alert [str]
           - "none" light is not performing an alert
           - "select" light is blinking a short time
           - "lselect" light is blinking a longer time
@@ -200,7 +203,7 @@ class Light(DeconzLight):
           - "colorloop" the light will cycle continuously through all
                         colors with the speed specified by colorloopspeed
         - hue [int] 0-65535
-        - on [bool] 0-255
+        - on [bool] True/False
         - on_time [int] 0-65535 1/10 seconds resolution
         - saturation [int] 0-255
         - transition_time [int] 0-65535 1/10 seconds resolution

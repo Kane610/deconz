@@ -9,6 +9,8 @@ from pydeconz.light import (
     ALERT_KEY,
     ALERT_LONG,
     ALERT_NONE,
+    ALERT_SHORT,
+    EFFECT_COLOR_LOOP,
     FAN_SPEED_100_PERCENT,
     ON_TIME_KEY,
     Lights,
@@ -17,6 +19,7 @@ from pydeconz.light import (
 
 async def test_create_light():
     """Verify that creating a light works."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -46,7 +49,7 @@ async def test_create_light():
                 "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     light = lights["0"]
 
@@ -111,7 +114,45 @@ async def test_create_light():
     light._request.assert_called_with("put", path="/lights/0/state", json={"on": True})
 
     await light.async_set_config({"on": True})
-    light._request.assert_called_with("put", path="/lights/0/config", json={"on": True})
+    mock_request.assert_called_with("put", path="/lights/0/config", json={"on": True})
+
+    await light.set_state(
+        alert=ALERT_SHORT,
+        brightness=200,
+        color_loop_speed=10,
+        color_temperature=400,
+        effect=EFFECT_COLOR_LOOP,
+        hue=1000,
+        on=True,
+        on_time=100,
+        saturation=150,
+        transition_time=250,
+        xy=(0.1, 0.1),
+    )
+    mock_request.assert_called_with(
+        "put",
+        path="/lights/0/state",
+        json={
+            "alert": "select",
+            "bri": 200,
+            "colorloopspeed": 10,
+            "ct": 400,
+            "effect": "colorloop",
+            "hue": 1000,
+            "on": True,
+            "ontime": 100,
+            "sat": 150,
+            "transitiontime": 250,
+            "xy": (0.1, 0.1),
+        },
+    )
+
+    await light.set_state(on=False)
+    mock_request.assert_called_with(
+        "put",
+        path="/lights/0/state",
+        json={"on": False},
+    )
 
     lights.process_raw({"0": {"state": {"bri": 2}}})
     assert light.brightness == 2
