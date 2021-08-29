@@ -408,7 +408,7 @@ async def test_create_fan():
     assert fan.changed_keys == {"state", "speed"}
 
     await fan.set_speed(FAN_SPEED_100_PERCENT)
-    mock_request.assert_called_with("put", "/lights/0/state", json={"speed": 4})
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"speed": 4})
 
     fan.remove_callback(mock_callback)
     assert not fan._callbacks
