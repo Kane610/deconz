@@ -5,7 +5,14 @@ pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 
 from unittest.mock import AsyncMock, Mock, patch
 
-from pydeconz.light import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, Lights
+from pydeconz.light import (
+    ALERT_KEY,
+    ALERT_LONG,
+    ALERT_NONE,
+    FAN_SPEED_100_PERCENT,
+    ON_TIME_KEY,
+    Lights,
+)
 
 
 async def test_create_light():
@@ -338,6 +345,7 @@ async def test_create_cover_without_lift():
 
 async def test_create_fan():
     """Verify light fixture with fan work."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -358,7 +366,7 @@ async def test_create_fan():
                 "uniqueid": "00:22:a3:00:00:27:8b:81-01",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     fan = lights["0"]
 
@@ -399,9 +407,8 @@ async def test_create_fan():
     mock_callback.assert_called_once()
     assert fan.changed_keys == {"state", "speed"}
 
-    with patch.object(fan, "async_set_state", return_value=True) as set_state:
-        await fan.set_speed(4)
-        set_state.assert_called_with({"speed": 4})
+    await fan.set_speed(FAN_SPEED_100_PERCENT)
+    mock_request.assert_called_with("put", "/lights/0/state", json={"speed": 4})
 
     fan.remove_callback(mock_callback)
     assert not fan._callbacks
