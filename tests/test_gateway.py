@@ -439,12 +439,12 @@ async def test_group_events(mock_aioresponse):
     mock_group_callback = Mock()
     session.groups["1"].register_callback(mock_group_callback)
     session.event_handler(
-        {"e": "changed", "id": "1", "r": "groups", "action": {"bri": 3}}
+        {"e": "changed", "id": "1", "r": "groups", "action": {"bri": 2}}
     )
 
     mock_group_callback.assert_called()
     assert session.groups["1"].changed_keys == {"action", "bri", "e", "id", "r"}
-    assert session.groups["1"].brightness == 3
+    assert session.groups["1"].brightness == 2
 
 
 async def test_sensor_events():
