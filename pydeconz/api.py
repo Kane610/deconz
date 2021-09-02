@@ -44,6 +44,10 @@ class APIItems:
             else:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 
+    def remove(self, obj_id: str) -> None:
+        """Remove item."""
+        del self._items[obj_id]
+
     def items(self) -> Any:
         """Return items."""
         return self._items.items()

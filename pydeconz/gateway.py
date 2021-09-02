@@ -25,7 +25,7 @@ EVENT_TYPE_CHANGED = "changed"
 EVENT_TYPE_DELETED = "deleted"
 EVENT_TYPE_SCENE_CALLED = "scene-called"
 
-SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
+SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED, EVENT_TYPE_DELETED)
 SUPPORTED_EVENT_RESOURCES = (
     ALARM_SYSTEM_RESOURCE,
     GROUP_RESOURCE,
@@ -178,6 +178,9 @@ class DeconzSession:
             if self.async_add_device_callback:
                 self.async_add_device_callback(resource_type, device)
             return
+
+        if event_type == EVENT_TYPE_DELETED and device_id in device_class:
+            device_class.remove(device_id)
 
     def update_group_color(self, lights: list) -> None:
         """Update group colors based on light states.
