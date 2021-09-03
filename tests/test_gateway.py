@@ -276,7 +276,7 @@ async def test_unsupported_events():
         aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
     )
 
-    assert not session.event_handler({"e": "deleted"})
+    # assert not session.event_handler({"e": "deleted"})
 
     assert not session.event_handler({"e": "added", "r": "scenes"})
 
@@ -627,3 +627,40 @@ async def test_update_group_color(mock_aioresponse, light_ids, expected_group_st
     assert session.groups["g1"].effect == expected_group_state["effect"]
 
     await session.session.close()
+
+
+async def test_delete_light_event(mock_aioresponse):
+    """Test event_handler works."""
+    session = DeconzSession(
+        aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
+    )
+
+    init_response = {
+        "config": {},
+        "groups": {},
+        "lights": {
+            "1": {
+                "type": "light",
+                "state": {
+                    "bri": 1,
+                    "reachable": True,
+                },
+            }
+        },
+        "sensors": {},
+    }
+    mock_aioresponse.get(
+        f"http://{HOST}:{PORT}/api/{API_KEY}",
+        payload=init_response,
+        content_type="application/json",
+        status=200,
+    )
+    await session.initialize()
+    await session.session.close()
+
+    # Delete light
+
+    session.event_handler({"e": "deleted", "id": "1", "r": "lights"})
+
+    assert "1" not in session.lights
+    # session.async_add_device_callback.assert_called_with("lights", session.lights["1"])
