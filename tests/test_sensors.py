@@ -1641,7 +1641,7 @@ async def test_tuya_thermostat():
     )
     mock_request.assert_called_with(
         "put",
-        "/sensors/0/config",
+        path="/sensors/0/config",
         json={
             "coolsetpoint": 1000,
             "schedule_on": True,
@@ -1665,7 +1665,7 @@ async def test_tuya_thermostat():
     await sensor.set_config(mode=THERMOSTAT_MODE_OFF)
     mock_request.assert_called_with(
         "put",
-        "/sensors/0/config",
+        path="/sensors/0/config",
         json={"mode": "off"},
     )
 
