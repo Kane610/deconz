@@ -30,7 +30,7 @@ async def deconz_gateway(
 
     try:
         with async_timeout.timeout(5):
-            await deconz.initialize()
+            await deconz.refresh_state()
         return deconz
 
     except errors.Unauthorized:
@@ -61,7 +61,7 @@ async def main(host: str, port: int, api_key: str) -> None:
         await session.close()
         return
 
-    await gateway.initialize()
+    await gateway.refresh_state()
     # gateway.start()
 
     try:

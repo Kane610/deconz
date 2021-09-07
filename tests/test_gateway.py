@@ -70,7 +70,7 @@ async def test_websocket_config_provided_websocket_port(mock_aioresponse):
         status=200,
     )
 
-    await session.initialize()
+    await session.refresh_state()
 
     with patch("pydeconz.gateway.WSClient") as mock_wsclient:
         session.start()
@@ -81,8 +81,8 @@ async def test_websocket_config_provided_websocket_port(mock_aioresponse):
     session.websocket.stop.assert_called()
 
 
-async def test_initialize(mock_aioresponse):
-    """Test initialize creates devices as expected."""
+async def test_initial_state(mock_aioresponse):
+    """Test refresh_state creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
     init_response = {
         "alarmsystems": {"0": {}},
@@ -104,7 +104,7 @@ async def test_initialize(mock_aioresponse):
         status=200,
     )
 
-    await session.initialize()
+    await session.refresh_state()
 
     assert session.config.bridgeid == "012345"
 
@@ -142,7 +142,7 @@ async def test_refresh_state(mock_aioresponse):
         status=200,
     )
 
-    await session.initialize()
+    await session.refresh_state()
 
     assert session.config.bridgeid == "0000000000000000"
     assert len(session.alarm_systems.values()) == 0
@@ -288,7 +288,7 @@ async def test_event_handler(mock_aioresponse):
         status=200,
     )
 
-    await session.initialize()
+    await session.refresh_state()
 
     assert not session.event_handler({"e": "deleted"})
 
@@ -531,7 +531,7 @@ async def test_update_group_color(mock_aioresponse, light_ids, expected_group_st
         status=200,
     )
 
-    await session.initialize()
+    await session.refresh_state()
 
     assert session.groups["g1"].brightness == expected_group_state["brightness"]
     assert session.groups["g1"].ct == expected_group_state["ct"]

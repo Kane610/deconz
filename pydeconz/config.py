@@ -7,6 +7,8 @@ from .utils import normalize_bridge_id
 
 _LOGGER = logging.getLogger(__name__)
 
+RESOURCE_TYPE = "config"
+
 UNINITIALIZED_BRIDGE_ID = "0000000000000000"
 
 

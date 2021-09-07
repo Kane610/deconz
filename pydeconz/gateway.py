@@ -7,17 +7,32 @@ from typing import Any, Callable, Dict, Optional, Union
 from aiohttp import client_exceptions
 
 from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
-from .config import DeconzConfig
+from .config import RESOURCE_TYPE as CONFIG_RESOURCE, DeconzConfig
 from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
 from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
 from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE, Sensors
-from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, WSClient
+from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
 
-EVENT_ADDED = "added"
-EVENT_CHANGED = "changed"
+EVENT_ID = "id"
+EVENT_RESOURCE = "r"
+
+EVENT_TYPE = "e"
+EVENT_TYPE_ADDED = "added"
+EVENT_TYPE_CHANGED = "changed"
+EVENT_TYPE_DELETED = "deleted"
+EVENT_TYPE_SCENE_CALLED = "scene-called"
+
+SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
+SUPPORTED_EVENT_RESOURCES = (GROUP_RESOURCE, LIGHT_RESOURCE, SENSOR_RESOURCE)
+
+RESOURCE_TYPE_TO_DEVICE_TYPE = {
+    GROUP_RESOURCE: "group",
+    LIGHT_RESOURCE: "light",
+    SENSOR_RESOURCE: "sensor",
+}
 
 
 class DeconzSession:
@@ -43,10 +58,10 @@ class DeconzSession:
 
         self.alarm_systems = AlarmSystems({}, self.request)
         self.config: Optional[DeconzConfig] = None
-        self.groups: Optional[Groups] = None
-        self.lights: Optional[Lights] = None
+        self.groups = Groups({}, self.request)
+        self.lights = Lights({}, self.request)
         self.scenes: Dict[str, DeconzScene] = {}
-        self.sensors: Optional[Sensors] = None
+        self.sensors = Sensors({}, self.request)
         self.websocket: Optional[WSClient] = None
 
     def start(self, websocketport: Optional[int] = None) -> None:
@@ -68,30 +83,19 @@ class DeconzSession:
         if self.websocket:
             self.websocket.stop()
 
-    async def initialize(self) -> None:
-        """Load deCONZ parameters."""
+    async def refresh_state(self) -> None:
+        """Read deCONZ parameters."""
         data = await self.request("get")
 
-        self.config = DeconzConfig(data["config"])
+        if not self.config:
+            self.config = DeconzConfig(data[CONFIG_RESOURCE])
 
         self.alarm_systems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
-        self.groups = Groups(data["groups"], self.request)  # type: ignore
-        self.lights = Lights(data["lights"], self.request)  # type: ignore
-        self.sensors = Sensors(data["sensors"], self.request)  # type: ignore
+        self.groups.process_raw(data[GROUP_RESOURCE])
+        self.lights.process_raw(data[LIGHT_RESOURCE])
+        self.sensors.process_raw(data[SENSOR_RESOURCE])
 
         self.update_group_color(list(self.lights.keys()))
-        self.update_scenes()
-
-    async def refresh_state(self) -> None:
-        """Refresh deCONZ parameters."""
-        data = await self.request("get")
-
-        self.alarm_systems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
-        self.groups.process_raw(data["groups"])  # type: ignore
-        self.lights.process_raw(data["lights"])  # type: ignore
-        self.sensors.process_raw(data["sensors"])  # type: ignore
-
-        self.update_group_color(list(self.lights.keys()))  # type: ignore
         self.update_scenes()
 
     async def request(
@@ -134,52 +138,36 @@ class DeconzSession:
         if signal == SIGNAL_DATA:
             self.event_handler(self.websocket.data)  # type: ignore
 
-        elif signal == SIGNAL_CONNECTION_STATE:
-            if self.async_connection_status_callback:
-                self.async_connection_status_callback(self.websocket.state == "running")  # type: ignore
+        elif (
+            signal == SIGNAL_CONNECTION_STATE and self.async_connection_status_callback
+        ):
+            self.async_connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
 
     def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
 
-        {
-            "e": "changed",
-            "id": "12",
-            "r": "sensors",
-            "t": "event",
-            "state": { "buttonevent": 2002 }
-        }
-        {
-            'e': 'changed',
-            'id': '1',
-            'name': 'Spot 1',
-            'r': 'lights',
-            't': 'event',
-            'uniqueid': '00:17:88:01:02:03:04:fc-0b'
-        }
+        Note that only one of config, name, or state will be present per changed event.
         """
-        if (event_type := event["e"]) not in (EVENT_ADDED, EVENT_CHANGED):
+        if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
             LOGGER.debug("Unsupported event %s", event)
             return
 
-        if (resource_type := event["r"]) not in (
-            GROUP_RESOURCE,
-            LIGHT_RESOURCE,
-            SENSOR_RESOURCE,
-        ):
+        if (resource_type := event[EVENT_RESOURCE]) not in SUPPORTED_EVENT_RESOURCES:
             LOGGER.debug("Unsupported resource %s", event)
             return
 
         device_class = getattr(self, resource_type)
-        device_id = event["id"]
+        device_id = event[EVENT_ID]
 
-        if event_type == EVENT_CHANGED and device_id in device_class:
+        if event_type == EVENT_TYPE_CHANGED and device_id in device_class:
             device_class.process_raw({device_id: event})
             if resource_type == LIGHT_RESOURCE and "attr" not in event:
                 self.update_group_color([device_id])
             return
 
-        if event_type == EVENT_ADDED and device_id not in device_class:
-            device_class.process_raw({device_id: event[resource_type[:-1]]})
+        if event_type == EVENT_TYPE_ADDED and device_id not in device_class:
+            device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
+            device_class.process_raw({device_id: event[device_type]})
             device = device_class[device_id]
             if self.async_add_device_callback:
                 self.async_add_device_callback(resource_type, device)
@@ -193,7 +181,7 @@ class DeconzSession:
         properties of the group to the current color of the lights in the
         group.
         """
-        for group in self.groups.values():  # type: ignore
+        for group in self.groups.values():
             # Skip group if there are no common light ids.
             if not any({*lights} & {*group.lights}):
                 continue
@@ -204,7 +192,7 @@ class DeconzSession:
 
             first = True
             for light_id in light_ids:
-                light = self.lights[light_id]  # type: ignore
+                light = self.lights[light_id]
 
                 if light.ZHATYPE == Light.ZHATYPE and light.reachable:
                     group.update_color_state(light, update_all_attributes=first)
@@ -215,7 +203,7 @@ class DeconzSession:
         self.scenes.update(
             {
                 f"{group.id}_{scene.id}": scene
-                for group in self.groups.values()  # type: ignore
+                for group in self.groups.values()
                 for scene in group.scenes.values()
                 if f"{group.id}_{scene.id}" not in self.scenes
             }
