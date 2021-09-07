@@ -2,8 +2,10 @@
 
 pytest --cov-report term-missing --cov=pydeconz.api tests/test_api.py
 """
-from asyncio import sleep
+from asyncio import gather
 from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 from pydeconz.api import APIItems
 from pydeconz.deconzdevice import DeconzDevice
@@ -28,9 +30,48 @@ async def test_api_items():
     item_1._callbacks[0].assert_called()
     item_1.changed_keys == ("key1")
 
-    with patch.object(item_1, "_request", side_effect=BridgeBusy):
-        await item_1.async_set("field", {"key1": "on"})
-        assert item_1._cancel_retry
-
     await item_1.async_set("field", {"key2": "on"})
-    assert not item_1._cancel_retry
+
+
+@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+async def test_retry_on_bridge_busy(_):
+    """Verify a max count of 4 bridge busy messages."""
+    request_mock = AsyncMock(side_effect=BridgeBusy)
+    apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
+
+    item_1 = apiitems["1"]
+    with pytest.raises(BridgeBusy):
+        await item_1.async_set("field", {"key1": "on"})
+
+    assert request_mock.call_count == 3
+    assert not item_1._sleep_task
+
+
+@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+async def test_request_exception_bridge_busy_pass_on_retry(_):
+    """Verify retry can return an expected response."""
+    request_mock = AsyncMock(side_effect=(BridgeBusy, {"response": "ok"}))
+    apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
+
+    item_1 = apiitems["1"]
+    assert await item_1.async_set("field", {"key1": "on"}) == {"response": "ok"}
+
+    assert request_mock.call_count == 2
+    assert not item_1._sleep_task
+
+
+@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+async def test_reset_retry_with_a_second_request(_):
+    """Verify an ongoing retry can be reset by a new request."""
+    request_mock = AsyncMock(side_effect=(BridgeBusy, BridgeBusy, {"response": "ok"}))
+    apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
+
+    item_1 = apiitems["1"]
+    collected_responses = await gather(
+        item_1.async_set("field", {"key1": "on"}),
+        item_1.async_set("field", {"key2": "on"}),
+    )
+
+    assert request_mock.call_count == 3
+    assert not item_1._sleep_task
+    assert collected_responses == [{}, {"response": "ok"}]

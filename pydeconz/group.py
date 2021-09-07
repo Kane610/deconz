@@ -32,7 +32,7 @@ class Groups(APIItems):
         self,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
     ) -> None:
@@ -68,10 +68,10 @@ class DeconzGroup(DeconzDevice):
         """Resource type."""
         return RESOURCE_TYPE
 
-    async def async_set_state(self, data: dict) -> None:
+    async def async_set_state(self, data: dict) -> dict:
         """Set state of light group."""
         field = f"{self.deconz_id}/action"
-        await self.async_set(field, data)
+        return await self.async_set(field, data)
 
     @property
     def state(self) -> Optional[bool]:
@@ -269,7 +269,7 @@ class DeconzScene:
         group: DeconzGroup,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
     ) -> None:
@@ -287,10 +287,10 @@ class DeconzScene:
         """Resource type."""
         return RESOURCE_TYPE_SCENE
 
-    async def async_set_state(self, data: dict) -> Optional[dict]:
+    async def async_set_state(self, data: dict) -> dict:
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
-        return await self._request("put", field, json=data)  # type: ignore
+        return await self._request("put", path=field, json=data)  # type: ignore
 
     @property
     def deconz_id(self) -> str:

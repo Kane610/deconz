@@ -1,6 +1,6 @@
 """API base classes."""
 
-from asyncio import TimerHandle, get_running_loop
+from asyncio import CancelledError, Task, create_task, sleep
 import logging
 from typing import Any, Awaitable, Callable, Dict, Optional
 
@@ -16,7 +16,7 @@ class APIItems:
         self,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
         path: str,
@@ -73,7 +73,7 @@ class APIItem:
         resource_id: str,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
     ) -> None:
@@ -82,10 +82,8 @@ class APIItem:
         self._raw = raw
         self._request = request
 
-        self._loop = get_running_loop()
-
         self._callbacks: list = []
-        self._cancel_retry: Optional[TimerHandle] = None
+        self._sleep_task: Optional[Task] = None
         self._changed_keys: set = set()
 
     @property
@@ -138,30 +136,27 @@ class APIItem:
         for async_signal_update in self._callbacks:
             async_signal_update()
 
-    async def async_set(self, field: str, data: dict, tries: int = 0) -> None:
+    async def async_set(self, field: str, data: dict, tries: int = 0) -> dict:
         """Set state of device."""
-        self.cancel_retry()
+        if self._sleep_task is not None:
+            self._sleep_task.cancel()
+            self._sleep_task = None
 
         try:
-            await self._request("put", field, json=data)  # type: ignore
+            return await self._request("put", path=field, json=data)  # type: ignore
 
         except BridgeBusy:
-            LOGGER.debug("BridgeBusy, schedule retry %s %s", field, str(data))
+            LOGGER.debug("Bridge is busy, schedule retry %s %s", field, str(data))
 
-            def retry_set() -> None:
-                """Retry set state."""
-                self._cancel_retry = None
-                self._loop.create_task(self.async_set(field, data, tries + 1))
+            if (tries := tries + 1) < 3:
+                self._sleep_task = create_task(sleep(2 ** (tries)))
 
-            if tries < 3:
-                retry_delay = 2 ** (tries + 1)
-                self._cancel_retry = self._loop.call_later(retry_delay, retry_set)
+                try:
+                    await self._sleep_task
+                except CancelledError:
+                    return {}
 
-    def cancel_retry(self) -> None:
-        """Cancel retry.
+                return await self.async_set(field, data, tries)
 
-        Called at the start of async_set.
-        """
-        if self._cancel_retry is not None:
-            self._cancel_retry.cancel()
-            self._cancel_retry = None
+            self._sleep_task = None
+            raise BridgeBusy

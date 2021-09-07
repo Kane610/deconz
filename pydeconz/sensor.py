@@ -61,7 +61,7 @@ class Sensors(APIItems):
         self,
         raw: dict,
         request: Callable[
-            [str, Optional[str], Optional[Dict[str, Any]]],
+            [str, str, Optional[Dict[str, Any]]],
             Awaitable[Dict[str, Any]],
         ],
     ) -> None:
@@ -351,13 +351,13 @@ class DoorLock(DeconzSensor):
         """Lock configuration."""
         return self.raw["config"]["lock"]
 
-    async def lock(self) -> None:
+    async def lock(self) -> dict:
         """Lock the lock."""
-        await self.async_set_config({"lock": True})
+        return await self.async_set_config({"lock": True})
 
-    async def unlock(self) -> None:
+    async def unlock(self) -> dict:
         """Unlock the lock."""
-        await self.async_set_config({"lock": False})
+        return await self.async_set_config({"lock": False})
 
 
 class Fire(DeconzBinarySensor):
@@ -876,7 +876,7 @@ def create_sensor(
     resource_id: str,
     raw: dict,
     request: Callable[
-        [str, Optional[str], Optional[Dict[str, Any]]],
+        [str, str, Optional[Dict[str, Any]]],
         Awaitable[Dict[str, Any]],
     ],
 ) -> Union[

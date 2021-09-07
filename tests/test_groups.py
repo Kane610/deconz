@@ -93,7 +93,7 @@ async def test_create_group():
     assert group.xy is None
 
     await group.async_set_state({"on": True})
-    group._request.assert_called_with("put", "/groups/0/action", json={"on": True})
+    group._request.assert_called_with("put", path="/groups/0/action", json={"on": True})
 
     # Scene
 
@@ -104,7 +104,7 @@ async def test_create_group():
     assert scene.full_name == "Hall warmlight"
 
     await scene.async_set_state({})
-    scene._request.assert_called_with("put", "/groups/0/scenes/1/recall", json={})
+    scene._request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
 
     group.scenes.process_raw([{"id": "1", "name": "coldlight"}])
 
