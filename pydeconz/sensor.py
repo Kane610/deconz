@@ -53,6 +53,42 @@ DEVICE_MODE_DUAL_ROCKER = "dualrocker"
 DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
 DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
 
+THERMOSTAT_MODE_AUTO = "auto"
+THERMOSTAT_MODE_COOL = "cool"
+THERMOSTAT_MODE_DRY = "dry"
+THERMOSTAT_MODE_FAN_ONLY = "fan only"
+THERMOSTAT_MODE_HEAT = "heat"
+THERMOSTAT_MODE_EMERGENCY_HEATING = "emergency heating"
+THERMOSTAT_MODE_OFF = "off"
+THERMOSTAT_MODE_PRECOOLING = "precooling"
+THERMOSTAT_MODE_SLEEP = "sleep"
+
+THERMOSTAT_FAN_MODE_AUTO = "auto"
+THERMOSTAT_FAN_MODE_HIGH = "high"
+THERMOSTAT_FAN_MODE_LOW = "low"
+THERMOSTAT_FAN_MODE_MEDIUM = "medium"
+THERMOSTAT_FAN_MODE_OFF = "off"
+THERMOSTAT_FAN_MODE_ON = "on"
+THERMOSTAT_FAN_MODE_SMART = "smart"
+
+THERMOSTAT_PRESET_AUTO = "auto"
+THERMOSTAT_PRESET_BOOST = "boost"
+THERMOSTAT_PRESET_COMFORT = "comfort"
+THERMOSTAT_PRESET_COMPLEX = "complex"
+THERMOSTAT_PRESET_ECO = "eco"
+THERMOSTAT_PRESET_HOLIDAY = "holiday"
+THERMOSTAT_PRESET_MANUAL = "manual"
+
+THERMOSTAT_SWING_MODE_FULLY_CLOSED = "fully closed"
+THERMOSTAT_SWING_MODE_FULLY_OPEN = "fully open"
+THERMOSTAT_SWING_MODE_HALF_OPEN = "half open"
+THERMOSTAT_SWING_MODE_QUARTER_OPEN = "quarter open"
+THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN = "three quarters open"
+
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR = "air sensor"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION = "floor protection"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR = "floor sensor"
+
 
 class Sensors(APIItems):
     """Represent deCONZ sensors."""
@@ -782,6 +818,100 @@ class Thermostat(Temperature):
         (Support is device dependent).
         """
         return self.raw["config"].get("windowopen_set")
+
+    async def set_config(
+        self,
+        cool_set_point: Optional[int] = None,
+        enable_schedule: Optional[bool] = None,
+        external_sensor_temperature: Optional[int] = None,
+        external_window_open: Optional[bool] = None,
+        fan_mode: Optional[str] = None,
+        flip_display: Optional[bool] = None,
+        heat_set_point: Optional[int] = None,
+        locked: Optional[bool] = None,
+        mode: Optional[str] = None,
+        mounting_mode: Optional[bool] = None,
+        preset: Optional[str] = None,
+        schedule: Optional[list] = None,
+        set_valve: Optional[bool] = None,
+        swing_mode: Optional[str] = None,
+        temperature_measurement: Optional[str] = None,
+        window_open_detection: Optional[bool] = None,
+    ) -> dict:
+        """Change config of thermostat.
+
+        Supported values:
+        - cool_set_point [int] 700-3500
+        - enable_schedule [bool] True/False
+        - external_sensor_temperature [int] -32768-32767
+        - external_window_open [bool] True/False
+        - fan_mode [str]
+          - "auto"
+          - "high"
+          - "low"
+          - "medium"
+          - "off"
+          - "on"
+          - "smart"
+        - flip_display [bool] True/False
+        - heat_set_point [int] 500-3200
+        - locked [bool] True/False
+        - mode [str]
+          - "auto"
+          - "cool"
+          - "dry"
+          - "emergency heating"
+          - "fan only"
+          - "heat"
+          - "off"
+          - "precooling"
+          - "sleep"
+        - mounting_mode [bool] True/False
+        - preset [str]
+          - "auto"
+          - "boost"
+          - "comfort"
+          - "complex"
+          - "eco"
+          - "holiday"
+          - "manual"
+        - schedule [list]
+        - set_valve [bool] True/False
+        - swing_mode [str]
+          - "fully closed"
+          - "fully open"
+          - "half open"
+          - "quarter open"
+          - "three quarters open"
+        - temperature_measurement [str]
+          - "air sensor"
+          - "floor protection"
+          - "floor sensor"
+        - window_open_detection [bool] True/False
+        """
+        data = {
+            key: value
+            for key, value in {
+                "coolsetpoint": cool_set_point,
+                "schedule_on": enable_schedule,
+                "externalsensortemp": external_sensor_temperature,
+                "externalwindowopen": external_window_open,
+                "fanmode": fan_mode,
+                "displayflipped": flip_display,
+                "heatsetpoint": heat_set_point,
+                "locked": locked,
+                "mode": mode,
+                "mountingmode": mounting_mode,
+                "preset": preset,
+                "schedule": schedule,
+                "setvalve": set_valve,
+                "swingmode": swing_mode,
+                "temperaturemeasurement": temperature_measurement,
+                "windowopen_set": window_open_detection,
+            }.items()
+            if value is not None
+        }
+        return await self.async_set(field=f"{self.deconz_id}/config", data=data)
 
 
 class Time(DeconzSensor):

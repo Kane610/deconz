@@ -10,6 +10,12 @@ import pytest
 from pydeconz.sensor import (
     DEVICE_MODE_DUAL_ROCKER,
     SENSOR_CLASSES,
+    THERMOSTAT_FAN_MODE_AUTO,
+    THERMOSTAT_MODE_AUTO,
+    THERMOSTAT_MODE_OFF,
+    THERMOSTAT_PRESET_AUTO,
+    THERMOSTAT_SWING_MODE_HALF_OPEN,
+    THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
     Thermostat,
     create_sensor,
     Sensors,
@@ -1551,6 +1557,7 @@ async def test_eurotronic_thermostat():
 
 async def test_tuya_thermostat():
     """Verify that Tuya thermostat works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -1579,7 +1586,7 @@ async def test_tuya_thermostat():
                 "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -1613,6 +1620,54 @@ async def test_tuya_thermostat():
     assert sensor.swversion == "20180727"
     assert sensor.type == "ZHAThermostat"
     assert sensor.uniqueid == "bc:33:ac:ff:fe:47:a1:95-01-0201"
+
+    await sensor.set_config(
+        cool_set_point=1000,
+        enable_schedule=True,
+        external_sensor_temperature=24,
+        external_window_open=True,
+        fan_mode=THERMOSTAT_FAN_MODE_AUTO,
+        flip_display=False,
+        heat_set_point=500,
+        locked=True,
+        mode=THERMOSTAT_MODE_AUTO,
+        mounting_mode=False,
+        preset=THERMOSTAT_PRESET_AUTO,
+        schedule=[],
+        set_valve=True,
+        swing_mode=THERMOSTAT_SWING_MODE_HALF_OPEN,
+        temperature_measurement=THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
+        window_open_detection=True,
+    )
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={
+            "coolsetpoint": 1000,
+            "schedule_on": True,
+            "externalsensortemp": 24,
+            "externalwindowopen": True,
+            "fanmode": "auto",
+            "displayflipped": False,
+            "heatsetpoint": 500,
+            "locked": True,
+            "mode": "auto",
+            "mountingmode": False,
+            "preset": "auto",
+            "schedule": [],
+            "setvalve": True,
+            "swingmode": "half open",
+            "temperaturemeasurement": "floor sensor",
+            "windowopen_set": True,
+        },
+    )
+
+    await sensor.set_config(mode=THERMOSTAT_MODE_OFF)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"mode": "off"},
+    )
 
 
 async def test_time_sensor():
