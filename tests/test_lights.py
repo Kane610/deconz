@@ -111,7 +111,7 @@ async def test_create_light():
     assert light.ctmin is None
 
     await light.async_set_state({"on": True})
-    light._request.assert_called_with("put", path="/lights/0/state", json={"on": True})
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
 
     await light.async_set_config({"on": True})
     mock_request.assert_called_with("put", path="/lights/0/config", json={"on": True})
