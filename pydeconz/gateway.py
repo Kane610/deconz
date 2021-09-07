@@ -26,9 +26,15 @@ EVENT_TYPE_DELETED = "deleted"
 EVENT_TYPE_SCENE_CALLED = "scene-called"
 
 SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
-SUPPORTED_EVENT_RESOURCES = (GROUP_RESOURCE, LIGHT_RESOURCE, SENSOR_RESOURCE)
+SUPPORTED_EVENT_RESOURCES = (
+    ALARM_SYSTEM_RESOURCE,
+    GROUP_RESOURCE,
+    LIGHT_RESOURCE,
+    SENSOR_RESOURCE,
+)
 
 RESOURCE_TYPE_TO_DEVICE_TYPE = {
+    ALARM_SYSTEM_RESOURCE: "alarmsystem",
     GROUP_RESOURCE: "group",
     LIGHT_RESOURCE: "light",
     SENSOR_RESOURCE: "sensor",
@@ -56,7 +62,7 @@ class DeconzSession:
         self.async_add_device_callback = async_add_device
         self.async_connection_status_callback = connection_status
 
-        self.alarm_systems = AlarmSystems({}, self.request)
+        self.alarmsystems = AlarmSystems({}, self.request)
         self.config: Optional[DeconzConfig] = None
         self.groups = Groups({}, self.request)
         self.lights = Lights({}, self.request)
@@ -90,7 +96,7 @@ class DeconzSession:
         if not self.config:
             self.config = DeconzConfig(data[CONFIG_RESOURCE])
 
-        self.alarm_systems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
+        self.alarmsystems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
         self.groups.process_raw(data[GROUP_RESOURCE])
         self.lights.process_raw(data[LIGHT_RESOURCE])
         self.sensors.process_raw(data[SENSOR_RESOURCE])
