@@ -13,6 +13,9 @@ ALERT_LONG = "lselect"
 ALERT_NONE = "none"
 ALERT_SHORT = "select"
 
+EFFECT_NONE = "none"
+EFFECT_COLOR_LOOP = "colorloop"
+
 FAN_SPEED_OFF = 0
 FAN_SPEED_25_PERCENT = 1
 FAN_SPEED_50_PERCENT = 2
@@ -167,6 +170,63 @@ class Light(DeconzLight):
         colorloop — the light will cycle continuously through all colors with the speed specified by colorloopspeed.
         """
         return self.raw["state"].get("effect")
+
+    async def set_state(
+        self,
+        alert: Optional[str] = None,
+        brightness: Optional[int] = None,
+        color_loop_speed: Optional[int] = None,
+        color_temperature: Optional[int] = None,
+        effect: Optional[str] = None,
+        hue: Optional[int] = None,
+        on: Optional[bool] = None,
+        on_time: Optional[int] = None,
+        saturation: Optional[int] = None,
+        transition_time: Optional[int] = None,
+        xy: Optional[Tuple[float, float]] = None,
+    ) -> dict:
+        """Change state of a light.
+
+        Supported values:
+        - alert [str]
+          - "none" light is not performing an alert
+          - "select" light is blinking a short time
+          - "lselect" light is blinking a longer time
+        - brightness [int] 0-255
+        - color_loop_speed [int] 1-255
+          - 1 = very fast
+          - 15 is default
+          - 255 very slow
+        - color_temperature [int] between ctmin-ctmax
+        - effect [str]
+          - "none" no effect
+          - "colorloop" the light will cycle continuously through all
+                        colors with the speed specified by colorloopspeed
+        - hue [int] 0-65535
+        - on [bool] True/False
+        - on_time [int] 0-65535 1/10 seconds resolution
+        - saturation [int] 0-255
+        - transition_time [int] 0-65535 1/10 seconds resolution
+        - xy [tuple] 0-1
+        """
+        data = {
+            key: value
+            for key, value in {
+                "alert": alert,
+                "bri": brightness,
+                "colorloopspeed": color_loop_speed,
+                "ct": color_temperature,
+                "effect": effect,
+                "hue": hue,
+                "on": on,
+                "ontime": on_time,
+                "sat": saturation,
+                "transitiontime": transition_time,
+                "xy": xy,
+            }.items()
+            if value is not None
+        }
+        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
 
 
 class ConfigurationTool(DeconzLight):
