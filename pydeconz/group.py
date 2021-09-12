@@ -31,10 +31,7 @@ class Groups(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""
         super().__init__(raw, request, URL, DeconzGroup)
@@ -51,10 +48,7 @@ class DeconzGroup(DeconzDevice):
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[
-            [str, Optional[str], Optional[Dict[Any, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Set initial information about light group.
 
@@ -235,10 +229,7 @@ class Scenes(APIItems):
     def __init__(
         self,
         group: DeconzGroup,
-        request: Callable[
-            [str, Optional[str], Optional[Dict[Any, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize scene manager."""
         self.group = group
@@ -268,10 +259,7 @@ class DeconzScene:
         self,
         group: DeconzGroup,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Set initial information about scene.
 
@@ -290,7 +278,7 @@ class DeconzScene:
     async def async_set_state(self, data: dict) -> dict:
         """Recall scene to group."""
         field = f"{self.deconz_id}/recall"
-        return await self._request("put", path=field, json=data)  # type: ignore
+        return await self._request("put", path=field, json=data)
 
     @property
     def deconz_id(self) -> str:
