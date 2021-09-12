@@ -13,6 +13,7 @@ from pydeconz import (
     ERRORS,
     pydeconzException,
 )
+from pydeconz.gateway import EVENT_TYPE_DELETED, LIGHT_RESOURCE
 
 import aiohttp
 from aioresponses import aioresponses
@@ -276,7 +277,7 @@ async def test_unsupported_events():
         aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
     )
 
-    # assert not session.event_handler({"e": "deleted"})
+    assert not session.event_handler({"e": "scene-called"})
 
     assert not session.event_handler({"e": "added", "r": "scenes"})
 
@@ -631,8 +632,13 @@ async def test_update_group_color(mock_aioresponse, light_ids, expected_group_st
 
 async def test_delete_light_event(mock_aioresponse):
     """Test event_handler works."""
+    add_remove_device_mock = Mock()
     session = DeconzSession(
-        aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
+        aiohttp.ClientSession(),
+        HOST,
+        PORT,
+        API_KEY,
+        add_remove_device=add_remove_device_mock,
     )
 
     init_response = {
@@ -645,6 +651,7 @@ async def test_delete_light_event(mock_aioresponse):
                     "bri": 1,
                     "reachable": True,
                 },
+                "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
             }
         },
         "sensors": {},
@@ -655,7 +662,7 @@ async def test_delete_light_event(mock_aioresponse):
         content_type="application/json",
         status=200,
     )
-    await session.initialize()
+    await session.refresh_state()
     await session.session.close()
 
     # Delete light
@@ -663,4 +670,6 @@ async def test_delete_light_event(mock_aioresponse):
     session.event_handler({"e": "deleted", "id": "1", "r": "lights"})
 
     assert "1" not in session.lights
-    # session.async_add_device_callback.assert_called_with("lights", session.lights["1"])
+    add_remove_device_mock.assert_called_with(
+        EVENT_TYPE_DELETED, LIGHT_RESOURCE, "00:21:2E:FF:FF:00:73:9F-0A"
+    )

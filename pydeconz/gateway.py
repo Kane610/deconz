@@ -51,6 +51,7 @@ class DeconzSession:
         port: int,
         api_key: str,
         async_add_device: Optional[Callable[[str, Any], None]] = None,
+        add_remove_device: Optional[Callable[[str, str, Any], None]] = None,
         connection_status: Optional[Callable[[bool], None]] = None,
     ):
         """Session setup."""
@@ -60,6 +61,7 @@ class DeconzSession:
         self.api_key = api_key
 
         self.async_add_device_callback = async_add_device
+        self.add_remove_device_callback = add_remove_device
         self.async_connection_status_callback = connection_status
 
         self.alarmsystems = AlarmSystems({}, self.request)
@@ -154,6 +156,7 @@ class DeconzSession:
 
         Note that only one of config, name, or state will be present per changed event.
         """
+        print(event)
         if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
             LOGGER.debug("Unsupported event %s", event)
             return
@@ -180,7 +183,11 @@ class DeconzSession:
             return
 
         if event_type == EVENT_TYPE_DELETED and device_id in device_class:
-            device_class.remove(device_id)
+            device = device_class.remove(device_id)
+            if self.add_remove_device_callback:
+                self.add_remove_device_callback(
+                    event_type, resource_type, device.uniqueid
+                )
 
     def update_group_color(self, lights: list) -> None:
         """Update group colors based on light states.
