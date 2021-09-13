@@ -7,11 +7,12 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from pydeconz.group import Groups
-from pydeconz.light import Light
+from pydeconz.light import Light, ALERT_SHORT, EFFECT_COLOR_LOOP
 
 
 async def test_create_group():
     """Verify that groups works."""
+    mock_request = AsyncMock()
     groups = Groups(
         {
             "0": {
@@ -36,7 +37,7 @@ async def test_create_group():
                 "type": "LightGroup",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     group = groups["0"]
 
@@ -93,7 +94,77 @@ async def test_create_group():
     assert group.xy is None
 
     await group.async_set_state({"on": True})
-    group._request.assert_called_with("put", path="/groups/0/action", json={"on": True})
+    mock_request.assert_called_with("put", path="/groups/0/action", json={"on": True})
+
+    # Set attributes
+
+    await group.set_attributes(
+        hidden=False,
+        light_sequence=["1", "2"],
+        lights=["3", "4"],
+        multi_device_ids=["5", "6"],
+        name="Group",
+    )
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0",
+        json={
+            "hidden": False,
+            "lightsequence": ["1", "2"],
+            "lights": ["3", "4"],
+            "multideviceids": ["5", "6"],
+            "name": "Group",
+        },
+    )
+
+    await group.set_attributes(name="Group")
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0",
+        json={"name": "Group"},
+    )
+
+    # Set state
+
+    await group.set_state(
+        alert=ALERT_SHORT,
+        brightness=200,
+        color_loop_speed=10,
+        color_temperature=400,
+        effect=EFFECT_COLOR_LOOP,
+        hue=1000,
+        on=True,
+        on_time=100,
+        saturation=150,
+        toggle=True,
+        transition_time=250,
+        xy=(0.1, 0.1),
+    )
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/action",
+        json={
+            "alert": "select",
+            "bri": 200,
+            "colorloopspeed": 10,
+            "ct": 400,
+            "effect": "colorloop",
+            "hue": 1000,
+            "on": True,
+            "ontime": 100,
+            "sat": 150,
+            "toggle": True,
+            "transitiontime": 250,
+            "xy": (0.1, 0.1),
+        },
+    )
+
+    await group.set_state(on=True)
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/action",
+        json={"on": True},
+    )
 
     # Scene
 
@@ -104,7 +175,7 @@ async def test_create_group():
     assert scene.full_name == "Hall warmlight"
 
     await scene.async_set_state({})
-    scene._request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
+    mock_request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
 
     group.scenes.process_raw([{"id": "1", "name": "coldlight"}])
 

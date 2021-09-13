@@ -2,7 +2,7 @@
 
 import logging
 from pprint import pformat
-from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconzdevice import DeconzDevice
@@ -200,6 +200,97 @@ class DeconzGroup(DeconzDevice):
         Subsequent ids from multidevices with multiple endpoints.
         """
         return self.raw.get("multideviceids")
+
+    async def set_attributes(
+        self,
+        hidden: Optional[bool] = None,
+        light_sequence: Optional[List[str]] = None,
+        lights: Optional[List[str]] = None,
+        multi_device_ids: Optional[List[str]] = None,
+        name: Optional[str] = None,
+    ) -> dict:
+        """Change attributes of a group.
+
+        Supported values:
+        - hidden [bool] Indicates the hidden status of the group
+        - light_sequence [list of light IDs] Specify a sorted list of light IDs for apps
+        - lights [list of light IDs]IDs of the lights which are members of the group
+        - multi_device_ids [int] Subsequential light IDs of multidevices
+        - name [str] The name of the group
+        """
+        data = {
+            key: value
+            for key, value in {
+                "hidden": hidden,
+                "lightsequence": light_sequence,
+                "lights": lights,
+                "multideviceids": multi_device_ids,
+                "name": name,
+            }.items()
+            if value is not None
+        }
+        return await self.async_set(field=f"{self.deconz_id}", data=data)
+
+    async def set_state(
+        self,
+        alert: Optional[str] = None,
+        brightness: Optional[int] = None,
+        color_loop_speed: Optional[int] = None,
+        color_temperature: Optional[int] = None,
+        effect: Optional[str] = None,
+        hue: Optional[int] = None,
+        on: Optional[bool] = None,
+        on_time: Optional[int] = None,
+        saturation: Optional[int] = None,
+        toggle: Optional[bool] = None,
+        transition_time: Optional[int] = None,
+        xy: Optional[Tuple[float, float]] = None,
+    ) -> dict:
+        """Change state of a group.
+
+        Supported values:
+        - alert [str]
+          - "none" light is not performing an alert
+          - "select" light is blinking a short time
+          - "lselect" light is blinking a longer time
+        - brightness [int] 0-255
+        - color_loop_speed [int] 1-255
+          - 1 = very fast
+          - 15 is default
+          - 255 very slow
+        - color_temperature [int] between ctmin-ctmax
+        - effect [str]
+          - "none" no effect
+          - "colorloop" the light will cycle continuously through all
+                        colors with the speed specified by colorloopspeed
+        - hue [int] 0-65535
+        - on [bool] True/False
+        - on_time [int] 0-65535 1/10 seconds resolution
+        - saturation [int] 0-255
+        - toggle [bool] True toggles the lights of that group from on to off
+                        or vice versa, false has no effect
+        - transition_time [int] 0-65535 1/10 seconds resolution
+        - xy [tuple] 0-1
+        """
+        data = {
+            key: value
+            for key, value in {
+                "alert": alert,
+                "bri": brightness,
+                "colorloopspeed": color_loop_speed,
+                "ct": color_temperature,
+                "effect": effect,
+                "hue": hue,
+                "on": on,
+                "ontime": on_time,
+                "sat": saturation,
+                "toggle": toggle,
+                "transitiontime": transition_time,
+                "xy": xy,
+            }.items()
+            if value is not None
+        }
+        return await self.async_set(field=f"{self.deconz_id}/action", data=data)
 
     def update_color_state(self, light: Light, update_all_attributes=False) -> None:
         """Sync color state with light.
