@@ -96,10 +96,7 @@ class Sensors(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize sensor manager."""
         super().__init__(raw, request, URL, create_sensor)
@@ -1005,10 +1002,7 @@ SENSOR_CLASSES = (
 def create_sensor(
     resource_id: str,
     raw: dict,
-    request: Callable[
-        [str, str, Optional[Dict[str, Any]]],
-        Awaitable[Dict[str, Any]],
-    ],
+    request: Callable[..., Awaitable[Dict[str, Any]]],
 ) -> Union[
     AirQuality,
     Alarm,

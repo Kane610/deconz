@@ -15,10 +15,7 @@ class APIItems:
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
         path: str,
         item_cls: Any,
     ) -> None:
@@ -31,7 +28,7 @@ class APIItems:
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self._path)  # type: ignore
+        raw = await self._request("get", self._path)
         self.process_raw(raw)
 
     def process_raw(self, raw: dict) -> None:
@@ -72,10 +69,7 @@ class APIItem:
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
         self._resource_id = resource_id
@@ -143,7 +137,7 @@ class APIItem:
             self._sleep_task = None
 
         try:
-            return await self._request("put", path=field, json=data)  # type: ignore
+            return await self._request("put", path=field, json=data)
 
         except BridgeBusy:
             LOGGER.debug("Bridge is busy, schedule retry %s %s", field, str(data))
