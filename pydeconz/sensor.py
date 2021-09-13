@@ -1002,10 +1002,7 @@ SENSOR_CLASSES = (
 def create_sensor(
     resource_id: str,
     raw: dict,
-    request: Callable[
-        [str, str, Optional[Dict[str, Any]]],
-        Awaitable[Dict[str, Any]],
-    ],
+    request: Callable[..., Awaitable[Dict[str, Any]]],
 ) -> Union[
     AirQuality,
     Alarm,
