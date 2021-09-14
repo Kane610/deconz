@@ -828,6 +828,7 @@ class Thermostat(Temperature):
         locked: Optional[bool] = None,
         mode: Optional[str] = None,
         mounting_mode: Optional[bool] = None,
+        on: Optional[bool] = None,
         preset: Optional[str] = None,
         schedule: Optional[list] = None,
         set_valve: Optional[bool] = None,
@@ -864,6 +865,7 @@ class Thermostat(Temperature):
           - "precooling"
           - "sleep"
         - mounting_mode [bool] True/False
+        - on [bool] True/False
         - preset [str]
           - "auto"
           - "boost"
@@ -899,6 +901,7 @@ class Thermostat(Temperature):
                 "locked": locked,
                 "mode": mode,
                 "mountingmode": mounting_mode,
+                "on": on,
                 "preset": preset,
                 "schedule": schedule,
                 "setvalve": set_valve,
