@@ -168,6 +168,15 @@ class Light(DeconzLight):
         """
         return self.raw["state"].get("effect")
 
+    async def set_attributes(self, name: str) -> dict:
+        """Change attributes of a light.
+
+        Supported values:
+        - name [str] The name of the light
+        """
+        data = {"name": name}
+        return await self.async_set(field=f"{self.deconz_id}", data=data)
+
     async def set_state(
         self,
         alert: Optional[str] = None,

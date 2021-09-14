@@ -116,6 +116,13 @@ async def test_create_light():
     await light.async_set_config({"on": True})
     mock_request.assert_called_with("put", path="/lights/0/config", json={"on": True})
 
+    await light.set_attributes(name="light")
+    mock_request.assert_called_with(
+        "put",
+        path="/lights/0",
+        json={"name": "light"},
+    )
+
     await light.set_state(
         alert=ALERT_SHORT,
         brightness=200,
