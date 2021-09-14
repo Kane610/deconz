@@ -386,11 +386,17 @@ class DoorLock(DeconzSensor):
 
     async def lock(self) -> dict:
         """Lock the lock."""
-        return await self.async_set_config({"lock": True})
+        return await self.async_set(
+            field=f"{self.deconz_id}/config",
+            data={"lock": True},
+        )
 
     async def unlock(self) -> dict:
         """Unlock the lock."""
-        return await self.async_set_config({"lock": False})
+        return await self.async_set(
+            field=f"{self.deconz_id}/config",
+            data={"lock": False},
+        )
 
 
 class Fire(DeconzBinarySensor):
