@@ -461,6 +461,7 @@ async def test_daylight_sensor():
 
 async def test_door_lock_sensor():
     """Verify that door lock sensor works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -485,7 +486,7 @@ async def test_door_lock_sensor():
                 "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -516,13 +517,15 @@ async def test_door_lock_sensor():
     assert sensor.type == "ZHADoorLock"
     assert sensor.uniqueid == "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101"
 
-    with patch.object(sensor, "async_set_config", return_value=True) as set_config:
-        await sensor.lock()
-        set_config.assert_called_with({"lock": True})
+    await sensor.lock()
+    mock_request.assert_called_with(
+        "put", path="/sensors/0/config", json={"lock": True}
+    )
 
-    with patch.object(sensor, "async_set_config", return_value=True) as set_config:
-        await sensor.unlock()
-        set_config.assert_called_with({"lock": False})
+    await sensor.unlock()
+    mock_request.assert_called_with(
+        "put", path="/sensors/0/config", json={"lock": False}
+    )
 
 
 async def test_fire_sensor():

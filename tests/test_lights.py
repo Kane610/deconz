@@ -110,12 +110,6 @@ async def test_create_light():
     del light.raw["ctmin"]
     assert light.ctmin is None
 
-    await light.async_set_state({"on": True})
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
-
-    await light.async_set_config({"on": True})
-    mock_request.assert_called_with("put", path="/lights/0/config", json={"on": True})
-
     await light.set_attributes(name="light")
     mock_request.assert_called_with(
         "put",
@@ -203,6 +197,7 @@ async def test_configuration_tool():
 
 async def test_create_cover():
     """Verify that covers work."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -225,7 +220,7 @@ async def test_create_cover():
                 "uniqueid": "00:24:46:00:00:12:34:56-01",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     cover = lights["0"]
 
@@ -261,30 +256,28 @@ async def test_create_cover():
     assert cover.is_open is True
     assert cover.lift == 50
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.open()
-        set_state.assert_called_with({"open": True})
+    await cover.open()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": True})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.close()
-        set_state.assert_called_with({"open": False})
+    await cover.close()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": False})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=30, tilt=60)
-        set_state.assert_called_with({"lift": 30})  # Tilt not supported
+    # Tilt not supported
+    await cover.set_position(lift=30, tilt=60)
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"lift": 30})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.stop()
-        set_state.assert_called_with({"stop": True})
+    await cover.stop()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"stop": True})
 
     # Verify tilt works as well
 
     cover.raw["state"]["tilt"] = 40
     assert cover.tilt == 40
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=20, tilt=60)
-        set_state.assert_called_with({"lift": 20, "tilt": 60})
+    await cover.set_position(lift=20, tilt=60)
+    mock_request.assert_called_with(
+        "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
+    )
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
@@ -292,6 +285,7 @@ async def test_create_cover():
 
 async def test_create_cover_without_lift():
     """Verify that covers work with older deconz versions."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -308,7 +302,7 @@ async def test_create_cover_without_lift():
                 "uniqueid": "00:24:46:00:00:12:34:56-01",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     cover = lights["0"]
 
@@ -344,30 +338,27 @@ async def test_create_cover_without_lift():
     assert cover.is_open is True
     assert cover.lift == 11
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.open()
-        set_state.assert_called_with({"on": False})
+    await cover.open()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": False})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.close()
-        set_state.assert_called_with({"on": True})
+    await cover.close()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=30)
-        set_state.assert_called_with({"bri": 76})
+    await cover.set_position(lift=30)
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"bri": 76})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.stop()
-        set_state.assert_called_with({"bri_inc": 0})
+    await cover.stop()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"bri_inc": 0})
 
     # Verify sat (for tilt) works as well
 
     cover.raw["state"]["sat"] = 40
     assert cover.tilt == 15
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=20, tilt=60)
-        set_state.assert_called_with({"bri": 50, "sat": 152})
+    await cover.set_position(lift=20, tilt=60)
+    mock_request.assert_called_with(
+        "put", path="/lights/0/state", json={"bri": 50, "sat": 152}
+    )
 
     cover.raw["state"]["lift"] = 0
     cover.raw["state"]["tilt"] = 0
@@ -375,17 +366,16 @@ async def test_create_cover_without_lift():
 
     assert cover.tilt == 0
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.open()
-        set_state.assert_called_with({"open": True})
+    await cover.open()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": True})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.close()
-        set_state.assert_called_with({"open": False})
+    await cover.close()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": False})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=20, tilt=60)
-        set_state.assert_called_with({"lift": 20, "tilt": 60})
+    await cover.set_position(lift=20, tilt=60)
+    mock_request.assert_called_with(
+        "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
+    )
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
@@ -464,6 +454,7 @@ async def test_create_fan():
 
 async def test_create_lock():
     """Verify that locks work."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -480,7 +471,7 @@ async def test_create_lock():
                 "uniqueid": "00:00:00:00:00:00:00:00-00",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     lock = lights["0"]
 
@@ -508,13 +499,11 @@ async def test_create_lock():
     mock_callback.assert_called_once()
     assert lock.changed_keys == {"state", "on"}
 
-    with patch.object(lock, "async_set_state", return_value=True) as set_state:
-        await lock.lock()
-        set_state.assert_called_with({"on": True})
+    await lock.lock()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
 
-    with patch.object(lock, "async_set_state", return_value=True) as set_state:
-        await lock.unlock()
-        set_state.assert_called_with({"on": False})
+    await lock.unlock()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": False})
 
     lock.remove_callback(mock_callback)
     assert not lock._callbacks
@@ -522,7 +511,7 @@ async def test_create_lock():
 
 async def test_create_siren():
     """Verify that sirens work."""
-    request_mock = AsyncMock()
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -537,7 +526,7 @@ async def test_create_siren():
                 "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
             }
         },
-        request_mock,
+        mock_request,
     )
     siren = lights["0"]
 
@@ -566,21 +555,21 @@ async def test_create_siren():
     assert siren.changed_keys == {"state", ALERT_KEY}
 
     await siren.turn_on()
-    request_mock.assert_called_with(
+    mock_request.assert_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG},
     )
 
     await siren.turn_on(duration=10)
-    request_mock.assert_called_with(
+    mock_request.assert_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
     )
 
     await siren.turn_off()
-    request_mock.assert_called_with(
+    mock_request.assert_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_NONE},

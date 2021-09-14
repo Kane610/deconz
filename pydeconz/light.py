@@ -308,21 +308,21 @@ class Cover(DeconzLight):
             elif "sat" in self.raw["state"]:  # Legacy support
                 data["sat"] = int(tilt * 2.54)
 
-        return await self.async_set_state(data)
+        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
 
     async def open(self) -> dict:
         """Fully open cover."""
         data = {"open": True}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": False}
-        return await self.async_set_state(data)
+        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
 
     async def close(self) -> dict:
         """Fully close cover."""
         data = {"open": False}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": True}
-        return await self.async_set_state(data)
+        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
 
     async def stop(self) -> dict:
         """Stop cover motion."""
@@ -330,7 +330,7 @@ class Cover(DeconzLight):
         data = {"stop": True}
         if "lift" not in self.raw["state"]:  # Legacy support
             data = {"bri_inc": 0}
-        return await self.async_set_state(data)
+        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
 
 
 class Fan(Light):
@@ -357,7 +357,10 @@ class Fan(Light):
 
         Speed [int] between 0-6.
         """
-        return await self.async_set_state({"speed": speed})
+        return await self.async_set(
+            field=f"{self.deconz_id}/state",
+            data={"speed": speed},
+        )
 
 
 class Lock(DeconzLight):
@@ -372,11 +375,11 @@ class Lock(DeconzLight):
 
     async def lock(self) -> dict:
         """Lock the lock."""
-        return await self.async_set_state({"on": True})
+        return await self.async_set(field=f"{self.deconz_id}/state", data={"on": True})
 
     async def unlock(self) -> dict:
         """Unlock the lock."""
-        return await self.async_set_state({"on": False})
+        return await self.async_set(field=f"{self.deconz_id}/state", data={"on": False})
 
 
 class Siren(DeconzLight):
@@ -397,11 +400,14 @@ class Siren(DeconzLight):
         data: Dict[str, Union[int, str]] = {ALERT_KEY: ALERT_LONG}
         if duration:
             data[ON_TIME_KEY] = duration
-        return await self.async_set_state(data)
+        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
 
     async def turn_off(self) -> dict:
         """Turn off device."""
-        return await self.async_set_state({ALERT_KEY: ALERT_NONE})
+        return await self.async_set(
+            field=f"{self.deconz_id}/state",
+            data={ALERT_KEY: ALERT_NONE},
+        )
 
 
 NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)

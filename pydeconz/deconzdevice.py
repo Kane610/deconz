@@ -24,16 +24,6 @@ class DeconzDevice(APIItem):
         """Id to call device over API e.g. /sensors/1."""
         return f"/{self.resource_type}/{self.resource_id}"
 
-    async def async_set_config(self, data: dict) -> dict:
-        """Set config of device."""
-        field = f"{self.deconz_id}/config"
-        return await self.async_set(field, data)
-
-    async def async_set_state(self, data: dict) -> dict:
-        """Set state of device."""
-        field = f"{self.deconz_id}/state"
-        return await self.async_set(field, data)
-
     @property
     def etag(self) -> Optional[str]:
         """HTTP etag change on any action to the device."""
