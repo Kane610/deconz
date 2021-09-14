@@ -93,9 +93,6 @@ async def test_create_group():
     del group.raw["action"]["xy"]
     assert group.xy is None
 
-    await group.async_set_state({"on": True})
-    mock_request.assert_called_with("put", path="/groups/0/action", json={"on": True})
-
     # Set attributes
 
     await group.set_attributes(
@@ -174,7 +171,7 @@ async def test_create_group():
     assert scene.name == "warmlight"
     assert scene.full_name == "Hall warmlight"
 
-    await scene.async_set_state({})
+    await scene.recall()
     mock_request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
 
     group.scenes.process_raw([{"id": "1", "name": "coldlight"}])

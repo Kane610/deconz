@@ -11,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 URL_DISCOVER = "https://phoscon.de/discover"
 
 
-async def async_get_api_key(session, host, port, username=None, password=None):
+async def get_api_key(session, host, port, username=None, password=None):
     """Get a new API key for devicetype."""
     url = f"http://{host}:{port}/api"
 
@@ -20,48 +20,48 @@ async def async_get_api_key(session, host, port, username=None, password=None):
         auth = aiohttp.BasicAuth(username, password=password)
 
     data = b'{"devicetype": "pydeconz"}'
-    response = await async_request(session.post, url, auth=auth, data=data)
+    response = await request(session.post, url, auth=auth, data=data)
 
     api_key = response[0]["success"]["username"]
     LOGGER.info("API key: %s", api_key)
     return api_key
 
 
-async def async_delete_api_key(session, host, port, api_key):
+async def delete_api_key(session, host, port, api_key):
     """Delete API key from deCONZ."""
     url = f"http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}"
 
-    response = await async_request(session.delete, url)
+    response = await request(session.delete, url)
 
     LOGGER.info(response)
 
 
-async def async_delete_all_keys(session, host, port, api_key, api_keys=[]):
+async def delete_all_keys(session, host, port, api_key, api_keys=[]):
     """Delete all API keys except for the ones provided to the method."""
     url = f"http://{host}:{port}/api/{api_key}/config"
 
-    response = await async_request(session.get, url)
+    response = await request(session.get, url)
 
     api_keys.append(api_key)
     for key in response["whitelist"].keys():
         if key not in api_keys:
-            await async_delete_api_key(session, host, port, key)
+            await delete_api_key(session, host, port, key)
 
 
-async def async_get_bridge_id(session, host, port, api_key):
+async def get_bridge_id(session, host, port, api_key):
     """Get bridge id for bridge."""
     url = f"http://{host}:{port}/api/{api_key}/config"
 
-    response = await async_request(session.get, url)
+    response = await request(session.get, url)
 
     bridge_id = normalize_bridge_id(response["bridgeid"])
     LOGGER.info("Bridge id: %s", bridge_id)
     return bridge_id
 
 
-async def async_discovery(session):
+async def discovery(session):
     """Find bridges allowing gateway discovery."""
-    response = await async_request(session.get, URL_DISCOVER)
+    response = await request(session.get, URL_DISCOVER)
     LOGGER.info("Discovered the following bridges: %s.", response)
 
     return [
@@ -74,7 +74,7 @@ async def async_discovery(session):
     ]
 
 
-async def async_request(session, url, **kwargs):
+async def request(session, url, **kwargs):
     """Do a web request and manage response."""
     LOGGER.debug("Sending %s to %s", kwargs, url)
 

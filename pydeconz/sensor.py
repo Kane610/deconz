@@ -386,14 +386,14 @@ class DoorLock(DeconzSensor):
 
     async def lock(self) -> dict:
         """Lock the lock."""
-        return await self.async_set(
+        return await self.request(
             field=f"{self.deconz_id}/config",
             data={"lock": True},
         )
 
     async def unlock(self) -> dict:
         """Unlock the lock."""
-        return await self.async_set(
+        return await self.request(
             field=f"{self.deconz_id}/config",
             data={"lock": False},
         )
@@ -917,7 +917,7 @@ class Thermostat(Temperature):
             }.items()
             if value is not None
         }
-        return await self.async_set(field=f"{self.deconz_id}/config", data=data)
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
 
 
 class Time(DeconzSensor):

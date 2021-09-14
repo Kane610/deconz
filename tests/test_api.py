@@ -30,7 +30,7 @@ async def test_api_items():
     item_1._callbacks[0].assert_called()
     item_1.changed_keys == ("key1")
 
-    await item_1.async_set("field", {"key2": "on"})
+    await item_1.request("field", {"key2": "on"})
 
 
 @patch("pydeconz.api.sleep", new_callable=AsyncMock)
@@ -41,7 +41,7 @@ async def test_retry_on_bridge_busy(_):
 
     item_1 = apiitems["1"]
     with pytest.raises(BridgeBusy):
-        await item_1.async_set("field", {"key1": "on"})
+        await item_1.request("field", {"key1": "on"})
 
     assert request_mock.call_count == 3
     assert not item_1._sleep_task
@@ -54,7 +54,7 @@ async def test_request_exception_bridge_busy_pass_on_retry(_):
     apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
 
     item_1 = apiitems["1"]
-    assert await item_1.async_set("field", {"key1": "on"}) == {"response": "ok"}
+    assert await item_1.request("field", {"key1": "on"}) == {"response": "ok"}
 
     assert request_mock.call_count == 2
     assert not item_1._sleep_task
@@ -68,8 +68,8 @@ async def test_reset_retry_with_a_second_request(_):
 
     item_1 = apiitems["1"]
     collected_responses = await gather(
-        item_1.async_set("field", {"key1": "on"}),
-        item_1.async_set("field", {"key2": "on"}),
+        item_1.request("field", {"key1": "on"}),
+        item_1.request("field", {"key2": "on"}),
     )
 
     assert request_mock.call_count == 3

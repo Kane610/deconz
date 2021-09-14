@@ -96,10 +96,7 @@ class APIItem:
         return self._changed_keys
 
     def register_callback(self, callback: Callable[..., None]) -> None:
-        """Register callback for signalling.
-
-        Callback will be called at the end of updating device information in self.async_update.
-        """
+        """Register callback for signalling."""
         self._callbacks.append(callback)
 
     def remove_callback(self, callback: Callable[..., None]) -> None:
@@ -127,10 +124,10 @@ class APIItem:
 
         self._changed_keys = changed_keys
 
-        for async_signal_update in self._callbacks:
-            async_signal_update()
+        for signal_update_callback in self._callbacks:
+            signal_update_callback()
 
-    async def async_set(self, field: str, data: dict, tries: int = 0) -> dict:
+    async def request(self, field: str, data: dict, tries: int = 0) -> dict:
         """Set state of device."""
         if self._sleep_task is not None:
             self._sleep_task.cancel()
@@ -150,7 +147,7 @@ class APIItem:
                 except CancelledError:
                     return {}
 
-                return await self.async_set(field, data, tries)
+                return await self.request(field, data, tries)
 
             self._sleep_task = None
             raise BridgeBusy

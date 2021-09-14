@@ -50,7 +50,7 @@ class DeconzSession:
         host: str,
         port: int,
         api_key: str,
-        async_add_device: Optional[Callable[[str, Any], None]] = None,
+        add_device: Optional[Callable[[str, Any], None]] = None,
         connection_status: Optional[Callable[[bool], None]] = None,
     ):
         """Session setup."""
@@ -59,8 +59,8 @@ class DeconzSession:
         self.port = port
         self.api_key = api_key
 
-        self.async_add_device_callback = async_add_device
-        self.async_connection_status_callback = connection_status
+        self.add_device_callback = add_device
+        self.connection_status_callback = connection_status
 
         self.alarmsystems = AlarmSystems({}, self.request)
         self.config: Optional[DeconzConfig] = None
@@ -144,10 +144,8 @@ class DeconzSession:
         if signal == SIGNAL_DATA:
             self.event_handler(self.websocket.data)  # type: ignore
 
-        elif (
-            signal == SIGNAL_CONNECTION_STATE and self.async_connection_status_callback
-        ):
-            self.async_connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
+        elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
+            self.connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
 
     def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
@@ -175,8 +173,8 @@ class DeconzSession:
             device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
             device_class.process_raw({device_id: event[device_type]})
             device = device_class[device_id]
-            if self.async_add_device_callback:
-                self.async_add_device_callback(resource_type, device)
+            if self.add_device_callback:
+                self.add_device_callback(resource_type, device)
             return
 
     def update_group_color(self, lights: list) -> None:

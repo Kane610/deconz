@@ -26,7 +26,7 @@ async def deconz_gateway(
     callback: Callable,
 ) -> Optional[DeconzSession]:
     """Create a gateway object and verify configuration."""
-    deconz = DeconzSession(session, host, port, api_key, async_add_device=callback)
+    deconz = DeconzSession(session, host, port, api_key, add_device=callback)
 
     try:
         with async_timeout.timeout(5):
