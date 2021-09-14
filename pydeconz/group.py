@@ -62,11 +62,6 @@ class DeconzGroup(DeconzDevice):
         """Resource type."""
         return RESOURCE_TYPE
 
-    async def async_set_state(self, data: dict) -> dict:
-        """Set state of light group."""
-        field = f"{self.deconz_id}/action"
-        return await self.async_set(field, data)
-
     @property
     def state(self) -> Optional[bool]:
         """Is any light in light group on."""
@@ -229,7 +224,7 @@ class DeconzGroup(DeconzDevice):
             }.items()
             if value is not None
         }
-        return await self.async_set(field=f"{self.deconz_id}", data=data)
+        return await self.request(field=f"{self.deconz_id}", data=data)
 
     async def set_state(
         self,
@@ -290,7 +285,7 @@ class DeconzGroup(DeconzDevice):
             }.items()
             if value is not None
         }
-        return await self.async_set(field=f"{self.deconz_id}/action", data=data)
+        return await self.request(field=f"{self.deconz_id}/action", data=data)
 
     def update_color_state(self, light: Light, update_all_attributes=False) -> None:
         """Sync color state with light.
@@ -366,10 +361,9 @@ class DeconzScene:
         """Resource type."""
         return RESOURCE_TYPE_SCENE
 
-    async def async_set_state(self, data: dict) -> dict:
+    async def recall(self) -> dict:
         """Recall scene to group."""
-        field = f"{self.deconz_id}/recall"
-        return await self._request("put", path=field, json=data)
+        return await self._request("put", path=f"{self.deconz_id}/recall", json={})
 
     @property
     def deconz_id(self) -> str:
