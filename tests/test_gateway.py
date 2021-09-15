@@ -106,7 +106,7 @@ async def test_initial_state(mock_aioresponse):
 
     await session.refresh_state()
 
-    assert session.config.bridgeid == "012345"
+    assert session.config.bridge_id == "012345"
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
@@ -144,7 +144,7 @@ async def test_refresh_state(mock_aioresponse):
 
     await session.refresh_state()
 
-    assert session.config.bridgeid == "0000000000000000"
+    assert session.config.bridge_id == "0000000000000000"
     assert len(session.alarmsystems.values()) == 0
     assert len(session.groups.values()) == 0
     assert len(session.lights.values()) == 0
@@ -173,7 +173,7 @@ async def test_refresh_state(mock_aioresponse):
 
     await session.refresh_state()
 
-    assert session.config.bridgeid == "0000000000000000"
+    assert session.config.bridge_id == "0000000000000000"
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
