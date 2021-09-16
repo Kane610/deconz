@@ -35,7 +35,7 @@ class Config:
 
     @property
     def bridge_id(self) -> str:
-        """Unique identifier for the gateway."""
+        """Gateway unique identifier."""
         return normalize_bridge_id(self.raw.get("bridgeid", UNINITIALIZED_BRIDGE_ID))
 
     @property
@@ -53,7 +53,7 @@ class Config:
 
     @property
     def firmware_version(self) -> Optional[str]:
-        """Current ZigBee firmware version."""
+        """Version of the ZigBee firmware."""
         return self.raw.get("fwversion")
 
     @property
@@ -116,12 +116,15 @@ class Config:
 
     @property
     def portal_services(self) -> Optional[bool]:
-        """Indicates whether the bridge is registered to synchronize data with a portal account."""
+        """State of registration to portal service.
+
+        Is the bridge registered to synchronize data with a portal account.
+        """
         return self.raw.get("portalservices")
 
     @property
     def rf_connected(self) -> Optional[bool]:
-        """True when deCONZ is connected with the firmware and the Zigbee network is up."""
+        """State of deCONZ connection to firmware and if Zigbee network is up."""
         return self.raw.get("rfconnected")
 
     @property
@@ -136,7 +139,7 @@ class Config:
 
     @property
     def time_format(self) -> Optional[str]:
-        """Stores a value of the timeformat that can be used by other applications.
+        """Timeformat used by gateway.
 
         Supported values:
         "12h" or "24h"
@@ -145,7 +148,7 @@ class Config:
 
     @property
     def time_zone(self) -> Optional[str]:
-        """Timezone used by the gateway
+        """Time zone used by gateway.
 
         Only on Raspberry Pi.
         "None" if not further specified.
@@ -154,7 +157,7 @@ class Config:
 
     @property
     def utc(self) -> Optional[str]:
-        """Current UTC time of the gateway in ISO 8601 format."""
+        """UTC time of gateway in ISO 8601 format."""
         return self.raw.get("utc")
 
     @property
