@@ -16,11 +16,11 @@ URL = "/groups"
 
 GROUP_TO_LIGHT_ATTRIBUTES = {
     "bri": "brightness",
-    "ct": "ct",
+    "ct": "color_temp",
     "hue": "hue",
-    "sat": "sat",
+    "sat": "saturation",
     "xy": "xy",
-    "colormode": "colormode",
+    "colormode": "color_mode",
     "effect": "effect",
 }
 
@@ -77,7 +77,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("bri")
 
     @property
-    def ct(self) -> Optional[int]:
+    def color_temp(self) -> Optional[int]:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["action"].get("ct")
 
@@ -91,7 +91,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("hue")
 
     @property
-    def sat(self) -> Optional[int]:
+    def saturation(self) -> Optional[int]:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -116,7 +116,7 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def colormode(self) -> Optional[str]:
+    def color_mode(self) -> Optional[str]:
         """Color mode of the light.
 
         hs - hue and saturation
@@ -140,7 +140,7 @@ class DeconzGroup(DeconzDevice):
         return True
 
     @property
-    def groupclass(self) -> Optional[str]:
+    def group_class(self) -> Optional[str]:
         """Type of class."""
         return self.raw.get("class")
 
@@ -155,7 +155,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["state"].get("any_on")
 
     @property
-    def devicemembership(self) -> Optional[list]:
+    def device_membership(self) -> Optional[list]:
         """List of device ids (sensors) when group was created by a device."""
         return self.raw.get("devicemembership")
 
@@ -181,7 +181,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lights", [])
 
     @property
-    def lightsequence(self) -> Optional[list]:
+    def light_sequence(self) -> Optional[list]:
         """List of light IDs in group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
@@ -189,7 +189,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lightsequence")
 
     @property
-    def multideviceids(self) -> Optional[list]:
+    def multi_device_ids(self) -> Optional[list]:
         """List of light IDs in group.
 
         Subsequent ids from multidevices with multiple endpoints.

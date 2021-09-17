@@ -617,11 +617,11 @@ async def test_update_group_color(mock_aioresponse, light_ids, expected_group_st
     await session.refresh_state()
 
     assert session.groups["g1"].brightness == expected_group_state["brightness"]
-    assert session.groups["g1"].ct == expected_group_state["ct"]
+    assert session.groups["g1"].color_temp == expected_group_state["ct"]
     assert session.groups["g1"].hue == expected_group_state["hue"]
-    assert session.groups["g1"].sat == expected_group_state["sat"]
+    assert session.groups["g1"].saturation == expected_group_state["sat"]
     assert session.groups["g1"].xy == expected_group_state["xy"]
-    assert session.groups["g1"].colormode == expected_group_state["colormode"]
+    assert session.groups["g1"].color_mode == expected_group_state["colormode"]
     assert session.groups["g1"].effect == expected_group_state["effect"]
 
     await session.session.close()
