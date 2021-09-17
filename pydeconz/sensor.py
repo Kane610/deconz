@@ -4,7 +4,7 @@ import logging
 from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
-from .deconzdevice import DeconzDevice
+from .deconz_device import DeconzDevice
 
 LOGGER = logging.getLogger(__name__)
 RESOURCE_TYPE = "sensors"

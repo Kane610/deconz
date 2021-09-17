@@ -91,11 +91,11 @@ async def test_air_quality_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "c2d2e42396f7c78e11e46c66e2ec0200"
     assert sensor.manufacturer == "BOSCH"
-    assert sensor.modelid == "AIR"
+    assert sensor.model_id == "AIR"
     assert sensor.name == "BOSCH Air quality sensor"
-    assert sensor.swversion == "20200402"
+    assert sensor.software_version == "20200402"
     assert sensor.type == "ZHAAirQuality"
-    assert sensor.uniqueid == "00:12:4b:00:14:4d:00:07-02-fdef"
+    assert sensor.unique_id == "00:12:4b:00:14:4d:00:07-02-fdef"
 
 
 async def test_alarm_sensor():
@@ -148,11 +148,11 @@ async def test_alarm_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "18c0f3c2100904e31a7f938db2ba9ba9"
     assert sensor.manufacturer == "dresden elektronik"
-    assert sensor.modelid == "lumi.sensor_motion.aq2"
+    assert sensor.model_id == "lumi.sensor_motion.aq2"
     assert sensor.name == "Alarm 10"
-    assert sensor.swversion == "20170627"
+    assert sensor.software_version == "20170627"
     assert sensor.type == "ZHAAlarm"
-    assert sensor.uniqueid == "00:15:8d:00:02:b5:d1:80-01-0500"
+    assert sensor.unique_id == "00:15:8d:00:02:b5:d1:80-01-0500"
 
 
 async def test_ancillary_control_sensor():
@@ -211,16 +211,15 @@ async def test_ancillary_control_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "5aaa1c6bae8501f59929539c6e8f44d6"
     assert sensor.manufacturer == "lk"
-    assert sensor.modelid == "ZB-KeypadGeneric-D0002"
+    assert sensor.model_id == "ZB-KeypadGeneric-D0002"
     assert sensor.name == "Keypad"
-    assert sensor.swversion == "3.13"
+    assert sensor.software_version == "3.13"
     assert sensor.type == "ZHAAncillaryControl"
-    assert sensor.uniqueid == "ec:1b:bd:ff:fe:6f:c3:4d-01-0501"
+    assert sensor.unique_id == "ec:1b:bd:ff:fe:6f:c3:4d-01-0501"
 
 
 async def test_battery_sensor():
     """Verify that alarm sensor works."""
-    # sensor = create_sensor("0", FIXTURE_BATTERY, None)
     sensors = Sensors(
         {
             "0": {
@@ -258,11 +257,11 @@ async def test_battery_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "23a8659f1cb22df2f51bc2da0e241bb4"
     assert sensor.manufacturer == "IKEA of Sweden"
-    assert sensor.modelid == "FYRTUR block-out roller blind"
+    assert sensor.model_id == "FYRTUR block-out roller blind"
     assert sensor.name == "FYRTUR block-out roller blind"
-    assert sensor.swversion == "2.2.007"
+    assert sensor.software_version == "2.2.007"
     assert sensor.type == "ZHABattery"
-    assert sensor.uniqueid == "00:0d:6f:ff:fe:01:23:45-01-0001"
+    assert sensor.unique_id == "00:0d:6f:ff:fe:01:23:45-01-0001"
 
 
 async def test_carbonmonoxide_sensor():
@@ -315,11 +314,11 @@ async def test_carbonmonoxide_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "b7599df551944df97b2aa87d160b9c45"
     assert sensor.manufacturer == "Heiman"
-    assert sensor.modelid == "CO_V16"
+    assert sensor.model_id == "CO_V16"
     assert sensor.name == "Cave, CO"
-    assert sensor.swversion == "20150330"
+    assert sensor.software_version == "20150330"
     assert sensor.type == "ZHACarbonMonoxide"
-    assert sensor.uniqueid == "00:15:8d:00:02:a5:21:24-01-0101"
+    assert sensor.unique_id == "00:15:8d:00:02:a5:21:24-01-0101"
 
 
 async def test_consumption_sensor():
@@ -366,11 +365,11 @@ async def test_consumption_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "a99e5bc463d15c23af7e89946e784cca"
     assert sensor.manufacturer == "Heiman"
-    assert sensor.modelid == "SmartPlug"
+    assert sensor.model_id == "SmartPlug"
     assert sensor.name == "Consumption 15"
-    assert sensor.swversion is None
+    assert sensor.software_version is None
     assert sensor.type == "ZHAConsumption"
-    assert sensor.uniqueid == "00:0d:6f:00:0b:7a:64:29-01-0702"
+    assert sensor.unique_id == "00:0d:6f:00:0b:7a:64:29-01-0702"
 
     del sensor.raw["state"]["consumption"]
     assert sensor.state is None
@@ -427,11 +426,11 @@ async def test_daylight_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "55047cf652a7e594d0ee7e6fae01dd38"
     assert sensor.manufacturer == "Philips"
-    assert sensor.modelid == "PHDL00"
+    assert sensor.model_id == "PHDL00"
     assert sensor.name == "Daylight"
-    assert sensor.swversion == "1.0"
+    assert sensor.software_version == "1.0"
     assert sensor.type == "Daylight"
-    assert sensor.uniqueid is None
+    assert sensor.unique_id is None
 
     statuses = {
         100: "nadir",
@@ -511,11 +510,11 @@ async def test_door_lock_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "a43862f76b7fa48b0fbb9107df123b0e"
     assert sensor.manufacturer == "Onesti Products AS"
-    assert sensor.modelid == "easyCodeTouch_v1"
+    assert sensor.model_id == "easyCodeTouch_v1"
     assert sensor.name == "easyCodeTouch_v1"
-    assert sensor.swversion == "20201211"
+    assert sensor.software_version == "20201211"
     assert sensor.type == "ZHADoorLock"
-    assert sensor.uniqueid == "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101"
+    assert sensor.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101"
 
     await sensor.lock()
     mock_request.assert_called_with(
@@ -567,11 +566,11 @@ async def test_fire_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "2b585d2c016bfd665ba27a8fdad28670"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.sensor_smoke"
+    assert sensor.model_id == "lumi.sensor_smoke"
     assert sensor.name == "sensor_kitchen_smoke"
-    assert sensor.swversion is None
+    assert sensor.software_version is None
     assert sensor.type == "ZHAFire"
-    assert sensor.uniqueid == "00:15:8d:00:01:d9:3e:7c-01-0500"
+    assert sensor.unique_id == "00:15:8d:00:01:d9:3e:7c-01-0500"
 
 
 async def test_genericflag_sensor():
@@ -611,11 +610,11 @@ async def test_genericflag_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag is None
     assert sensor.manufacturer == ""
-    assert sensor.modelid == "Switch"
+    assert sensor.model_id == "Switch"
     assert sensor.name == "Kitchen Switch"
-    assert sensor.swversion == "1.0.0"
+    assert sensor.software_version == "1.0.0"
     assert sensor.type == "CLIPGenericFlag"
-    assert sensor.uniqueid == "kitchen-switch"
+    assert sensor.unique_id == "kitchen-switch"
 
 
 async def test_genericstatus_sensor():
@@ -657,11 +656,11 @@ async def test_genericstatus_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "aacc83bc7d6e4af7e44014e9f776b206"
     assert sensor.manufacturer == "Phoscon"
-    assert sensor.modelid == "PHOSCON_FSM_STATE"
+    assert sensor.model_id == "PHOSCON_FSM_STATE"
     assert sensor.name == "FSM_STATE Motion stair"
-    assert sensor.swversion == "1.0"
+    assert sensor.software_version == "1.0"
     assert sensor.type == "CLIPGenericStatus"
-    assert sensor.uniqueid == "fsm-state-1520195376277"
+    assert sensor.unique_id == "fsm-state-1520195376277"
 
 
 async def test_humidity_sensor():
@@ -704,11 +703,11 @@ async def test_humidity_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "1220e5d026493b6e86207993703a8a71"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.weather"
+    assert sensor.model_id == "lumi.weather"
     assert sensor.name == "Mi temperature 1"
-    assert sensor.swversion == "20161129"
+    assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAHumidity"
-    assert sensor.uniqueid == "00:15:8d:00:02:45:dc:53-01-0405"
+    assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0405"
 
     del sensor.raw["state"]["humidity"]
     assert sensor.state is None
@@ -775,11 +774,11 @@ async def test_lightlevel_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "5cfb81765e86aa53ace427cfd52c6d52"
     assert sensor.manufacturer == "Philips"
-    assert sensor.modelid == "SML001"
+    assert sensor.model_id == "SML001"
     assert sensor.name == "Motion sensor 4"
-    assert sensor.swversion == "6.1.0.18912"
+    assert sensor.software_version == "6.1.0.18912"
     assert sensor.type == "ZHALightLevel"
-    assert sensor.uniqueid == "00:17:88:01:03:28:8c:9b-02-0400"
+    assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0400"
 
     del sensor.raw["state"]["lightlevel"]
     assert sensor.state is None
@@ -830,11 +829,11 @@ async def test_openclose_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "66cc641d0368110da6882b50090174ac"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.sensor_magnet.aq2"
+    assert sensor.model_id == "lumi.sensor_magnet.aq2"
     assert sensor.name == "Back Door"
-    assert sensor.swversion == "20161128"
+    assert sensor.software_version == "20161128"
     assert sensor.type == "ZHAOpenClose"
-    assert sensor.uniqueid == "00:15:8d:00:02:2b:96:b4-01-0006"
+    assert sensor.unique_id == "00:15:8d:00:02:2b:96:b4-01-0006"
 
 
 @pytest.mark.parametrize(
@@ -867,7 +866,7 @@ async def test_openclose_sensor():
                 "etag": "96e71c7db4685b334d3d0decc3f11868",
                 "lowbattery": None,
                 "manufacturer": "Heiman",
-                "modelid": "SmartPlug",
+                "model_id": "SmartPlug",
                 "name": "Power 16",
                 "on": True,
                 "power": 64,
@@ -875,10 +874,10 @@ async def test_openclose_sensor():
                 "resource_type": "sensors",
                 "secondary_temperature": None,
                 "state": 64,
-                "swversion": None,
+                "software_version": None,
                 "tampered": None,
                 "type": "ZHAPower",
-                "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0b04",
+                "unique_id": "00:0d:6f:00:0b:7a:64:29-01-0b04",
                 "voltage": 231,
             },
         ),
@@ -906,17 +905,17 @@ async def test_openclose_sensor():
                 "etag": "77ab6ddae6dd81469080ad62118d81b6",
                 "lowbattery": None,
                 "manufacturer": "LUMI",
-                "modelid": "lumi.plug.maus01",
+                "model_id": "lumi.plug.maus01",
                 "name": "Power 27",
                 "on": True,
                 "power": 1,
                 "reachable": True,
                 "secondary_temperature": 34.0,
                 "state": 1,
-                "swversion": "05-02-2018",
+                "software_version": "05-02-2018",
                 "tampered": None,
                 "type": "ZHAPower",
-                "uniqueid": "00:15:8d:00:02:82:d3:56-02-000c",
+                "unique_id": "00:15:8d:00:02:82:d3:56-02-000c",
                 "voltage": None,
             },
         ),
@@ -983,11 +982,11 @@ async def test_presence_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "5cfb81765e86aa53ace427cfd52c6d52"
     assert sensor.manufacturer == "Philips"
-    assert sensor.modelid == "SML001"
+    assert sensor.model_id == "SML001"
     assert sensor.name == "Motion sensor 4"
-    assert sensor.swversion == "6.1.0.18912"
+    assert sensor.software_version == "6.1.0.18912"
     assert sensor.type == "ZHAPresence"
-    assert sensor.uniqueid == "00:17:88:01:03:28:8c:9b-02-0406"
+    assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0406"
 
 
 async def test_pressure_sensor():
@@ -1030,11 +1029,11 @@ async def test_pressure_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "1220e5d026493b6e86207993703a8a71"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.weather"
+    assert sensor.model_id == "lumi.weather"
     assert sensor.name == "Mi temperature 1"
-    assert sensor.swversion == "20161129"
+    assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAPressure"
-    assert sensor.uniqueid == "00:15:8d:00:02:45:dc:53-01-0403"
+    assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0403"
 
 
 async def test_switch_sensor():
@@ -1086,11 +1085,11 @@ async def test_switch_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "233ae541bbb7ac98c42977753884b8d2"
     assert sensor.manufacturer == "Philips"
-    assert sensor.modelid == "RWL021"
+    assert sensor.model_id == "RWL021"
     assert sensor.name == "Dimmer switch 3"
-    assert sensor.swversion == "5.45.1.17846"
+    assert sensor.software_version == "5.45.1.17846"
     assert sensor.type == "ZHASwitch"
-    assert sensor.uniqueid == "00:17:88:01:02:0e:32:a3-02-fc00"
+    assert sensor.unique_id == "00:17:88:01:02:0e:32:a3-02-fc00"
 
 
 async def test_switch_sensor_cube():
@@ -1144,11 +1143,11 @@ async def test_switch_sensor_cube():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "e34fa1c7a19d960e35a1f4d56ac475af"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.sensor_cube.aqgl01"
+    assert sensor.model_id == "lumi.sensor_cube.aqgl01"
     assert sensor.name == "Mi Magic Cube"
-    assert sensor.swversion == "20160704"
+    assert sensor.software_version == "20160704"
     assert sensor.type == "ZHASwitch"
-    assert sensor.uniqueid == "00:15:8d:00:02:8b:3b:24-03-000c"
+    assert sensor.unique_id == "00:15:8d:00:02:8b:3b:24-03-000c"
 
 
 async def test_switch_sensor_hue_wall_switch_module():
@@ -1211,11 +1210,11 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "01173dc5b19bb0a976006eee8d0d3718"
     assert sensor.manufacturer == "Signify Netherlands B.V."
-    assert sensor.modelid == "RDM001"
+    assert sensor.model_id == "RDM001"
     assert sensor.name == "RDM001 15"
-    assert sensor.swversion == "20210115"
+    assert sensor.software_version == "20210115"
     assert sensor.type == "ZHASwitch"
-    assert sensor.uniqueid == "00:17:88:01:0b:00:05:5d-01-fc00"
+    assert sensor.unique_id == "00:17:88:01:0b:00:05:5d-01-fc00"
 
 
 async def test_switch_sensor_tint_remote():
@@ -1264,11 +1263,11 @@ async def test_switch_sensor_tint_remote():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "b1336f750d31300afa441a04f2c69b68"
     assert sensor.manufacturer == "MLI"
-    assert sensor.modelid == "ZBT-Remote-ALL-RGBW"
+    assert sensor.model_id == "ZBT-Remote-ALL-RGBW"
     assert sensor.name == "ZHA Remote 1"
-    assert sensor.swversion == "2.0"
+    assert sensor.software_version == "2.0"
     assert sensor.type == "ZHASwitch"
-    assert sensor.uniqueid == "00:11:22:33:44:55:66:77-01-1000"
+    assert sensor.unique_id == "00:11:22:33:44:55:66:77-01-1000"
 
 
 async def test_switch_ubisys_j1():
@@ -1320,11 +1319,11 @@ async def test_switch_ubisys_j1():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "da5fbb89eca4133b6949537e73b31f77"
     assert sensor.manufacturer == "ubisys"
-    assert sensor.modelid == "J1 (5502)"
+    assert sensor.model_id == "J1 (5502)"
     assert sensor.name == "J1"
-    assert sensor.swversion == "20190129-DE-FB0"
+    assert sensor.software_version == "20190129-DE-FB0"
     assert sensor.type == "ZHASwitch"
-    assert sensor.uniqueid == "00:1f:ee:00:00:00:00:09-02-0102"
+    assert sensor.unique_id == "00:1f:ee:00:00:00:00:09-02-0102"
 
 
 async def test_temperature_sensor():
@@ -1367,11 +1366,11 @@ async def test_temperature_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "1220e5d026493b6e86207993703a8a71"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.weather"
+    assert sensor.model_id == "lumi.weather"
     assert sensor.name == "Mi temperature 1"
-    assert sensor.swversion == "20161129"
+    assert sensor.software_version == "20161129"
     assert sensor.type == "ZHATemperature"
-    assert sensor.uniqueid == "00:15:8d:00:02:45:dc:53-01-0402"
+    assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0402"
 
     del sensor.raw["state"]["temperature"]
     assert sensor.state is None
@@ -1473,11 +1472,11 @@ async def test_danfoss_thermostat():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "6130553ac247174809bae47144ee23f8"
     assert sensor.manufacturer == "Danfoss"
-    assert sensor.modelid == "eTRV0100"
+    assert sensor.model_id == "eTRV0100"
     assert sensor.name == "Thermostat_stue_sofa"
-    assert sensor.swversion == "01.02.0008 01.02"
+    assert sensor.software_version == "01.02.0008 01.02"
     assert sensor.type == "ZHAThermostat"
-    assert sensor.uniqueid == "14:b4:57:ff:fe:d5:4e:77-01-0201"
+    assert sensor.unique_id == "14:b4:57:ff:fe:d5:4e:77-01-0201"
 
 
 async def test_eurotronic_thermostat():
@@ -1551,11 +1550,11 @@ async def test_eurotronic_thermostat():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "25aac331bc3c4b465cfb2197f6243ea4"
     assert sensor.manufacturer == "Eurotronic"
-    assert sensor.modelid == "SPZB0001"
+    assert sensor.model_id == "SPZB0001"
     assert sensor.name == "Living Room Radiator"
-    assert sensor.swversion == "15181120"
+    assert sensor.software_version == "15181120"
     assert sensor.type == "ZHAThermostat"
-    assert sensor.uniqueid == "00:15:8d:00:01:92:d2:51-01-0201"
+    assert sensor.unique_id == "00:15:8d:00:01:92:d2:51-01-0201"
 
 
 async def test_tuya_thermostat():
@@ -1618,11 +1617,11 @@ async def test_tuya_thermostat():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "36850fc8521f7c23606c9304b2e1f7bb"
     assert sensor.manufacturer == "_TYST11_kfvq6avy"
-    assert sensor.modelid == "fvq6avy"
+    assert sensor.model_id == "fvq6avy"
     assert sensor.name == "fvq6avy"
-    assert sensor.swversion == "20180727"
+    assert sensor.software_version == "20180727"
     assert sensor.type == "ZHAThermostat"
-    assert sensor.uniqueid == "bc:33:ac:ff:fe:47:a1:95-01-0201"
+    assert sensor.unique_id == "bc:33:ac:ff:fe:47:a1:95-01-0201"
 
     await sensor.set_config(
         cool_set_point=1000,
@@ -1721,11 +1720,11 @@ async def test_time_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "28e796678d9a24712feef59294343bb6"
     assert sensor.manufacturer == "Danfoss"
-    assert sensor.modelid == "eTRV0100"
+    assert sensor.model_id == "eTRV0100"
     assert sensor.name == "eTRV Séjour"
-    assert sensor.swversion == "20200429"
+    assert sensor.software_version == "20200429"
     assert sensor.type == "ZHATime"
-    assert sensor.uniqueid == "cc:cc:cc:ff:fe:38:4d:b3-01-000a"
+    assert sensor.unique_id == "cc:cc:cc:ff:fe:38:4d:b3-01-000a"
 
 
 async def test_vibration_sensor():
@@ -1787,11 +1786,11 @@ async def test_vibration_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "b7599df551944df97b2aa87d160b9c45"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.vibration.aq1"
+    assert sensor.model_id == "lumi.vibration.aq1"
     assert sensor.name == "Vibration 1"
-    assert sensor.swversion == "20180130"
+    assert sensor.software_version == "20180130"
     assert sensor.type == "ZHAVibration"
-    assert sensor.uniqueid == "00:15:8d:00:02:a5:21:24-01-0101"
+    assert sensor.unique_id == "00:15:8d:00:02:a5:21:24-01-0101"
 
     mock_callback = Mock()
     sensor.register_callback(mock_callback)
@@ -1857,8 +1856,8 @@ async def test_water_sensor():
     assert sensor.deconz_id == "/sensors/0"
     assert sensor.etag == "fae893708dfe9b358df59107d944fa1c"
     assert sensor.manufacturer == "LUMI"
-    assert sensor.modelid == "lumi.sensor_wleak.aq1"
+    assert sensor.model_id == "lumi.sensor_wleak.aq1"
     assert sensor.name == "water2"
-    assert sensor.swversion == "20170721"
+    assert sensor.software_version == "20170721"
     assert sensor.type == "ZHAWater"
-    assert sensor.uniqueid == "00:15:8d:00:02:2f:07:db-01-0500"
+    assert sensor.unique_id == "00:15:8d:00:02:2f:07:db-01-0500"

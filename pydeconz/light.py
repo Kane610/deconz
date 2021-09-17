@@ -3,7 +3,7 @@
 from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
 
 from .api import APIItems
-from .deconzdevice import DeconzDevice
+from .deconz_device import DeconzDevice
 
 RESOURCE_TYPE = "lights"
 URL = "/lights"

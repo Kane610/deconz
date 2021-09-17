@@ -70,11 +70,11 @@ async def test_create_light():
     assert light.deconz_id == "/lights/0"
     assert light.etag == "026bcfe544ad76c7534e5ca8ed39047c"
     assert light.manufacturer == "dresden elektronik"
-    assert light.modelid == "FLS-PP3"
+    assert light.model_id == "FLS-PP3"
     assert light.name == "Light 1"
-    assert light.swversion == "020C.201000A0"
+    assert light.software_version == "020C.201000A0"
     assert light.type == "Extended color light"
-    assert light.uniqueid == "00:21:2E:FF:FF:00:73:9F-0A"
+    assert light.unique_id == "00:21:2E:FF:FF:00:73:9F-0A"
 
     mock_callback = Mock()
     light.register_callback(mock_callback)
@@ -187,11 +187,11 @@ async def test_configuration_tool():
     assert configuration_tool.deconz_id == "/lights/0"
     assert configuration_tool.etag == "26839cb118f5bf7ba1f2108256644010"
     assert configuration_tool.manufacturer == "dresden elektronik"
-    assert configuration_tool.modelid == "ConBee II"
+    assert configuration_tool.model_id == "ConBee II"
     assert configuration_tool.name == "Configuration tool 1"
-    assert configuration_tool.swversion == "0x264a0700"
+    assert configuration_tool.software_version == "0x264a0700"
     assert configuration_tool.type == "Configuration tool"
-    assert configuration_tool.uniqueid == "00:21:2e:ff:ff:05:a7:a3-01"
+    assert configuration_tool.unique_id == "00:21:2e:ff:ff:05:a7:a3-01"
 
 
 async def test_create_cover():
@@ -233,11 +233,11 @@ async def test_create_cover():
     assert cover.deconz_id == "/lights/0"
     assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
     assert cover.manufacturer == "AXIS"
-    assert cover.modelid == "Gear"
+    assert cover.model_id == "Gear"
     assert cover.name == "Covering device"
-    assert cover.swversion == "100-5.3.5.1122"
+    assert cover.software_version == "100-5.3.5.1122"
     assert cover.type == "Window covering device"
-    assert cover.uniqueid == "00:24:46:00:00:12:34:56-01"
+    assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
 
     mock_callback = Mock()
     cover.register_callback(mock_callback)
@@ -315,11 +315,11 @@ async def test_create_cover_without_lift():
     assert cover.deconz_id == "/lights/0"
     assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
     assert cover.manufacturer == "AXIS"
-    assert cover.modelid == "Gear"
+    assert cover.model_id == "Gear"
     assert cover.name == "Covering device"
-    assert cover.swversion == "100-5.3.5.1122"
+    assert cover.software_version == "100-5.3.5.1122"
     assert cover.type == "Window covering device"
-    assert cover.uniqueid == "00:24:46:00:00:12:34:56-01"
+    assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
 
     mock_callback = Mock()
     cover.register_callback(mock_callback)
@@ -425,11 +425,11 @@ async def test_create_fan():
     assert fan.deconz_id == "/lights/0"
     assert fan.etag == "432f3de28965052961a99e3c5494daf4"
     assert fan.manufacturer == "King Of Fans,  Inc."
-    assert fan.modelid == "HDC52EastwindFan"
+    assert fan.model_id == "HDC52EastwindFan"
     assert fan.name == "Ceiling fan"
-    assert fan.swversion == "0000000F"
+    assert fan.software_version == "0000000F"
     assert fan.type == "Fan"
-    assert fan.uniqueid == "00:22:a3:00:00:27:8b:81-01"
+    assert fan.unique_id == "00:22:a3:00:00:27:8b:81-01"
 
     mock_callback = Mock()
     fan.register_callback(mock_callback)
@@ -481,11 +481,11 @@ async def test_create_lock():
     assert lock.deconz_id == "/lights/0"
     assert lock.etag == "5c2ec06cde4bd654aef3a555fcd8ad12"
     assert lock.manufacturer == "Danalock"
-    assert lock.modelid == "V3-BTZB"
+    assert lock.model_id == "V3-BTZB"
     assert lock.name == "Door lock"
-    assert lock.swversion == "19042019"
+    assert lock.software_version == "19042019"
     assert lock.type == "Door Lock"
-    assert lock.uniqueid == "00:00:00:00:00:00:00:00-00"
+    assert lock.unique_id == "00:00:00:00:00:00:00:00-00"
 
     mock_callback = Mock()
     lock.register_callback(mock_callback)
@@ -536,11 +536,11 @@ async def test_create_siren():
     assert siren.deconz_id == "/lights/0"
     assert siren.etag == "0667cb8fff2adc1bf22be0e6eece2a18"
     assert siren.manufacturer == "Heiman"
-    assert siren.modelid == "WarningDevice"
+    assert siren.model_id == "WarningDevice"
     assert siren.name == "alarm_tuin"
-    assert siren.swversion is None
+    assert siren.software_version is None
     assert siren.type == "Warning device"
-    assert siren.uniqueid == "00:0d:6f:00:0f:ab:12:34-01"
+    assert siren.unique_id == "00:0d:6f:00:0f:ab:12:34-01"
 
     mock_callback = Mock()
     siren.register_callback(mock_callback)
