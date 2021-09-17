@@ -75,13 +75,13 @@ async def test_air_quality_sensor():
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
     assert sensor.state == "poor"
-    assert sensor.airquality == "poor"
-    assert sensor.airqualityppb == 809
+    assert sensor.air_quality == "poor"
+    assert sensor.air_quality_ppb == 809
 
     # DeconzSensor
     assert sensor.battery is None
     assert sensor.ep == 2
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -138,7 +138,7 @@ async def test_alarm_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -201,7 +201,7 @@ async def test_ancillary_control_sensor():
     # DeconzSensor
     assert sensor.battery == 95
     assert sensor.ep == 1
-    assert not sensor.lowbattery
+    assert not sensor.low_battery
     assert sensor.on
     assert sensor.reachable
     assert not sensor.tampered
@@ -247,7 +247,7 @@ async def test_battery_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -299,12 +299,12 @@ async def test_carbonmonoxide_sensor():
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
 
     assert sensor.state is False
-    assert sensor.carbonmonoxide is False
+    assert sensor.carbon_monoxide is False
 
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is False
+    assert sensor.low_battery is False
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is False
@@ -355,7 +355,7 @@ async def test_consumption_sensor():
     # DeconzSensor
     assert sensor.battery is None
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -410,13 +410,13 @@ async def test_daylight_sensor():
     assert sensor.configured is True
     assert sensor.daylight is True
     assert sensor.status == "solar_noon"
-    assert sensor.sunriseoffset == 30
-    assert sensor.sunsetoffset == -30
+    assert sensor.sunrise_offset == 30
+    assert sensor.sunset_offset == -30
 
     # DeconzSensor
     assert sensor.battery is None
     assert sensor.ep is None
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -494,13 +494,13 @@ async def test_door_lock_sensor():
 
     assert sensor.state == "unlocked"
     assert sensor.is_locked is False
-    assert sensor.lockstate == "unlocked"
-    assert sensor.lockconfig is False
+    assert sensor.lock_state == "unlocked"
+    assert sensor.lock_configuration is False
 
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 11
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -556,7 +556,7 @@ async def test_fire_sensor():
     # DeconzSensor
     assert sensor.battery is None
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -600,7 +600,7 @@ async def test_genericflag_sensor():
     # DeconzSensor
     assert sensor.battery is None
     assert sensor.ep is None
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -646,7 +646,7 @@ async def test_genericstatus_sensor():
     # DeconzSensor
     assert sensor.battery is None
     assert sensor.ep is None
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -693,7 +693,7 @@ async def test_humidity_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -756,15 +756,15 @@ async def test_lightlevel_sensor():
     assert sensor.state == 5
     assert sensor.dark is True
     assert sensor.daylight is False
-    assert sensor.lightlevel == 6955
+    assert sensor.light_level == 6955
     assert sensor.lux == 5
-    assert sensor.tholddark == 12000
-    assert sensor.tholdoffset == 7000
+    assert sensor.threshold_dark == 12000
+    assert sensor.threshold_offset == 7000
 
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 2
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -819,7 +819,7 @@ async def test_openclose_sensor():
     # DeconzSensor
     assert sensor.battery == 95
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -864,7 +864,7 @@ async def test_openclose_sensor():
                 "deconz_id": "/sensors/0",
                 "ep": 1,
                 "etag": "96e71c7db4685b334d3d0decc3f11868",
-                "lowbattery": None,
+                "low_battery": None,
                 "manufacturer": "Heiman",
                 "model_id": "SmartPlug",
                 "name": "Power 16",
@@ -903,7 +903,7 @@ async def test_openclose_sensor():
                 "deconz_id": "/sensors/0",
                 "ep": 2,
                 "etag": "77ab6ddae6dd81469080ad62118d81b6",
-                "lowbattery": None,
+                "low_battery": None,
                 "manufacturer": "LUMI",
                 "model_id": "lumi.plug.maus01",
                 "name": "Power 27",
@@ -972,7 +972,7 @@ async def test_presence_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 2
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1019,7 +1019,7 @@ async def test_pressure_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1067,7 +1067,7 @@ async def test_switch_sensor():
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.state == 1002
-    assert sensor.buttonevent == 1002
+    assert sensor.button_event == 1002
     assert sensor.gesture is None
     assert sensor.angle is None
     assert sensor.xy is None
@@ -1075,7 +1075,7 @@ async def test_switch_sensor():
     # DeconzSensor
     assert sensor.battery == 90
     assert sensor.ep == 2
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1127,13 +1127,13 @@ async def test_switch_sensor_cube():
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.state == 747
-    assert sensor.buttonevent == 747
+    assert sensor.button_event == 747
     assert sensor.gesture == 7
 
     # DeconzSensor
     assert sensor.battery == 90
     assert sensor.ep == 3
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1187,20 +1187,20 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.state == 1002
-    assert sensor.buttonevent == 1002
-    assert sensor.eventduration == 1
-    assert sensor.devicemode == DEVICE_MODE_DUAL_ROCKER
+    assert sensor.button_event == 1002
+    assert sensor.event_duration == 1
+    assert sensor.device_mode == DEVICE_MODE_DUAL_ROCKER
     assert not sensor.angle
     assert not sensor.gesture
     assert not sensor.mode
-    assert not sensor.windowcoveringtype
+    assert not sensor.window_covering_type
     assert not sensor.xy
 
     # DeconzSensor
     assert sensor.battery == 100
     assert not sensor.config_pending
     assert sensor.ep == 1
-    assert not sensor.lowbattery
+    assert not sensor.low_battery
     assert sensor.on
     assert sensor.reachable
     assert not sensor.tampered
@@ -1248,13 +1248,13 @@ async def test_switch_sensor_tint_remote():
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.state == 6002
-    assert sensor.buttonevent == 6002
+    assert sensor.button_event == 6002
     assert sensor.angle == 10
     assert sensor.xy == [0.3381, 0.1627]
 
     # DeconzSensor
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1302,15 +1302,15 @@ async def test_switch_ubisys_j1():
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.state is None
-    assert sensor.buttonevent is None
+    assert sensor.button_event is None
     assert sensor.angle is None
     assert sensor.xy is None
     assert sensor.mode == "momentary"
-    assert sensor.windowcoveringtype == 0
+    assert sensor.window_covering_type == 0
 
     # DeconzSensor
     assert sensor.ep == 2
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is False
     assert sensor.tampered is None
@@ -1356,7 +1356,7 @@ async def test_temperature_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1440,29 +1440,29 @@ async def test_danfoss_thermostat():
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
     assert sensor.state == 21.0
-    assert sensor.coolsetpoint is None
-    assert sensor.errorcode is None
-    assert sensor.fanmode is None
-    assert sensor.floortemperature is None
+    assert sensor.cooling_setpoint is None
+    assert sensor.error_code is None
+    assert sensor.fan_mode is None
+    assert sensor.floor_temperature is None
     assert sensor.heating is None
-    assert sensor.heatsetpoint == 21.00
+    assert sensor.heating_setpoint == 21.00
     assert sensor.locked is None
     assert sensor.mode is None
-    assert sensor.mountingmode is None
-    assert sensor.mountingmodeactive is False
+    assert sensor.mounting_mode is None
+    assert sensor.mounting_mode_active is False
     assert sensor.offset == 0
     assert sensor.preset is None
     assert sensor.state_on is True
-    assert sensor.swingmode is None
+    assert sensor.swing_mode is None
     assert sensor.temperature == 21.0
-    assert sensor.temperaturemeasurement is None
+    assert sensor.temperature_measurement is None
     assert sensor.valve == 24
-    assert sensor.windowopen_set is None
+    assert sensor.window_open_detection is None
 
     # DeconzSensor
     assert sensor.battery == 59
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1518,29 +1518,29 @@ async def test_eurotronic_thermostat():
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
     assert sensor.state == 21.5
-    assert sensor.coolsetpoint is None
-    assert sensor.errorcode is None
-    assert sensor.fanmode is None
-    assert sensor.floortemperature is None
+    assert sensor.cooling_setpoint is None
+    assert sensor.error_code is None
+    assert sensor.fan_mode is None
+    assert sensor.floor_temperature is None
     assert sensor.heating is None
-    assert sensor.heatsetpoint == 21.00
+    assert sensor.heating_setpoint == 21.00
     assert sensor.locked is False
     assert sensor.mode == "auto"
-    assert sensor.mountingmode is None
-    assert sensor.mountingmodeactive is None
+    assert sensor.mounting_mode is None
+    assert sensor.mounting_mode_active is None
     assert sensor.offset == 0
     assert sensor.preset is None
     assert sensor.state_on is False
-    assert sensor.swingmode is None
+    assert sensor.swing_mode is None
     assert sensor.temperature == 21.5
-    assert sensor.temperaturemeasurement is None
+    assert sensor.temperature_measurement is None
     assert sensor.valve == 0
-    assert sensor.windowopen_set is None
+    assert sensor.window_open_detection is None
 
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1596,7 +1596,7 @@ async def test_tuya_thermostat():
     assert sensor.ZHATYPE == Thermostat.ZHATYPE
 
     assert sensor.state == 22.9
-    assert sensor.heatsetpoint == 15.50
+    assert sensor.heating_setpoint == 15.50
     assert sensor.locked is None
     assert sensor.mode is None
     assert sensor.offset == 0
@@ -1607,7 +1607,7 @@ async def test_tuya_thermostat():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1624,13 +1624,13 @@ async def test_tuya_thermostat():
     assert sensor.unique_id == "bc:33:ac:ff:fe:47:a1:95-01-0201"
 
     await sensor.set_config(
-        cool_set_point=1000,
+        cooling_setpoint=1000,
         enable_schedule=True,
         external_sensor_temperature=24,
         external_window_open=True,
         fan_mode=THERMOSTAT_FAN_MODE_AUTO,
         flip_display=False,
-        heat_set_point=500,
+        heating_setpoint=500,
         locked=True,
         mode=THERMOSTAT_MODE_AUTO,
         mounting_mode=False,
@@ -1705,12 +1705,12 @@ async def test_time_sensor():
     assert sensor.ZHATYPE == ("ZHATime",)
 
     assert sensor.state == "2020-11-19T08:07:08Z"
-    assert sensor.lastset == "2020-11-19T08:07:08Z"
+    assert sensor.last_set == "2020-11-19T08:07:08Z"
 
     # DeconzSensor
     assert sensor.battery == 40
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1768,15 +1768,15 @@ async def test_vibration_sensor():
     assert sensor.state is True
     assert sensor.orientation == [10, 1059, 0]
     assert sensor.sensitivity == 21
-    assert sensor.sensitivitymax == 21
-    assert sensor.tiltangle == 83
+    assert sensor.max_sensitivity == 21
+    assert sensor.tilt_angle == 83
     assert sensor.vibration is True
-    assert sensor.vibrationstrength == 114
+    assert sensor.vibration_strength == 114
 
     # DeconzSensor
     assert sensor.battery == 91
     assert sensor.ep == 1
-    assert sensor.lowbattery is None
+    assert sensor.low_battery is None
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
@@ -1846,7 +1846,7 @@ async def test_water_sensor():
     # DeconzSensor
     assert sensor.battery == 100
     assert sensor.ep == 1
-    assert sensor.lowbattery is False
+    assert sensor.low_battery is False
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is False
