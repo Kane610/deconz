@@ -49,7 +49,7 @@ class DeconzSession:
         session: Any,
         host: str,
         port: int,
-        api_key: str,
+        api_key: Optional[str] = None,
         add_device: Optional[Callable[[str, Any], None]] = None,
         connection_status: Optional[Callable[[bool], None]] = None,
     ):
@@ -69,6 +69,33 @@ class DeconzSession:
         self.scenes: Dict[str, DeconzScene] = {}
         self.sensors = Sensors({}, self.request)
         self.websocket: Optional[WSClient] = None
+
+    async def get_api_key(
+        self,
+        api_key: Optional[str] = None,
+        client_name: str = "pydeconz",
+    ) -> str:
+        """Request a new API key.
+
+        Supported values:
+        - api_key [str] 10-40 characters, key to use for authentication
+        - client_name [str] 0-40 characters, name of the client application
+        """
+        data = {
+            key: value
+            for key, value in {
+                "username": api_key,
+                "devicetype": client_name,
+            }.items()
+            if value is not None
+        }
+        response = await self._request(
+            "post",
+            url=f"http://{self.host}:{self.port}/api",
+            json=data,
+        )
+
+        return response[0]["success"]["username"]
 
     def start(self, websocketport: Optional[int] = None) -> None:
         """Connect websocket to deCONZ."""
@@ -91,7 +118,7 @@ class DeconzSession:
 
     async def refresh_state(self) -> None:
         """Read deCONZ parameters."""
-        data = await self.request("get")
+        data = await self.request("get", "")
 
         if not self.config:
             self.config = Config(data[CONFIG_RESOURCE], self.request)
@@ -107,13 +134,24 @@ class DeconzSession:
     async def request(
         self,
         method: str,
-        path: str = "",
+        path: str,
         json: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Make a request to the API."""
-        LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
+        return await self._request(
+            method,
+            url=f"http://{self.host}:{self.port}/api/{self.api_key}{path}",
+            json=json,
+        )
 
-        url = f"http://{self.host}:{self.port}/api/{self.api_key}{path}"
+    async def _request(
+        self,
+        method: str,
+        url: str,
+        json: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Make a request."""
+        LOGGER.debug('Sending "%s" "%s" to "%s"', method, json, url)
 
         try:
             async with self.session.request(method, url, json=json) as res:

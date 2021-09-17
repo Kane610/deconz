@@ -11,22 +11,6 @@ LOGGER = logging.getLogger(__name__)
 URL_DISCOVER = "https://phoscon.de/discover"
 
 
-async def get_api_key(session, host, port, username=None, password=None):
-    """Get a new API key for devicetype."""
-    url = f"http://{host}:{port}/api"
-
-    auth = None
-    if username and password:
-        auth = aiohttp.BasicAuth(username, password=password)
-
-    data = b'{"devicetype": "pydeconz"}'
-    response = await request(session.post, url, auth=auth, data=data)
-
-    api_key = response[0]["success"]["username"]
-    LOGGER.info("API key: %s", api_key)
-    return api_key
-
-
 async def delete_api_key(session, host, port, api_key):
     """Delete API key from deCONZ."""
     url = f"http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}"

@@ -125,6 +125,20 @@ async def test_initial_state(mock_aioresponse):
     await session.session.close()
 
 
+async def test_get_api_key(mock_aioresponse):
+    """Verify that get_api_key method can retrieve an api key."""
+    api_key = "0123456789abc36"
+    session = DeconzSession(aiohttp.ClientSession(), HOST, PORT)
+    mock_aioresponse.post(
+        f"http://{HOST}:{PORT}/api",
+        payload=[{"success": {"username": api_key}}],
+        content_type="application/json",
+        status=200,
+    )
+
+    assert await session.get_api_key() == api_key
+
+
 async def test_refresh_state(mock_aioresponse):
     """Test refresh_state creates devices as expected."""
     session = DeconzSession(aiohttp.ClientSession(), HOST, PORT, API_KEY)
