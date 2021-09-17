@@ -5,7 +5,7 @@ from pprint import pformat
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, Union
 
 from .api import APIItems
-from .deconzdevice import DeconzDevice
+from .deconz_device import DeconzDevice
 from .light import Light
 
 LOGGER = logging.getLogger(__name__)

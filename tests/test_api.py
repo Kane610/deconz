@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz.api import APIItems
-from pydeconz.deconzdevice import DeconzDevice
+from pydeconz.deconz_device import DeconzDevice
 from pydeconz.errors import BridgeBusy
 
 
