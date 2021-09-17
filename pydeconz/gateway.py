@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, Optional, Union
 from aiohttp import client_exceptions
 
 from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
-from .config import RESOURCE_TYPE as CONFIG_RESOURCE, DeconzConfig
+from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
 from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
@@ -63,7 +63,7 @@ class DeconzSession:
         self.connection_status_callback = connection_status
 
         self.alarmsystems = AlarmSystems({}, self.request)
-        self.config: Optional[DeconzConfig] = None
+        self.config: Optional[Config] = None
         self.groups = Groups({}, self.request)
         self.lights = Lights({}, self.request)
         self.scenes: Dict[str, DeconzScene] = {}
@@ -73,7 +73,7 @@ class DeconzSession:
     def start(self, websocketport: Optional[int] = None) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
-            websocketport = self.config.websocketport
+            websocketport = self.config.websocket_port
 
         if not websocketport:
             LOGGER.error("No websocket port specified")
@@ -94,7 +94,7 @@ class DeconzSession:
         data = await self.request("get")
 
         if not self.config:
-            self.config = DeconzConfig(data[CONFIG_RESOURCE])
+            self.config = Config(data[CONFIG_RESOURCE], self.request)
 
         self.alarmsystems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
         self.groups.process_raw(data[GROUP_RESOURCE])
