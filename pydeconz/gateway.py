@@ -95,7 +95,7 @@ class DeconzSession:
             json=data,
         )
 
-        return response[0]["success"]["username"]
+        return response[0]["success"]["username"]  # type: ignore[index]
 
     def start(self, websocketport: Optional[int] = None) -> None:
         """Connect websocket to deCONZ."""
