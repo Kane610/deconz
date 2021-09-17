@@ -17,34 +17,6 @@ IP = "127.0.0.1"
 PORT = "80"
 
 
-async def test_get_api_key() -> None:
-    """Test a successful call of get_api_key."""
-    session = Mock()
-
-    with patch(
-        "pydeconz.utils.request",
-        new=AsyncMock(return_value=[{"success": {"username": API_KEY}}]),
-    ):
-        response = await utils.get_api_key(session, IP, PORT)
-
-    assert response == API_KEY
-
-
-async def test_get_api_key_with_credentials() -> None:
-    """Test a successful call of get_api_key with user crendentials."""
-    session = Mock()
-
-    with patch(
-        "pydeconz.utils.request",
-        new=AsyncMock(return_value=[{"success": {"username": API_KEY}}]),
-    ):
-        response = await utils.get_api_key(
-            session, IP, PORT, username="user", password="pass"
-        )
-
-    assert response == API_KEY
-
-
 async def test_delete_api_key() -> None:
     """Test a successful call of delete_api_key."""
     session = Mock()
