@@ -58,14 +58,13 @@ async def test_create_light():
 
     assert light.brightness == 111
     assert light.hue == 7998
-    assert light.sat == 172
-    assert light.ct == 307
+    assert light.saturation == 172
+    assert light.color_temp == 307
     assert light.xy == (0.421253, 0.39921)
-    assert light.colormode == "ct"
-    assert light.ctmax == 500
-    assert light.ctmin == 153
+    assert light.color_mode == "ct"
+    assert light.max_color_temp == 500
+    assert light.min_color_temp == 153
     assert light.effect is None
-    assert light.hascolor is True
     assert light.reachable is True
 
     assert light.deconz_id == "/lights/0"
@@ -99,16 +98,16 @@ async def test_create_light():
     assert light.xy is None
 
     light.raw["ctmax"] = 1000
-    assert light.ctmax == 650
+    assert light.max_color_temp == 650
 
     light.raw["ctmin"] = 0
-    assert light.ctmin == 140
+    assert light.min_color_temp == 140
 
     del light.raw["ctmax"]
-    assert light.ctmax is None
+    assert light.max_color_temp is None
 
     del light.raw["ctmin"]
-    assert light.ctmin is None
+    assert light.min_color_temp is None
 
     await light.set_attributes(name="light")
     mock_request.assert_called_with(
@@ -413,14 +412,13 @@ async def test_create_fan():
 
     assert fan.brightness == 254
     assert fan.hue is None
-    assert fan.sat is None
-    assert fan.ct is None
+    assert fan.saturation is None
+    assert fan.color_temp is None
     assert fan.xy is None
-    assert fan.colormode is None
-    assert fan.ctmax is None
-    assert fan.ctmin is None
+    assert fan.color_mode is None
+    assert fan.max_color_temp is None
+    assert fan.min_color_temp is None
     assert fan.effect is None
-    assert fan.hascolor is None
     assert fan.reachable is True
     assert fan.speed == 4
 

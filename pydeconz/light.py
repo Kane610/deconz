@@ -92,7 +92,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("bri")
 
     @property
-    def ct(self) -> Optional[int]:
+    def color_temp(self) -> Optional[int]:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["state"].get("ct")
 
@@ -106,7 +106,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("hue")
 
     @property
-    def sat(self) -> Optional[int]:
+    def saturation(self) -> Optional[int]:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -131,7 +131,7 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def colormode(self) -> Optional[str]:
+    def color_mode(self) -> Optional[str]:
         """Color mode of light.
 
         hs - hue and saturation
@@ -141,19 +141,14 @@ class Light(DeconzLight):
         return self.raw["state"].get("colormode")
 
     @property
-    def hascolor(self) -> Optional[bool]:
-        """Tells if light has color support."""
-        return self.raw["state"].get("hascolor")
-
-    @property
-    def ctmax(self) -> Optional[int]:
+    def max_color_temp(self) -> Optional[int]:
         """Max value for color temperature."""
         if (ctmax := self.raw.get("ctmax")) is not None and ctmax > 650:
             ctmax = 650
         return ctmax
 
     @property
-    def ctmin(self) -> Optional[int]:
+    def min_color_temp(self) -> Optional[int]:
         """Min value for color temperature."""
         if (ctmin := self.raw.get("ctmin")) is not None and ctmin < 140:
             ctmin = 140
@@ -395,7 +390,7 @@ class Siren(DeconzLight):
     async def turn_on(self, duration: Optional[int] = None) -> dict:
         """Turn on device.
 
-        Duration is counted as a tenth of a second.
+        Duration is counted as 1/10 of a second.
         """
         data: Dict[str, Union[int, str]] = {ALERT_KEY: ALERT_LONG}
         if duration:

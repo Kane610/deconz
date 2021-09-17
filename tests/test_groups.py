@@ -42,24 +42,24 @@ async def test_create_group():
     group = groups["0"]
 
     assert group.state is True
-    assert group.groupclass is None
+    assert group.group_class is None
     assert group.all_on is False
     assert group.any_on is True
-    assert group.devicemembership == []
+    assert group.device_membership == []
     assert group.hidden is None
     assert group.id == "11"
     assert group.lights == ["14", "15", "12"]
-    assert group.lightsequence is None
-    assert group.multideviceids is None
+    assert group.light_sequence is None
+    assert group.multi_device_ids is None
     assert group.scenes["1"].id == "1"
     assert group.scenes["1"].name == "warmlight"
 
     assert group.brightness == 132
     assert group.hue == 0
-    assert group.sat == 127
-    assert group.ct == 0
+    assert group.saturation == 127
+    assert group.color_temp == 0
     assert group.xy == (0, 0)
-    assert group.colormode == "hs"
+    assert group.color_mode == "hs"
     assert group.effect == "none"
     assert group.reachable is True
 
@@ -259,9 +259,9 @@ async def test_update_color_state(light_state, update_all, expected_group_state)
     group.update_color_state(light, update_all_attributes=update_all)
 
     assert group.brightness == expected_group_state["brightness"]
-    assert group.ct == expected_group_state["ct"]
+    assert group.color_temp == expected_group_state["ct"]
     assert group.hue == expected_group_state["hue"]
-    assert group.sat == expected_group_state["sat"]
+    assert group.saturation == expected_group_state["sat"]
     assert group.xy == expected_group_state["xy"]
-    assert group.colormode == expected_group_state["colormode"]
+    assert group.color_mode == expected_group_state["colormode"]
     assert group.effect == expected_group_state["effect"]
