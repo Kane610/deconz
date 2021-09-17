@@ -35,7 +35,7 @@ class DeconzDevice(APIItem):
         return self.raw.get("manufacturername", "")
 
     @property
-    def modelid(self) -> Optional[str]:
+    def model_id(self) -> Optional[str]:
         """Device model."""
         return self.raw.get("modelid")
 
@@ -45,7 +45,7 @@ class DeconzDevice(APIItem):
         return self.raw.get("name")
 
     @property
-    def swversion(self) -> Optional[str]:
+    def software_version(self) -> Optional[str]:
         """Firmware version."""
         return self.raw.get("swversion")
 
@@ -55,6 +55,6 @@ class DeconzDevice(APIItem):
         return self.raw.get("type")
 
     @property
-    def uniqueid(self) -> Optional[str]:
+    def unique_id(self) -> Optional[str]:
         """Id for unique device identification."""
         return self.raw.get("uniqueid")
