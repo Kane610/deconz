@@ -4,7 +4,7 @@ import logging
 from pprint import pformat
 from typing import Any, Callable, Dict, Optional, Union
 
-from aiohttp import client_exceptions
+import aiohttp
 
 from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
 from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
@@ -46,7 +46,7 @@ class DeconzSession:
 
     def __init__(
         self,
-        session: Any,
+        session: aiohttp.ClientSession,
         host: str,
         port: int,
         api_key: Optional[str] = None,
@@ -168,7 +168,7 @@ class DeconzSession:
 
                 return response
 
-        except client_exceptions.ClientError as err:
+        except aiohttp.client_exceptions.ClientError as err:
             raise RequestError(
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
