@@ -143,7 +143,7 @@ class DeconzSensor(DeconzDevice):
         return self.raw.get("ep")
 
     @property
-    def lowbattery(self) -> Optional[bool]:
+    def low_battery(self) -> Optional[bool]:
         """Low battery."""
         return self.raw["state"].get("lowbattery")
 
@@ -183,11 +183,11 @@ class DeconzBinarySensor(DeconzSensor):
 class AirQuality(DeconzSensor):
     """Air quality sensor."""
 
-    STATE_PROPERTY = "airquality"
+    STATE_PROPERTY = "air_quality"
     ZHATYPE = ("ZHAAirQuality",)
 
     @property
-    def airquality(self) -> str:
+    def air_quality(self) -> str:
         """Air quality.
 
         Supported values:
@@ -201,7 +201,7 @@ class AirQuality(DeconzSensor):
         return self.raw["state"]["airquality"]
 
     @property
-    def airqualityppb(self) -> int:
+    def air_quality_ppb(self) -> int:
         """Air quality PPB."""
         return self.raw["state"]["airqualityppb"]
 
@@ -285,11 +285,11 @@ class Battery(DeconzSensor):
 class CarbonMonoxide(DeconzBinarySensor):
     """Carbon monoxide sensor."""
 
-    STATE_PROPERTY = "carbonmonoxide"
+    STATE_PROPERTY = "carbon_monoxide"
     ZHATYPE = ("ZHACarbonMonoxide",)
 
     @property
-    def carbonmonoxide(self) -> bool:
+    def carbon_monoxide(self) -> bool:
         """Carbon monoxide detected."""
         return self.raw["state"]["carbonmonoxide"]
 
@@ -341,7 +341,7 @@ class Daylight(DeconzSensor):
         return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
 
     @property
-    def sunriseoffset(self) -> int:
+    def sunrise_offset(self) -> int:
         """Sunrise offset.
 
         -120 to 120.
@@ -349,7 +349,7 @@ class Daylight(DeconzSensor):
         return self.raw["config"]["sunriseoffset"]
 
     @property
-    def sunsetoffset(self) -> int:
+    def sunset_offset(self) -> int:
         """Sunset offset.
 
         -120 to 120.
@@ -360,27 +360,28 @@ class Daylight(DeconzSensor):
 class DoorLock(DeconzSensor):
     """Door lock sensor."""
 
-    STATE_PROPERTY = "lockstate"
+    STATE_PROPERTY = "lock_state"
     ZHATYPE = ("ZHADoorLock",)
 
     @property
     def is_locked(self) -> bool:
         """Return True if lock is locked."""
-        return self.lockstate == "locked"
+        return self.lock_state == "locked"
 
     @property
-    def lockstate(self) -> str:
+    def lock_state(self) -> str:
         """State the lock is in.
 
-        locked
-        unlocked
-        undefined
-        not fully locked
+        Supported values:
+        - "locked"
+        - "unlocked"
+        - "undefined"
+        - "not fully locked"
         """
         return self.raw["state"]["lockstate"]
 
     @property
-    def lockconfig(self) -> bool:
+    def lock_configuration(self) -> bool:
         """Lock configuration."""
         return self.raw["config"]["lock"]
 
@@ -458,16 +459,16 @@ class Humidity(DeconzSensor):
 class LightLevel(DeconzSensor):
     """Light level sensor."""
 
-    STATE_PROPERTY = "scaled_lightlevel"
+    STATE_PROPERTY = "scaled_light_level"
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")
 
     @property
-    def scaled_lightlevel(self) -> Optional[float]:
+    def scaled_light_level(self) -> Optional[float]:
         """Scaled light level."""
-        if self.lightlevel is None:
+        if self.light_level is None:
             return None
 
-        return round(10 ** (float(self.lightlevel - 1) / 10000), 1)
+        return round(10 ** (float(self.light_level - 1) / 10000), 1)
 
     @property
     def dark(self) -> Optional[bool]:
@@ -480,7 +481,7 @@ class LightLevel(DeconzSensor):
         return self.raw["state"].get("daylight")
 
     @property
-    def lightlevel(self) -> Optional[int]:
+    def light_level(self) -> Optional[int]:
         """Light level."""
         return self.raw["state"].get("lightlevel")
 
@@ -490,12 +491,12 @@ class LightLevel(DeconzSensor):
         return self.raw["state"].get("lux")
 
     @property
-    def tholddark(self) -> Optional[int]:
+    def threshold_dark(self) -> Optional[int]:
         """Threshold to hold dark."""
         return self.raw["config"].get("tholddark")
 
     @property
-    def tholdoffset(self) -> Optional[int]:
+    def threshold_offset(self) -> Optional[int]:
         """Offset for threshold to hold dark."""
         return self.raw["config"].get("tholdoffset")
 
@@ -571,11 +572,11 @@ class Pressure(DeconzSensor):
 class Switch(DeconzSensor):
     """Switch sensor."""
 
-    STATE_PROPERTY = "buttonevent"
+    STATE_PROPERTY = "button_event"
     ZHATYPE = ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     @property
-    def buttonevent(self) -> Optional[int]:
+    def button_event(self) -> Optional[int]:
         """Button press."""
         return self.raw["state"].get("buttonevent")
 
@@ -595,7 +596,7 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("xy")
 
     @property
-    def eventduration(self) -> Optional[int]:
+    def event_duration(self) -> Optional[int]:
         """Duration of a push button event for the Hue wall switch module.
 
         Increased with 8 for each x001, and they are issued pretty much every 800ms.
@@ -603,7 +604,7 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("eventduration")
 
     @property
-    def devicemode(self) -> Optional[str]:
+    def device_mode(self) -> Optional[str]:
         """Different modes for the Hue wall switch module.
 
         Behavior as rocker:
@@ -635,7 +636,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("mode")
 
     @property
-    def windowcoveringtype(self) -> Optional[int]:
+    def window_covering_type(self) -> Optional[int]:
         """Set the covering type and starts calibration for Ubisys J1.
 
         Supported values:
@@ -679,7 +680,7 @@ class Thermostat(Temperature):
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
 
     @property
-    def coolsetpoint(self) -> Optional[float]:
+    def cooling_setpoint(self) -> Optional[float]:
         """Cooling setpoint.
 
         700-3500.
@@ -687,12 +688,12 @@ class Thermostat(Temperature):
         return self.convert_temperature(self.raw["config"].get("coolsetpoint"))
 
     @property
-    def errorcode(self) -> Optional[bool]:
+    def error_code(self) -> Optional[bool]:
         """Error code."""
         return self.raw["state"].get("errorcode")
 
     @property
-    def fanmode(self) -> Optional[str]:
+    def fan_mode(self) -> Optional[str]:
         """Fan mode.
 
         Supported values:
@@ -708,7 +709,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("fanmode")
 
     @property
-    def floortemperature(self) -> Optional[float]:
+    def floor_temperature(self) -> Optional[float]:
         """Floor temperature."""
         return self.convert_temperature(self.raw["state"].get("floortemperature"))
 
@@ -718,7 +719,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("heating")
 
     @property
-    def heatsetpoint(self) -> Optional[float]:
+    def heating_setpoint(self) -> Optional[float]:
         """Heating setpoint.
 
         500-3200.
@@ -749,12 +750,12 @@ class Thermostat(Temperature):
         return self.raw["config"].get("mode")
 
     @property
-    def mountingmode(self) -> Optional[bool]:
+    def mounting_mode(self) -> Optional[bool]:
         """Set a TRV into mounting mode if supported (valve fully open position)."""
         return self.raw["config"].get("mountingmode")
 
     @property
-    def mountingmodeactive(self) -> Optional[bool]:
+    def mounting_mode_active(self) -> Optional[bool]:
         """If thermostat mounting mode is active."""
         return self.raw["state"].get("mountingmodeactive")
 
@@ -785,7 +786,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("on")
 
     @property
-    def swingmode(self) -> Optional[str]:
+    def swing_mode(self) -> Optional[str]:
         """Set the AC louvers position.
 
         Supported values:
@@ -799,7 +800,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("swingmode")
 
     @property
-    def temperaturemeasurement(self) -> Optional[str]:
+    def temperature_measurement(self) -> Optional[str]:
         """Set the mode of operation for Elko Super TR thermostat.
 
         Supported values:
@@ -815,7 +816,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("valve")
 
     @property
-    def windowopen_set(self) -> Optional[bool]:
+    def window_open_detection(self) -> Optional[bool]:
         """Set if window open detection shall be active or inactive for Tuya thermostats.
 
         (Support is device dependent).
@@ -824,13 +825,13 @@ class Thermostat(Temperature):
 
     async def set_config(
         self,
-        cool_set_point: Optional[int] = None,
+        cooling_setpoint: Optional[int] = None,
         enable_schedule: Optional[bool] = None,
         external_sensor_temperature: Optional[int] = None,
         external_window_open: Optional[bool] = None,
         fan_mode: Optional[str] = None,
         flip_display: Optional[bool] = None,
-        heat_set_point: Optional[int] = None,
+        heating_setpoint: Optional[int] = None,
         locked: Optional[bool] = None,
         mode: Optional[str] = None,
         mounting_mode: Optional[bool] = None,
@@ -845,7 +846,7 @@ class Thermostat(Temperature):
         """Change config of thermostat.
 
         Supported values:
-        - cool_set_point [int] 700-3500
+        - cooling_setpoint [int] 700-3500
         - enable_schedule [bool] True/False
         - external_sensor_temperature [int] -32768-32767
         - external_window_open [bool] True/False
@@ -858,7 +859,7 @@ class Thermostat(Temperature):
           - "on"
           - "smart"
         - flip_display [bool] True/False
-        - heat_set_point [int] 500-3200
+        - heating_setpoint [int] 500-3200
         - locked [bool] True/False
         - mode [str]
           - "auto"
@@ -897,13 +898,13 @@ class Thermostat(Temperature):
         data = {
             key: value
             for key, value in {
-                "coolsetpoint": cool_set_point,
+                "coolsetpoint": cooling_setpoint,
                 "schedule_on": enable_schedule,
                 "externalsensortemp": external_sensor_temperature,
                 "externalwindowopen": external_window_open,
                 "fanmode": fan_mode,
                 "displayflipped": flip_display,
-                "heatsetpoint": heat_set_point,
+                "heatsetpoint": heating_setpoint,
                 "locked": locked,
                 "mode": mode,
                 "mountingmode": mounting_mode,
@@ -923,11 +924,11 @@ class Thermostat(Temperature):
 class Time(DeconzSensor):
     """Time sensor."""
 
-    STATE_PROPERTY = "lastset"
+    STATE_PROPERTY = "last_set"
     ZHATYPE = ("ZHATime",)
 
     @property
-    def lastset(self) -> str:
+    def last_set(self) -> str:
         """Last time time was set."""
         return self.raw["state"]["lastset"]
 
@@ -949,12 +950,12 @@ class Vibration(DeconzBinarySensor):
         return self.raw["config"].get("sensitivity")
 
     @property
-    def sensitivitymax(self) -> Optional[int]:
+    def max_sensitivity(self) -> Optional[int]:
         """Vibration max sensitivity."""
         return self.raw["config"].get("sensitivitymax")
 
     @property
-    def tiltangle(self) -> Optional[int]:
+    def tilt_angle(self) -> Optional[int]:
         """Tilt angle."""
         return self.raw["state"].get("tiltangle")
 
@@ -964,7 +965,7 @@ class Vibration(DeconzBinarySensor):
         return self.raw["state"]["vibration"]
 
     @property
-    def vibrationstrength(self) -> Optional[int]:
+    def vibration_strength(self) -> Optional[int]:
         """Strength of vibration."""
         return self.raw["state"].get("vibrationstrength")
 
