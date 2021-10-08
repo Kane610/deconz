@@ -804,7 +804,7 @@ class Thermostat(Temperature):
 
     @property
     def schedule_enabled(self) -> Optional[bool]:
-        """True when a thermostat schedule is enabled."""
+        """Tell when thermostat schedule is enabled."""
         return self.raw["config"].get("schedule_on")
 
     @property
