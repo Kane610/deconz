@@ -698,7 +698,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("errorcode")
 
     @property
-    def external_sensor_temperature(self) -> Optional[int]:
+    def external_sensor_temperature(self) -> Optional[float]:
         """Track temperature value provided by an external sensor.
 
         -32768–32767.
