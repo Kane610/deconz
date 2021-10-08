@@ -688,9 +688,31 @@ class Thermostat(Temperature):
         return self.convert_temperature(self.raw["config"].get("coolsetpoint"))
 
     @property
+    def display_flipped(self) -> Optional[bool]:
+        """Tells if display for TRVs is flipped."""
+        return self.raw["config"].get("displayflipped")
+
+    @property
     def error_code(self) -> Optional[bool]:
         """Error code."""
         return self.raw["state"].get("errorcode")
+
+    @property
+    def external_sensor_temperature(self) -> Optional[int]:
+        """Track temperature value provided by an external sensor.
+
+        -32768–32767.
+        Modes are device dependent and only exposed for devices supporting it.
+        """
+        return self.convert_temperature(self.raw["config"].get("externalsensortemp"))
+
+    @property
+    def external_window_open(self) -> Optional[bool]:
+        """Track open/close state of an external sensor.
+
+        Modes are device dependent and only exposed for devices supporting it.
+        """
+        return self.raw["config"].get("externalwindowopen")
 
     @property
     def fan_mode(self) -> Optional[str]:
@@ -779,6 +801,11 @@ class Thermostat(Temperature):
         Modes are device dependent and only exposed for devices supporting it.
         """
         return self.raw["config"].get("preset")
+
+    @property
+    def schedule_enabled(self) -> Optional[bool]:
+        """True when a thermostat schedule is enabled."""
+        return self.raw["config"].get("schedule_on")
 
     @property
     def state_on(self) -> Optional[bool]:
