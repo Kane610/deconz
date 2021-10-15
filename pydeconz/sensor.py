@@ -547,6 +547,11 @@ class Presence(DeconzBinarySensor):
         return self.raw["state"].get("dark")
 
     @property
+    def delay(self) -> Optional[int]:
+        """Occupied to unoccupied delay in seconds."""
+        return self.raw["config"].get("delay")
+
+    @property
     def duration(self) -> Optional[int]:
         """Minimum duration which presence will be true."""
         return self.raw["config"].get("duration")
@@ -555,6 +560,27 @@ class Presence(DeconzBinarySensor):
     def presence(self) -> Optional[bool]:
         """Motion detected."""
         return self.raw["state"]["presence"]
+
+    async def set_config(
+        self,
+        delay: Optional[int] = None,
+        duration: Optional[int] = None,
+    ) -> dict:
+        """Change config of presence sensor.
+
+        Supported values (in seconds):
+        - delay [int] 0-65535
+        - duration [int] 0-65535
+        """
+        data = {
+            key: value
+            for key, value in {
+                "delay": delay,
+                "duration": duration,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
 
 
 class Pressure(DeconzSensor):

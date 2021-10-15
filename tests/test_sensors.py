@@ -3,7 +3,7 @@
 pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 """
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -931,6 +931,7 @@ async def test_power_sensor(input, expected):
 
 async def test_presence_sensor():
     """Verify that presence sensor works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -957,7 +958,7 @@ async def test_presence_sensor():
                 "uniqueid": "00:17:88:01:03:28:8c:9b-02-0406",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -967,6 +968,7 @@ async def test_presence_sensor():
     assert sensor.state is False
     assert sensor.presence is False
     assert sensor.dark is None
+    assert sensor.delay == 0
     assert sensor.duration is None
 
     # DeconzSensor
@@ -987,6 +989,27 @@ async def test_presence_sensor():
     assert sensor.software_version == "6.1.0.18912"
     assert sensor.type == "ZHAPresence"
     assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0406"
+
+    await sensor.set_config(delay=10, duration=20)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"delay": 10, "duration": 20},
+    )
+
+    await sensor.set_config(delay=1)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"delay": 1},
+    )
+
+    await sensor.set_config(duration=2)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"duration": 2},
+    )
 
 
 async def test_pressure_sensor():
