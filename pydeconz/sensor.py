@@ -455,6 +455,32 @@ class Humidity(DeconzSensor):
         """Humidity level."""
         return self.raw["state"].get("humidity")
 
+    @property
+    def offset(self) -> Optional[int]:
+        """Signed offset value to measured state values.
+
+        Values send by the REST-API are already amended by the offset.
+        """
+        return self.raw["config"].get("offset")
+
+    async def set_config(
+        self,
+        offset: Optional[int] = None,
+    ) -> dict:
+        """Change config of humidity sensor.
+
+        Supported values:
+        - offset [int] -32768–32767
+        """
+        data = {
+            key: value
+            for key, value in {
+                "offset": offset,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
+
 
 class LightLevel(DeconzSensor):
     """Light level sensor."""
@@ -507,7 +533,7 @@ class LightLevel(DeconzSensor):
     ) -> dict:
         """Change config of presence sensor.
 
-        Supported values (in seconds):
+        Supported values:
         - threshold_dark [int] 0-65534
         - threshold_offset [int] 1-65534
         """
