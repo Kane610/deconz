@@ -548,7 +548,7 @@ class Presence(DeconzBinarySensor):
 
     @property
     def delay(self) -> Optional[int]:
-        """Timeout in seconds presence state is set to false again."""
+        """Occupied to unoccupied delay in seconds."""
         return self.raw["config"].get("delay")
 
     @property
