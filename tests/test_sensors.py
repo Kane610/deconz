@@ -665,6 +665,7 @@ async def test_genericstatus_sensor():
 
 async def test_humidity_sensor():
     """Verify that humidity sensor works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -680,7 +681,7 @@ async def test_humidity_sensor():
                 "uniqueid": "00:15:8d:00:02:45:dc:53-01-0405",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -689,6 +690,7 @@ async def test_humidity_sensor():
 
     assert sensor.state == 35.5
     assert sensor.humidity == 3555
+    assert sensor.offset == 0
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -711,6 +713,13 @@ async def test_humidity_sensor():
 
     del sensor.raw["state"]["humidity"]
     assert sensor.state is None
+
+    await sensor.set_config(offset=1)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"offset": 1},
+    )
 
 
 async def test_lightlevel_sensor():
