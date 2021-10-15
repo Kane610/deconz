@@ -500,6 +500,27 @@ class LightLevel(DeconzSensor):
         """Offset for threshold to hold dark."""
         return self.raw["config"].get("tholdoffset")
 
+    async def set_config(
+        self,
+        threshold_dark: Optional[int] = None,
+        threshold_offset: Optional[int] = None,
+    ) -> dict:
+        """Change config of presence sensor.
+
+        Supported values (in seconds):
+        - threshold_dark [int] 0-65534
+        - threshold_offset [int] 1-65534
+        """
+        data = {
+            key: value
+            for key, value in {
+                "tholddark": threshold_dark,
+                "tholdoffset": threshold_offset,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
+
 
 class OpenClose(DeconzBinarySensor):
     """Door/Window sensor."""

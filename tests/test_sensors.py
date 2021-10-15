@@ -715,6 +715,7 @@ async def test_humidity_sensor():
 
 async def test_lightlevel_sensor():
     """Verify that light level sensor works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -746,7 +747,7 @@ async def test_lightlevel_sensor():
                 "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -782,6 +783,27 @@ async def test_lightlevel_sensor():
 
     del sensor.raw["state"]["lightlevel"]
     assert sensor.state is None
+
+    await sensor.set_config(threshold_dark=10, threshold_offset=20)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholddark": 10, "tholdoffset": 20},
+    )
+
+    await sensor.set_config(threshold_dark=1)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholddark": 1},
+    )
+
+    await sensor.set_config(threshold_offset=2)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholdoffset": 2},
+    )
 
 
 async def test_openclose_sensor():
