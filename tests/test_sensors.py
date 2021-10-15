@@ -1441,7 +1441,10 @@ async def test_danfoss_thermostat():
 
     assert sensor.state == 21.0
     assert sensor.cooling_setpoint is None
+    assert sensor.display_flipped is None
     assert sensor.error_code is None
+    assert sensor.external_sensor_temperature is None
+    assert sensor.external_window_open is None
     assert sensor.fan_mode is None
     assert sensor.floor_temperature is None
     assert sensor.heating is None
@@ -1600,6 +1603,7 @@ async def test_tuya_thermostat():
     assert sensor.locked is None
     assert sensor.mode is None
     assert sensor.offset == 0
+    assert sensor.schedule_enabled is None
     assert sensor.state_on is None
     assert sensor.temperature == 22.9
     assert sensor.valve is None
