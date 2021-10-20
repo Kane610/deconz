@@ -62,12 +62,12 @@ async def main(host: str, port: int, api_key: str) -> None:
         return
 
     await gateway.refresh_state()
-    # gateway.start()
+    gateway.start()
 
     try:
         while True:
             await asyncio.sleep(1)
-            break
+            # break
 
     except asyncio.CancelledError:
         pass

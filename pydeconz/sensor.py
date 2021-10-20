@@ -53,6 +53,13 @@ DEVICE_MODE_DUAL_ROCKER = "dualrocker"
 DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
 DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
 
+PRESENCE_DELAY = "delay"
+PRESENCE_DURATION = "duration"
+PRESENCE_SENSITIVITY = "sensitivity"
+PRESENCE_SENSITIVITY_MAX = "sensitivitymax"
+PRESENCE_DARK = "dark"
+PRESENCE_PRESENCE = "presence"
+
 THERMOSTAT_MODE_AUTO = "auto"
 THERMOSTAT_MODE_COOL = "cool"
 THERMOSTAT_MODE_DRY = "dry"
@@ -591,39 +598,56 @@ class Presence(DeconzBinarySensor):
     @property
     def dark(self) -> Optional[bool]:
         """If the area near the sensor is light or not."""
-        return self.raw["state"].get("dark")
+        return self.raw["state"].get(PRESENCE_DARK)
 
     @property
     def delay(self) -> Optional[int]:
         """Occupied to unoccupied delay in seconds."""
-        return self.raw["config"].get("delay")
+        return self.raw["config"].get(PRESENCE_DELAY)
 
     @property
     def duration(self) -> Optional[int]:
         """Minimum duration which presence will be true."""
-        return self.raw["config"].get("duration")
+        return self.raw["config"].get(PRESENCE_DURATION)
 
     @property
-    def presence(self) -> Optional[bool]:
+    def presence(self) -> bool:
         """Motion detected."""
-        return self.raw["state"]["presence"]
+        return self.raw["state"][PRESENCE_PRESENCE]
+
+    @property
+    def sensitivity(self) -> Optional[int]:
+        """Sensitivity setting for Philips Hue motion sensor.
+
+        Supported values:
+        - 0-[sensitivitymax]
+        """
+        return self.raw["config"].get(PRESENCE_SENSITIVITY)
+
+    @property
+    def max_sensitivity(self) -> Optional[int]:
+        """Maximum sensitivity value."""
+        return self.raw["config"].get(PRESENCE_SENSITIVITY_MAX)
 
     async def set_config(
         self,
         delay: Optional[int] = None,
         duration: Optional[int] = None,
+        sensitivity: Optional[int] = None,
     ) -> dict:
         """Change config of presence sensor.
 
-        Supported values (in seconds):
-        - delay [int] 0-65535
-        - duration [int] 0-65535
+        Supported values:
+        - delay [int] 0-65535 (in seconds)
+        - duration [int] 0-65535 (in seconds)
+        - sensitivity [int] 0-[sensitivitymax]
         """
         data = {
             key: value
             for key, value in {
-                "delay": delay,
-                "duration": duration,
+                PRESENCE_DELAY: delay,
+                PRESENCE_DURATION: duration,
+                PRESENCE_SENSITIVITY: sensitivity,
             }.items()
             if value is not None
         }

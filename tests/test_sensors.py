@@ -974,7 +974,7 @@ async def test_presence_sensor():
                     "on": True,
                     "pending": [],
                     "reachable": True,
-                    "sensitivity": 2,
+                    "sensitivity": 1,
                     "sensitivitymax": 2,
                     "usertest": False,
                 },
@@ -1001,6 +1001,8 @@ async def test_presence_sensor():
     assert sensor.dark is None
     assert sensor.delay == 0
     assert sensor.duration is None
+    assert sensor.sensitivity == 1
+    assert sensor.max_sensitivity == 2
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -1021,11 +1023,11 @@ async def test_presence_sensor():
     assert sensor.type == "ZHAPresence"
     assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0406"
 
-    await sensor.set_config(delay=10, duration=20)
+    await sensor.set_config(delay=10, duration=20, sensitivity=1)
     mock_request.assert_called_with(
         "put",
         path="/sensors/0/config",
-        json={"delay": 10, "duration": 20},
+        json={"delay": 10, "duration": 20, "sensitivity": 1},
     )
 
     await sensor.set_config(delay=1)
@@ -1040,6 +1042,13 @@ async def test_presence_sensor():
         "put",
         path="/sensors/0/config",
         json={"duration": 2},
+    )
+
+    await sensor.set_config(sensitivity=3)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"sensitivity": 3},
     )
 
 
