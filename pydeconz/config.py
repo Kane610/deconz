@@ -1,11 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
 from typing import Any, Awaitable, Callable, Dict, Optional
 
 from .utils import normalize_bridge_id
-
-_LOGGER = logging.getLogger(__name__)
 
 RESOURCE_TYPE = "config"
 
