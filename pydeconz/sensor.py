@@ -6,7 +6,6 @@ from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
 from .api import APIItems
 from .deconz_device import DeconzDevice
 
-LOGGER = logging.getLogger(__name__)
 RESOURCE_TYPE = "sensors"
 URL = "/sensors"
 
@@ -1168,5 +1167,4 @@ def create_sensor(
         if raw["type"] in sensor_class.ZHATYPE:
             return sensor_class(resource_id, raw, request)
 
-    LOGGER.info("Unsupported sensor type %s", raw)
     return DeconzSensor(resource_id, raw, request)

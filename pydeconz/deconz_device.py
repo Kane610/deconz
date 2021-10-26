@@ -1,11 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
 from typing import Optional
 
 from .api import APIItem
-
-LOGGER = logging.getLogger(__name__)
 
 
 class DeconzDevice(APIItem):

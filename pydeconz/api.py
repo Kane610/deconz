@@ -2,7 +2,16 @@
 
 from asyncio import CancelledError, Task, create_task, sleep
 import logging
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    ItemsView,
+    KeysView,
+    Optional,
+    ValuesView,
+)
 
 from .errors import BridgeBusy
 
@@ -34,22 +43,22 @@ class APIItems:
     def process_raw(self, raw: dict) -> None:
         """Process data."""
         for id, raw_item in raw.items():
-            obj = self._items.get(id)
 
-            if obj is not None:
+            if (obj := self._items.get(id)) is not None:
                 obj.update(raw_item)
+
             else:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 
-    def items(self) -> Any:
+    def items(self) -> ItemsView[str, Any]:
         """Return items."""
         return self._items.items()
 
-    def keys(self) -> Any:
+    def keys(self) -> KeysView[Any]:
         """Return item keys."""
         return self._items.keys()
 
-    def values(self) -> Any:
+    def values(self) -> ValuesView[Any]:
         """Return item values."""
         return self._items.values()
 

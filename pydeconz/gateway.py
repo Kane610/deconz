@@ -179,11 +179,13 @@ class DeconzSession:
         data - new data available for processing.
         state - network state has changed.
         """
+        assert self.websocket
+
         if signal == SIGNAL_DATA:
-            self.event_handler(self.websocket.data)  # type: ignore
+            self.event_handler(self.websocket.data)
 
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
-            self.connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
+            self.connection_status_callback(self.websocket.state == STATE_RUNNING)
 
     def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.

@@ -8,8 +8,6 @@ from .api import APIItems
 from .deconz_device import DeconzDevice
 from .light import Light
 
-LOGGER = logging.getLogger(__name__)
-
 RESOURCE_TYPE = "groups"
 RESOURCE_TYPE_SCENE = "scenes"
 URL = "/groups"
@@ -354,7 +352,6 @@ class DeconzScene:
         self.group = group
         self.raw = raw
         self._request = request
-        LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
     @property
     def resource_type(self) -> str:
