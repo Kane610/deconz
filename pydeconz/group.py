@@ -1,7 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
-from pprint import pformat
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, Union
 
 from .api import APIItems
