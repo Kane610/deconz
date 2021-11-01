@@ -115,9 +115,9 @@ class DeconzGroup(DeconzDevice):
     def color_mode(self) -> Literal["ct", "hs", "xy", None]:
         """Color mode of the light.
 
+        ct - color temperature
         hs - hue and saturation
         xy - CIE xy values
-        ct - color temperature
         """
         return self.raw["action"].get("colormode")
 
@@ -125,8 +125,8 @@ class DeconzGroup(DeconzDevice):
     def effect(self) -> Literal["colorloop", "none", None]:
         """Effect of the group.
 
-        none - no effect
         colorloop
+        none - no effect
         """
         return self.raw["action"].get("effect")
 
