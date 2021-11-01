@@ -2,7 +2,7 @@ pytest
 pytest-cov
 pytest-aiohttp
 aioresponses
-black==21.9b0
+black==21.10b0
 flake8==4.0.1
 flake8-docstrings==1.6.0
 flake8-noqa==1.2.0
