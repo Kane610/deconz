@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import Any, Awaitable, Callable, Dict, Literal, Optional
 
 from .utils import normalize_bridge_id
 
@@ -99,7 +99,7 @@ class Config:
         return self.raw.get("networkopenduration")
 
     @property
-    def ntp(self) -> Optional[str]:
+    def ntp(self) -> Literal["synced", "unsynced", None]:
         """Tells if the NTP time is "synced" or "unsynced".
 
         Only for gateways running on Linux.
@@ -135,7 +135,7 @@ class Config:
         return self.raw.get("swversion")
 
     @property
-    def time_format(self) -> Optional[str]:
+    def time_format(self) -> Literal["12h", "24h", None]:
         """Timeformat used by gateway.
 
         Supported values:
@@ -181,7 +181,7 @@ class Config:
         return self.raw.get("whitelist")
 
     @property
-    def zigbee_channel(self) -> Optional[int]:
+    def zigbee_channel(self) -> Literal[11, 15, 20, 25, None]:
         """Wireless frequency channel.
 
         Supported channels: 11, 15, 20, 25.
@@ -198,12 +198,12 @@ class Config:
         otau_active: Optional[bool] = None,
         permit_join: Optional[int] = None,
         rf_connected: Optional[bool] = None,
-        time_format: Optional[str] = None,
+        time_format: Literal["12h", "24h", None] = None,
         time_zone: Optional[str] = None,
         unlock: Optional[int] = None,
-        update_channel: Optional[str] = None,
+        update_channel: Literal["alpha", "beta", "stable", None] = None,
         utc: Optional[str] = None,
-        zigbee_channel: Optional[int] = None,
+        zigbee_channel: Literal[11, 15, 20, 25, None] = None,
         websocket_notify_all: Optional[bool] = None,
     ) -> Dict[str, Any]:
         """Modify configuration parameters.

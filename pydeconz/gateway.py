@@ -2,7 +2,7 @@
 
 import logging
 from pprint import pformat
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, Literal, Optional, Union
 
 import aiohttp
 
@@ -173,7 +173,7 @@ class DeconzSession:
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    async def session_handler(self, signal: str) -> None:
+    async def session_handler(self, signal: Literal["data", "state"]) -> None:
         """Signalling from websocket.
 
         data - new data available for processing.

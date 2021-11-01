@@ -3,14 +3,14 @@
 from asyncio import create_task, get_running_loop
 from collections import deque
 import logging
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Final, Literal
 
 import aiohttp
 
 LOGGER = logging.getLogger(__name__)
 
-SIGNAL_CONNECTION_STATE = "state"
-SIGNAL_DATA = "data"
+SIGNAL_CONNECTION_STATE: Final = "state"
+SIGNAL_DATA: Final = "data"
 
 STATE_RETRYING = "retrying"
 STATE_RUNNING = "running"
@@ -27,7 +27,7 @@ class WSClient:
         session: aiohttp.ClientSession,
         host: str,
         port: int,
-        callback: Callable[[str], Awaitable[None]],
+        callback: Callable[[Literal["data", "state"]], Awaitable[None]],
     ) -> None:
         """Create resources for websocket communication."""
         self.session = session

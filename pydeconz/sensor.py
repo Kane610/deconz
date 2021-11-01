@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -192,16 +192,18 @@ class AirQuality(DeconzSensor):
     ZHATYPE = ("ZHAAirQuality",)
 
     @property
-    def air_quality(self) -> str:
+    def air_quality(
+        self,
+    ) -> Literal["excellent", "good", "moderate", "poor", "unhealthy", "out of scale"]:
         """Air quality.
 
         Supported values:
-        - excellent
-        - good
-        - moderate
-        - poor
-        - unhealthy
-        - out of scale
+        - "excellent"
+        - "good"
+        - "moderate"
+        - "poor"
+        - "unhealthy"
+        - "out of scale"
         """
         return self.raw["state"]["airquality"]
 
@@ -230,7 +232,18 @@ class AncillaryControl(DeconzSensor):
     ZHATYPE = ("ZHAAncillaryControl",)
 
     @property
-    def action(self) -> str:
+    def action(
+        self,
+    ) -> Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "disarmed",
+        "emergency",
+        "fire",
+        "invalid_code",
+        "panic",
+    ]:
         """Last action a user invoked on the keypad.
 
         Supported values:
@@ -246,7 +259,22 @@ class AncillaryControl(DeconzSensor):
         return self.raw["state"]["action"]
 
     @property
-    def panel(self) -> Optional[str]:
+    def panel(
+        self,
+    ) -> Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "arming_away",
+        "arming_night",
+        "arming_stay",
+        "disarmed",
+        "entry_delay",
+        "exit_delay",
+        "in_alarm",
+        "not_ready",
+        None,
+    ]:
         """Mirror of alarm system state.armstate attribute.
 
         It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
@@ -255,7 +283,7 @@ class AncillaryControl(DeconzSensor):
         - "armed_away"
         - "armed_night"
         - "armed_stay"
-        - "arming_away
+        - "arming_away"
         - "arming_night"
         - "arming_stay"
         - "disarmed"
@@ -374,7 +402,9 @@ class DoorLock(DeconzSensor):
         return self.lock_state == "locked"
 
     @property
-    def lock_state(self) -> str:
+    def lock_state(
+        self,
+    ) -> Literal["locked", "unlocked", "undefined", "not fully locked"]:
         """State the lock is in.
 
         Supported values:
@@ -699,7 +729,11 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("eventduration")
 
     @property
-    def device_mode(self) -> Optional[str]:
+    def device_mode(
+        self,
+    ) -> Literal[
+        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker", None
+    ]:
         """Different modes for the Hue wall switch module.
 
         Behavior as rocker:
@@ -721,7 +755,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("devicemode")
 
     @property
-    def mode(self) -> Optional[str]:
+    def mode(self) -> Literal["momentary", "rocker", None]:
         """For Ubisys S1/S2, operation mode of the switch.
 
         Supported values:
@@ -731,7 +765,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("mode")
 
     @property
-    def window_covering_type(self) -> Optional[int]:
+    def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, None]:
         """Set the covering type and starts calibration for Ubisys J1.
 
         Supported values:
@@ -810,7 +844,9 @@ class Thermostat(Temperature):
         return self.raw["config"].get("externalwindowopen")
 
     @property
-    def fan_mode(self) -> Optional[str]:
+    def fan_mode(
+        self,
+    ) -> Literal["off", "low", "medium", "high", "on", "auto", "smart", None]:
         """Fan mode.
 
         Supported values:
@@ -849,7 +885,20 @@ class Thermostat(Temperature):
         return self.raw["config"].get("locked")
 
     @property
-    def mode(self) -> Optional[str]:
+    def mode(
+        self,
+    ) -> Literal[
+        "off",
+        "auto",
+        "cool",
+        "heat",
+        "emergency heating",
+        "precooling",
+        "fan only",
+        "dry",
+        "sleep",
+        None,
+    ]:
         """Set the current operating mode of a thermostat.
 
         Supported values:
@@ -882,7 +931,9 @@ class Thermostat(Temperature):
         return self.raw["config"].get("offset")
 
     @property
-    def preset(self) -> Optional[str]:
+    def preset(
+        self,
+    ) -> Literal["holiday", "auto", "manual", "comfort", "eco", "boost", "complex"]:
         """Set the current operating mode for Tuya thermostats.
 
         Supported values:
@@ -908,7 +959,16 @@ class Thermostat(Temperature):
         return self.raw["state"].get("on")
 
     @property
-    def swing_mode(self) -> Optional[str]:
+    def swing_mode(
+        self,
+    ) -> Literal[
+        "fully closed",
+        "fully open",
+        "quarter open",
+        "half open",
+        "three quarters open",
+        None,
+    ]:
         """Set the AC louvers position.
 
         Supported values:
@@ -922,7 +982,9 @@ class Thermostat(Temperature):
         return self.raw["config"].get("swingmode")
 
     @property
-    def temperature_measurement(self) -> Optional[str]:
+    def temperature_measurement(
+        self,
+    ) -> Literal["air sensor", "floor sensor", "floor protection", None]:
         """Set the mode of operation for Elko Super TR thermostat.
 
         Supported values:
@@ -951,18 +1013,42 @@ class Thermostat(Temperature):
         enable_schedule: Optional[bool] = None,
         external_sensor_temperature: Optional[int] = None,
         external_window_open: Optional[bool] = None,
-        fan_mode: Optional[str] = None,
+        fan_mode: Literal[
+            "off", "low", "medium", "high", "on", "auto", "smart", None
+        ] = None,
         flip_display: Optional[bool] = None,
         heating_setpoint: Optional[int] = None,
         locked: Optional[bool] = None,
-        mode: Optional[str] = None,
+        mode: Literal[
+            "off",
+            "auto",
+            "cool",
+            "heat",
+            "emergency heating",
+            "precooling",
+            "fan only",
+            "dry",
+            "sleep",
+            None,
+        ] = None,
         mounting_mode: Optional[bool] = None,
         on: Optional[bool] = None,
-        preset: Optional[str] = None,
+        preset: Literal[
+            "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
+        ] = None,
         schedule: Optional[list] = None,
         set_valve: Optional[bool] = None,
-        swing_mode: Optional[str] = None,
-        temperature_measurement: Optional[str] = None,
+        swing_mode: Literal[
+            "fully closed",
+            "fully open",
+            "quarter open",
+            "half open",
+            "three quarters open",
+            None,
+        ] = None,
+        temperature_measurement: Literal[
+            "air sensor", "floor sensor", "floor protection", None
+        ] = None,
         window_open_detection: Optional[bool] = None,
     ) -> dict:
         """Change config of thermostat.
