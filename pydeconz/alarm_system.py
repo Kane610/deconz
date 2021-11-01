@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import Any, Awaitable, Callable, Dict, Literal, Optional
 
 from .api import APIItem, APIItems
 
@@ -149,7 +149,20 @@ class AlarmSystem(APIItem):
         )
 
     @property
-    def arm_state(self) -> str:
+    def arm_state(
+        self,
+    ) -> Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "arming_away",
+        "arming_night",
+        "arming_stay",
+        "disarmed",
+        "entry_delay",
+        "exit_delay",
+        "in_alarm",
+    ]:
         """Alarm system state.
 
         Can be different from the config.armmode during state transitions.
@@ -185,7 +198,9 @@ class AlarmSystem(APIItem):
         return self.raw["config"]["configured"]
 
     @property
-    def arm_mode(self):
+    def arm_mode(
+        self,
+    ) -> Literal["armed_away", "armed_night", "armed_stay", "disarmed"]:
         """Target arm mode.
 
         Supported values:

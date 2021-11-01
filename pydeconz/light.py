@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -72,7 +72,7 @@ class Light(DeconzLight):
     """
 
     @property
-    def alert(self) -> Optional[str]:
+    def alert(self) -> Literal["none", "select", "lselect", None]:
         """Temporary alert effect.
 
         Following values are possible:
@@ -131,12 +131,12 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def color_mode(self) -> Optional[str]:
+    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
         """Color mode of light.
 
+        ct - color temperature
         hs - hue and saturation
         xy - CIE xy values
-        ct - color temperature
         """
         return self.raw["state"].get("colormode")
 
@@ -155,11 +155,12 @@ class Light(DeconzLight):
         return ctmin
 
     @property
-    def effect(self) -> Optional[str]:
+    def effect(self) -> Literal["colorloop", "none", None]:
         """Effect of the light.
 
+        colorloop — the light will cycle continuously through all colors
+                    with the speed specified by colorloopspeed.
         none — no effect.
-        colorloop — the light will cycle continuously through all colors with the speed specified by colorloopspeed.
         """
         return self.raw["state"].get("effect")
 
@@ -174,11 +175,11 @@ class Light(DeconzLight):
 
     async def set_state(
         self,
-        alert: Optional[str] = None,
+        alert: Literal["none", "select", "lselect", None] = None,
         brightness: Optional[int] = None,
         color_loop_speed: Optional[int] = None,
         color_temperature: Optional[int] = None,
-        effect: Optional[str] = None,
+        effect: Literal["colorloop", "none", None] = None,
         hue: Optional[int] = None,
         on: Optional[bool] = None,
         on_time: Optional[int] = None,
@@ -343,11 +344,11 @@ class Fan(Light):
     ZHATYPE = ("Fan",)
 
     @property
-    def speed(self) -> int:
+    def speed(self) -> Literal[0, 1, 2, 3, 4, 5, 6]:
         """Speed of the fan."""
         return self.raw["state"]["speed"]
 
-    async def set_speed(self, speed: int) -> dict:
+    async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict:
         """Set speed of fans/ventilators.
 
         Speed [int] between 0-6.

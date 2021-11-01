@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, List, Literal, Optional, Tuple, Union
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -112,7 +112,7 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def color_mode(self) -> Optional[str]:
+    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
         """Color mode of the light.
 
         hs - hue and saturation
@@ -122,7 +122,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("colormode")
 
     @property
-    def effect(self) -> Optional[str]:
+    def effect(self) -> Literal["colorloop", "none", None]:
         """Effect of the group.
 
         none - no effect
@@ -224,11 +224,11 @@ class DeconzGroup(DeconzDevice):
 
     async def set_state(
         self,
-        alert: Optional[str] = None,
+        alert: Literal["none", "select", "lselect", None] = None,
         brightness: Optional[int] = None,
         color_loop_speed: Optional[int] = None,
         color_temperature: Optional[int] = None,
-        effect: Optional[str] = None,
+        effect: Literal["colorloop", "none", None] = None,
         hue: Optional[int] = None,
         on: Optional[bool] = None,
         on_time: Optional[int] = None,
