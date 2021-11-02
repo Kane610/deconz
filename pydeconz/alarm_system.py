@@ -336,7 +336,14 @@ class AlarmSystem(APIItem):
         armed_away: bool = False,
         armed_night: bool = False,
         armed_stay: bool = False,
-        trigger: Optional[str] = None,
+        trigger: Literal[
+            "state/presence",
+            "state/open",
+            "state/vibration",
+            "state/buttonevent",
+            "state/on",
+            None,
+        ] = None,
         is_keypad: bool = False,
     ) -> Dict[str, Any]:
         """Link device with alarm system.
