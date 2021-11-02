@@ -1,12 +1,12 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional
+from typing import Any, Awaitable, Callable, Dict, Final, Literal, Optional
 
 from .utils import normalize_bridge_id
 
-RESOURCE_TYPE = "config"
+RESOURCE_TYPE: Final = "config"
 
-UNINITIALIZED_BRIDGE_ID = "0000000000000000"
+UNINITIALIZED_BRIDGE_ID: Final = "0000000000000000"
 
 
 class Config:

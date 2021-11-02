@@ -12,11 +12,11 @@ LOGGER = logging.getLogger(__name__)
 SIGNAL_CONNECTION_STATE: Final = "state"
 SIGNAL_DATA: Final = "data"
 
-STATE_RETRYING = "retrying"
-STATE_RUNNING = "running"
-STATE_STOPPED = "stopped"
+STATE_RETRYING: Final = "retrying"
+STATE_RUNNING: Final = "running"
+STATE_STOPPED: Final = "stopped"
 
-RETRY_TIMER = 15
+RETRY_TIMER: Final = 15
 
 
 class WSClient:

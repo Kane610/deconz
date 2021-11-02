@@ -1,30 +1,40 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Tuple, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Final,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
 
-RESOURCE_TYPE = "lights"
-URL = "/lights"
+RESOURCE_TYPE: Final = "lights"
+URL: Final = "/lights"
 
-ALERT_KEY = "alert"
-ALERT_LONG = "lselect"
-ALERT_NONE = "none"
-ALERT_SHORT = "select"
+ALERT_KEY: Final = "alert"
+ALERT_LONG: Final = "lselect"
+ALERT_NONE: Final = "none"
+ALERT_SHORT: Final = "select"
 
-EFFECT_NONE = "none"
-EFFECT_COLOR_LOOP = "colorloop"
+EFFECT_NONE: Final = "none"
+EFFECT_COLOR_LOOP: Final = "colorloop"
 
-FAN_SPEED_OFF = 0
-FAN_SPEED_25_PERCENT = 1
-FAN_SPEED_50_PERCENT = 2
-FAN_SPEED_75_PERCENT = 3
-FAN_SPEED_100_PERCENT = 4
-FAN_SPEED_AUTO = 5
-FAN_SPEED_COMFORT_BREEZE = 6
+FAN_SPEED_OFF: Final = 0
+FAN_SPEED_25_PERCENT: Final = 1
+FAN_SPEED_50_PERCENT: Final = 2
+FAN_SPEED_75_PERCENT: Final = 3
+FAN_SPEED_100_PERCENT: Final = 4
+FAN_SPEED_AUTO: Final = 5
+FAN_SPEED_COMFORT_BREEZE: Final = 6
 
-ON_TIME_KEY = "ontime"
+ON_TIME_KEY: Final = "ontime"
 
 
 class Lights(APIItems):

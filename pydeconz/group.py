@@ -1,16 +1,27 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, List, Literal, Optional, Tuple, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
 from .light import Light
 
-RESOURCE_TYPE = "groups"
-RESOURCE_TYPE_SCENE = "scenes"
-URL = "/groups"
+RESOURCE_TYPE: Final = "groups"
+RESOURCE_TYPE_SCENE: Final = "scenes"
+URL: Final = "/groups"
 
-GROUP_TO_LIGHT_ATTRIBUTES = {
+GROUP_TO_LIGHT_ATTRIBUTES: Final = {
     "bri": "brightness",
     "ct": "color_temp",
     "hue": "hue",
