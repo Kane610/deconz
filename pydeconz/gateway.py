@@ -2,7 +2,7 @@
 
 import logging
 from pprint import pformat
-from typing import Any, Callable, Dict, Literal, Optional, Union
+from typing import Any, Callable, Dict, Final, Literal, Optional, Union
 
 import aiohttp
 
@@ -16,24 +16,24 @@ from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSCl
 
 LOGGER = logging.getLogger(__name__)
 
-EVENT_ID = "id"
-EVENT_RESOURCE = "r"
+EVENT_ID: Final = "id"
+EVENT_RESOURCE: Final = "r"
 
-EVENT_TYPE = "e"
-EVENT_TYPE_ADDED = "added"
-EVENT_TYPE_CHANGED = "changed"
-EVENT_TYPE_DELETED = "deleted"
-EVENT_TYPE_SCENE_CALLED = "scene-called"
+EVENT_TYPE: Final = "e"
+EVENT_TYPE_ADDED: Final = "added"
+EVENT_TYPE_CHANGED: Final = "changed"
+EVENT_TYPE_DELETED: Final = "deleted"
+EVENT_TYPE_SCENE_CALLED: Final = "scene-called"
 
-SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
-SUPPORTED_EVENT_RESOURCES = (
+SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
+SUPPORTED_EVENT_RESOURCES: Final = (
     ALARM_SYSTEM_RESOURCE,
     GROUP_RESOURCE,
     LIGHT_RESOURCE,
     SENSOR_RESOURCE,
 )
 
-RESOURCE_TYPE_TO_DEVICE_TYPE = {
+RESOURCE_TYPE_TO_DEVICE_TYPE: Final = {
     ALARM_SYSTEM_RESOURCE: "alarmsystem",
     GROUP_RESOURCE: "group",
     LIGHT_RESOURCE: "light",

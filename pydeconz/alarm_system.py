@@ -1,39 +1,39 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional
+from typing import Any, Awaitable, Callable, Dict, Final, Literal, Optional
 
 from .api import APIItem, APIItems
 
-RESOURCE_TYPE = "alarmsystems"
-URL = "/alarmsystems"
+RESOURCE_TYPE: Final = "alarmsystems"
+URL: Final = "/alarmsystems"
 
-PATH_ARM_AWAY = "arm_away"
-PATH_ARM_NIGHT = "arm_night"
-PATH_ARM_STAY = "arm_stay"
-PATH_DISARM = "disarm"
+PATH_ARM_AWAY: Final = "arm_away"
+PATH_ARM_NIGHT: Final = "arm_night"
+PATH_ARM_STAY: Final = "arm_stay"
+PATH_DISARM: Final = "disarm"
 
-ARM_MODE_ARMED_AWAY = "armed_away"
-ARM_MODE_ARMED_NIGHT = "armed_night"
-ARM_MODE_ARMED_STAY = "armed_stay"
-ARM_MODE_DISARMED = "disarmed"
+ARM_MODE_ARMED_AWAY: Final = "armed_away"
+ARM_MODE_ARMED_NIGHT: Final = "armed_night"
+ARM_MODE_ARMED_STAY: Final = "armed_stay"
+ARM_MODE_DISARMED: Final = "disarmed"
 
-ARM_STATE_ARMED_AWAY = "armed_away"
-ARM_STATE_ARMED_NIGHT = "armed_night"
-ARM_STATE_ARMED_STAY = "armed_stay"
-ARM_STATE_ARMING_AWAY = "arming_away"
-ARM_STATE_ARMING_NIGHT = "arming_night"
-ARM_STATE_ARMING_STAY = "arming_stay"
-ARM_STATE_DISARMED = "disarmed"
-ARM_STATE_ENTRY_DELAY = "entry_delay"
-ARM_STATE_EXIT_DELAY = "exit_delay"
-ARM_STATE_IN_ALARM = "in_alarm"
+ARM_STATE_ARMED_AWAY: Final = "armed_away"
+ARM_STATE_ARMED_NIGHT: Final = "armed_night"
+ARM_STATE_ARMED_STAY: Final = "armed_stay"
+ARM_STATE_ARMING_AWAY: Final = "arming_away"
+ARM_STATE_ARMING_NIGHT: Final = "arming_night"
+ARM_STATE_ARMING_STAY: Final = "arming_stay"
+ARM_STATE_DISARMED: Final = "disarmed"
+ARM_STATE_ENTRY_DELAY: Final = "entry_delay"
+ARM_STATE_EXIT_DELAY: Final = "exit_delay"
+ARM_STATE_IN_ALARM: Final = "in_alarm"
 
-DEVICE_TRIGGER_ACTION = "state/action"
-DEVICE_TRIGGER_BUTTON_EVENT = "state/buttonevent"
-DEVICE_TRIGGER_ON = "state/on"
-DEVICE_TRIGGER_OPEN = "state/open"
-DEVICE_TRIGGER_PRESENCE = "state/presence"
-DEVICE_TRIGGER_VIBRATION = "state/vibration"
+DEVICE_TRIGGER_ACTION: Final = "state/action"
+DEVICE_TRIGGER_BUTTON_EVENT: Final = "state/buttonevent"
+DEVICE_TRIGGER_ON: Final = "state/on"
+DEVICE_TRIGGER_OPEN: Final = "state/open"
+DEVICE_TRIGGER_PRESENCE: Final = "state/presence"
+DEVICE_TRIGGER_VIBRATION: Final = "state/vibration"
 
 
 class AlarmSystems(APIItems):

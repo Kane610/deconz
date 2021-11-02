@@ -1,6 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import logging
+from typing import Final
 
 import aiohttp
 
@@ -8,7 +9,7 @@ from .errors import RequestError, ResponseError, raise_error
 
 LOGGER = logging.getLogger(__name__)
 
-URL_DISCOVER = "https://phoscon.de/discover"
+URL_DISCOVER: Final = "https://phoscon.de/discover"
 
 
 async def delete_api_key(session, host, port, api_key):

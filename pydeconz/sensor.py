@@ -1,35 +1,45 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Tuple, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Final,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
 
-RESOURCE_TYPE = "sensors"
-URL = "/sensors"
+RESOURCE_TYPE: Final = "sensors"
+URL: Final = "/sensors"
 
 # Action and Panel
-ANCILLARY_CONTROL_ARMED_AWAY = "armed_away"
-ANCILLARY_CONTROL_ARMED_NIGHT = "armed_night"
-ANCILLARY_CONTROL_ARMED_STAY = "armed_stay"
-ANCILLARY_CONTROL_DISARMED = "disarmed"
+ANCILLARY_CONTROL_ARMED_AWAY: Final = "armed_away"
+ANCILLARY_CONTROL_ARMED_NIGHT: Final = "armed_night"
+ANCILLARY_CONTROL_ARMED_STAY: Final = "armed_stay"
+ANCILLARY_CONTROL_DISARMED: Final = "disarmed"
 
 # Action only
-ANCILLARY_CONTROL_EMERGENCY = "emergency"
-ANCILLARY_CONTROL_FIRE = "fire"
-ANCILLARY_CONTROL_INVALID_CODE = "invalid_code"
-ANCILLARY_CONTROL_PANIC = "panic"
+ANCILLARY_CONTROL_EMERGENCY: Final = "emergency"
+ANCILLARY_CONTROL_FIRE: Final = "fire"
+ANCILLARY_CONTROL_INVALID_CODE: Final = "invalid_code"
+ANCILLARY_CONTROL_PANIC: Final = "panic"
 
 # Panel only
-ANCILLARY_CONTROL_ARMING_AWAY = "arming_away"
-ANCILLARY_CONTROL_ARMING_NIGHT = "arming_night"
-ANCILLARY_CONTROL_ARMING_STAY = "arming_stay"
-ANCILLARY_CONTROL_ENTRY_DELAY = "entry_delay"
-ANCILLARY_CONTROL_EXIT_DELAY = "exit_delay"
-ANCILLARY_CONTROL_IN_ALARM = "in_alarm"
-ANCILLARY_CONTROL_NOT_READY = "not_ready"
+ANCILLARY_CONTROL_ARMING_AWAY: Final = "arming_away"
+ANCILLARY_CONTROL_ARMING_NIGHT: Final = "arming_night"
+ANCILLARY_CONTROL_ARMING_STAY: Final = "arming_stay"
+ANCILLARY_CONTROL_ENTRY_DELAY: Final = "entry_delay"
+ANCILLARY_CONTROL_EXIT_DELAY: Final = "exit_delay"
+ANCILLARY_CONTROL_IN_ALARM: Final = "in_alarm"
+ANCILLARY_CONTROL_NOT_READY: Final = "not_ready"
 
-DAYLIGHT_STATUS = {
+DAYLIGHT_STATUS: Final = {
     100: "nadir",
     110: "night_end",
     120: "nautical_dawn",
@@ -46,53 +56,53 @@ DAYLIGHT_STATUS = {
     230: "night_start",
 }
 
-DEVICE_MODE_DUAL_PUSH_BUTTON = "dualpushbutton"
-DEVICE_MODE_DUAL_ROCKER = "dualrocker"
-DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
-DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
+DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
+DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
+DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
+DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
 
-PRESENCE_DELAY = "delay"
-PRESENCE_DURATION = "duration"
-PRESENCE_SENSITIVITY = "sensitivity"
-PRESENCE_SENSITIVITY_MAX = "sensitivitymax"
-PRESENCE_DARK = "dark"
-PRESENCE_PRESENCE = "presence"
+PRESENCE_DELAY: Final = "delay"
+PRESENCE_DURATION: Final = "duration"
+PRESENCE_SENSITIVITY: Final = "sensitivity"
+PRESENCE_SENSITIVITY_MAX: Final = "sensitivitymax"
+PRESENCE_DARK: Final = "dark"
+PRESENCE_PRESENCE: Final = "presence"
 
-THERMOSTAT_MODE_AUTO = "auto"
-THERMOSTAT_MODE_COOL = "cool"
-THERMOSTAT_MODE_DRY = "dry"
-THERMOSTAT_MODE_FAN_ONLY = "fan only"
-THERMOSTAT_MODE_HEAT = "heat"
-THERMOSTAT_MODE_EMERGENCY_HEATING = "emergency heating"
-THERMOSTAT_MODE_OFF = "off"
-THERMOSTAT_MODE_PRECOOLING = "precooling"
-THERMOSTAT_MODE_SLEEP = "sleep"
+THERMOSTAT_MODE_AUTO: Final = "auto"
+THERMOSTAT_MODE_COOL: Final = "cool"
+THERMOSTAT_MODE_DRY: Final = "dry"
+THERMOSTAT_MODE_FAN_ONLY: Final = "fan only"
+THERMOSTAT_MODE_HEAT: Final = "heat"
+THERMOSTAT_MODE_EMERGENCY_HEATING: Final = "emergency heating"
+THERMOSTAT_MODE_OFF: Final = "off"
+THERMOSTAT_MODE_PRECOOLING: Final = "precooling"
+THERMOSTAT_MODE_SLEEP: Final = "sleep"
 
-THERMOSTAT_FAN_MODE_AUTO = "auto"
-THERMOSTAT_FAN_MODE_HIGH = "high"
-THERMOSTAT_FAN_MODE_LOW = "low"
-THERMOSTAT_FAN_MODE_MEDIUM = "medium"
-THERMOSTAT_FAN_MODE_OFF = "off"
-THERMOSTAT_FAN_MODE_ON = "on"
-THERMOSTAT_FAN_MODE_SMART = "smart"
+THERMOSTAT_FAN_MODE_AUTO: Final = "auto"
+THERMOSTAT_FAN_MODE_HIGH: Final = "high"
+THERMOSTAT_FAN_MODE_LOW: Final = "low"
+THERMOSTAT_FAN_MODE_MEDIUM: Final = "medium"
+THERMOSTAT_FAN_MODE_OFF: Final = "off"
+THERMOSTAT_FAN_MODE_ON: Final = "on"
+THERMOSTAT_FAN_MODE_SMART: Final = "smart"
 
-THERMOSTAT_PRESET_AUTO = "auto"
-THERMOSTAT_PRESET_BOOST = "boost"
-THERMOSTAT_PRESET_COMFORT = "comfort"
-THERMOSTAT_PRESET_COMPLEX = "complex"
-THERMOSTAT_PRESET_ECO = "eco"
-THERMOSTAT_PRESET_HOLIDAY = "holiday"
-THERMOSTAT_PRESET_MANUAL = "manual"
+THERMOSTAT_PRESET_AUTO: Final = "auto"
+THERMOSTAT_PRESET_BOOST: Final = "boost"
+THERMOSTAT_PRESET_COMFORT: Final = "comfort"
+THERMOSTAT_PRESET_COMPLEX: Final = "complex"
+THERMOSTAT_PRESET_ECO: Final = "eco"
+THERMOSTAT_PRESET_HOLIDAY: Final = "holiday"
+THERMOSTAT_PRESET_MANUAL: Final = "manual"
 
-THERMOSTAT_SWING_MODE_FULLY_CLOSED = "fully closed"
-THERMOSTAT_SWING_MODE_FULLY_OPEN = "fully open"
-THERMOSTAT_SWING_MODE_HALF_OPEN = "half open"
-THERMOSTAT_SWING_MODE_QUARTER_OPEN = "quarter open"
-THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN = "three quarters open"
+THERMOSTAT_SWING_MODE_FULLY_CLOSED: Final = "fully closed"
+THERMOSTAT_SWING_MODE_FULLY_OPEN: Final = "fully open"
+THERMOSTAT_SWING_MODE_HALF_OPEN: Final = "half open"
+THERMOSTAT_SWING_MODE_QUARTER_OPEN: Final = "quarter open"
+THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN: Final = "three quarters open"
 
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR = "air sensor"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION = "floor protection"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR = "floor sensor"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR: Final = "air sensor"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION: Final = "floor protection"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR: Final = "floor sensor"
 
 
 class Sensors(APIItems):
