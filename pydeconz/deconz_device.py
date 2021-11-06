@@ -1,7 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Optional
-
 from .api import APIItem
 
 
@@ -22,9 +20,9 @@ class DeconzDevice(APIItem):
         return f"/{self.resource_type}/{self.resource_id}"
 
     @property
-    def etag(self) -> Optional[str]:
+    def etag(self) -> str:
         """HTTP etag change on any action to the device."""
-        return self.raw.get("etag")
+        return self.raw.get("etag", "")
 
     @property
     def manufacturer(self) -> str:
@@ -32,26 +30,26 @@ class DeconzDevice(APIItem):
         return self.raw.get("manufacturername", "")
 
     @property
-    def model_id(self) -> Optional[str]:
+    def model_id(self) -> str:
         """Device model."""
-        return self.raw.get("modelid")
+        return self.raw.get("modelid", "")
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str:
         """Name of the device."""
-        return self.raw.get("name")
+        return self.raw.get("name", "")
 
     @property
-    def software_version(self) -> Optional[str]:
+    def software_version(self) -> str:
         """Firmware version."""
-        return self.raw.get("swversion")
+        return self.raw.get("swversion", "")
 
     @property
-    def type(self) -> Optional[str]:
+    def type(self) -> str:
         """Human readable type of the device."""
-        return self.raw.get("type")
+        return self.raw.get("type", "")
 
     @property
-    def unique_id(self) -> Optional[str]:
+    def unique_id(self) -> str:
         """Id for unique device identification."""
-        return self.raw.get("uniqueid")
+        return self.raw.get("uniqueid", "")

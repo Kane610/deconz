@@ -66,11 +66,11 @@ async def test_create_group():
     assert group.deconz_id == "/groups/0"
     assert group.etag == "e31c23b3bd9ece918f23ee17ef430304"
     assert group.manufacturer == ""
-    assert group.model_id is None
+    assert group.model_id == ""
     assert group.name == "Hall"
-    assert group.software_version is None
+    assert group.software_version == ""
     assert group.type == "LightGroup"
-    assert group.unique_id is None
+    assert group.unique_id == ""
 
     mock_callback = Mock()
     group.register_callback(mock_callback)
