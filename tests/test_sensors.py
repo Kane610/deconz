@@ -367,7 +367,7 @@ async def test_consumption_sensor():
     assert sensor.manufacturer == "Heiman"
     assert sensor.model_id == "SmartPlug"
     assert sensor.name == "Consumption 15"
-    assert sensor.software_version is None
+    assert sensor.software_version == ""
     assert sensor.type == "ZHAConsumption"
     assert sensor.unique_id == "00:0d:6f:00:0b:7a:64:29-01-0702"
 
@@ -430,7 +430,7 @@ async def test_daylight_sensor():
     assert sensor.name == "Daylight"
     assert sensor.software_version == "1.0"
     assert sensor.type == "Daylight"
-    assert sensor.unique_id is None
+    assert sensor.unique_id == ""
 
     statuses = {
         100: "nadir",
@@ -568,7 +568,7 @@ async def test_fire_sensor():
     assert sensor.manufacturer == "LUMI"
     assert sensor.model_id == "lumi.sensor_smoke"
     assert sensor.name == "sensor_kitchen_smoke"
-    assert sensor.software_version is None
+    assert sensor.software_version == ""
     assert sensor.type == "ZHAFire"
     assert sensor.unique_id == "00:15:8d:00:01:d9:3e:7c-01-0500"
 
@@ -608,7 +608,7 @@ async def test_genericflag_sensor():
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
-    assert sensor.etag is None
+    assert sensor.etag == ""
     assert sensor.manufacturer == ""
     assert sensor.model_id == "Switch"
     assert sensor.name == "Kitchen Switch"
@@ -905,7 +905,7 @@ async def test_openclose_sensor():
                 "resource_type": "sensors",
                 "secondary_temperature": None,
                 "state": 64,
-                "software_version": None,
+                "software_version": "",
                 "tampered": None,
                 "type": "ZHAPower",
                 "unique_id": "00:0d:6f:00:0b:7a:64:29-01-0b04",
