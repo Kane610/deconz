@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from .api import APIItems
+from .api import APIItems, JsonBlobType, JsonDictType
 from .deconz_device import DeconzDevice
 
 RESOURCE_TYPE: Final = "sensors"
@@ -103,7 +103,7 @@ class Sensors(APIItems):
 
     def __init__(
         self,
-        raw: dict,
+        raw: JsonBlobType,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize sensor manager."""
@@ -128,7 +128,7 @@ class DeconzSensor(DeconzDevice):
         return RESOURCE_TYPE
 
     @property
-    def state(self) -> bool | int | str | None:
+    def state(self) -> bool | float | int | str | None:
         """State of sensor."""
         return getattr(self, self.STATE_PROPERTY)
 
@@ -1228,7 +1228,7 @@ SENSOR_CLASSES = (
 
 def create_sensor(
     resource_id: str,
-    raw: dict,
+    raw: JsonDictType,
     request: Callable[..., Awaitable[dict[str, Any]]],
 ) -> (
     AirQuality

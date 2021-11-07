@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from .api import APIItems
+from .api import APIItems, DataDictType, JsonBlobType
 from .deconz_device import DeconzDevice
 from .light import Light
 
@@ -29,7 +29,7 @@ class Groups(APIItems):
 
     def __init__(
         self,
-        raw: dict,
+        raw: JsonBlobType,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""
@@ -293,7 +293,8 @@ class DeconzGroup(DeconzDevice):
         write light attributes with the value None to the group.
         This is used to not keep any bad values from the group.
         """
-        data: dict[str, float | int | str | tuple | None] = {}
+        # data: dict[str, float | int | str | tuple | None] = {}  are these really the same thing?
+        data: DataDictType = {}
 
         for group_key, light_attribute_key in GROUP_TO_LIGHT_ATTRIBUTES.items():
             light_attribute = getattr(light, light_attribute_key)

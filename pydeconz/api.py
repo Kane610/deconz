@@ -1,4 +1,5 @@
 """API base classes."""
+from __future__ import annotations
 
 from __future__ import annotations
 
@@ -11,13 +12,17 @@ from .errors import BridgeBusy
 
 LOGGER = logging.getLogger(__name__)
 
+DataDictType = dict[str, bool | float | int | str | dict | tuple | None]
+JsonDictType = dict[str, bool | int | str | DataDictType]
+JsonBlobType = dict[str, JsonDictType]
+
 
 class APIItems:
     """Base class for a map of API Items."""
 
     def __init__(
         self,
-        raw: dict,
+        raw: JsonBlobType,
         request: Callable[..., Awaitable[dict[str, Any]]],
         path: str,
         item_cls: Any,
@@ -31,10 +36,10 @@ class APIItems:
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self._path)
+        raw: JsonBlobType = await self._request("get", self._path)
         self.process_raw(raw)
 
-    def process_raw(self, raw: dict) -> None:
+    def process_raw(self, raw: JsonBlobType) -> None:
         """Process data."""
         for id, raw_item in raw.items():
 
@@ -71,7 +76,7 @@ class APIItem:
     def __init__(
         self,
         resource_id: str,
-        raw: dict,
+        raw: JsonDictType,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
@@ -90,6 +95,7 @@ class APIItem:
 
     @property
     def raw(self) -> dict:
+        # def raw(self) -> JsonDictType:
         """Read only raw data."""
         return self._raw
 
@@ -107,20 +113,22 @@ class APIItem:
         if callback in self._callbacks:
             self._callbacks.remove(callback)
 
-    def update(self, raw: dict) -> None:
+    def update(self, raw: JsonDictType) -> None:
         """Update input attr in self.
 
         Store a set of keys with changed values.
-        Kwargs will be passed on to callbacks.
         """
         changed_keys = set()
 
         for k, v in raw.items():
             changed_keys.add(k)
 
-            if isinstance(self.raw.get(k), dict) and isinstance(v, dict):
+            if (raw_value := self._raw.get(k)) is None:
+                continue
+
+            if isinstance(raw_value, dict) and isinstance(v, dict):
                 changed_keys.update(set(v.keys()))
-                self._raw[k].update(v)
+                raw_value.update(v)
 
             else:
                 self._raw[k] = v

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from .api import APIItem, APIItems
+from .api import APIItem, APIItems, JsonBlobType
 
 RESOURCE_TYPE: Final = "alarmsystems"
 URL: Final = "/alarmsystems"
@@ -44,7 +44,7 @@ class AlarmSystems(APIItems):
 
     def __init__(
         self,
-        raw: dict,
+        raw: JsonBlobType,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize alarm system manager."""
