@@ -1,9 +1,13 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
+<<<<<<< HEAD
 
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
+=======
+from typing import Any, Awaitable, Callable, Dict, Final, List, Literal, Optional, Tuple
+>>>>>>> 3d5c2ed (Group reachable is always bool)
 
 from .api import APIItems, DataDictType, JsonBlobType
 from .deconz_device import DeconzDevice
@@ -134,7 +138,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("effect")
 
     @property
-    def reachable(self) -> bool | None:
+    def reachable(self) -> bool:
         """Is group reachable."""
         return True
 
