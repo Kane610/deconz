@@ -560,6 +560,7 @@ async def test_fire_sensor():
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
+    assert sensor.test is None
     assert sensor.secondary_temperature is None
 
     # DeconzDevice
@@ -571,6 +572,60 @@ async def test_fire_sensor():
     assert sensor.software_version == ""
     assert sensor.type == "ZHAFire"
     assert sensor.unique_id == "00:15:8d:00:01:d9:3e:7c-01-0500"
+
+
+async def test_fire_sensor_test_develco():
+    """Verify that develco/frient fire sensor works."""
+    sensors = Sensors(
+        {
+            "0": {
+                "config": {"on": True, "battery": 90, "reachable": True},
+                "ep": 1,
+                "etag": "abcdef1234567890abcdef1234567890",
+                "manufacturername": "frient A/S",
+                "modelid": "SMSZB-120",
+                "name": "Fire alarm",
+                "state": {
+                    "fire": False,
+                    "lastupdated": "2021-11-25T08:00:02.003",
+                    "lowbattery": False,
+                    "test": True
+                },
+                "swversion": "20210526 05:57",
+                "type": "ZHAFire",
+                "uniqueid": "00:11:22:33:44:55:66:77-88-9900"
+            }
+
+        },
+        AsyncMock(),
+    )
+    sensor = sensors["0"]
+
+    assert sensor.BINARY is True
+    assert sensor.ZHATYPE == ("ZHAFire",)
+
+    assert sensor.state is False
+    assert sensor.fire is False
+
+    # DeconzSensor
+    assert sensor.battery == 90
+    assert sensor.ep == 1
+    assert sensor.low_battery is False
+    assert sensor.on is True
+    assert sensor.reachable is True
+    assert sensor.tampered is None
+    assert sensor.test is True
+    assert sensor.secondary_temperature is None
+
+    # DeconzDevice
+    assert sensor.deconz_id == "/sensors/0"
+    assert sensor.etag == "abcdef1234567890abcdef1234567890"
+    assert sensor.manufacturer == "frient A/S"
+    assert sensor.model_id == "SMSZB-120"
+    assert sensor.name == "Fire alarm"
+    assert sensor.software_version == "20210526 05:57"
+    assert sensor.type == "ZHAFire"
+    assert sensor.unique_id == "00:11:22:33:44:55:66:77-88-9900"
 
 
 async def test_genericflag_sensor():
