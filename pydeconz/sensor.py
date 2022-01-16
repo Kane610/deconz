@@ -457,9 +457,9 @@ class Fire(DeconzBinarySensor):
         return self.raw["state"]["fire"]
 
     @property
-    def in_test_mode(self) -> Optional[bool]:
+    def in_test_mode(self) -> bool:
         """Sensor is in test mode."""
-        return self.raw["state"].get("test")
+        return self.raw["state"].get("test", False)
 
 
 class GenericFlag(DeconzBinarySensor):
