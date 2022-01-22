@@ -1,11 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
-from typing import Optional
-
 from .api import APIItem
-
-LOGGER = logging.getLogger(__name__)
 
 
 class DeconzDevice(APIItem):
@@ -24,20 +19,10 @@ class DeconzDevice(APIItem):
         """Id to call device over API e.g. /sensors/1."""
         return f"/{self.resource_type}/{self.resource_id}"
 
-    async def async_set_config(self, data: dict) -> dict:
-        """Set config of device."""
-        field = f"{self.deconz_id}/config"
-        return await self.async_set(field, data)
-
-    async def async_set_state(self, data: dict) -> dict:
-        """Set state of device."""
-        field = f"{self.deconz_id}/state"
-        return await self.async_set(field, data)
-
     @property
-    def etag(self) -> Optional[str]:
+    def etag(self) -> str:
         """HTTP etag change on any action to the device."""
-        return self.raw.get("etag")
+        return self.raw.get("etag", "")
 
     @property
     def manufacturer(self) -> str:
@@ -45,26 +30,26 @@ class DeconzDevice(APIItem):
         return self.raw.get("manufacturername", "")
 
     @property
-    def modelid(self) -> Optional[str]:
+    def model_id(self) -> str:
         """Device model."""
-        return self.raw.get("modelid")
+        return self.raw.get("modelid", "")
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str:
         """Name of the device."""
-        return self.raw.get("name")
+        return self.raw.get("name", "")
 
     @property
-    def swversion(self) -> Optional[str]:
+    def software_version(self) -> str:
         """Firmware version."""
-        return self.raw.get("swversion")
+        return self.raw.get("swversion", "")
 
     @property
-    def type(self) -> Optional[str]:
+    def type(self) -> str:
         """Human readable type of the device."""
-        return self.raw.get("type")
+        return self.raw.get("type", "")
 
     @property
-    def uniqueid(self) -> Optional[str]:
+    def unique_id(self) -> str:
         """Id for unique device identification."""
-        return self.raw.get("uniqueid")
+        return self.raw.get("uniqueid", "")

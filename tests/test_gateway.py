@@ -107,7 +107,7 @@ async def test_initial_state(mock_aioresponse):
 
     await session.refresh_state()
 
-    assert session.config.bridgeid == "012345"
+    assert session.config.bridge_id == "012345"
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
@@ -124,6 +124,20 @@ async def test_initial_state(mock_aioresponse):
     assert session.scenes == {"gid_sc1": session.groups["g1"].scenes["sc1"]}
 
     await session.session.close()
+
+
+async def test_get_api_key(mock_aioresponse):
+    """Verify that get_api_key method can retrieve an api key."""
+    api_key = "0123456789abc36"
+    session = DeconzSession(aiohttp.ClientSession(), HOST, PORT)
+    mock_aioresponse.post(
+        f"http://{HOST}:{PORT}/api",
+        payload=[{"success": {"username": api_key}}],
+        content_type="application/json",
+        status=200,
+    )
+
+    assert await session.get_api_key() == api_key
 
 
 async def test_refresh_state(mock_aioresponse):
@@ -145,7 +159,7 @@ async def test_refresh_state(mock_aioresponse):
 
     await session.refresh_state()
 
-    assert session.config.bridgeid == "0000000000000000"
+    assert session.config.bridge_id == "0000000000000000"
     assert len(session.alarmsystems.values()) == 0
     assert len(session.groups.values()) == 0
     assert len(session.lights.values()) == 0
@@ -174,7 +188,7 @@ async def test_refresh_state(mock_aioresponse):
 
     await session.refresh_state()
 
-    assert session.config.bridgeid == "0000000000000000"
+    assert session.config.bridge_id == "0000000000000000"
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
@@ -268,13 +282,13 @@ async def test_session_handler():
     # Connection status changed
 
     await session.session_handler(signal="state")
-    session.async_connection_status_callback.assert_called_with(True)
+    session.connection_status_callback.assert_called_with(True)
 
 
 async def test_unsupported_events():
     """Test event_handler handles unsupported events and resources."""
     session = DeconzSession(
-        aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
+        aiohttp.ClientSession(), HOST, PORT, API_KEY, add_device=Mock()
     )
 
     assert not session.event_handler({"e": "scene-called"})
@@ -284,7 +298,7 @@ async def test_unsupported_events():
 
 async def test_alarmsystem_events():
     """Test event_handler works."""
-    session = DeconzSession(AsyncMock(), HOST, PORT, API_KEY, async_add_device=Mock())
+    session = DeconzSession(AsyncMock(), HOST, PORT, API_KEY, add_device=Mock())
 
     # Add alarmsystem
 
@@ -321,7 +335,7 @@ async def test_alarmsystem_events():
 
     assert "1" in session.alarmsystems
     assert session.alarmsystems["1"].arm_state == "disarmed"
-    session.async_add_device_callback.assert_called_with(
+    session.add_device_callback.assert_called_with(
         "alarmsystems", session.alarmsystems["1"]
     )
 
@@ -351,7 +365,7 @@ async def test_alarmsystem_events():
 
 async def test_light_events():
     """Test event_handler works."""
-    session = DeconzSession(AsyncMock(), HOST, PORT, API_KEY, async_add_device=Mock())
+    session = DeconzSession(AsyncMock(), HOST, PORT, API_KEY, add_device=Mock())
 
     # Add light
 
@@ -372,7 +386,7 @@ async def test_light_events():
 
     assert "1" in session.lights
     assert session.lights["1"].brightness == 1
-    session.async_add_device_callback.assert_called_with("lights", session.lights["1"])
+    session.add_device_callback.assert_called_with("lights", session.lights["1"])
 
     # Update light
 
@@ -390,7 +404,7 @@ async def test_light_events():
 async def test_group_events(mock_aioresponse):
     """Test event_handler works."""
     session = DeconzSession(
-        aiohttp.ClientSession(), HOST, PORT, API_KEY, async_add_device=Mock()
+        aiohttp.ClientSession(), HOST, PORT, API_KEY, add_device=Mock()
     )
 
     init_response = {
@@ -433,7 +447,7 @@ async def test_group_events(mock_aioresponse):
 
     assert "1" in session.groups
     assert session.groups["1"].brightness == 1
-    session.async_add_device_callback.assert_called_with("groups", session.groups["1"])
+    session.add_device_callback.assert_called_with("groups", session.groups["1"])
 
     # Update group
 
@@ -450,7 +464,7 @@ async def test_group_events(mock_aioresponse):
 
 async def test_sensor_events():
     """Test event_handler works."""
-    session = DeconzSession(AsyncMock(), HOST, PORT, API_KEY, async_add_device=Mock())
+    session = DeconzSession(AsyncMock(), HOST, PORT, API_KEY, add_device=Mock())
 
     # Add sensor
 
@@ -470,9 +484,7 @@ async def test_sensor_events():
 
     assert "1" in session.sensors
     assert session.sensors["1"].reachable
-    session.async_add_device_callback.assert_called_with(
-        "sensors", session.sensors["1"]
-    )
+    session.add_device_callback.assert_called_with("sensors", session.sensors["1"])
 
     # Update sensor
 
@@ -620,11 +632,11 @@ async def test_update_group_color(mock_aioresponse, light_ids, expected_group_st
     await session.refresh_state()
 
     assert session.groups["g1"].brightness == expected_group_state["brightness"]
-    assert session.groups["g1"].ct == expected_group_state["ct"]
+    assert session.groups["g1"].color_temp == expected_group_state["ct"]
     assert session.groups["g1"].hue == expected_group_state["hue"]
-    assert session.groups["g1"].sat == expected_group_state["sat"]
+    assert session.groups["g1"].saturation == expected_group_state["sat"]
     assert session.groups["g1"].xy == expected_group_state["xy"]
-    assert session.groups["g1"].colormode == expected_group_state["colormode"]
+    assert session.groups["g1"].color_mode == expected_group_state["colormode"]
     assert session.groups["g1"].effect == expected_group_state["effect"]
 
     await session.session.close()

@@ -2,12 +2,12 @@
 
 import logging
 from pprint import pformat
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, Final, Literal, Optional, Union
 
-from aiohttp import client_exceptions
+import aiohttp
 
 from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
-from .config import RESOURCE_TYPE as CONFIG_RESOURCE, DeconzConfig
+from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
 from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
@@ -16,24 +16,24 @@ from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSCl
 
 LOGGER = logging.getLogger(__name__)
 
-EVENT_ID = "id"
-EVENT_RESOURCE = "r"
+EVENT_ID: Final = "id"
+EVENT_RESOURCE: Final = "r"
 
-EVENT_TYPE = "e"
-EVENT_TYPE_ADDED = "added"
-EVENT_TYPE_CHANGED = "changed"
-EVENT_TYPE_DELETED = "deleted"
-EVENT_TYPE_SCENE_CALLED = "scene-called"
+EVENT_TYPE: Final = "e"
+EVENT_TYPE_ADDED: Final = "added"
+EVENT_TYPE_CHANGED: Final = "changed"
+EVENT_TYPE_DELETED: Final = "deleted"
+EVENT_TYPE_SCENE_CALLED: Final = "scene-called"
 
-SUPPORTED_EVENT_TYPES = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED, EVENT_TYPE_DELETED)
-SUPPORTED_EVENT_RESOURCES = (
+SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED, EVENT_TYPE_DELETED)
+SUPPORTED_EVENT_RESOURCES: Final = (
     ALARM_SYSTEM_RESOURCE,
     GROUP_RESOURCE,
     LIGHT_RESOURCE,
     SENSOR_RESOURCE,
 )
 
-RESOURCE_TYPE_TO_DEVICE_TYPE = {
+RESOURCE_TYPE_TO_DEVICE_TYPE: Final = {
     ALARM_SYSTEM_RESOURCE: "alarmsystem",
     GROUP_RESOURCE: "group",
     LIGHT_RESOURCE: "light",
@@ -46,11 +46,11 @@ class DeconzSession:
 
     def __init__(
         self,
-        session: Any,
+        session: aiohttp.ClientSession,
         host: str,
         port: int,
-        api_key: str,
-        async_add_device: Optional[Callable[[str, Any], None]] = None,
+        api_key: Optional[str] = None,
+        add_device: Optional[Callable[[str, Any], None]] = None,
         add_remove_device: Optional[Callable[[str, str, Any], None]] = None,
         connection_status: Optional[Callable[[bool], None]] = None,
     ):
@@ -60,22 +60,49 @@ class DeconzSession:
         self.port = port
         self.api_key = api_key
 
-        self.async_add_device_callback = async_add_device
+        self.add_device_callback = add_device
         self.add_remove_device_callback = add_remove_device
-        self.async_connection_status_callback = connection_status
+        self.connection_status_callback = connection_status
 
         self.alarmsystems = AlarmSystems({}, self.request)
-        self.config: Optional[DeconzConfig] = None
+        self.config: Optional[Config] = None
         self.groups = Groups({}, self.request)
         self.lights = Lights({}, self.request)
         self.scenes: Dict[str, DeconzScene] = {}
         self.sensors = Sensors({}, self.request)
         self.websocket: Optional[WSClient] = None
 
+    async def get_api_key(
+        self,
+        api_key: Optional[str] = None,
+        client_name: str = "pydeconz",
+    ) -> str:
+        """Request a new API key.
+
+        Supported values:
+        - api_key [str] 10-40 characters, key to use for authentication
+        - client_name [str] 0-40 characters, name of the client application
+        """
+        data = {
+            key: value
+            for key, value in {
+                "username": api_key,
+                "devicetype": client_name,
+            }.items()
+            if value is not None
+        }
+        response = await self._request(
+            "post",
+            url=f"http://{self.host}:{self.port}/api",
+            json=data,
+        )
+
+        return response[0]["success"]["username"]  # type: ignore[index]
+
     def start(self, websocketport: Optional[int] = None) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
-            websocketport = self.config.websocketport
+            websocketport = self.config.websocket_port
 
         if not websocketport:
             LOGGER.error("No websocket port specified")
@@ -93,10 +120,10 @@ class DeconzSession:
 
     async def refresh_state(self) -> None:
         """Read deCONZ parameters."""
-        data = await self.request("get")
+        data = await self.request("get", "")
 
         if not self.config:
-            self.config = DeconzConfig(data[CONFIG_RESOURCE])
+            self.config = Config(data[CONFIG_RESOURCE], self.request)
 
         self.alarmsystems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
         self.groups.process_raw(data[GROUP_RESOURCE])
@@ -109,13 +136,24 @@ class DeconzSession:
     async def request(
         self,
         method: str,
-        path: str = "",
+        path: str,
         json: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Make a request to the API."""
-        LOGGER.debug('Sending "%s" "%s" to "%s %s"', method, json, self.host, path)
+        return await self._request(
+            method,
+            url=f"http://{self.host}:{self.port}/api/{self.api_key}{path}",
+            json=json,
+        )
 
-        url = f"http://{self.host}:{self.port}/api/{self.api_key}{path}"
+    async def _request(
+        self,
+        method: str,
+        url: str,
+        json: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Make a request."""
+        LOGGER.debug('Sending "%s" "%s" to "%s"', method, json, url)
 
         try:
             async with self.session.request(method, url, json=json) as res:
@@ -132,24 +170,24 @@ class DeconzSession:
 
                 return response
 
-        except client_exceptions.ClientError as err:
+        except aiohttp.client_exceptions.ClientError as err:
             raise RequestError(
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    async def session_handler(self, signal: str) -> None:
+    async def session_handler(self, signal: Literal["data", "state"]) -> None:
         """Signalling from websocket.
 
         data - new data available for processing.
         state - network state has changed.
         """
-        if signal == SIGNAL_DATA:
-            self.event_handler(self.websocket.data)  # type: ignore
+        assert self.websocket
 
-        elif (
-            signal == SIGNAL_CONNECTION_STATE and self.async_connection_status_callback
-        ):
-            self.async_connection_status_callback(self.websocket.state == STATE_RUNNING)  # type: ignore
+        if signal == SIGNAL_DATA:
+            self.event_handler(self.websocket.data)
+
+        elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
+            self.connection_status_callback(self.websocket.state == STATE_RUNNING)
 
     def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.
@@ -178,8 +216,8 @@ class DeconzSession:
             device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
             device_class.process_raw({device_id: event[device_type]})
             device = device_class[device_id]
-            if self.async_add_device_callback:
-                self.async_add_device_callback(resource_type, device)
+            if self.add_device_callback:
+                self.add_device_callback(resource_type, device)
             return
 
         if event_type == EVENT_TYPE_DELETED and device_id in device_class:

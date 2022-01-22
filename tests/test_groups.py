@@ -7,11 +7,12 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from pydeconz.group import Groups
-from pydeconz.light import Light
+from pydeconz.light import Light, ALERT_SHORT, EFFECT_COLOR_LOOP
 
 
 async def test_create_group():
     """Verify that groups works."""
+    mock_request = AsyncMock()
     groups = Groups(
         {
             "0": {
@@ -36,40 +37,40 @@ async def test_create_group():
                 "type": "LightGroup",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     group = groups["0"]
 
     assert group.state is True
-    assert group.groupclass is None
+    assert group.group_class is None
     assert group.all_on is False
     assert group.any_on is True
-    assert group.devicemembership == []
+    assert group.device_membership == []
     assert group.hidden is None
     assert group.id == "11"
     assert group.lights == ["14", "15", "12"]
-    assert group.lightsequence is None
-    assert group.multideviceids is None
+    assert group.light_sequence is None
+    assert group.multi_device_ids is None
     assert group.scenes["1"].id == "1"
     assert group.scenes["1"].name == "warmlight"
 
     assert group.brightness == 132
     assert group.hue == 0
-    assert group.sat == 127
-    assert group.ct == 0
+    assert group.saturation == 127
+    assert group.color_temp == 0
     assert group.xy == (0, 0)
-    assert group.colormode == "hs"
+    assert group.color_mode == "hs"
     assert group.effect == "none"
     assert group.reachable is True
 
     assert group.deconz_id == "/groups/0"
     assert group.etag == "e31c23b3bd9ece918f23ee17ef430304"
     assert group.manufacturer == ""
-    assert group.modelid is None
+    assert group.model_id == ""
     assert group.name == "Hall"
-    assert group.swversion is None
+    assert group.software_version == ""
     assert group.type == "LightGroup"
-    assert group.uniqueid is None
+    assert group.unique_id == ""
 
     mock_callback = Mock()
     group.register_callback(mock_callback)
@@ -92,8 +93,75 @@ async def test_create_group():
     del group.raw["action"]["xy"]
     assert group.xy is None
 
-    await group.async_set_state({"on": True})
-    group._request.assert_called_with("put", path="/groups/0/action", json={"on": True})
+    # Set attributes
+
+    await group.set_attributes(
+        hidden=False,
+        light_sequence=["1", "2"],
+        lights=["3", "4"],
+        multi_device_ids=["5", "6"],
+        name="Group",
+    )
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0",
+        json={
+            "hidden": False,
+            "lightsequence": ["1", "2"],
+            "lights": ["3", "4"],
+            "multideviceids": ["5", "6"],
+            "name": "Group",
+        },
+    )
+
+    await group.set_attributes(name="Group")
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0",
+        json={"name": "Group"},
+    )
+
+    # Set state
+
+    await group.set_state(
+        alert=ALERT_SHORT,
+        brightness=200,
+        color_loop_speed=10,
+        color_temperature=400,
+        effect=EFFECT_COLOR_LOOP,
+        hue=1000,
+        on=True,
+        on_time=100,
+        saturation=150,
+        toggle=True,
+        transition_time=250,
+        xy=(0.1, 0.1),
+    )
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/action",
+        json={
+            "alert": "select",
+            "bri": 200,
+            "colorloopspeed": 10,
+            "ct": 400,
+            "effect": "colorloop",
+            "hue": 1000,
+            "on": True,
+            "ontime": 100,
+            "sat": 150,
+            "toggle": True,
+            "transitiontime": 250,
+            "xy": (0.1, 0.1),
+        },
+    )
+
+    await group.set_state(on=True)
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/action",
+        json={"on": True},
+    )
 
     # Scene
 
@@ -103,8 +171,8 @@ async def test_create_group():
     assert scene.name == "warmlight"
     assert scene.full_name == "Hall warmlight"
 
-    await scene.async_set_state({})
-    scene._request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
+    await scene.recall()
+    mock_request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
 
     group.scenes.process_raw([{"id": "1", "name": "coldlight"}])
 
@@ -191,9 +259,9 @@ async def test_update_color_state(light_state, update_all, expected_group_state)
     group.update_color_state(light, update_all_attributes=update_all)
 
     assert group.brightness == expected_group_state["brightness"]
-    assert group.ct == expected_group_state["ct"]
+    assert group.color_temp == expected_group_state["ct"]
     assert group.hue == expected_group_state["hue"]
-    assert group.sat == expected_group_state["sat"]
+    assert group.saturation == expected_group_state["sat"]
     assert group.xy == expected_group_state["xy"]
-    assert group.colormode == expected_group_state["colormode"]
+    assert group.color_mode == expected_group_state["colormode"]
     assert group.effect == expected_group_state["effect"]

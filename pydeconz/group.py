@@ -1,26 +1,33 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
-from pprint import pformat
-from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .api import APIItems
-from .deconzdevice import DeconzDevice
+from .deconz_device import DeconzDevice
 from .light import Light
 
-LOGGER = logging.getLogger(__name__)
+RESOURCE_TYPE: Final = "groups"
+RESOURCE_TYPE_SCENE: Final = "scenes"
+URL: Final = "/groups"
 
-RESOURCE_TYPE = "groups"
-RESOURCE_TYPE_SCENE = "scenes"
-URL = "/groups"
-
-GROUP_TO_LIGHT_ATTRIBUTES = {
+GROUP_TO_LIGHT_ATTRIBUTES: Final = {
     "bri": "brightness",
-    "ct": "ct",
+    "ct": "color_temp",
     "hue": "hue",
-    "sat": "sat",
+    "sat": "saturation",
     "xy": "xy",
-    "colormode": "colormode",
+    "colormode": "color_mode",
     "effect": "effect",
 }
 
@@ -31,10 +38,7 @@ class Groups(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""
         super().__init__(raw, request, URL, DeconzGroup)
@@ -51,10 +55,7 @@ class DeconzGroup(DeconzDevice):
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[
-            [str, Optional[str], Optional[Dict[Any, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Set initial information about light group.
 
@@ -67,11 +68,6 @@ class DeconzGroup(DeconzDevice):
     def resource_type(self) -> str:
         """Resource type."""
         return RESOURCE_TYPE
-
-    async def async_set_state(self, data: dict) -> dict:
-        """Set state of light group."""
-        field = f"{self.deconz_id}/action"
-        return await self.async_set(field, data)
 
     @property
     def state(self) -> Optional[bool]:
@@ -88,7 +84,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("bri")
 
     @property
-    def ct(self) -> Optional[int]:
+    def color_temp(self) -> Optional[int]:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["action"].get("ct")
 
@@ -102,7 +98,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("hue")
 
     @property
-    def sat(self) -> Optional[int]:
+    def saturation(self) -> Optional[int]:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -127,21 +123,21 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def colormode(self) -> Optional[str]:
+    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
         """Color mode of the light.
 
+        ct - color temperature
         hs - hue and saturation
         xy - CIE xy values
-        ct - color temperature
         """
         return self.raw["action"].get("colormode")
 
     @property
-    def effect(self) -> Optional[str]:
+    def effect(self) -> Literal["colorloop", "none", None]:
         """Effect of the group.
 
-        none - no effect
         colorloop
+        none - no effect
         """
         return self.raw["action"].get("effect")
 
@@ -151,7 +147,7 @@ class DeconzGroup(DeconzDevice):
         return True
 
     @property
-    def groupclass(self) -> Optional[str]:
+    def group_class(self) -> Optional[str]:
         """Type of class."""
         return self.raw.get("class")
 
@@ -166,7 +162,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["state"].get("any_on")
 
     @property
-    def devicemembership(self) -> Optional[list]:
+    def device_membership(self) -> Optional[list]:
         """List of device ids (sensors) when group was created by a device."""
         return self.raw.get("devicemembership")
 
@@ -192,7 +188,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lights", [])
 
     @property
-    def lightsequence(self) -> Optional[list]:
+    def light_sequence(self) -> Optional[list]:
         """List of light IDs in group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
@@ -200,12 +196,103 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lightsequence")
 
     @property
-    def multideviceids(self) -> Optional[list]:
+    def multi_device_ids(self) -> Optional[list]:
         """List of light IDs in group.
 
         Subsequent ids from multidevices with multiple endpoints.
         """
         return self.raw.get("multideviceids")
+
+    async def set_attributes(
+        self,
+        hidden: Optional[bool] = None,
+        light_sequence: Optional[List[str]] = None,
+        lights: Optional[List[str]] = None,
+        multi_device_ids: Optional[List[str]] = None,
+        name: Optional[str] = None,
+    ) -> dict:
+        """Change attributes of a group.
+
+        Supported values:
+        - hidden [bool] Indicates the hidden status of the group
+        - light_sequence [list of light IDs] Specify a sorted list of light IDs for apps
+        - lights [list of light IDs]IDs of the lights which are members of the group
+        - multi_device_ids [int] Subsequential light IDs of multidevices
+        - name [str] The name of the group
+        """
+        data = {
+            key: value
+            for key, value in {
+                "hidden": hidden,
+                "lightsequence": light_sequence,
+                "lights": lights,
+                "multideviceids": multi_device_ids,
+                "name": name,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}", data=data)
+
+    async def set_state(
+        self,
+        alert: Literal["none", "select", "lselect", None] = None,
+        brightness: Optional[int] = None,
+        color_loop_speed: Optional[int] = None,
+        color_temperature: Optional[int] = None,
+        effect: Literal["colorloop", "none", None] = None,
+        hue: Optional[int] = None,
+        on: Optional[bool] = None,
+        on_time: Optional[int] = None,
+        saturation: Optional[int] = None,
+        toggle: Optional[bool] = None,
+        transition_time: Optional[int] = None,
+        xy: Optional[Tuple[float, float]] = None,
+    ) -> dict:
+        """Change state of a group.
+
+        Supported values:
+        - alert [str]
+          - "none" light is not performing an alert
+          - "select" light is blinking a short time
+          - "lselect" light is blinking a longer time
+        - brightness [int] 0-255
+        - color_loop_speed [int] 1-255
+          - 1 = very fast
+          - 15 is default
+          - 255 very slow
+        - color_temperature [int] between ctmin-ctmax
+        - effect [str]
+          - "none" no effect
+          - "colorloop" the light will cycle continuously through all
+                        colors with the speed specified by colorloopspeed
+        - hue [int] 0-65535
+        - on [bool] True/False
+        - on_time [int] 0-65535 1/10 seconds resolution
+        - saturation [int] 0-255
+        - toggle [bool] True toggles the lights of that group from on to off
+                        or vice versa, false has no effect
+        - transition_time [int] 0-65535 1/10 seconds resolution
+        - xy [tuple] 0-1
+        """
+        data = {
+            key: value
+            for key, value in {
+                "alert": alert,
+                "bri": brightness,
+                "colorloopspeed": color_loop_speed,
+                "ct": color_temperature,
+                "effect": effect,
+                "hue": hue,
+                "on": on,
+                "ontime": on_time,
+                "sat": saturation,
+                "toggle": toggle,
+                "transitiontime": transition_time,
+                "xy": xy,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/action", data=data)
 
     def update_color_state(self, light: Light, update_all_attributes=False) -> None:
         """Sync color state with light.
@@ -235,10 +322,7 @@ class Scenes(APIItems):
     def __init__(
         self,
         group: DeconzGroup,
-        request: Callable[
-            [str, Optional[str], Optional[Dict[Any, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize scene manager."""
         self.group = group
@@ -268,10 +352,7 @@ class DeconzScene:
         self,
         group: DeconzGroup,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Set initial information about scene.
 
@@ -280,17 +361,15 @@ class DeconzScene:
         self.group = group
         self.raw = raw
         self._request = request
-        LOGGER.debug("%s created as \n%s", self.name, pformat(self.raw))
 
     @property
     def resource_type(self) -> str:
         """Resource type."""
         return RESOURCE_TYPE_SCENE
 
-    async def async_set_state(self, data: dict) -> dict:
+    async def recall(self) -> dict:
         """Recall scene to group."""
-        field = f"{self.deconz_id}/recall"
-        return await self._request("put", path=field, json=data)  # type: ignore
+        return await self._request("put", path=f"{self.deconz_id}/recall", json={})
 
     @property
     def deconz_id(self) -> str:

@@ -1,37 +1,45 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-import logging
-from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Final,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .api import APIItems
-from .deconzdevice import DeconzDevice
+from .deconz_device import DeconzDevice
 
-LOGGER = logging.getLogger(__name__)
-RESOURCE_TYPE = "sensors"
-URL = "/sensors"
+RESOURCE_TYPE: Final = "sensors"
+URL: Final = "/sensors"
 
 # Action and Panel
-ANCILLARY_CONTROL_ARMED_AWAY = "armed_away"
-ANCILLARY_CONTROL_ARMED_NIGHT = "armed_night"
-ANCILLARY_CONTROL_ARMED_STAY = "armed_stay"
-ANCILLARY_CONTROL_DISARMED = "disarmed"
+ANCILLARY_CONTROL_ARMED_AWAY: Final = "armed_away"
+ANCILLARY_CONTROL_ARMED_NIGHT: Final = "armed_night"
+ANCILLARY_CONTROL_ARMED_STAY: Final = "armed_stay"
+ANCILLARY_CONTROL_DISARMED: Final = "disarmed"
 
 # Action only
-ANCILLARY_CONTROL_EMERGENCY = "emergency"
-ANCILLARY_CONTROL_FIRE = "fire"
-ANCILLARY_CONTROL_INVALID_CODE = "invalid_code"
-ANCILLARY_CONTROL_PANIC = "panic"
+ANCILLARY_CONTROL_EMERGENCY: Final = "emergency"
+ANCILLARY_CONTROL_FIRE: Final = "fire"
+ANCILLARY_CONTROL_INVALID_CODE: Final = "invalid_code"
+ANCILLARY_CONTROL_PANIC: Final = "panic"
 
 # Panel only
-ANCILLARY_CONTROL_ARMING_AWAY = "arming_away"
-ANCILLARY_CONTROL_ARMING_NIGHT = "arming_night"
-ANCILLARY_CONTROL_ARMING_STAY = "arming_stay"
-ANCILLARY_CONTROL_ENTRY_DELAY = "entry_delay"
-ANCILLARY_CONTROL_EXIT_DELAY = "exit_delay"
-ANCILLARY_CONTROL_IN_ALARM = "in_alarm"
-ANCILLARY_CONTROL_NOT_READY = "not_ready"
+ANCILLARY_CONTROL_ARMING_AWAY: Final = "arming_away"
+ANCILLARY_CONTROL_ARMING_NIGHT: Final = "arming_night"
+ANCILLARY_CONTROL_ARMING_STAY: Final = "arming_stay"
+ANCILLARY_CONTROL_ENTRY_DELAY: Final = "entry_delay"
+ANCILLARY_CONTROL_EXIT_DELAY: Final = "exit_delay"
+ANCILLARY_CONTROL_IN_ALARM: Final = "in_alarm"
+ANCILLARY_CONTROL_NOT_READY: Final = "not_ready"
 
-DAYLIGHT_STATUS = {
+DAYLIGHT_STATUS: Final = {
     100: "nadir",
     110: "night_end",
     120: "nautical_dawn",
@@ -48,46 +56,53 @@ DAYLIGHT_STATUS = {
     230: "night_start",
 }
 
-DEVICE_MODE_DUAL_PUSH_BUTTON = "dualpushbutton"
-DEVICE_MODE_DUAL_ROCKER = "dualrocker"
-DEVICE_MODE_SINGLE_PUSH_BUTTON = "singlepushbutton"
-DEVICE_MODE_SINGLE_ROCKER = "singlerocker"
+DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
+DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
+DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
+DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
 
-THERMOSTAT_MODE_AUTO = "auto"
-THERMOSTAT_MODE_COOL = "cool"
-THERMOSTAT_MODE_DRY = "dry"
-THERMOSTAT_MODE_FAN_ONLY = "fan only"
-THERMOSTAT_MODE_HEAT = "heat"
-THERMOSTAT_MODE_EMERGENCY_HEATING = "emergency heating"
-THERMOSTAT_MODE_OFF = "off"
-THERMOSTAT_MODE_PRECOOLING = "precooling"
-THERMOSTAT_MODE_SLEEP = "sleep"
+PRESENCE_DELAY: Final = "delay"
+PRESENCE_DURATION: Final = "duration"
+PRESENCE_SENSITIVITY: Final = "sensitivity"
+PRESENCE_SENSITIVITY_MAX: Final = "sensitivitymax"
+PRESENCE_DARK: Final = "dark"
+PRESENCE_PRESENCE: Final = "presence"
 
-THERMOSTAT_FAN_MODE_AUTO = "auto"
-THERMOSTAT_FAN_MODE_HIGH = "high"
-THERMOSTAT_FAN_MODE_LOW = "low"
-THERMOSTAT_FAN_MODE_MEDIUM = "medium"
-THERMOSTAT_FAN_MODE_OFF = "off"
-THERMOSTAT_FAN_MODE_ON = "on"
-THERMOSTAT_FAN_MODE_SMART = "smart"
+THERMOSTAT_MODE_AUTO: Final = "auto"
+THERMOSTAT_MODE_COOL: Final = "cool"
+THERMOSTAT_MODE_DRY: Final = "dry"
+THERMOSTAT_MODE_FAN_ONLY: Final = "fan only"
+THERMOSTAT_MODE_HEAT: Final = "heat"
+THERMOSTAT_MODE_EMERGENCY_HEATING: Final = "emergency heating"
+THERMOSTAT_MODE_OFF: Final = "off"
+THERMOSTAT_MODE_PRECOOLING: Final = "precooling"
+THERMOSTAT_MODE_SLEEP: Final = "sleep"
 
-THERMOSTAT_PRESET_AUTO = "auto"
-THERMOSTAT_PRESET_BOOST = "boost"
-THERMOSTAT_PRESET_COMFORT = "comfort"
-THERMOSTAT_PRESET_COMPLEX = "complex"
-THERMOSTAT_PRESET_ECO = "eco"
-THERMOSTAT_PRESET_HOLIDAY = "holiday"
-THERMOSTAT_PRESET_MANUAL = "manual"
+THERMOSTAT_FAN_MODE_AUTO: Final = "auto"
+THERMOSTAT_FAN_MODE_HIGH: Final = "high"
+THERMOSTAT_FAN_MODE_LOW: Final = "low"
+THERMOSTAT_FAN_MODE_MEDIUM: Final = "medium"
+THERMOSTAT_FAN_MODE_OFF: Final = "off"
+THERMOSTAT_FAN_MODE_ON: Final = "on"
+THERMOSTAT_FAN_MODE_SMART: Final = "smart"
 
-THERMOSTAT_SWING_MODE_FULLY_CLOSED = "fully closed"
-THERMOSTAT_SWING_MODE_FULLY_OPEN = "fully open"
-THERMOSTAT_SWING_MODE_HALF_OPEN = "half open"
-THERMOSTAT_SWING_MODE_QUARTER_OPEN = "quarter open"
-THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN = "three quarters open"
+THERMOSTAT_PRESET_AUTO: Final = "auto"
+THERMOSTAT_PRESET_BOOST: Final = "boost"
+THERMOSTAT_PRESET_COMFORT: Final = "comfort"
+THERMOSTAT_PRESET_COMPLEX: Final = "complex"
+THERMOSTAT_PRESET_ECO: Final = "eco"
+THERMOSTAT_PRESET_HOLIDAY: Final = "holiday"
+THERMOSTAT_PRESET_MANUAL: Final = "manual"
 
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR = "air sensor"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION = "floor protection"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR = "floor sensor"
+THERMOSTAT_SWING_MODE_FULLY_CLOSED: Final = "fully closed"
+THERMOSTAT_SWING_MODE_FULLY_OPEN: Final = "fully open"
+THERMOSTAT_SWING_MODE_HALF_OPEN: Final = "half open"
+THERMOSTAT_SWING_MODE_QUARTER_OPEN: Final = "quarter open"
+THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN: Final = "three quarters open"
+
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR: Final = "air sensor"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION: Final = "floor protection"
+THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR: Final = "floor sensor"
 
 
 class Sensors(APIItems):
@@ -96,10 +111,7 @@ class Sensors(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize sensor manager."""
         super().__init__(raw, request, URL, create_sensor)
@@ -146,7 +158,7 @@ class DeconzSensor(DeconzDevice):
         return self.raw.get("ep")
 
     @property
-    def lowbattery(self) -> Optional[bool]:
+    def low_battery(self) -> Optional[bool]:
         """Low battery."""
         return self.raw["state"].get("lowbattery")
 
@@ -186,25 +198,27 @@ class DeconzBinarySensor(DeconzSensor):
 class AirQuality(DeconzSensor):
     """Air quality sensor."""
 
-    STATE_PROPERTY = "airquality"
+    STATE_PROPERTY = "air_quality"
     ZHATYPE = ("ZHAAirQuality",)
 
     @property
-    def airquality(self) -> str:
+    def air_quality(
+        self,
+    ) -> Literal["excellent", "good", "moderate", "poor", "unhealthy", "out of scale"]:
         """Air quality.
 
         Supported values:
-        - excellent
-        - good
-        - moderate
-        - poor
-        - unhealthy
-        - out of scale
+        - "excellent"
+        - "good"
+        - "moderate"
+        - "poor"
+        - "unhealthy"
+        - "out of scale"
         """
         return self.raw["state"]["airquality"]
 
     @property
-    def airqualityppb(self) -> int:
+    def air_quality_ppb(self) -> int:
         """Air quality PPB."""
         return self.raw["state"]["airqualityppb"]
 
@@ -228,7 +242,18 @@ class AncillaryControl(DeconzSensor):
     ZHATYPE = ("ZHAAncillaryControl",)
 
     @property
-    def action(self) -> str:
+    def action(
+        self,
+    ) -> Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "disarmed",
+        "emergency",
+        "fire",
+        "invalid_code",
+        "panic",
+    ]:
         """Last action a user invoked on the keypad.
 
         Supported values:
@@ -244,7 +269,22 @@ class AncillaryControl(DeconzSensor):
         return self.raw["state"]["action"]
 
     @property
-    def panel(self) -> Optional[str]:
+    def panel(
+        self,
+    ) -> Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "arming_away",
+        "arming_night",
+        "arming_stay",
+        "disarmed",
+        "entry_delay",
+        "exit_delay",
+        "in_alarm",
+        "not_ready",
+        None,
+    ]:
         """Mirror of alarm system state.armstate attribute.
 
         It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
@@ -253,7 +293,7 @@ class AncillaryControl(DeconzSensor):
         - "armed_away"
         - "armed_night"
         - "armed_stay"
-        - "arming_away
+        - "arming_away"
         - "arming_night"
         - "arming_stay"
         - "disarmed"
@@ -288,11 +328,11 @@ class Battery(DeconzSensor):
 class CarbonMonoxide(DeconzBinarySensor):
     """Carbon monoxide sensor."""
 
-    STATE_PROPERTY = "carbonmonoxide"
+    STATE_PROPERTY = "carbon_monoxide"
     ZHATYPE = ("ZHACarbonMonoxide",)
 
     @property
-    def carbonmonoxide(self) -> bool:
+    def carbon_monoxide(self) -> bool:
         """Carbon monoxide detected."""
         return self.raw["state"]["carbonmonoxide"]
 
@@ -344,7 +384,7 @@ class Daylight(DeconzSensor):
         return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
 
     @property
-    def sunriseoffset(self) -> int:
+    def sunrise_offset(self) -> int:
         """Sunrise offset.
 
         -120 to 120.
@@ -352,7 +392,7 @@ class Daylight(DeconzSensor):
         return self.raw["config"]["sunriseoffset"]
 
     @property
-    def sunsetoffset(self) -> int:
+    def sunset_offset(self) -> int:
         """Sunset offset.
 
         -120 to 120.
@@ -363,37 +403,46 @@ class Daylight(DeconzSensor):
 class DoorLock(DeconzSensor):
     """Door lock sensor."""
 
-    STATE_PROPERTY = "lockstate"
+    STATE_PROPERTY = "lock_state"
     ZHATYPE = ("ZHADoorLock",)
 
     @property
     def is_locked(self) -> bool:
         """Return True if lock is locked."""
-        return self.lockstate == "locked"
+        return self.lock_state == "locked"
 
     @property
-    def lockstate(self) -> str:
+    def lock_state(
+        self,
+    ) -> Literal["locked", "unlocked", "undefined", "not fully locked"]:
         """State the lock is in.
 
-        locked
-        unlocked
-        undefined
-        not fully locked
+        Supported values:
+        - "locked"
+        - "unlocked"
+        - "undefined"
+        - "not fully locked"
         """
         return self.raw["state"]["lockstate"]
 
     @property
-    def lockconfig(self) -> bool:
+    def lock_configuration(self) -> bool:
         """Lock configuration."""
         return self.raw["config"]["lock"]
 
     async def lock(self) -> dict:
         """Lock the lock."""
-        return await self.async_set_config({"lock": True})
+        return await self.request(
+            field=f"{self.deconz_id}/config",
+            data={"lock": True},
+        )
 
     async def unlock(self) -> dict:
         """Unlock the lock."""
-        return await self.async_set_config({"lock": False})
+        return await self.request(
+            field=f"{self.deconz_id}/config",
+            data={"lock": False},
+        )
 
 
 class Fire(DeconzBinarySensor):
@@ -451,20 +500,46 @@ class Humidity(DeconzSensor):
         """Humidity level."""
         return self.raw["state"].get("humidity")
 
+    @property
+    def offset(self) -> Optional[int]:
+        """Signed offset value to measured state values.
+
+        Values send by the REST-API are already amended by the offset.
+        """
+        return self.raw["config"].get("offset")
+
+    async def set_config(
+        self,
+        offset: Optional[int] = None,
+    ) -> dict:
+        """Change config of humidity sensor.
+
+        Supported values:
+        - offset [int] -32768–32767
+        """
+        data = {
+            key: value
+            for key, value in {
+                "offset": offset,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
+
 
 class LightLevel(DeconzSensor):
     """Light level sensor."""
 
-    STATE_PROPERTY = "scaled_lightlevel"
+    STATE_PROPERTY = "scaled_light_level"
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")
 
     @property
-    def scaled_lightlevel(self) -> Optional[float]:
+    def scaled_light_level(self) -> Optional[float]:
         """Scaled light level."""
-        if self.lightlevel is None:
+        if self.light_level is None:
             return None
 
-        return round(10 ** (float(self.lightlevel - 1) / 10000), 1)
+        return round(10 ** (float(self.light_level - 1) / 10000), 1)
 
     @property
     def dark(self) -> Optional[bool]:
@@ -477,7 +552,7 @@ class LightLevel(DeconzSensor):
         return self.raw["state"].get("daylight")
 
     @property
-    def lightlevel(self) -> Optional[int]:
+    def light_level(self) -> Optional[int]:
         """Light level."""
         return self.raw["state"].get("lightlevel")
 
@@ -487,14 +562,35 @@ class LightLevel(DeconzSensor):
         return self.raw["state"].get("lux")
 
     @property
-    def tholddark(self) -> Optional[int]:
+    def threshold_dark(self) -> Optional[int]:
         """Threshold to hold dark."""
         return self.raw["config"].get("tholddark")
 
     @property
-    def tholdoffset(self) -> Optional[int]:
+    def threshold_offset(self) -> Optional[int]:
         """Offset for threshold to hold dark."""
         return self.raw["config"].get("tholdoffset")
+
+    async def set_config(
+        self,
+        threshold_dark: Optional[int] = None,
+        threshold_offset: Optional[int] = None,
+    ) -> dict:
+        """Change config of presence sensor.
+
+        Supported values:
+        - threshold_dark [int] 0-65534
+        - threshold_offset [int] 1-65534
+        """
+        data = {
+            key: value
+            for key, value in {
+                "tholddark": threshold_dark,
+                "tholdoffset": threshold_offset,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
 
 
 class OpenClose(DeconzBinarySensor):
@@ -540,17 +636,60 @@ class Presence(DeconzBinarySensor):
     @property
     def dark(self) -> Optional[bool]:
         """If the area near the sensor is light or not."""
-        return self.raw["state"].get("dark")
+        return self.raw["state"].get(PRESENCE_DARK)
+
+    @property
+    def delay(self) -> Optional[int]:
+        """Occupied to unoccupied delay in seconds."""
+        return self.raw["config"].get(PRESENCE_DELAY)
 
     @property
     def duration(self) -> Optional[int]:
         """Minimum duration which presence will be true."""
-        return self.raw["config"].get("duration")
+        return self.raw["config"].get(PRESENCE_DURATION)
 
     @property
-    def presence(self) -> Optional[bool]:
+    def presence(self) -> bool:
         """Motion detected."""
-        return self.raw["state"]["presence"]
+        return self.raw["state"][PRESENCE_PRESENCE]
+
+    @property
+    def sensitivity(self) -> Optional[int]:
+        """Sensitivity setting for Philips Hue motion sensor.
+
+        Supported values:
+        - 0-[sensitivitymax]
+        """
+        return self.raw["config"].get(PRESENCE_SENSITIVITY)
+
+    @property
+    def max_sensitivity(self) -> Optional[int]:
+        """Maximum sensitivity value."""
+        return self.raw["config"].get(PRESENCE_SENSITIVITY_MAX)
+
+    async def set_config(
+        self,
+        delay: Optional[int] = None,
+        duration: Optional[int] = None,
+        sensitivity: Optional[int] = None,
+    ) -> dict:
+        """Change config of presence sensor.
+
+        Supported values:
+        - delay [int] 0-65535 (in seconds)
+        - duration [int] 0-65535 (in seconds)
+        - sensitivity [int] 0-[sensitivitymax]
+        """
+        data = {
+            key: value
+            for key, value in {
+                PRESENCE_DELAY: delay,
+                PRESENCE_DURATION: duration,
+                PRESENCE_SENSITIVITY: sensitivity,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
 
 
 class Pressure(DeconzSensor):
@@ -568,11 +707,11 @@ class Pressure(DeconzSensor):
 class Switch(DeconzSensor):
     """Switch sensor."""
 
-    STATE_PROPERTY = "buttonevent"
+    STATE_PROPERTY = "button_event"
     ZHATYPE = ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     @property
-    def buttonevent(self) -> Optional[int]:
+    def button_event(self) -> Optional[int]:
         """Button press."""
         return self.raw["state"].get("buttonevent")
 
@@ -592,7 +731,7 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("xy")
 
     @property
-    def eventduration(self) -> Optional[int]:
+    def event_duration(self) -> Optional[int]:
         """Duration of a push button event for the Hue wall switch module.
 
         Increased with 8 for each x001, and they are issued pretty much every 800ms.
@@ -600,7 +739,11 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("eventduration")
 
     @property
-    def devicemode(self) -> Optional[str]:
+    def device_mode(
+        self,
+    ) -> Literal[
+        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker", None
+    ]:
         """Different modes for the Hue wall switch module.
 
         Behavior as rocker:
@@ -622,7 +765,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("devicemode")
 
     @property
-    def mode(self) -> Optional[str]:
+    def mode(self) -> Literal["momentary", "rocker", None]:
         """For Ubisys S1/S2, operation mode of the switch.
 
         Supported values:
@@ -632,7 +775,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("mode")
 
     @property
-    def windowcoveringtype(self) -> Optional[int]:
+    def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, None]:
         """Set the covering type and starts calibration for Ubisys J1.
 
         Supported values:
@@ -676,7 +819,7 @@ class Thermostat(Temperature):
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
 
     @property
-    def coolsetpoint(self) -> Optional[float]:
+    def cooling_setpoint(self) -> Optional[float]:
         """Cooling setpoint.
 
         700-3500.
@@ -684,12 +827,36 @@ class Thermostat(Temperature):
         return self.convert_temperature(self.raw["config"].get("coolsetpoint"))
 
     @property
-    def errorcode(self) -> Optional[bool]:
+    def display_flipped(self) -> Optional[bool]:
+        """Tells if display for TRVs is flipped."""
+        return self.raw["config"].get("displayflipped")
+
+    @property
+    def error_code(self) -> Optional[bool]:
         """Error code."""
         return self.raw["state"].get("errorcode")
 
     @property
-    def fanmode(self) -> Optional[str]:
+    def external_sensor_temperature(self) -> Optional[float]:
+        """Track temperature value provided by an external sensor.
+
+        -32768–32767.
+        Modes are device dependent and only exposed for devices supporting it.
+        """
+        return self.convert_temperature(self.raw["config"].get("externalsensortemp"))
+
+    @property
+    def external_window_open(self) -> Optional[bool]:
+        """Track open/close state of an external sensor.
+
+        Modes are device dependent and only exposed for devices supporting it.
+        """
+        return self.raw["config"].get("externalwindowopen")
+
+    @property
+    def fan_mode(
+        self,
+    ) -> Literal["off", "low", "medium", "high", "on", "auto", "smart", None]:
         """Fan mode.
 
         Supported values:
@@ -705,7 +872,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("fanmode")
 
     @property
-    def floortemperature(self) -> Optional[float]:
+    def floor_temperature(self) -> Optional[float]:
         """Floor temperature."""
         return self.convert_temperature(self.raw["state"].get("floortemperature"))
 
@@ -715,7 +882,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("heating")
 
     @property
-    def heatsetpoint(self) -> Optional[float]:
+    def heating_setpoint(self) -> Optional[float]:
         """Heating setpoint.
 
         500-3200.
@@ -728,7 +895,20 @@ class Thermostat(Temperature):
         return self.raw["config"].get("locked")
 
     @property
-    def mode(self) -> Optional[str]:
+    def mode(
+        self,
+    ) -> Literal[
+        "off",
+        "auto",
+        "cool",
+        "heat",
+        "emergency heating",
+        "precooling",
+        "fan only",
+        "dry",
+        "sleep",
+        None,
+    ]:
         """Set the current operating mode of a thermostat.
 
         Supported values:
@@ -746,12 +926,12 @@ class Thermostat(Temperature):
         return self.raw["config"].get("mode")
 
     @property
-    def mountingmode(self) -> Optional[bool]:
+    def mounting_mode(self) -> Optional[bool]:
         """Set a TRV into mounting mode if supported (valve fully open position)."""
         return self.raw["config"].get("mountingmode")
 
     @property
-    def mountingmodeactive(self) -> Optional[bool]:
+    def mounting_mode_active(self) -> Optional[bool]:
         """If thermostat mounting mode is active."""
         return self.raw["state"].get("mountingmodeactive")
 
@@ -761,7 +941,9 @@ class Thermostat(Temperature):
         return self.raw["config"].get("offset")
 
     @property
-    def preset(self) -> Optional[str]:
+    def preset(
+        self,
+    ) -> Literal["holiday", "auto", "manual", "comfort", "eco", "boost", "complex"]:
         """Set the current operating mode for Tuya thermostats.
 
         Supported values:
@@ -777,12 +959,26 @@ class Thermostat(Temperature):
         return self.raw["config"].get("preset")
 
     @property
+    def schedule_enabled(self) -> Optional[bool]:
+        """Tell when thermostat schedule is enabled."""
+        return self.raw["config"].get("schedule_on")
+
+    @property
     def state_on(self) -> Optional[bool]:
         """Declare if the sensor is on or off."""
         return self.raw["state"].get("on")
 
     @property
-    def swingmode(self) -> Optional[str]:
+    def swing_mode(
+        self,
+    ) -> Literal[
+        "fully closed",
+        "fully open",
+        "quarter open",
+        "half open",
+        "three quarters open",
+        None,
+    ]:
         """Set the AC louvers position.
 
         Supported values:
@@ -796,7 +992,9 @@ class Thermostat(Temperature):
         return self.raw["config"].get("swingmode")
 
     @property
-    def temperaturemeasurement(self) -> Optional[str]:
+    def temperature_measurement(
+        self,
+    ) -> Literal["air sensor", "floor sensor", "floor protection", None]:
         """Set the mode of operation for Elko Super TR thermostat.
 
         Supported values:
@@ -812,7 +1010,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("valve")
 
     @property
-    def windowopen_set(self) -> Optional[bool]:
+    def window_open_detection(self) -> Optional[bool]:
         """Set if window open detection shall be active or inactive for Tuya thermostats.
 
         (Support is device dependent).
@@ -821,27 +1019,52 @@ class Thermostat(Temperature):
 
     async def set_config(
         self,
-        cool_set_point: Optional[int] = None,
+        cooling_setpoint: Optional[int] = None,
         enable_schedule: Optional[bool] = None,
         external_sensor_temperature: Optional[int] = None,
         external_window_open: Optional[bool] = None,
-        fan_mode: Optional[str] = None,
+        fan_mode: Literal[
+            "off", "low", "medium", "high", "on", "auto", "smart", None
+        ] = None,
         flip_display: Optional[bool] = None,
-        heat_set_point: Optional[int] = None,
+        heating_setpoint: Optional[int] = None,
         locked: Optional[bool] = None,
-        mode: Optional[str] = None,
+        mode: Literal[
+            "off",
+            "auto",
+            "cool",
+            "heat",
+            "emergency heating",
+            "precooling",
+            "fan only",
+            "dry",
+            "sleep",
+            None,
+        ] = None,
         mounting_mode: Optional[bool] = None,
-        preset: Optional[str] = None,
+        on: Optional[bool] = None,
+        preset: Literal[
+            "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
+        ] = None,
         schedule: Optional[list] = None,
         set_valve: Optional[bool] = None,
-        swing_mode: Optional[str] = None,
-        temperature_measurement: Optional[str] = None,
+        swing_mode: Literal[
+            "fully closed",
+            "fully open",
+            "quarter open",
+            "half open",
+            "three quarters open",
+            None,
+        ] = None,
+        temperature_measurement: Literal[
+            "air sensor", "floor sensor", "floor protection", None
+        ] = None,
         window_open_detection: Optional[bool] = None,
     ) -> dict:
         """Change config of thermostat.
 
         Supported values:
-        - cool_set_point [int] 700-3500
+        - cooling_setpoint [int] 700-3500
         - enable_schedule [bool] True/False
         - external_sensor_temperature [int] -32768-32767
         - external_window_open [bool] True/False
@@ -854,7 +1077,7 @@ class Thermostat(Temperature):
           - "on"
           - "smart"
         - flip_display [bool] True/False
-        - heat_set_point [int] 500-3200
+        - heating_setpoint [int] 500-3200
         - locked [bool] True/False
         - mode [str]
           - "auto"
@@ -867,6 +1090,7 @@ class Thermostat(Temperature):
           - "precooling"
           - "sleep"
         - mounting_mode [bool] True/False
+        - on [bool] True/False
         - preset [str]
           - "auto"
           - "boost"
@@ -892,16 +1116,17 @@ class Thermostat(Temperature):
         data = {
             key: value
             for key, value in {
-                "coolsetpoint": cool_set_point,
+                "coolsetpoint": cooling_setpoint,
                 "schedule_on": enable_schedule,
                 "externalsensortemp": external_sensor_temperature,
                 "externalwindowopen": external_window_open,
                 "fanmode": fan_mode,
                 "displayflipped": flip_display,
-                "heatsetpoint": heat_set_point,
+                "heatsetpoint": heating_setpoint,
                 "locked": locked,
                 "mode": mode,
                 "mountingmode": mounting_mode,
+                "on": on,
                 "preset": preset,
                 "schedule": schedule,
                 "setvalve": set_valve,
@@ -911,17 +1136,17 @@ class Thermostat(Temperature):
             }.items()
             if value is not None
         }
-        return await self.async_set(field=f"{self.deconz_id}/config", data=data)
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
 
 
 class Time(DeconzSensor):
     """Time sensor."""
 
-    STATE_PROPERTY = "lastset"
+    STATE_PROPERTY = "last_set"
     ZHATYPE = ("ZHATime",)
 
     @property
-    def lastset(self) -> str:
+    def last_set(self) -> str:
         """Last time time was set."""
         return self.raw["state"]["lastset"]
 
@@ -943,12 +1168,12 @@ class Vibration(DeconzBinarySensor):
         return self.raw["config"].get("sensitivity")
 
     @property
-    def sensitivitymax(self) -> Optional[int]:
+    def max_sensitivity(self) -> Optional[int]:
         """Vibration max sensitivity."""
         return self.raw["config"].get("sensitivitymax")
 
     @property
-    def tiltangle(self) -> Optional[int]:
+    def tilt_angle(self) -> Optional[int]:
         """Tilt angle."""
         return self.raw["state"].get("tiltangle")
 
@@ -958,7 +1183,7 @@ class Vibration(DeconzBinarySensor):
         return self.raw["state"]["vibration"]
 
     @property
-    def vibrationstrength(self) -> Optional[int]:
+    def vibration_strength(self) -> Optional[int]:
         """Strength of vibration."""
         return self.raw["state"].get("vibrationstrength")
 
@@ -1005,10 +1230,7 @@ SENSOR_CLASSES = (
 def create_sensor(
     resource_id: str,
     raw: dict,
-    request: Callable[
-        [str, str, Optional[Dict[str, Any]]],
-        Awaitable[Dict[str, Any]],
-    ],
+    request: Callable[..., Awaitable[Dict[str, Any]]],
 ) -> Union[
     AirQuality,
     Alarm,
@@ -1040,5 +1262,4 @@ def create_sensor(
         if raw["type"] in sensor_class.ZHATYPE:
             return sensor_class(resource_id, raw, request)
 
-    LOGGER.info("Unsupported sensor type %s", raw)
     return DeconzSensor(resource_id, raw, request)

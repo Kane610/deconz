@@ -58,24 +58,23 @@ async def test_create_light():
 
     assert light.brightness == 111
     assert light.hue == 7998
-    assert light.sat == 172
-    assert light.ct == 307
+    assert light.saturation == 172
+    assert light.color_temp == 307
     assert light.xy == (0.421253, 0.39921)
-    assert light.colormode == "ct"
-    assert light.ctmax == 500
-    assert light.ctmin == 153
+    assert light.color_mode == "ct"
+    assert light.max_color_temp == 500
+    assert light.min_color_temp == 153
     assert light.effect is None
-    assert light.hascolor is True
     assert light.reachable is True
 
     assert light.deconz_id == "/lights/0"
     assert light.etag == "026bcfe544ad76c7534e5ca8ed39047c"
     assert light.manufacturer == "dresden elektronik"
-    assert light.modelid == "FLS-PP3"
+    assert light.model_id == "FLS-PP3"
     assert light.name == "Light 1"
-    assert light.swversion == "020C.201000A0"
+    assert light.software_version == "020C.201000A0"
     assert light.type == "Extended color light"
-    assert light.uniqueid == "00:21:2E:FF:FF:00:73:9F-0A"
+    assert light.unique_id == "00:21:2E:FF:FF:00:73:9F-0A"
 
     mock_callback = Mock()
     light.register_callback(mock_callback)
@@ -99,22 +98,23 @@ async def test_create_light():
     assert light.xy is None
 
     light.raw["ctmax"] = 1000
-    assert light.ctmax == 650
+    assert light.max_color_temp == 650
 
     light.raw["ctmin"] = 0
-    assert light.ctmin == 140
+    assert light.min_color_temp == 140
 
     del light.raw["ctmax"]
-    assert light.ctmax is None
+    assert light.max_color_temp is None
 
     del light.raw["ctmin"]
-    assert light.ctmin is None
+    assert light.min_color_temp is None
 
-    await light.async_set_state({"on": True})
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
-
-    await light.async_set_config({"on": True})
-    mock_request.assert_called_with("put", path="/lights/0/config", json={"on": True})
+    await light.set_attributes(name="light")
+    mock_request.assert_called_with(
+        "put",
+        path="/lights/0",
+        json={"name": "light"},
+    )
 
     await light.set_state(
         alert=ALERT_SHORT,
@@ -187,15 +187,16 @@ async def test_configuration_tool():
     assert configuration_tool.deconz_id == "/lights/0"
     assert configuration_tool.etag == "26839cb118f5bf7ba1f2108256644010"
     assert configuration_tool.manufacturer == "dresden elektronik"
-    assert configuration_tool.modelid == "ConBee II"
+    assert configuration_tool.model_id == "ConBee II"
     assert configuration_tool.name == "Configuration tool 1"
-    assert configuration_tool.swversion == "0x264a0700"
+    assert configuration_tool.software_version == "0x264a0700"
     assert configuration_tool.type == "Configuration tool"
-    assert configuration_tool.uniqueid == "00:21:2e:ff:ff:05:a7:a3-01"
+    assert configuration_tool.unique_id == "00:21:2e:ff:ff:05:a7:a3-01"
 
 
 async def test_create_cover():
     """Verify that covers work."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -218,7 +219,7 @@ async def test_create_cover():
                 "uniqueid": "00:24:46:00:00:12:34:56-01",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     cover = lights["0"]
 
@@ -232,11 +233,11 @@ async def test_create_cover():
     assert cover.deconz_id == "/lights/0"
     assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
     assert cover.manufacturer == "AXIS"
-    assert cover.modelid == "Gear"
+    assert cover.model_id == "Gear"
     assert cover.name == "Covering device"
-    assert cover.swversion == "100-5.3.5.1122"
+    assert cover.software_version == "100-5.3.5.1122"
     assert cover.type == "Window covering device"
-    assert cover.uniqueid == "00:24:46:00:00:12:34:56-01"
+    assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
 
     mock_callback = Mock()
     cover.register_callback(mock_callback)
@@ -254,30 +255,28 @@ async def test_create_cover():
     assert cover.is_open is True
     assert cover.lift == 50
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.open()
-        set_state.assert_called_with({"open": True})
+    await cover.open()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": True})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.close()
-        set_state.assert_called_with({"open": False})
+    await cover.close()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": False})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=30, tilt=60)
-        set_state.assert_called_with({"lift": 30})  # Tilt not supported
+    # Tilt not supported
+    await cover.set_position(lift=30, tilt=60)
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"lift": 30})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.stop()
-        set_state.assert_called_with({"stop": True})
+    await cover.stop()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"stop": True})
 
     # Verify tilt works as well
 
     cover.raw["state"]["tilt"] = 40
     assert cover.tilt == 40
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=20, tilt=60)
-        set_state.assert_called_with({"lift": 20, "tilt": 60})
+    await cover.set_position(lift=20, tilt=60)
+    mock_request.assert_called_with(
+        "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
+    )
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
@@ -285,6 +284,7 @@ async def test_create_cover():
 
 async def test_create_cover_without_lift():
     """Verify that covers work with older deconz versions."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -301,7 +301,7 @@ async def test_create_cover_without_lift():
                 "uniqueid": "00:24:46:00:00:12:34:56-01",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     cover = lights["0"]
 
@@ -315,11 +315,11 @@ async def test_create_cover_without_lift():
     assert cover.deconz_id == "/lights/0"
     assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
     assert cover.manufacturer == "AXIS"
-    assert cover.modelid == "Gear"
+    assert cover.model_id == "Gear"
     assert cover.name == "Covering device"
-    assert cover.swversion == "100-5.3.5.1122"
+    assert cover.software_version == "100-5.3.5.1122"
     assert cover.type == "Window covering device"
-    assert cover.uniqueid == "00:24:46:00:00:12:34:56-01"
+    assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
 
     mock_callback = Mock()
     cover.register_callback(mock_callback)
@@ -337,30 +337,27 @@ async def test_create_cover_without_lift():
     assert cover.is_open is True
     assert cover.lift == 11
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.open()
-        set_state.assert_called_with({"on": False})
+    await cover.open()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": False})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.close()
-        set_state.assert_called_with({"on": True})
+    await cover.close()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=30)
-        set_state.assert_called_with({"bri": 76})
+    await cover.set_position(lift=30)
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"bri": 76})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.stop()
-        set_state.assert_called_with({"bri_inc": 0})
+    await cover.stop()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"bri_inc": 0})
 
     # Verify sat (for tilt) works as well
 
     cover.raw["state"]["sat"] = 40
     assert cover.tilt == 15
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=20, tilt=60)
-        set_state.assert_called_with({"bri": 50, "sat": 152})
+    await cover.set_position(lift=20, tilt=60)
+    mock_request.assert_called_with(
+        "put", path="/lights/0/state", json={"bri": 50, "sat": 152}
+    )
 
     cover.raw["state"]["lift"] = 0
     cover.raw["state"]["tilt"] = 0
@@ -368,17 +365,16 @@ async def test_create_cover_without_lift():
 
     assert cover.tilt == 0
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.open()
-        set_state.assert_called_with({"open": True})
+    await cover.open()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": True})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.close()
-        set_state.assert_called_with({"open": False})
+    await cover.close()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": False})
 
-    with patch.object(cover, "async_set_state", return_value=True) as set_state:
-        await cover.set_position(lift=20, tilt=60)
-        set_state.assert_called_with({"lift": 20, "tilt": 60})
+    await cover.set_position(lift=20, tilt=60)
+    mock_request.assert_called_with(
+        "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
+    )
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
@@ -416,25 +412,24 @@ async def test_create_fan():
 
     assert fan.brightness == 254
     assert fan.hue is None
-    assert fan.sat is None
-    assert fan.ct is None
+    assert fan.saturation is None
+    assert fan.color_temp is None
     assert fan.xy is None
-    assert fan.colormode is None
-    assert fan.ctmax is None
-    assert fan.ctmin is None
+    assert fan.color_mode is None
+    assert fan.max_color_temp is None
+    assert fan.min_color_temp is None
     assert fan.effect is None
-    assert fan.hascolor is None
     assert fan.reachable is True
     assert fan.speed == 4
 
     assert fan.deconz_id == "/lights/0"
     assert fan.etag == "432f3de28965052961a99e3c5494daf4"
     assert fan.manufacturer == "King Of Fans,  Inc."
-    assert fan.modelid == "HDC52EastwindFan"
+    assert fan.model_id == "HDC52EastwindFan"
     assert fan.name == "Ceiling fan"
-    assert fan.swversion == "0000000F"
+    assert fan.software_version == "0000000F"
     assert fan.type == "Fan"
-    assert fan.uniqueid == "00:22:a3:00:00:27:8b:81-01"
+    assert fan.unique_id == "00:22:a3:00:00:27:8b:81-01"
 
     mock_callback = Mock()
     fan.register_callback(mock_callback)
@@ -457,6 +452,7 @@ async def test_create_fan():
 
 async def test_create_lock():
     """Verify that locks work."""
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -473,7 +469,7 @@ async def test_create_lock():
                 "uniqueid": "00:00:00:00:00:00:00:00-00",
             }
         },
-        AsyncMock(),
+        mock_request,
     )
     lock = lights["0"]
 
@@ -485,11 +481,11 @@ async def test_create_lock():
     assert lock.deconz_id == "/lights/0"
     assert lock.etag == "5c2ec06cde4bd654aef3a555fcd8ad12"
     assert lock.manufacturer == "Danalock"
-    assert lock.modelid == "V3-BTZB"
+    assert lock.model_id == "V3-BTZB"
     assert lock.name == "Door lock"
-    assert lock.swversion == "19042019"
+    assert lock.software_version == "19042019"
     assert lock.type == "Door Lock"
-    assert lock.uniqueid == "00:00:00:00:00:00:00:00-00"
+    assert lock.unique_id == "00:00:00:00:00:00:00:00-00"
 
     mock_callback = Mock()
     lock.register_callback(mock_callback)
@@ -501,13 +497,11 @@ async def test_create_lock():
     mock_callback.assert_called_once()
     assert lock.changed_keys == {"state", "on"}
 
-    with patch.object(lock, "async_set_state", return_value=True) as set_state:
-        await lock.lock()
-        set_state.assert_called_with({"on": True})
+    await lock.lock()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
 
-    with patch.object(lock, "async_set_state", return_value=True) as set_state:
-        await lock.unlock()
-        set_state.assert_called_with({"on": False})
+    await lock.unlock()
+    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": False})
 
     lock.remove_callback(mock_callback)
     assert not lock._callbacks
@@ -515,7 +509,7 @@ async def test_create_lock():
 
 async def test_create_siren():
     """Verify that sirens work."""
-    request_mock = AsyncMock()
+    mock_request = AsyncMock()
     lights = Lights(
         {
             "0": {
@@ -530,7 +524,7 @@ async def test_create_siren():
                 "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
             }
         },
-        request_mock,
+        mock_request,
     )
     siren = lights["0"]
 
@@ -542,11 +536,11 @@ async def test_create_siren():
     assert siren.deconz_id == "/lights/0"
     assert siren.etag == "0667cb8fff2adc1bf22be0e6eece2a18"
     assert siren.manufacturer == "Heiman"
-    assert siren.modelid == "WarningDevice"
+    assert siren.model_id == "WarningDevice"
     assert siren.name == "alarm_tuin"
-    assert siren.swversion is None
+    assert siren.software_version is None
     assert siren.type == "Warning device"
-    assert siren.uniqueid == "00:0d:6f:00:0f:ab:12:34-01"
+    assert siren.unique_id == "00:0d:6f:00:0f:ab:12:34-01"
 
     mock_callback = Mock()
     siren.register_callback(mock_callback)
@@ -559,21 +553,21 @@ async def test_create_siren():
     assert siren.changed_keys == {"state", ALERT_KEY}
 
     await siren.turn_on()
-    request_mock.assert_called_with(
+    mock_request.assert_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG},
     )
 
     await siren.turn_on(duration=10)
-    request_mock.assert_called_with(
+    mock_request.assert_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
     )
 
     await siren.turn_off()
-    request_mock.assert_called_with(
+    mock_request.assert_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_NONE},

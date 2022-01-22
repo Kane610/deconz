@@ -1,30 +1,40 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Optional, Tuple, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Final,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .api import APIItems
-from .deconzdevice import DeconzDevice
+from .deconz_device import DeconzDevice
 
-RESOURCE_TYPE = "lights"
-URL = "/lights"
+RESOURCE_TYPE: Final = "lights"
+URL: Final = "/lights"
 
-ALERT_KEY = "alert"
-ALERT_LONG = "lselect"
-ALERT_NONE = "none"
-ALERT_SHORT = "select"
+ALERT_KEY: Final = "alert"
+ALERT_LONG: Final = "lselect"
+ALERT_NONE: Final = "none"
+ALERT_SHORT: Final = "select"
 
-EFFECT_NONE = "none"
-EFFECT_COLOR_LOOP = "colorloop"
+EFFECT_NONE: Final = "none"
+EFFECT_COLOR_LOOP: Final = "colorloop"
 
-FAN_SPEED_OFF = 0
-FAN_SPEED_25_PERCENT = 1
-FAN_SPEED_50_PERCENT = 2
-FAN_SPEED_75_PERCENT = 3
-FAN_SPEED_100_PERCENT = 4
-FAN_SPEED_AUTO = 5
-FAN_SPEED_COMFORT_BREEZE = 6
+FAN_SPEED_OFF: Final = 0
+FAN_SPEED_25_PERCENT: Final = 1
+FAN_SPEED_50_PERCENT: Final = 2
+FAN_SPEED_75_PERCENT: Final = 3
+FAN_SPEED_100_PERCENT: Final = 4
+FAN_SPEED_AUTO: Final = 5
+FAN_SPEED_COMFORT_BREEZE: Final = 6
 
-ON_TIME_KEY = "ontime"
+ON_TIME_KEY: Final = "ontime"
 
 
 class Lights(APIItems):
@@ -33,10 +43,7 @@ class Lights(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize light manager."""
         super().__init__(raw, request, URL, create_light)
@@ -75,7 +82,7 @@ class Light(DeconzLight):
     """
 
     @property
-    def alert(self) -> Optional[str]:
+    def alert(self) -> Literal["none", "select", "lselect", None]:
         """Temporary alert effect.
 
         Following values are possible:
@@ -95,7 +102,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("bri")
 
     @property
-    def ct(self) -> Optional[int]:
+    def color_temp(self) -> Optional[int]:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["state"].get("ct")
 
@@ -109,7 +116,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("hue")
 
     @property
-    def sat(self) -> Optional[int]:
+    def saturation(self) -> Optional[int]:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -134,50 +141,55 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def colormode(self) -> Optional[str]:
+    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
         """Color mode of light.
 
+        ct - color temperature
         hs - hue and saturation
         xy - CIE xy values
-        ct - color temperature
         """
         return self.raw["state"].get("colormode")
 
     @property
-    def hascolor(self) -> Optional[bool]:
-        """Tells if light has color support."""
-        return self.raw["state"].get("hascolor")
-
-    @property
-    def ctmax(self) -> Optional[int]:
+    def max_color_temp(self) -> Optional[int]:
         """Max value for color temperature."""
         if (ctmax := self.raw.get("ctmax")) is not None and ctmax > 650:
             ctmax = 650
         return ctmax
 
     @property
-    def ctmin(self) -> Optional[int]:
+    def min_color_temp(self) -> Optional[int]:
         """Min value for color temperature."""
         if (ctmin := self.raw.get("ctmin")) is not None and ctmin < 140:
             ctmin = 140
         return ctmin
 
     @property
-    def effect(self) -> Optional[str]:
+    def effect(self) -> Literal["colorloop", "none", None]:
         """Effect of the light.
 
+        colorloop — the light will cycle continuously through all colors
+                    with the speed specified by colorloopspeed.
         none — no effect.
-        colorloop — the light will cycle continuously through all colors with the speed specified by colorloopspeed.
         """
         return self.raw["state"].get("effect")
 
+    async def set_attributes(self, name: str) -> dict:
+        """Change attributes of a light.
+
+        Supported values:
+        - name [str] The name of the light
+        """
+        data = {"name": name}
+        return await self.request(field=f"{self.deconz_id}", data=data)
+
     async def set_state(
         self,
-        alert: Optional[str] = None,
+        alert: Literal["none", "select", "lselect", None] = None,
         brightness: Optional[int] = None,
         color_loop_speed: Optional[int] = None,
         color_temperature: Optional[int] = None,
-        effect: Optional[str] = None,
+        effect: Literal["colorloop", "none", None] = None,
         hue: Optional[int] = None,
         on: Optional[bool] = None,
         on_time: Optional[int] = None,
@@ -226,7 +238,7 @@ class Light(DeconzLight):
             }.items()
             if value is not None
         }
-        return await self.async_set(field=f"{self.deconz_id}/state", data=data)
+        return await self.request(field=f"{self.deconz_id}/state", data=data)
 
 
 class ConfigurationTool(DeconzLight):
@@ -302,21 +314,21 @@ class Cover(DeconzLight):
             elif "sat" in self.raw["state"]:  # Legacy support
                 data["sat"] = int(tilt * 2.54)
 
-        return await self.async_set_state(data)
+        return await self.request(field=f"{self.deconz_id}/state", data=data)
 
     async def open(self) -> dict:
         """Fully open cover."""
         data = {"open": True}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": False}
-        return await self.async_set_state(data)
+        return await self.request(field=f"{self.deconz_id}/state", data=data)
 
     async def close(self) -> dict:
         """Fully close cover."""
         data = {"open": False}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": True}
-        return await self.async_set_state(data)
+        return await self.request(field=f"{self.deconz_id}/state", data=data)
 
     async def stop(self) -> dict:
         """Stop cover motion."""
@@ -324,7 +336,7 @@ class Cover(DeconzLight):
         data = {"stop": True}
         if "lift" not in self.raw["state"]:  # Legacy support
             data = {"bri_inc": 0}
-        return await self.async_set_state(data)
+        return await self.request(field=f"{self.deconz_id}/state", data=data)
 
 
 class Fan(Light):
@@ -342,16 +354,19 @@ class Fan(Light):
     ZHATYPE = ("Fan",)
 
     @property
-    def speed(self) -> int:
+    def speed(self) -> Literal[0, 1, 2, 3, 4, 5, 6]:
         """Speed of the fan."""
         return self.raw["state"]["speed"]
 
-    async def set_speed(self, speed: int) -> dict:
+    async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict:
         """Set speed of fans/ventilators.
 
         Speed [int] between 0-6.
         """
-        return await self.async_set_state({"speed": speed})
+        return await self.request(
+            field=f"{self.deconz_id}/state",
+            data={"speed": speed},
+        )
 
 
 class Lock(DeconzLight):
@@ -366,11 +381,11 @@ class Lock(DeconzLight):
 
     async def lock(self) -> dict:
         """Lock the lock."""
-        return await self.async_set_state({"on": True})
+        return await self.request(field=f"{self.deconz_id}/state", data={"on": True})
 
     async def unlock(self) -> dict:
         """Unlock the lock."""
-        return await self.async_set_state({"on": False})
+        return await self.request(field=f"{self.deconz_id}/state", data={"on": False})
 
 
 class Siren(DeconzLight):
@@ -386,16 +401,19 @@ class Siren(DeconzLight):
     async def turn_on(self, duration: Optional[int] = None) -> dict:
         """Turn on device.
 
-        Duration is counted as a tenth of a second.
+        Duration is counted as 1/10 of a second.
         """
         data: Dict[str, Union[int, str]] = {ALERT_KEY: ALERT_LONG}
         if duration:
             data[ON_TIME_KEY] = duration
-        return await self.async_set_state(data)
+        return await self.request(field=f"{self.deconz_id}/state", data=data)
 
     async def turn_off(self) -> dict:
         """Turn off device."""
-        return await self.async_set_state({ALERT_KEY: ALERT_NONE})
+        return await self.request(
+            field=f"{self.deconz_id}/state",
+            data={ALERT_KEY: ALERT_NONE},
+        )
 
 
 NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
@@ -404,10 +422,7 @@ NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
 def create_light(
     light_id: str,
     raw: dict,
-    request: Callable[
-        [str, str, Optional[Dict[str, Any]]],
-        Awaitable[Dict[str, Any]],
-    ],
+    request: Callable[..., Awaitable[Dict[str, Any]]],
 ) -> DeconzLight:
     # ) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
     """Create device out of a light resource."""

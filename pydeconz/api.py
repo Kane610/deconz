@@ -2,7 +2,16 @@
 
 from asyncio import CancelledError, Task, create_task, sleep
 import logging
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    ItemsView,
+    KeysView,
+    Optional,
+    ValuesView,
+)
 
 from .errors import BridgeBusy
 
@@ -15,10 +24,7 @@ class APIItems:
     def __init__(
         self,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
         path: str,
         item_cls: Any,
     ) -> None:
@@ -31,16 +37,16 @@ class APIItems:
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self._path)  # type: ignore
+        raw = await self._request("get", self._path)
         self.process_raw(raw)
 
     def process_raw(self, raw: dict) -> None:
         """Process data."""
         for id, raw_item in raw.items():
-            obj = self._items.get(id)
 
-            if obj is not None:
+            if (obj := self._items.get(id)) is not None:
                 obj.update(raw_item)
+
             else:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 
@@ -48,15 +54,15 @@ class APIItems:
         """Remove item."""
         return self._items.pop(obj_id)
 
-    def items(self) -> Any:
+    def items(self) -> ItemsView[str, Any]:
         """Return items."""
         return self._items.items()
 
-    def keys(self) -> Any:
+    def keys(self) -> KeysView[Any]:
         """Return item keys."""
         return self._items.keys()
 
-    def values(self) -> Any:
+    def values(self) -> ValuesView[Any]:
         """Return item values."""
         return self._items.values()
 
@@ -76,10 +82,7 @@ class APIItem:
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[
-            [str, str, Optional[Dict[str, Any]]],
-            Awaitable[Dict[str, Any]],
-        ],
+        request: Callable[..., Awaitable[Dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
         self._resource_id = resource_id
@@ -106,10 +109,7 @@ class APIItem:
         return self._changed_keys
 
     def register_callback(self, callback: Callable[..., None]) -> None:
-        """Register callback for signalling.
-
-        Callback will be called at the end of updating device information in self.async_update.
-        """
+        """Register callback for signalling."""
         self._callbacks.append(callback)
 
     def remove_callback(self, callback: Callable[..., None]) -> None:
@@ -137,17 +137,17 @@ class APIItem:
 
         self._changed_keys = changed_keys
 
-        for async_signal_update in self._callbacks:
-            async_signal_update()
+        for signal_update_callback in self._callbacks:
+            signal_update_callback()
 
-    async def async_set(self, field: str, data: dict, tries: int = 0) -> dict:
+    async def request(self, field: str, data: dict, tries: int = 0) -> dict:
         """Set state of device."""
         if self._sleep_task is not None:
             self._sleep_task.cancel()
             self._sleep_task = None
 
         try:
-            return await self._request("put", path=field, json=data)  # type: ignore
+            return await self._request("put", path=field, json=data)
 
         except BridgeBusy:
             LOGGER.debug("Bridge is busy, schedule retry %s %s", field, str(data))
@@ -160,7 +160,7 @@ class APIItem:
                 except CancelledError:
                     return {}
 
-                return await self.async_set(field, data, tries)
+                return await self.request(field, data, tries)
 
             self._sleep_task = None
             raise BridgeBusy
