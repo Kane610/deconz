@@ -103,6 +103,6 @@ def normalize_bridge_id(bridge_id: str):
     if len(bridge_id) == 12:
         return bridge_id
 
-    LOGGER.warn("Received unexpected bridge id: %s", bridge_id)
+    LOGGER.warning("Received unexpected bridge id: %s", bridge_id)
 
     return bridge_id
