@@ -268,6 +268,15 @@ async def test_request(mock_aioresponse):
 async def test_session_handler():
     """Test session_handler works."""
     session = DeconzSession(Mock(), HOST, PORT, API_KEY, connection_status=Mock())
+
+    # Event handler not called when self.websocket is None
+
+    with patch.object(session, "event_handler", return_value=True) as event_handler:
+        await session.session_handler(signal="data")
+        event_handler.assert_not_called()
+
+    # Mock websocket
+
     session.websocket = Mock()
     session.websocket.data = {}
     session.websocket.state = "running"
