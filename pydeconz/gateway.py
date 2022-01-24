@@ -179,7 +179,8 @@ class DeconzSession:
         data - new data available for processing.
         state - network state has changed.
         """
-        assert self.websocket
+        if not self.websocket:
+            return
 
         if signal == SIGNAL_DATA:
             self.event_handler(self.websocket.data)
