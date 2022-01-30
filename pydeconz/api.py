@@ -1,17 +1,9 @@
 """API base classes."""
 
+from collections.abc import Awaitable, Callable, ItemsView, KeysView, ValuesView
 from asyncio import CancelledError, Task, create_task, sleep
 import logging
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Dict,
-    ItemsView,
-    KeysView,
-    Optional,
-    ValuesView,
-)
+from typing import Any, Dict, Optional
 
 from .errors import BridgeBusy
 

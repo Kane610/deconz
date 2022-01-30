@@ -2,8 +2,9 @@
 
 from asyncio import create_task, get_running_loop
 from collections import deque
+from collections.abc import Awaitable, Callable
 import logging
-from typing import Awaitable, Callable, Final, Literal
+from typing import Final, Literal
 
 import aiohttp
 
