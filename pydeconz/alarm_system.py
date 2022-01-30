@@ -1,6 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Awaitable, Callable, Dict, Final, Literal, Optional
+from __future__ import annotations
+
+from collections.abc import Awaitable, Callable
+from typing import Any, Final, Literal
 
 from .api import APIItem, APIItems
 
@@ -42,12 +45,12 @@ class AlarmSystems(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize alarm system manager."""
         super().__init__(raw, request, URL, AlarmSystem)
 
-    async def create_alarm_system(self, name: str) -> Dict[str, Any]:
+    async def create_alarm_system(self, name: str) -> dict[str, Any]:
         """Create a new alarm system.
 
         After creation the arm mode is set to disarmed.
@@ -78,19 +81,19 @@ class AlarmSystem(APIItem):
 
     async def set_alarm_system_configuration(
         self,
-        code0: Optional[str] = None,
-        armed_away_entry_delay: Optional[int] = None,
-        armed_away_exit_delay: Optional[int] = None,
-        armed_away_trigger_duration: Optional[int] = None,
-        armed_night_entry_delay: Optional[int] = None,
-        armed_night_exit_delay: Optional[int] = None,
-        armed_night_trigger_duration: Optional[int] = None,
-        armed_stay_entry_delay: Optional[int] = None,
-        armed_stay_exit_delay: Optional[int] = None,
-        armed_stay_trigger_duration: Optional[int] = None,
-        disarmed_entry_delay: Optional[int] = None,
-        disarmed_exit_delay: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        code0: str | None = None,
+        armed_away_entry_delay: int | None = None,
+        armed_away_exit_delay: int | None = None,
+        armed_away_trigger_duration: int | None = None,
+        armed_night_entry_delay: int | None = None,
+        armed_night_exit_delay: int | None = None,
+        armed_night_trigger_duration: int | None = None,
+        armed_stay_entry_delay: int | None = None,
+        armed_stay_exit_delay: int | None = None,
+        armed_stay_trigger_duration: int | None = None,
+        disarmed_entry_delay: int | None = None,
+        disarmed_exit_delay: int | None = None,
+    ) -> dict[str, Any]:
         """Set config of alarm system."""
         data = {
             key: value
@@ -116,7 +119,7 @@ class AlarmSystem(APIItem):
             json=data,
         )
 
-    async def arm_away(self, pin_code: str) -> Dict[str, Any]:
+    async def arm_away(self, pin_code: str) -> dict[str, Any]:
         """Set the alarm to away."""
         return await self._request(
             "put",
@@ -124,7 +127,7 @@ class AlarmSystem(APIItem):
             json={"code0": pin_code},
         )
 
-    async def arm_night(self, pin_code: str) -> Dict[str, Any]:
+    async def arm_night(self, pin_code: str) -> dict[str, Any]:
         """Set the alarm to night."""
         return await self._request(
             "put",
@@ -132,7 +135,7 @@ class AlarmSystem(APIItem):
             json={"code0": pin_code},
         )
 
-    async def arm_stay(self, pin_code: str) -> Dict[str, Any]:
+    async def arm_stay(self, pin_code: str) -> dict[str, Any]:
         """Set the alarm to stay."""
         return await self._request(
             "put",
@@ -140,7 +143,7 @@ class AlarmSystem(APIItem):
             json={"code0": pin_code},
         )
 
-    async def disarm(self, pin_code: str) -> Dict[str, Any]:
+    async def disarm(self, pin_code: str) -> dict[str, Any]:
         """Disarm alarm."""
         return await self._request(
             "put",
@@ -311,7 +314,7 @@ class AlarmSystem(APIItem):
         return self.raw["config"]["disarmed_exit_delay"]
 
     @property
-    def devices(self) -> Dict[str, Any]:
+    def devices(self) -> dict[str, Any]:
         """Devices associated with the alarm system.
 
         The keys refer to the uniqueid of a light, sensor, or keypad.
@@ -342,10 +345,10 @@ class AlarmSystem(APIItem):
             "state/vibration",
             "state/buttonevent",
             "state/on",
-            None,
-        ] = None,
+        ]
+        | None = None,
         is_keypad: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Link device with alarm system.
 
         A device can be linked to exactly one alarm system.
@@ -373,7 +376,7 @@ class AlarmSystem(APIItem):
             json=data,
         )
 
-    async def remove_device(self, unique_id: str) -> Dict[str, Any]:
+    async def remove_device(self, unique_id: str) -> dict[str, Any]:
         """Unlink device with alarm system."""
         return await self._request(
             "delete",

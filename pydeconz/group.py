@@ -1,17 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Dict,
-    Final,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    Union,
-)
+from __future__ import annotations
+
+from collections.abc import Awaitable, Callable
+from typing import Any, Final, Literal
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -38,7 +30,7 @@ class Groups(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""
         super().__init__(raw, request, URL, DeconzGroup)
@@ -55,7 +47,7 @@ class DeconzGroup(DeconzDevice):
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Set initial information about light group.
 
@@ -70,12 +62,12 @@ class DeconzGroup(DeconzDevice):
         return RESOURCE_TYPE
 
     @property
-    def state(self) -> Optional[bool]:
+    def state(self) -> bool | None:
         """Is any light in light group on."""
         return self.any_on
 
     @property
-    def brightness(self) -> Optional[int]:
+    def brightness(self) -> int | None:
         """Brightness of the light.
 
         Depending on the light type 0 might not mean visible "off"
@@ -84,12 +76,12 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("bri")
 
     @property
-    def color_temp(self) -> Optional[int]:
+    def color_temp(self) -> int | None:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["action"].get("ct")
 
     @property
-    def hue(self) -> Optional[int]:
+    def hue(self) -> int | None:
         """Color hue of the light.
 
         The hue parameter in the HSV color model is between 0°-360°
@@ -98,7 +90,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("hue")
 
     @property
-    def saturation(self) -> Optional[int]:
+    def saturation(self) -> int | None:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -107,7 +99,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("sat")
 
     @property
-    def xy(self) -> Optional[Tuple[float, float]]:
+    def xy(self) -> tuple[float, float] | None:
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
         x, y = self.raw["action"].get("xy", (None, None))
 
@@ -123,7 +115,7 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
+    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
         """Color mode of the light.
 
         ct - color temperature
@@ -133,7 +125,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("colormode")
 
     @property
-    def effect(self) -> Literal["colorloop", "none", None]:
+    def effect(self) -> Literal["colorloop", "none"] | None:
         """Effect of the group.
 
         colorloop
@@ -142,32 +134,32 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("effect")
 
     @property
-    def reachable(self) -> Optional[bool]:
+    def reachable(self) -> bool | None:
         """Is group reachable."""
         return True
 
     @property
-    def group_class(self) -> Optional[str]:
+    def group_class(self) -> str | None:
         """Type of class."""
         return self.raw.get("class")
 
     @property
-    def all_on(self) -> Optional[bool]:
+    def all_on(self) -> bool | None:
         """Is all lights in light group on."""
         return self.raw["state"].get("all_on")
 
     @property
-    def any_on(self) -> Optional[bool]:
+    def any_on(self) -> bool | None:
         """Is any lights in light group on."""
         return self.raw["state"].get("any_on")
 
     @property
-    def device_membership(self) -> Optional[list]:
+    def device_membership(self) -> list | None:
         """List of device ids (sensors) when group was created by a device."""
         return self.raw.get("devicemembership")
 
     @property
-    def hidden(self) -> Optional[bool]:
+    def hidden(self) -> bool | None:
         """Indicate the hidden status of the group.
 
         Has no effect at the gateway but apps can uses this to hide groups.
@@ -175,7 +167,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("hidden")
 
     @property
-    def id(self) -> Optional[str]:
+    def id(self) -> str | None:
         """Group ID."""
         return self.raw.get("id")
 
@@ -188,7 +180,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lights", [])
 
     @property
-    def light_sequence(self) -> Optional[list]:
+    def light_sequence(self) -> list | None:
         """List of light IDs in group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
@@ -196,7 +188,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw.get("lightsequence")
 
     @property
-    def multi_device_ids(self) -> Optional[list]:
+    def multi_device_ids(self) -> list | None:
         """List of light IDs in group.
 
         Subsequent ids from multidevices with multiple endpoints.
@@ -205,11 +197,11 @@ class DeconzGroup(DeconzDevice):
 
     async def set_attributes(
         self,
-        hidden: Optional[bool] = None,
-        light_sequence: Optional[List[str]] = None,
-        lights: Optional[List[str]] = None,
-        multi_device_ids: Optional[List[str]] = None,
-        name: Optional[str] = None,
+        hidden: bool | None = None,
+        light_sequence: list[str] | None = None,
+        lights: list[str] | None = None,
+        multi_device_ids: list[str] | None = None,
+        name: str | None = None,
     ) -> dict:
         """Change attributes of a group.
 
@@ -235,18 +227,18 @@ class DeconzGroup(DeconzDevice):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect", None] = None,
-        brightness: Optional[int] = None,
-        color_loop_speed: Optional[int] = None,
-        color_temperature: Optional[int] = None,
-        effect: Literal["colorloop", "none", None] = None,
-        hue: Optional[int] = None,
-        on: Optional[bool] = None,
-        on_time: Optional[int] = None,
-        saturation: Optional[int] = None,
-        toggle: Optional[bool] = None,
-        transition_time: Optional[int] = None,
-        xy: Optional[Tuple[float, float]] = None,
+        alert: Literal["none", "select", "lselect"] | None = None,
+        brightness: int | None = None,
+        color_loop_speed: int | None = None,
+        color_temperature: int | None = None,
+        effect: Literal["colorloop", "none"] | None = None,
+        hue: int | None = None,
+        on: bool | None = None,
+        on_time: int | None = None,
+        saturation: int | None = None,
+        toggle: bool | None = None,
+        transition_time: int | None = None,
+        xy: tuple[float, float] | None = None,
     ) -> dict:
         """Change state of a group.
 
@@ -301,7 +293,7 @@ class DeconzGroup(DeconzDevice):
         write light attributes with the value None to the group.
         This is used to not keep any bad values from the group.
         """
-        data: Dict[str, Union[float, int, str, tuple, None]] = {}
+        data: dict[str, float | int | str | tuple | None] = {}
 
         for group_key, light_attribute_key in GROUP_TO_LIGHT_ATTRIBUTES.items():
             light_attribute = getattr(light, light_attribute_key)
@@ -322,7 +314,7 @@ class Scenes(APIItems):
     def __init__(
         self,
         group: DeconzGroup,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize scene manager."""
         self.group = group
@@ -352,7 +344,7 @@ class DeconzScene:
         self,
         group: DeconzGroup,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Set initial information about scene.
 

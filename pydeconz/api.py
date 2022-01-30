@@ -1,17 +1,11 @@
 """API base classes."""
 
+from __future__ import annotations
+
 from asyncio import CancelledError, Task, create_task, sleep
+from collections.abc import Awaitable, Callable, ItemsView, KeysView, ValuesView
 import logging
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Dict,
-    ItemsView,
-    KeysView,
-    Optional,
-    ValuesView,
-)
+from typing import Any
 
 from .errors import BridgeBusy
 
@@ -24,7 +18,7 @@ class APIItems:
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
         path: str,
         item_cls: Any,
     ) -> None:
@@ -78,7 +72,7 @@ class APIItem:
         self,
         resource_id: str,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
         self._resource_id = resource_id
@@ -86,7 +80,7 @@ class APIItem:
         self._request = request
 
         self._callbacks: list = []
-        self._sleep_task: Optional[Task] = None
+        self._sleep_task: Task | None = None
         self._changed_keys: set = set()
 
     @property

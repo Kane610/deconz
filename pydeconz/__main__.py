@@ -1,9 +1,12 @@
 """Read attributes from your deCONZ gateway."""
 
+from __future__ import annotations
+
 import argparse
 import asyncio
+from collections.abc import Callable
 import logging
-from typing import Any, Callable, Optional
+from typing import Any
 
 import aiohttp
 import async_timeout
@@ -24,7 +27,7 @@ async def deconz_gateway(
     port: int,
     api_key: str,
     callback: Callable,
-) -> Optional[DeconzSession]:
+) -> DeconzSession | None:
     """Create a gateway object and verify configuration."""
     deconz = DeconzSession(session, host, port, api_key, add_device=callback)
 
