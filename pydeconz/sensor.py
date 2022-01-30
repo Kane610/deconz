@@ -276,8 +276,7 @@ class AncillaryControl(DeconzSensor):
         "exit_delay",
         "in_alarm",
         "not_ready",
-        None,
-    ]:
+    ] | None:
         """Mirror of alarm system state.armstate attribute.
 
         It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
@@ -740,8 +739,8 @@ class Switch(DeconzSensor):
     def device_mode(
         self,
     ) -> Literal[
-        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker", None
-    ]:
+        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
+    ] | None:
         """Different modes for the Hue wall switch module.
 
         Behavior as rocker:
@@ -763,7 +762,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("devicemode")
 
     @property
-    def mode(self) -> Literal["momentary", "rocker", None]:
+    def mode(self) -> Literal["momentary", "rocker"] | None:
         """For Ubisys S1/S2, operation mode of the switch.
 
         Supported values:
@@ -773,7 +772,7 @@ class Switch(DeconzSensor):
         return self.raw["config"].get("mode")
 
     @property
-    def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, None]:
+    def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None:
         """Set the covering type and starts calibration for Ubisys J1.
 
         Supported values:
@@ -854,7 +853,7 @@ class Thermostat(Temperature):
     @property
     def fan_mode(
         self,
-    ) -> Literal["off", "low", "medium", "high", "on", "auto", "smart", None]:
+    ) -> Literal["off", "low", "medium", "high", "on", "auto", "smart"] | None:
         """Fan mode.
 
         Supported values:
@@ -941,7 +940,9 @@ class Thermostat(Temperature):
     @property
     def preset(
         self,
-    ) -> Literal["holiday", "auto", "manual", "comfort", "eco", "boost", "complex"]:
+    ) -> Literal[
+        "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
+    ] | None:
         """Set the current operating mode for Tuya thermostats.
 
         Supported values:
@@ -975,8 +976,7 @@ class Thermostat(Temperature):
         "quarter open",
         "half open",
         "three quarters open",
-        None,
-    ]:
+    ] | None:
         """Set the AC louvers position.
 
         Supported values:
@@ -992,7 +992,7 @@ class Thermostat(Temperature):
     @property
     def temperature_measurement(
         self,
-    ) -> Literal["air sensor", "floor sensor", "floor protection", None]:
+    ) -> Literal["air sensor", "floor sensor", "floor protection"] | None:
         """Set the mode of operation for Elko Super TR thermostat.
 
         Supported values:
@@ -1021,9 +1021,8 @@ class Thermostat(Temperature):
         enable_schedule: bool | None = None,
         external_sensor_temperature: int | None = None,
         external_window_open: bool | None = None,
-        fan_mode: Literal[
-            "off", "low", "medium", "high", "on", "auto", "smart", None
-        ] = None,
+        fan_mode: Literal["off", "low", "medium", "high", "on", "auto", "smart"]
+        | None = None,
         flip_display: bool | None = None,
         heating_setpoint: int | None = None,
         locked: bool | None = None,
@@ -1037,13 +1036,14 @@ class Thermostat(Temperature):
             "fan only",
             "dry",
             "sleep",
-            None,
-        ] = None,
+        ]
+        | None = None,
         mounting_mode: bool | None = None,
         on: bool | None = None,
         preset: Literal[
             "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
-        ] = None,
+        ]
+        | None = None,
         schedule: list | None = None,
         set_valve: bool | None = None,
         swing_mode: Literal[
@@ -1052,11 +1052,12 @@ class Thermostat(Temperature):
             "quarter open",
             "half open",
             "three quarters open",
-            None,
-        ] = None,
+        ]
+        | None = None,
         temperature_measurement: Literal[
-            "air sensor", "floor sensor", "floor protection", None
-        ] = None,
+            "air sensor", "floor sensor", "floor protection"
+        ]
+        | None = None,
         window_open_detection: bool | None = None,
     ) -> dict:
         """Change config of thermostat.

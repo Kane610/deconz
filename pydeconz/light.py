@@ -75,7 +75,7 @@ class Light(DeconzLight):
     """
 
     @property
-    def alert(self) -> Literal["none", "select", "lselect", None]:
+    def alert(self) -> Literal["none", "select", "lselect"] | None:
         """Temporary alert effect.
 
         Following values are possible:
@@ -134,7 +134,7 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
+    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
         """Color mode of light.
 
         ct - color temperature
@@ -158,7 +158,7 @@ class Light(DeconzLight):
         return ctmin
 
     @property
-    def effect(self) -> Literal["colorloop", "none", None]:
+    def effect(self) -> Literal["colorloop", "none"] | None:
         """Effect of the light.
 
         colorloop — the light will cycle continuously through all colors
@@ -178,11 +178,11 @@ class Light(DeconzLight):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect", None] = None,
+        alert: Literal["none", "select", "lselect"] | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none", None] = None,
+        effect: Literal["colorloop", "none"] | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

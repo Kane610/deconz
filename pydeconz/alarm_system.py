@@ -345,8 +345,8 @@ class AlarmSystem(APIItem):
             "state/vibration",
             "state/buttonevent",
             "state/on",
-            None,
-        ] = None,
+        ]
+        | None = None,
         is_keypad: bool = False,
     ) -> dict[str, Any]:
         """Link device with alarm system.

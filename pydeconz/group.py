@@ -115,7 +115,7 @@ class DeconzGroup(DeconzDevice):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy", None]:
+    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
         """Color mode of the light.
 
         ct - color temperature
@@ -125,7 +125,7 @@ class DeconzGroup(DeconzDevice):
         return self.raw["action"].get("colormode")
 
     @property
-    def effect(self) -> Literal["colorloop", "none", None]:
+    def effect(self) -> Literal["colorloop", "none"] | None:
         """Effect of the group.
 
         colorloop
@@ -227,11 +227,11 @@ class DeconzGroup(DeconzDevice):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect", None] = None,
+        alert: Literal["none", "select", "lselect"] | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none", None] = None,
+        effect: Literal["colorloop", "none"] | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

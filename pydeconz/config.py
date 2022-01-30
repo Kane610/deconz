@@ -102,7 +102,7 @@ class Config:
         return self.raw.get("networkopenduration")
 
     @property
-    def ntp(self) -> Literal["synced", "unsynced", None]:
+    def ntp(self) -> Literal["synced", "unsynced"] | None:
         """Tells if the NTP time is "synced" or "unsynced".
 
         Only for gateways running on Linux.
@@ -138,7 +138,7 @@ class Config:
         return self.raw.get("swversion")
 
     @property
-    def time_format(self) -> Literal["12h", "24h", None]:
+    def time_format(self) -> Literal["12h", "24h"] | None:
         """Timeformat used by gateway.
 
         Supported values:
@@ -184,7 +184,7 @@ class Config:
         return self.raw.get("whitelist")
 
     @property
-    def zigbee_channel(self) -> Literal[11, 15, 20, 25, None]:
+    def zigbee_channel(self) -> Literal[11, 15, 20, 25] | None:
         """Wireless frequency channel.
 
         Supported channels: 11, 15, 20, 25.
@@ -201,12 +201,12 @@ class Config:
         otau_active: bool | None = None,
         permit_join: int | None = None,
         rf_connected: bool | None = None,
-        time_format: Literal["12h", "24h", None] = None,
+        time_format: Literal["12h", "24h"] | None = None,
         time_zone: str | None = None,
         unlock: int | None = None,
-        update_channel: Literal["alpha", "beta", "stable", None] = None,
+        update_channel: Literal["alpha", "beta", "stable"] | None = None,
         utc: str | None = None,
-        zigbee_channel: Literal[11, 15, 20, 25, None] = None,
+        zigbee_channel: Literal[11, 15, 20, 25] | None = None,
         websocket_notify_all: bool | None = None,
     ) -> dict[str, Any]:
         """Modify configuration parameters.
