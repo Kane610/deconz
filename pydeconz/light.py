@@ -1,7 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 from collections.abc import Awaitable, Callable
-from typing import Any, Dict, Final, Literal, Optional, Tuple, Union
+from typing import Any, Final, Literal
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -34,7 +36,7 @@ class Lights(APIItems):
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize light manager."""
         super().__init__(raw, request, URL, create_light)
@@ -55,7 +57,7 @@ class DeconzLight(DeconzDevice):
         return RESOURCE_TYPE
 
     @property
-    def state(self) -> Optional[bool]:
+    def state(self) -> bool | None:
         """Device state."""
         return self.raw["state"].get("on")
 
@@ -84,7 +86,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("alert")
 
     @property
-    def brightness(self) -> Optional[int]:
+    def brightness(self) -> int | None:
         """Brightness of the light.
 
         Depending on the light type 0 might not mean visible "off"
@@ -93,12 +95,12 @@ class Light(DeconzLight):
         return self.raw["state"].get("bri")
 
     @property
-    def color_temp(self) -> Optional[int]:
+    def color_temp(self) -> int | None:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["state"].get("ct")
 
     @property
-    def hue(self) -> Optional[int]:
+    def hue(self) -> int | None:
         """Color hue of the light.
 
         The hue parameter in the HSV color model is between 0°-360°
@@ -107,7 +109,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("hue")
 
     @property
-    def saturation(self) -> Optional[int]:
+    def saturation(self) -> int | None:
         """Color saturation of the light.
 
         There 0 means no color at all and 255 is the greatest saturation
@@ -116,7 +118,7 @@ class Light(DeconzLight):
         return self.raw["state"].get("sat")
 
     @property
-    def xy(self) -> Optional[Tuple[float, float]]:
+    def xy(self) -> tuple[float, float] | None:
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
         x, y = self.raw["state"].get("xy", (None, None))
 
@@ -142,14 +144,14 @@ class Light(DeconzLight):
         return self.raw["state"].get("colormode")
 
     @property
-    def max_color_temp(self) -> Optional[int]:
+    def max_color_temp(self) -> int | None:
         """Max value for color temperature."""
         if (ctmax := self.raw.get("ctmax")) is not None and ctmax > 650:
             ctmax = 650
         return ctmax
 
     @property
-    def min_color_temp(self) -> Optional[int]:
+    def min_color_temp(self) -> int | None:
         """Min value for color temperature."""
         if (ctmin := self.raw.get("ctmin")) is not None and ctmin < 140:
             ctmin = 140
@@ -177,16 +179,16 @@ class Light(DeconzLight):
     async def set_state(
         self,
         alert: Literal["none", "select", "lselect", None] = None,
-        brightness: Optional[int] = None,
-        color_loop_speed: Optional[int] = None,
-        color_temperature: Optional[int] = None,
+        brightness: int | None = None,
+        color_loop_speed: int | None = None,
+        color_temperature: int | None = None,
         effect: Literal["colorloop", "none", None] = None,
-        hue: Optional[int] = None,
-        on: Optional[bool] = None,
-        on_time: Optional[int] = None,
-        saturation: Optional[int] = None,
-        transition_time: Optional[int] = None,
-        xy: Optional[Tuple[float, float]] = None,
+        hue: int | None = None,
+        on: bool | None = None,
+        on_time: int | None = None,
+        saturation: int | None = None,
+        transition_time: int | None = None,
+        xy: tuple[float, float] | None = None,
     ) -> dict:
         """Change state of a light.
 
@@ -269,7 +271,7 @@ class Cover(DeconzLight):
         return self.raw["state"]["lift"]
 
     @property
-    def tilt(self) -> Optional[int]:
+    def tilt(self) -> int | None:
         """Amount of tilt.
 
         0 is fully open.
@@ -282,7 +284,7 @@ class Cover(DeconzLight):
         return None
 
     async def set_position(
-        self, *, lift: Optional[int] = None, tilt: Optional[int] = None
+        self, *, lift: int | None = None, tilt: int | None = None
     ) -> dict:
         """Set amount of closed position and/or tilt of cover.
 
@@ -323,7 +325,7 @@ class Cover(DeconzLight):
 
     async def stop(self) -> dict:
         """Stop cover motion."""
-        data: Dict[str, Union[bool, int]]
+        data: dict[str, bool | int]
         data = {"stop": True}
         if "lift" not in self.raw["state"]:  # Legacy support
             data = {"bri_inc": 0}
@@ -389,12 +391,12 @@ class Siren(DeconzLight):
         """If device is sounding."""
         return self.raw["state"][ALERT_KEY] == ALERT_LONG
 
-    async def turn_on(self, duration: Optional[int] = None) -> dict:
+    async def turn_on(self, duration: int | None = None) -> dict:
         """Turn on device.
 
         Duration is counted as 1/10 of a second.
         """
-        data: Dict[str, Union[int, str]] = {ALERT_KEY: ALERT_LONG}
+        data: dict[str, int | str] = {ALERT_KEY: ALERT_LONG}
         if duration:
             data[ON_TIME_KEY] = duration
         return await self.request(field=f"{self.deconz_id}/state", data=data)
@@ -413,7 +415,7 @@ NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
 def create_light(
     light_id: str,
     raw: dict,
-    request: Callable[..., Awaitable[Dict[str, Any]]],
+    request: Callable[..., Awaitable[dict[str, Any]]],
 ) -> DeconzLight:
     # ) -> Union[Light, ConfigurationTool, Cover, Fan, Lock, Siren]:
     """Create device out of a light resource."""

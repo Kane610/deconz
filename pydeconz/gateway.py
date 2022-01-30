@@ -1,9 +1,11 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 from collections.abc import Callable
 import logging
 from pprint import pformat
-from typing import Any, Dict, Final, Literal, Optional, Union
+from typing import Any, Final, Literal
 
 import aiohttp
 
@@ -50,9 +52,9 @@ class DeconzSession:
         session: aiohttp.ClientSession,
         host: str,
         port: int,
-        api_key: Optional[str] = None,
-        add_device: Optional[Callable[[str, Any], None]] = None,
-        connection_status: Optional[Callable[[bool], None]] = None,
+        api_key: str | None = None,
+        add_device: Callable[[str, Any], None] | None = None,
+        connection_status: Callable[[bool], None] | None = None,
     ):
         """Session setup."""
         self.session = session
@@ -64,16 +66,16 @@ class DeconzSession:
         self.connection_status_callback = connection_status
 
         self.alarmsystems = AlarmSystems({}, self.request)
-        self.config: Optional[Config] = None
+        self.config: Config | None = None
         self.groups = Groups({}, self.request)
         self.lights = Lights({}, self.request)
-        self.scenes: Dict[str, DeconzScene] = {}
+        self.scenes: dict[str, DeconzScene] = {}
         self.sensors = Sensors({}, self.request)
-        self.websocket: Optional[WSClient] = None
+        self.websocket: WSClient | None = None
 
     async def get_api_key(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         client_name: str = "pydeconz",
     ) -> str:
         """Request a new API key.
@@ -98,7 +100,7 @@ class DeconzSession:
 
         return response[0]["success"]["username"]  # type: ignore[index]
 
-    def start(self, websocketport: Optional[int] = None) -> None:
+    def start(self, websocketport: int | None = None) -> None:
         """Connect websocket to deCONZ."""
         if self.config:
             websocketport = self.config.websocket_port
@@ -136,8 +138,8 @@ class DeconzSession:
         self,
         method: str,
         path: str,
-        json: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        json: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Make a request to the API."""
         return await self._request(
             method,
@@ -149,8 +151,8 @@ class DeconzSession:
         self,
         method: str,
         url: str,
-        json: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        json: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Make a request."""
         LOGGER.debug('Sending "%s" "%s" to "%s"', method, json, url)
 
@@ -219,7 +221,7 @@ class DeconzSession:
                 self.add_device_callback(resource_type, device)
             return
 
-    def update_group_color(self, lights: list) -> None:
+    def update_group_color(self, lights: list[str]) -> None:
         """Update group colors based on light states.
 
         deCONZ group updates don't contain any information about the current
@@ -256,7 +258,7 @@ class DeconzSession:
         )
 
 
-def _raise_on_error(data: Union[list, dict]) -> None:
+def _raise_on_error(data: list | dict) -> None:
     """Check response for error message."""
     if isinstance(data, list) and data:
         data = data[0]

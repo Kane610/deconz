@@ -1,7 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 from collections.abc import Awaitable, Callable
-from typing import Any, Dict, Final, Literal, Optional
+from typing import Any, Final, Literal
 
 from .utils import normalize_bridge_id
 
@@ -20,14 +22,14 @@ class Config:
     def __init__(
         self,
         raw: dict,
-        request: Callable[..., Awaitable[Dict[str, Any]]],
+        request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Set configuration about deCONZ gateway."""
         self.raw = raw
         self.request = request
 
     @property
-    def api_version(self) -> Optional[str]:
+    def api_version(self) -> str | None:
         """Version of the deCONZ Rest API."""
         return self.raw.get("apiversion")
 
@@ -37,7 +39,7 @@ class Config:
         return normalize_bridge_id(self.raw.get("bridgeid", UNINITIALIZED_BRIDGE_ID))
 
     @property
-    def device_name(self) -> Optional[str]:
+    def device_name(self) -> str | None:
         """Product name of the gateway.
 
         Valid values are "ConBee", "RaspBee", "ConBee II" and "RaspBee II".
@@ -45,57 +47,57 @@ class Config:
         return self.raw.get("devicename")
 
     @property
-    def dhcp(self) -> Optional[bool]:
+    def dhcp(self) -> bool | None:
         """Whether the IP address of the bridge is obtained with DHCP."""
         return self.raw.get("dhcp")
 
     @property
-    def firmware_version(self) -> Optional[str]:
+    def firmware_version(self) -> str | None:
         """Version of the ZigBee firmware."""
         return self.raw.get("fwversion")
 
     @property
-    def gateway(self) -> Optional[str]:
+    def gateway(self) -> str | None:
         """IPv4 address of the gateway."""
         return self.raw.get("gateway")
 
     @property
-    def ip_address(self) -> Optional[str]:
+    def ip_address(self) -> str | None:
         """IPv4 address of the gateway."""
         return self.raw.get("ipaddress")
 
     @property
-    def link_button(self) -> Optional[bool]:
+    def link_button(self) -> bool | None:
         """Is gateway unlocked."""
         return self.raw.get("linkbutton")
 
     @property
-    def local_time(self) -> Optional[bool]:
+    def local_time(self) -> bool | None:
         """Localtime of the gateway."""
         return self.raw.get("localtime")
 
     @property
-    def mac(self) -> Optional[str]:
+    def mac(self) -> str | None:
         """MAC address of gateway."""
         return self.raw.get("mac")
 
     @property
-    def model_id(self) -> Optional[str]:
+    def model_id(self) -> str | None:
         """Model describing either conbee or raspbee."""
         return self.raw.get("modelid")
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Name of the gateway."""
         return self.raw.get("name")
 
     @property
-    def network_mask(self) -> Optional[str]:
+    def network_mask(self) -> str | None:
         """Network mask of the gateway."""
         return self.raw.get("netmask")
 
     @property
-    def network_open_duration(self) -> Optional[int]:
+    def network_open_duration(self) -> int | None:
         """Duration in seconds used by lights and sensors search."""
         return self.raw.get("networkopenduration")
 
@@ -108,12 +110,12 @@ class Config:
         return self.raw.get("ntp")
 
     @property
-    def pan_id(self) -> Optional[int]:
+    def pan_id(self) -> int | None:
         """Zigbee pan ID of the gateway."""
         return self.raw.get("panid")
 
     @property
-    def portal_services(self) -> Optional[bool]:
+    def portal_services(self) -> bool | None:
         """State of registration to portal service.
 
         Is the bridge registered to synchronize data with a portal account.
@@ -121,17 +123,17 @@ class Config:
         return self.raw.get("portalservices")
 
     @property
-    def rf_connected(self) -> Optional[bool]:
+    def rf_connected(self) -> bool | None:
         """State of deCONZ connection to firmware and if Zigbee network is up."""
         return self.raw.get("rfconnected")
 
     @property
-    def software_update(self) -> Optional[dict]:
+    def software_update(self) -> dict | None:
         """Contains information related to software updates."""
         return self.raw.get("swupdate")
 
     @property
-    def software_version(self) -> Optional[str]:
+    def software_version(self) -> str | None:
         """Software version of the gateway."""
         return self.raw.get("swversion")
 
@@ -145,7 +147,7 @@ class Config:
         return self.raw.get("timeformat")
 
     @property
-    def time_zone(self) -> Optional[str]:
+    def time_zone(self) -> str | None:
         """Time zone used by gateway.
 
         Only on Raspberry Pi.
@@ -154,17 +156,17 @@ class Config:
         return self.raw.get("timezone")
 
     @property
-    def utc(self) -> Optional[str]:
+    def utc(self) -> str | None:
         """UTC time of gateway in ISO 8601 format."""
         return self.raw.get("utc")
 
     @property
-    def uuid(self) -> Optional[str]:
+    def uuid(self) -> str | None:
         """UPNP Unique ID of the gateway."""
         return self.raw.get("uuid")
 
     @property
-    def websocket_notify_all(self) -> Optional[bool]:
+    def websocket_notify_all(self) -> bool | None:
         """All state changes will be signalled through the Websocket connection.
 
         Default true.
@@ -172,12 +174,12 @@ class Config:
         return self.raw.get("websocketnotifyall")
 
     @property
-    def websocket_port(self) -> Optional[int]:
+    def websocket_port(self) -> int | None:
         """Websocket port."""
         return self.raw.get("websocketport")
 
     @property
-    def whitelist(self) -> Optional[dict]:
+    def whitelist(self) -> dict | None:
         """Array of whitelisted API keys."""
         return self.raw.get("whitelist")
 
@@ -191,22 +193,22 @@ class Config:
 
     async def set_config(
         self,
-        discovery: Optional[bool] = None,
-        group_delay: Optional[int] = None,
-        light_last_seen_interval: Optional[int] = None,
-        name: Optional[str] = None,
-        network_open_duration: Optional[int] = None,
-        otau_active: Optional[bool] = None,
-        permit_join: Optional[int] = None,
-        rf_connected: Optional[bool] = None,
+        discovery: bool | None = None,
+        group_delay: int | None = None,
+        light_last_seen_interval: int | None = None,
+        name: str | None = None,
+        network_open_duration: int | None = None,
+        otau_active: bool | None = None,
+        permit_join: int | None = None,
+        rf_connected: bool | None = None,
         time_format: Literal["12h", "24h", None] = None,
-        time_zone: Optional[str] = None,
-        unlock: Optional[int] = None,
+        time_zone: str | None = None,
+        unlock: int | None = None,
         update_channel: Literal["alpha", "beta", "stable", None] = None,
-        utc: Optional[str] = None,
+        utc: str | None = None,
         zigbee_channel: Literal[11, 15, 20, 25, None] = None,
-        websocket_notify_all: Optional[bool] = None,
-    ) -> Dict[str, Any]:
+        websocket_notify_all: bool | None = None,
+    ) -> dict[str, Any]:
         """Modify configuration parameters.
 
         Supported values:
