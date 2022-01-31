@@ -3,13 +3,23 @@
 from __future__ import annotations
 
 from asyncio import CancelledError, Task, create_task, sleep
-from collections.abc import Awaitable, Callable, ItemsView, KeysView, ValuesView
+from collections.abc import (
+    Awaitable,
+    Callable,
+    ItemsView,
+    Iterable,
+    KeysView,
+    ValuesView,
+)
 import logging
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 from .errors import BridgeBusy
 
 LOGGER = logging.getLogger(__name__)
+
+# T = TypeVar("T", bound="APIItem")
+T = TypeVar("T")
 
 
 class APIItems:
@@ -20,14 +30,16 @@ class APIItems:
         raw: dict,
         request: Callable[..., Awaitable[dict[str, Any]]],
         path: str,
-        item_cls: Any,
+        item_cls: T,
+        # item_cls: Callable[..., T],
     ) -> None:
         """Initialize API items."""
         self._request = request
         self._path = path
         self._item_cls = item_cls
-        self._items: dict = {}
+        self._items: dict[str, T] = {}
         self.process_raw(raw)
+        reveal_type(item_cls)
 
     async def update(self) -> None:
         """Refresh data."""
@@ -44,28 +56,29 @@ class APIItems:
             else:
                 self._items[id] = self._item_cls(id, raw_item, self._request)
 
-    def items(self) -> ItemsView[str, Any]:
+    def items(self) -> ItemsView[str, T]:
         """Return items."""
         return self._items.items()
 
-    def keys(self) -> KeysView[Any]:
+    def keys(self) -> KeysView[str]:
         """Return item keys."""
         return self._items.keys()
 
-    def values(self) -> ValuesView[Any]:
+    def values(self) -> ValuesView[T]:
         """Return item values."""
         return self._items.values()
 
-    def __getitem__(self, obj_id: str) -> Any:
+    def __getitem__(self, obj_id: str) -> T:
         """Get item value based on key."""
         return self._items[obj_id]
 
-    def __iter__(self) -> Any:
+    def __iter__(self) -> Iterable[str]:
         """Allow iterate over items."""
         return iter(self._items)
 
 
 class APIItem:
+    # class APIItem(Generic[T]):
     """Base class for an API item."""
 
     def __init__(
