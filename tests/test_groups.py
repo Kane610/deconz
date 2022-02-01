@@ -174,10 +174,25 @@ async def test_create_group():
     await scene.recall()
     mock_request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
 
-    group.scenes.process_raw([{"id": "1", "name": "coldlight"}])
+    group.update(
+        {
+            "scenes": [
+                {"id": "1", "name": "coldlight"},
+                {"id": "2", "name": "New scene"},
+            ]
+        }
+    )
+
+    assert len(group.scenes.values()) == 2
 
     assert scene.name == "coldlight"
     assert scene.full_name == "Hall coldlight"
+
+    scene2 = group.scenes["2"]
+    assert scene2.deconz_id == "/groups/0/scenes/2"
+    assert scene2.id == "2"
+    assert scene2.name == "New scene"
+    assert scene2.full_name == "Hall New scene"
 
 
 @pytest.mark.parametrize(

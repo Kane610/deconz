@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from .api import APIItems
+from .api import APIItem, APIItems
 from .deconz_device import DeconzDevice
 from .light import Light
 
@@ -33,10 +33,10 @@ class Groups(APIItems):
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""
-        super().__init__(raw, request, URL, DeconzGroup)
+        super().__init__(raw, request, URL, Group)
 
 
-class DeconzGroup(DeconzDevice):
+class Group(DeconzDevice):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ
@@ -55,6 +55,13 @@ class DeconzGroup(DeconzDevice):
         """
         super().__init__(resource_id, raw, request)
         self.scenes = Scenes(self, request)
+
+    def update(self, raw: dict[str, Any]) -> None:
+        """Update group and scenes with new data."""
+        super().update(raw)
+
+        if "scenes" in self.changed_keys:
+            self.scenes.process_raw(self.scenes.pre_process_raw(self))
 
     @property
     def resource_type(self) -> str:
@@ -313,27 +320,22 @@ class Scenes(APIItems):
 
     def __init__(
         self,
-        group: DeconzGroup,
+        group: Group,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize scene manager."""
         self.group = group
+        raw = self.pre_process_raw(group)
         url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
-        super().__init__(group.raw["scenes"], request, url, DeconzScene)
+        super().__init__(raw, request, url, Scene)
 
-    def process_raw(self, raw: list) -> None:  # type: ignore
-        """Process raw scene data."""
-        for raw_item in raw:
-            id = raw_item["id"]
-            obj = self._items.get(id)
-
-            if obj is not None:
-                obj.raw = raw_item
-            else:
-                self._items[id] = self._item_cls(self.group, raw_item, self._request)
+    @staticmethod
+    def pre_process_raw(group: Group) -> dict[str, dict[str, Any]]:
+        """Transform scenes raw from list to dict."""
+        return {scene["id"]: scene | {"group": group} for scene in group.raw["scenes"]}
 
 
-class DeconzScene:
+class Scene(APIItem):
     """deCONZ scene representation.
 
     Dresden Elektroniks documentation of scenes in deCONZ
@@ -342,17 +344,13 @@ class DeconzScene:
 
     def __init__(
         self,
-        group: DeconzGroup,
-        raw: dict,
+        resource_id: str,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
-        """Set initial information about scene.
-
-        Set callback to set state of device.
-        """
-        self.group = group
-        self.raw = raw
-        self._request = request
+        """Set initial information about scene."""
+        super().__init__(resource_id, raw, request)
+        self.group = raw["group"]
 
     @property
     def resource_type(self) -> str:
