@@ -54,14 +54,17 @@ class Group(DeconzDevice):
         Create scenes related to light group.
         """
         super().__init__(resource_id, raw, request)
-        self.scenes = Scenes(self, request)
+
+        self.scenes = Scenes(raw, request, self.deconz_id, self.name)
 
     def update(self, raw: dict[str, Any]) -> None:
         """Update group and scenes with new data."""
         super().update(raw)
 
         if "scenes" in self.changed_keys:
-            self.scenes.process_raw(self.scenes.pre_process_raw(self))
+            self.scenes.process_raw(
+                self.scenes.pre_process_raw(raw, self.deconz_id, self.name)
+            )
 
     @property
     def resource_type(self) -> str:
@@ -320,19 +323,28 @@ class Scenes(APIItems):
 
     def __init__(
         self,
-        group: Group,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
+        group_id: str,
+        group_name: str,
     ) -> None:
         """Initialize scene manager."""
-        self.group = group
-        raw = self.pre_process_raw(group)
-        url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
+        raw = self.pre_process_raw(raw, group_id, group_name)
+        url = f"{URL}/{group_id}/{RESOURCE_TYPE_SCENE}"
         super().__init__(raw, request, url, Scene)
 
+        self.group_id: str = group_id
+        self.group_name: str = group_name
+
     @staticmethod
-    def pre_process_raw(group: Group) -> dict[str, dict[str, Any]]:
+    def pre_process_raw(
+        raw: dict[str, Any], group_id: str, group_name: str
+    ) -> dict[str, dict[str, Any]]:
         """Transform scenes raw from list to dict."""
-        return {scene["id"]: scene | {"group": group} for scene in group.raw["scenes"]}
+        return {
+            scene["id"]: scene | {"group_deconz_id": group_id, "group_name": group_name}
+            for scene in raw["scenes"]
+        }
 
 
 class Scene(APIItem):
@@ -350,7 +362,9 @@ class Scene(APIItem):
     ) -> None:
         """Set initial information about scene."""
         super().__init__(resource_id, raw, request)
-        self.group = raw["group"]
+
+        self.group_deconz_id = raw["group_deconz_id"]
+        self.group_name = raw["group_name"]
 
     @property
     def resource_type(self) -> str:
@@ -364,7 +378,7 @@ class Scene(APIItem):
     @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group.deconz_id}/{self.resource_type}/{self.id}"
+        return f"{self.group_deconz_id}/{self.resource_type}/{self.id}"
 
     @property
     def id(self) -> str:
@@ -379,4 +393,4 @@ class Scene(APIItem):
     @property
     def full_name(self) -> str:
         """Full name."""
-        return f"{self.group.name} {self.name}"
+        return f"{self.group_name} {self.name}"
