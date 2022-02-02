@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from pydeconz.sensor import (
-    DEVICE_MODE_DUAL_ROCKER,
+    SWITCH_DEVICE_MODE_DUAL_ROCKER,
     SENSOR_CLASSES,
     THERMOSTAT_FAN_MODE_AUTO,
     THERMOSTAT_MODE_AUTO,
@@ -589,13 +589,12 @@ async def test_fire_sensor_test_develco():
                     "fire": False,
                     "lastupdated": "2021-11-25T08:00:02.003",
                     "lowbattery": False,
-                    "test": True
+                    "test": True,
                 },
                 "swversion": "20210526 05:57",
                 "type": "ZHAFire",
-                "uniqueid": "00:11:22:33:44:55:66:77-88-9900"
+                "uniqueid": "00:11:22:33:44:55:66:77-88-9900",
             }
-
         },
         AsyncMock(),
     )
@@ -1270,6 +1269,7 @@ async def test_switch_sensor_cube():
 
 async def test_switch_sensor_hue_wall_switch_module():
     """Verify that cube switch sensor works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -1297,7 +1297,7 @@ async def test_switch_sensor_hue_wall_switch_module():
                 "uniqueid": "00:17:88:01:0b:00:05:5d-01-fc00",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -1307,7 +1307,7 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.state == 1002
     assert sensor.button_event == 1002
     assert sensor.event_duration == 1
-    assert sensor.device_mode == DEVICE_MODE_DUAL_ROCKER
+    assert sensor.device_mode == SWITCH_DEVICE_MODE_DUAL_ROCKER
     assert not sensor.angle
     assert not sensor.gesture
     assert not sensor.mode
@@ -1333,6 +1333,13 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.software_version == "20210115"
     assert sensor.type == "ZHASwitch"
     assert sensor.unique_id == "00:17:88:01:0b:00:05:5d-01-fc00"
+
+    await sensor.set_config(device_mode=SWITCH_DEVICE_MODE_DUAL_ROCKER)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"devicemode": "dualrocker"},
+    )
 
 
 async def test_switch_sensor_tint_remote():
@@ -1390,6 +1397,7 @@ async def test_switch_sensor_tint_remote():
 
 async def test_switch_ubisys_j1():
     """Verify that tint remote sensor works."""
+    mock_request = AsyncMock()
     sensors = Sensors(
         {
             "0": {
@@ -1412,7 +1420,7 @@ async def test_switch_ubisys_j1():
                 "uniqueid": "00:1f:ee:00:00:00:00:09-02-0102",
             },
         },
-        AsyncMock(),
+        mock_request,
     )
     sensor = sensors["0"]
 
@@ -1442,6 +1450,13 @@ async def test_switch_ubisys_j1():
     assert sensor.software_version == "20190129-DE-FB0"
     assert sensor.type == "ZHASwitch"
     assert sensor.unique_id == "00:1f:ee:00:00:00:00:09-02-0102"
+
+    await sensor.set_config(window_covering_type=2)
+    mock_request.assert_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"windowcoveringtype": 2},
+    )
 
 
 async def test_temperature_sensor():

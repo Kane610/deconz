@@ -49,17 +49,20 @@ DAYLIGHT_STATUS: Final = {
     230: "night_start",
 }
 
-DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
-DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
-DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
-DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
-
 PRESENCE_DELAY: Final = "delay"
 PRESENCE_DURATION: Final = "duration"
 PRESENCE_SENSITIVITY: Final = "sensitivity"
 PRESENCE_SENSITIVITY_MAX: Final = "sensitivitymax"
 PRESENCE_DARK: Final = "dark"
 PRESENCE_PRESENCE: Final = "presence"
+
+SWITCH_DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
+SWITCH_DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
+SWITCH_DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
+SWITCH_DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
+
+SWITCH_MODE_MOMENTARY: Final = "momentary"
+SWITCH_MODE_ROCKER: Final = "rocker"
 
 THERMOSTAT_MODE_AUTO: Final = "auto"
 THERMOSTAT_MODE_COOL: Final = "cool"
@@ -788,6 +791,39 @@ class Switch(DeconzSensor):
         - 9 = Projector Screen
         """
         return self.raw["config"].get("windowcoveringtype")
+
+    async def set_config(
+        self,
+        device_mode: Literal[
+            "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
+        ]
+        | None = None,
+        mode: Literal["momentary", "rocker"] | None = None,
+        window_covering_type: Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None = None,
+    ) -> dict:
+        """Change config of presence sensor.
+
+        Supported values:
+        - device_mode [str]
+          - "dualpushbutton"
+          - "dualrocker"
+          - "singlepushbutton"
+          - "singlerocker"
+        - mode [str]
+          - "momentary"
+          - "rocker"
+        - window_covering_type [int] 0-9
+        """
+        data = {
+            key: value
+            for key, value in {
+                "devicemode": device_mode,
+                "mode": mode,
+                "windowcoveringtype": window_covering_type,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}/config", data=data)
 
 
 class Temperature(DeconzSensor):
