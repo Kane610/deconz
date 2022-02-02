@@ -32,7 +32,14 @@ async def test_create_group():
                 "id": "11",
                 "lights": ["14", "15", "12"],
                 "name": "Hall",
-                "scenes": [{"id": "1", "name": "warmlight"}],
+                "scenes": [
+                    {
+                        "id": "1",
+                        "name": "warmlight",
+                        "lightcount": 3,
+                        "transitiontime": 10,
+                    }
+                ],
                 "state": {"all_on": False, "any_on": True},
                 "type": "LightGroup",
             }
@@ -165,19 +172,66 @@ async def test_create_group():
 
     # Scene
 
+    await group.scenes.create_scene(name="Garage")
+    mock_request.assert_called_with(
+        "post", path="/groups/0/scenes", json={"name": "Garage"}
+    )
+
     scene = group.scenes["1"]
     assert scene.deconz_id == "/groups/0/scenes/1"
     assert scene.id == "1"
+    assert scene.light_count == 3
+    assert scene.transition_time == 10
     assert scene.name == "warmlight"
     assert scene.full_name == "Hall warmlight"
 
     await scene.recall()
-    mock_request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1/recall",
+        json={},
+    )
 
-    group.scenes.process_raw([{"id": "1", "name": "coldlight"}])
+    await scene.store()
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1/store",
+        json={},
+    )
+
+    await scene.set_attributes(name="new name")
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1",
+        json={"name": "new name"},
+    )
+
+    await scene.set_attributes()
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1",
+        json={},
+    )
+
+    group.update(
+        {
+            "scenes": [
+                {"id": "1", "name": "coldlight"},
+                {"id": "2", "name": "New scene"},
+            ]
+        }
+    )
+
+    assert len(group.scenes.values()) == 2
 
     assert scene.name == "coldlight"
     assert scene.full_name == "Hall coldlight"
+
+    scene2 = group.scenes["2"]
+    assert scene2.deconz_id == "/groups/0/scenes/2"
+    assert scene2.id == "2"
+    assert scene2.name == "New scene"
+    assert scene2.full_name == "Hall New scene"
 
 
 @pytest.mark.parametrize(

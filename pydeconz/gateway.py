@@ -12,7 +12,7 @@ import aiohttp
 from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
 from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
-from .group import RESOURCE_TYPE as GROUP_RESOURCE, DeconzScene, Groups
+from .group import RESOURCE_TYPE as GROUP_RESOURCE, Groups, Scene
 from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
 from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE, Sensors
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
@@ -69,7 +69,7 @@ class DeconzSession:
         self.config: Config | None = None
         self.groups = Groups({}, self.request)
         self.lights = Lights({}, self.request)
-        self.scenes: dict[str, DeconzScene] = {}
+        self.scenes: dict[str, Scene] = {}
         self.sensors = Sensors({}, self.request)
         self.websocket: WSClient | None = None
 

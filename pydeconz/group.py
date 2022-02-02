@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from .api import APIItems
+from .api import APIItem, APIItems
 from .deconz_device import DeconzDevice
 from .light import Light
 
@@ -33,10 +33,10 @@ class Groups(APIItems):
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""
-        super().__init__(raw, request, URL, DeconzGroup)
+        super().__init__(raw, request, URL, Group)
 
 
-class DeconzGroup(DeconzDevice):
+class Group(DeconzDevice):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ
@@ -54,7 +54,17 @@ class DeconzGroup(DeconzDevice):
         Create scenes related to light group.
         """
         super().__init__(resource_id, raw, request)
-        self.scenes = Scenes(self, request)
+
+        self.scenes = Scenes(raw, request, self.deconz_id, self.name)
+
+    def update(self, raw: dict[str, Any]) -> None:
+        """Update group and scenes with new data."""
+        super().update(raw)
+
+        if "scenes" in self.changed_keys:
+            self.scenes.process_raw(
+                self.scenes.pre_process_raw(raw, self.deconz_id, self.name)
+            )
 
     @property
     def resource_type(self) -> str:
@@ -313,27 +323,35 @@ class Scenes(APIItems):
 
     def __init__(
         self,
-        group: DeconzGroup,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
+        group_id: str,
+        group_name: str,
     ) -> None:
         """Initialize scene manager."""
-        self.group = group
-        url = f"{URL}/{group.resource_id}/{RESOURCE_TYPE_SCENE}"
-        super().__init__(group.raw["scenes"], request, url, DeconzScene)
+        raw = self.pre_process_raw(raw, group_id, group_name)
+        url = f"{group_id}/{RESOURCE_TYPE_SCENE}"
+        super().__init__(raw, request, url, Scene)
 
-    def process_raw(self, raw: list) -> None:  # type: ignore
-        """Process raw scene data."""
-        for raw_item in raw:
-            id = raw_item["id"]
-            obj = self._items.get(id)
+    async def create_scene(self, name: str) -> dict[str, Any]:
+        """Create a new scene.
 
-            if obj is not None:
-                obj.raw = raw_item
-            else:
-                self._items[id] = self._item_cls(self.group, raw_item, self._request)
+        The actual state of each light will become the lights scene state.
+        """
+        return await self._request("post", path=self._path, json={"name": name})
+
+    @staticmethod
+    def pre_process_raw(
+        raw: dict[str, Any], group_id: str, group_name: str
+    ) -> dict[str, dict[str, Any]]:
+        """Transform scenes raw from list to dict."""
+        return {
+            scene["id"]: scene | {"group_deconz_id": group_id, "group_name": group_name}
+            for scene in raw["scenes"]
+        }
 
 
-class DeconzScene:
+class Scene(APIItem):
     """deCONZ scene representation.
 
     Dresden Elektroniks documentation of scenes in deCONZ
@@ -342,17 +360,15 @@ class DeconzScene:
 
     def __init__(
         self,
-        group: DeconzGroup,
-        raw: dict,
+        resource_id: str,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
-        """Set initial information about scene.
+        """Set initial information about scene."""
+        super().__init__(resource_id, raw, request)
 
-        Set callback to set state of device.
-        """
-        self.group = group
-        self.raw = raw
-        self._request = request
+        self.group_deconz_id = raw["group_deconz_id"]
+        self.group_name = raw["group_name"]
 
     @property
     def resource_type(self) -> str:
@@ -361,17 +377,52 @@ class DeconzScene:
 
     async def recall(self) -> dict:
         """Recall scene to group."""
-        return await self._request("put", path=f"{self.deconz_id}/recall", json={})
+        return await self.request(field=f"{self.deconz_id}/recall", data={})
+
+    async def store(self) -> dict:
+        """Store current group state in scene.
+
+        The actual state of each light in the group will become the lights scene state.
+        """
+        return await self.request(field=f"{self.deconz_id}/store", data={})
+
+    async def set_attributes(
+        self,
+        name: str | None = None,
+    ) -> dict:
+        """Change attributes of scene.
+
+        Supported values:
+        - name [str]
+        """
+        data = {
+            key: value
+            for key, value in {
+                "name": name,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}", data=data)
 
     @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group.deconz_id}/{self.resource_type}/{self.id}"
+        return f"{self.group_deconz_id}/{self.resource_type}/{self.id}"
 
     @property
     def id(self) -> str:
         """Scene ID."""
         return self.raw["id"]
+
+    @property
+    def light_count(self) -> int:
+        """Lights in group."""
+        return self.raw["lightcount"]
+
+    @property
+    def transition_time(self) -> int:
+        """Transition time for scene."""
+        return self.raw["transitiontime"]
 
     @property
     def name(self) -> str:
@@ -381,4 +432,4 @@ class DeconzScene:
     @property
     def full_name(self) -> str:
         """Full name."""
-        return f"{self.group.name} {self.name}"
+        return f"{self.group_name} {self.name}"

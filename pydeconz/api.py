@@ -34,7 +34,7 @@ class APIItems:
         raw = await self._request("get", self._path)
         self.process_raw(raw)
 
-    def process_raw(self, raw: dict) -> None:
+    def process_raw(self, raw: dict[str, Any]) -> None:
         """Process data."""
         for id, raw_item in raw.items():
 
