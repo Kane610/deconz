@@ -415,6 +415,16 @@ class Scene(APIItem):
         return self.raw["id"]
 
     @property
+    def light_count(self) -> int:
+        """Lights in group."""
+        return self.raw["lightcount"]
+
+    @property
+    def transition_time(self) -> int:
+        """Transition time for scene."""
+        return self.raw["transitiontime"]
+
+    @property
     def name(self) -> str:
         """Scene name."""
         return self.raw["name"]

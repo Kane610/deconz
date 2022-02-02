@@ -32,7 +32,14 @@ async def test_create_group():
                 "id": "11",
                 "lights": ["14", "15", "12"],
                 "name": "Hall",
-                "scenes": [{"id": "1", "name": "warmlight"}],
+                "scenes": [
+                    {
+                        "id": "1",
+                        "name": "warmlight",
+                        "lightcount": 3,
+                        "transitiontime": 10,
+                    }
+                ],
                 "state": {"all_on": False, "any_on": True},
                 "type": "LightGroup",
             }
@@ -173,6 +180,8 @@ async def test_create_group():
     scene = group.scenes["1"]
     assert scene.deconz_id == "/groups/0/scenes/1"
     assert scene.id == "1"
+    assert scene.light_count == 3
+    assert scene.transition_time == 10
     assert scene.name == "warmlight"
     assert scene.full_name == "Hall warmlight"
 
