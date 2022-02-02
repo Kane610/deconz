@@ -330,11 +330,15 @@ class Scenes(APIItems):
     ) -> None:
         """Initialize scene manager."""
         raw = self.pre_process_raw(raw, group_id, group_name)
-        url = f"{URL}/{group_id}/{RESOURCE_TYPE_SCENE}"
+        url = f"{group_id}/{RESOURCE_TYPE_SCENE}"
         super().__init__(raw, request, url, Scene)
 
-        self.group_id: str = group_id
-        self.group_name: str = group_name
+    async def create_scene(self, name: str) -> dict[str, Any]:
+        """Create a new scene.
+
+        The actual state of each light will become the lights scene state.
+        """
+        return await self._request("post", path=self._path, json={"name": name})
 
     @staticmethod
     def pre_process_raw(
@@ -373,7 +377,32 @@ class Scene(APIItem):
 
     async def recall(self) -> dict:
         """Recall scene to group."""
-        return await self._request("put", path=f"{self.deconz_id}/recall", json={})
+        return await self.request(field=f"{self.deconz_id}/recall", data={})
+
+    async def store(self) -> dict:
+        """Store current group state in scene.
+
+        The actual state of each light in the group will become the lights scene state.
+        """
+        return await self.request(field=f"{self.deconz_id}/store", data={})
+
+    async def set_attributes(
+        self,
+        name: str | None = None,
+    ) -> dict:
+        """Change attributes of scene.
+
+        Supported values:
+        - name [str]
+        """
+        data = {
+            key: value
+            for key, value in {
+                "name": name,
+            }.items()
+            if value is not None
+        }
+        return await self.request(field=f"{self.deconz_id}", data=data)
 
     @property
     def deconz_id(self) -> str:

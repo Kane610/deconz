@@ -165,6 +165,11 @@ async def test_create_group():
 
     # Scene
 
+    await group.scenes.create_scene(name="Garage")
+    mock_request.assert_called_with(
+        "post", path="/groups/0/scenes", json={"name": "Garage"}
+    )
+
     scene = group.scenes["1"]
     assert scene.deconz_id == "/groups/0/scenes/1"
     assert scene.id == "1"
@@ -172,7 +177,32 @@ async def test_create_group():
     assert scene.full_name == "Hall warmlight"
 
     await scene.recall()
-    mock_request.assert_called_with("put", path="/groups/0/scenes/1/recall", json={})
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1/recall",
+        json={},
+    )
+
+    await scene.store()
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1/store",
+        json={},
+    )
+
+    await scene.set_attributes(name="new name")
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1",
+        json={"name": "new name"},
+    )
+
+    await scene.set_attributes()
+    mock_request.assert_called_with(
+        "put",
+        path="/groups/0/scenes/1",
+        json={},
+    )
 
     group.update(
         {
