@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, Type
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -1266,35 +1266,48 @@ def create_sensor(
     resource_id: str,
     raw: dict,
     request: Callable[..., Awaitable[dict[str, Any]]],
-) -> (
-    AirQuality
-    | Alarm
-    | AncillaryControl
-    | Battery
-    | CarbonMonoxide
-    | Consumption
-    | Daylight
-    | DeconzSensor
-    | DoorLock
-    | Fire
-    | GenericFlag
-    | GenericStatus
-    | Humidity
-    | LightLevel
-    | OpenClose
-    | Power
-    | Presence
-    | Pressure
-    | Switch
-    | Temperature
-    | Thermostat
-    | Time
-    | Vibration
-    | Water
-):
+) -> DeconzSensor:
     """Simplify creating sensor by not needing to know type."""
     for sensor_class in SENSOR_CLASSES:
         if raw["type"] in sensor_class.ZHATYPE:
             return sensor_class(resource_id, raw, request)
 
     return DeconzSensor(resource_id, raw, request)
+
+
+# def create_sensor(
+#     resource_id: str,
+#     raw: dict,
+#     request: Callable[..., Awaitable[dict[str, Any]]],
+# ) -> (
+#     AirQuality
+#     | Alarm
+#     | AncillaryControl
+#     | Battery
+#     | CarbonMonoxide
+#     | Consumption
+#     | Daylight
+#     | DeconzSensor
+#     | DoorLock
+#     | Fire
+#     | GenericFlag
+#     | GenericStatus
+#     | Humidity
+#     | LightLevel
+#     | OpenClose
+#     | Power
+#     | Presence
+#     | Pressure
+#     | Switch
+#     | Temperature
+#     | Thermostat
+#     | Time
+#     | Vibration
+#     | Water
+# ):
+#     """Simplify creating sensor by not needing to know type."""
+#     for sensor_class in SENSOR_CLASSES:
+#         if raw["type"] in sensor_class.ZHATYPE:
+#             return sensor_class(resource_id, raw, request)
+
+#     return DeconzSensor(resource_id, raw, request)

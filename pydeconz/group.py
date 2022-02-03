@@ -332,6 +332,7 @@ class Scenes(APIItems):
         raw = self.pre_process_raw(raw, group_id, group_name)
         url = f"{group_id}/{RESOURCE_TYPE_SCENE}"
         super().__init__(raw, request, url, Scene)
+        reveal_type(self._item_cls)
 
     async def create_scene(self, name: str) -> dict[str, Any]:
         """Create a new scene.

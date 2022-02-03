@@ -42,8 +42,6 @@ DEVICE_TRIGGER_VIBRATION: Final = "state/vibration"
 class AlarmSystems(APIItems):
     """Manager of deCONZ alarm systems."""
 
-    # _items: dict[str, AlarmSystem]
-
     def __init__(
         self,
         raw: dict,
@@ -51,7 +49,8 @@ class AlarmSystems(APIItems):
     ) -> None:
         """Initialize alarm system manager."""
         super().__init__(raw, request, URL, AlarmSystem)
-        reveal_type(self._item_cls)
+        # reveal_type(self._item_cls)
+        reveal_locals()
 
     async def create_alarm_system(self, name: str) -> dict[str, Any]:
         """Create a new alarm system.

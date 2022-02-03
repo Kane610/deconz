@@ -12,14 +12,16 @@ from collections.abc import (
     ValuesView,
 )
 import logging
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Type, TypeVar
 
 from .errors import BridgeBusy
 
 LOGGER = logging.getLogger(__name__)
 
-# T = TypeVar("T", bound="APIItem")
-T = TypeVar("T")
+
+T = TypeVar("T", bound="APIItem")
+# T = TypeVar("T", bound=APIItem)
+# T = TypeVar("T")
 
 
 class APIItems:
@@ -30,7 +32,7 @@ class APIItems:
         raw: dict,
         request: Callable[..., Awaitable[dict[str, Any]]],
         path: str,
-        item_cls: T,
+        item_cls: Type[T],
         # item_cls: Callable[..., T],
     ) -> None:
         """Initialize API items."""
@@ -39,7 +41,7 @@ class APIItems:
         self._item_cls = item_cls
         self._items: dict[str, T] = {}
         self.process_raw(raw)
-        reveal_type(item_cls)
+        reveal_locals()
 
     async def update(self) -> None:
         """Refresh data."""
