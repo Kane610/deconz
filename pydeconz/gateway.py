@@ -15,7 +15,7 @@ from .errors import RequestError, ResponseError, raise_error
 from .group import RESOURCE_TYPE as GROUP_RESOURCE, Groups, Scene
 from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
 from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE, Sensors
-from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
+from .websocket import Signal, State, WSClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -176,7 +176,7 @@ class DeconzSession:
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    async def session_handler(self, signal: Literal["data", "state"]) -> None:
+    async def session_handler(self, signal: Signal) -> None:
         """Signalling from websocket.
 
         data - new data available for processing.
@@ -185,11 +185,11 @@ class DeconzSession:
         if not self.websocket:
             return
 
-        if signal == SIGNAL_DATA:
+        if signal == Signal.DATA:
             self.event_handler(self.websocket.data)
 
-        elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
-            self.connection_status_callback(self.websocket.state == STATE_RUNNING)
+        elif signal == Signal.CONNECTION_STATE and self.connection_status_callback:
+            self.connection_status_callback(self.websocket.state == State.RUNNING)
 
     def event_handler(self, event: dict) -> None:
         """Receive event from websocket and identifies where the event belong.

@@ -3,19 +3,30 @@
 from asyncio import create_task, get_running_loop
 from collections import deque
 from collections.abc import Awaitable, Callable
+import enum
 import logging
-from typing import Final, Literal
+from typing import Final
 
 import aiohttp
 
 LOGGER = logging.getLogger(__name__)
 
-SIGNAL_CONNECTION_STATE: Final = "state"
-SIGNAL_DATA: Final = "data"
 
-STATE_RETRYING: Final = "retrying"
-STATE_RUNNING: Final = "running"
-STATE_STOPPED: Final = "stopped"
+class Signal(enum.Enum):
+    """What is the content of the callback."""
+
+    CONNECTION_STATE = "state"
+    DATA = "data"
+
+
+class State(enum.Enum):
+    """State of the connection."""
+
+    NONE = ""
+    RETRYING = "retrying"
+    RUNNING = "running"
+    STOPPED = "stopped"
+
 
 RETRY_TIMER: Final = 15
 
@@ -28,7 +39,7 @@ class WSClient:
         session: aiohttp.ClientSession,
         host: str,
         port: int,
-        callback: Callable[[Literal["data", "state"]], Awaitable[None]],
+        callback: Callable[[Signal], Awaitable[None]],
     ) -> None:
         """Create resources for websocket communication."""
         self.session = session
@@ -39,8 +50,8 @@ class WSClient:
         self.loop = get_running_loop()
 
         self._data: deque = deque()
-        self._state: str = ""
-        self._previous_state: str = ""
+        self._state = State.NONE
+        self._previous_state = State.NONE
 
     @property
     def data(self) -> dict:
@@ -51,19 +62,19 @@ class WSClient:
             return {}
 
     @property
-    def state(self) -> str:
+    def state(self) -> State:
         """State of websocket."""
         return self._state
 
     @state.setter
-    def state(self, value: str) -> None:
+    def state(self, value: State) -> None:
         """Set state of websocket and store previous state."""
         self._previous_state = self._state
         self._state = value
 
     def state_changed(self) -> None:
         """Signal state change."""
-        create_task(self.session_handler_callback(SIGNAL_CONNECTION_STATE))
+        create_task(self.session_handler_callback(Signal.CONNECTION_STATE))
 
     def start(self) -> None:
         """Start websocket and update its state."""
@@ -71,7 +82,7 @@ class WSClient:
 
     async def running(self) -> None:
         """Start websocket connection."""
-        if self.state == STATE_RUNNING:
+        if self.state == State.RUNNING:
             return
 
         url = f"http://{self.host}:{self.port}"
@@ -79,18 +90,18 @@ class WSClient:
         try:
             async with self.session.ws_connect(url, heartbeat=60) as ws:
                 LOGGER.info("Connected to deCONZ (%s)", self.host)
-                self.state = STATE_RUNNING
+                self.state = State.RUNNING
                 self.state_changed()
 
                 async for msg in ws:
 
-                    if self.state == STATE_STOPPED:
+                    if self.state == State.STOPPED:
                         await ws.close()
                         break
 
                     if msg.type == aiohttp.WSMsgType.TEXT:
                         self._data.append(msg.json())
-                        create_task(self.session_handler_callback(SIGNAL_DATA))
+                        create_task(self.session_handler_callback(Signal.DATA))
                         LOGGER.debug(msg.data)
                         continue
 
@@ -103,19 +114,19 @@ class WSClient:
                         break
 
         except aiohttp.ClientConnectorError:
-            if self.state != STATE_RETRYING:
+            if self.state != State.RETRYING:
                 LOGGER.error("Websocket is not accessible (%s)", self.host)
 
         except Exception as err:
-            if self.state != STATE_RETRYING:
+            if self.state != State.RETRYING:
                 LOGGER.error("Unexpected error (%s) %s", self.host, err)
 
-        if self.state != STATE_STOPPED:
+        if self.state != State.STOPPED:
             self.retry()
 
     def stop(self) -> None:
         """Close websocket connection."""
-        self.state = STATE_STOPPED
+        self.state = State.STOPPED
         LOGGER.info("Shutting down connection to deCONZ (%s)", self.host)
 
     def retry(self) -> None:
@@ -124,7 +135,7 @@ class WSClient:
         Do an immediate retry without timer and without signalling state change.
         Signal state change only after first retry fails.
         """
-        if self.state == STATE_RETRYING and self._previous_state == STATE_RUNNING:
+        if self.state == State.RETRYING and self._previous_state == State.RUNNING:
             LOGGER.info(
                 "Reconnecting to deCONZ (%s) failed, scheduling retry at an interval of %i seconds",
                 self.host,
@@ -132,9 +143,9 @@ class WSClient:
             )
             self.state_changed()
 
-        self.state = STATE_RETRYING
+        self.state = State.RETRYING
 
-        if self._previous_state == STATE_RUNNING:
+        if self._previous_state == State.RUNNING:
             LOGGER.info("Reconnecting to deCONZ (%s)", self.host)
             self.start()
             return

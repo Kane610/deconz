@@ -12,6 +12,7 @@ from pydeconz import (
     ResponseError,
     ERRORS,
     pydeconzException,
+    websocket,
 )
 
 import aiohttp
@@ -279,17 +280,17 @@ async def test_session_handler():
 
     session.websocket = Mock()
     session.websocket.data = {}
-    session.websocket.state = "running"
+    session.websocket.state = websocket.State.RUNNING
 
     # Event data
 
     with patch.object(session, "event_handler", return_value=True) as event_handler:
-        await session.session_handler(signal="data")
+        await session.session_handler(signal=websocket.Signal.DATA)
         event_handler.assert_called()
 
     # Connection status changed
 
-    await session.session_handler(signal="state")
+    await session.session_handler(signal=websocket.Signal.CONNECTION_STATE)
     session.connection_status_callback.assert_called_with(True)
 
 
