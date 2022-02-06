@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 import logging
 from pprint import pformat
-from typing import Any, Final, Literal
+from typing import Any, Final
 
 import aiohttp
 

@@ -14,6 +14,7 @@ from pydeconz import (
     pydeconzException,
     websocket,
 )
+from pydeconz.alarm_system import ArmState
 
 import aiohttp
 from aioresponses import aioresponses
@@ -343,7 +344,7 @@ async def test_alarmsystem_events():
     )
 
     assert "1" in session.alarmsystems
-    assert session.alarmsystems["1"].arm_state == "disarmed"
+    assert session.alarmsystems["1"].arm_state == ArmState.DISARMED
     session.add_device_callback.assert_called_with(
         "alarmsystems", session.alarmsystems["1"]
     )
@@ -369,7 +370,7 @@ async def test_alarmsystem_events():
         "id",
         "r",
     }
-    assert session.alarmsystems["1"].arm_state == "armed_away"
+    assert session.alarmsystems["1"].arm_state == ArmState.ARMED_AWAY
 
 
 async def test_light_events():

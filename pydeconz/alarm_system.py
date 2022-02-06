@@ -3,40 +3,66 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final, Literal
+import enum
+from typing import Any, Final, TypedDict
 
 from .api import APIItem, APIItems
 
 RESOURCE_TYPE: Final = "alarmsystems"
 URL: Final = "/alarmsystems"
 
-PATH_ARM_AWAY: Final = "arm_away"
-PATH_ARM_NIGHT: Final = "arm_night"
-PATH_ARM_STAY: Final = "arm_stay"
-PATH_DISARM: Final = "disarm"
 
-ARM_MODE_ARMED_AWAY: Final = "armed_away"
-ARM_MODE_ARMED_NIGHT: Final = "armed_night"
-ARM_MODE_ARMED_STAY: Final = "armed_stay"
-ARM_MODE_DISARMED: Final = "disarmed"
+class Path(enum.Enum):
+    """Explicit url path."""
 
-ARM_STATE_ARMED_AWAY: Final = "armed_away"
-ARM_STATE_ARMED_NIGHT: Final = "armed_night"
-ARM_STATE_ARMED_STAY: Final = "armed_stay"
-ARM_STATE_ARMING_AWAY: Final = "arming_away"
-ARM_STATE_ARMING_NIGHT: Final = "arming_night"
-ARM_STATE_ARMING_STAY: Final = "arming_stay"
-ARM_STATE_DISARMED: Final = "disarmed"
-ARM_STATE_ENTRY_DELAY: Final = "entry_delay"
-ARM_STATE_EXIT_DELAY: Final = "exit_delay"
-ARM_STATE_IN_ALARM: Final = "in_alarm"
+    ARM_AWAY = "arm_away"
+    ARM_NIGHT = "arm_night"
+    ARM_STAY = "arm_stay"
+    DISARM = "disarm"
 
-DEVICE_TRIGGER_ACTION: Final = "state/action"
-DEVICE_TRIGGER_BUTTON_EVENT: Final = "state/buttonevent"
-DEVICE_TRIGGER_ON: Final = "state/on"
-DEVICE_TRIGGER_OPEN: Final = "state/open"
-DEVICE_TRIGGER_PRESENCE: Final = "state/presence"
-DEVICE_TRIGGER_VIBRATION: Final = "state/vibration"
+
+class ArmMode(enum.Enum):
+    """Arm mode of system."""
+
+    ARMED_AWAY = "armed_away"
+    ARMED_NIGHT = "armed_night"
+    ARMED_STAY = "armed_stay"
+    DISARMED = "disarmed"
+    NONE = "none"
+
+
+class ArmState(enum.Enum):
+    """Arm state of system."""
+
+    ARMED_AWAY = "armed_away"
+    ARMED_NIGHT = "armed_night"
+    ARMED_STAY = "armed_stay"
+    ARMING_AWAY = "arming_away"
+    ARMING_NIGHT = "arming_night"
+    ARMING_STAY = "arming_stay"
+    DISARMED = "disarmed"
+    ENTRY_DELAY = "entry_delay"
+    EXIT_DELAY = "exit_delay"
+    IN_ALARM = "in_alarm"
+    NOT_READY = "not_ready"
+
+
+class DeviceTrigger(enum.Enum):
+    """Device trigger alternatives."""
+
+    ACTION = "state/action"
+    BUTTON_EVENT = "state/buttonevent"
+    ON = "state/on"
+    OPEN = "state/open"
+    PRESENCE = "state/presence"
+    VIBRATION = "state/vibration"
+
+
+class Device(TypedDict, total=False):
+    """Configuration of device associated with the alarm system."""
+
+    armmask: ArmMode
+    trigger: DeviceTrigger
 
 
 class AlarmSystems(APIItems):
@@ -44,7 +70,7 @@ class AlarmSystems(APIItems):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize alarm system manager."""
@@ -123,7 +149,7 @@ class AlarmSystem(APIItem):
         """Set the alarm to away."""
         return await self._request(
             "put",
-            path=f"{self.deconz_id}/{PATH_ARM_AWAY}",
+            path=f"{self.deconz_id}/{Path.ARM_AWAY.value}",
             json={"code0": pin_code},
         )
 
@@ -131,7 +157,7 @@ class AlarmSystem(APIItem):
         """Set the alarm to night."""
         return await self._request(
             "put",
-            path=f"{self.deconz_id}/{PATH_ARM_NIGHT}",
+            path=f"{self.deconz_id}/{Path.ARM_NIGHT.value}",
             json={"code0": pin_code},
         )
 
@@ -139,7 +165,7 @@ class AlarmSystem(APIItem):
         """Set the alarm to stay."""
         return await self._request(
             "put",
-            path=f"{self.deconz_id}/{PATH_ARM_STAY}",
+            path=f"{self.deconz_id}/{Path.ARM_STAY.value}",
             json={"code0": pin_code},
         )
 
@@ -147,25 +173,12 @@ class AlarmSystem(APIItem):
         """Disarm alarm."""
         return await self._request(
             "put",
-            path=f"{self.deconz_id}/{PATH_DISARM}",
+            path=f"{self.deconz_id}/{Path.DISARM.value}",
             json={"code0": pin_code},
         )
 
     @property
-    def arm_state(
-        self,
-    ) -> Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "arming_away",
-        "arming_night",
-        "arming_stay",
-        "disarmed",
-        "entry_delay",
-        "exit_delay",
-        "in_alarm",
-    ]:
+    def arm_state(self) -> ArmState:
         """Alarm system state.
 
         Can be different from the config.armmode during state transitions.
@@ -182,7 +195,7 @@ class AlarmSystem(APIItem):
         - "exit_delay"
         - "in_alarm"
         """
-        return self.raw["state"]["armstate"]
+        return ArmState(self.raw["state"]["armstate"])
 
     @property
     def seconds_remaining(self) -> int:
@@ -201,9 +214,7 @@ class AlarmSystem(APIItem):
         return self.raw["config"]["configured"]
 
     @property
-    def arm_mode(
-        self,
-    ) -> Literal["armed_away", "armed_night", "armed_stay", "disarmed"]:
+    def arm_mode(self) -> ArmMode:
         """Target arm mode.
 
         Supported values:
@@ -212,7 +223,7 @@ class AlarmSystem(APIItem):
         - "armed_stay"
         - "disarmed"
         """
-        return self.raw["config"]["armmode"]
+        return ArmMode(self.raw["config"]["armmode"])
 
     @property
     def armed_away_entry_delay(self) -> int:
@@ -314,7 +325,7 @@ class AlarmSystem(APIItem):
         return self.raw["config"]["disarmed_exit_delay"]
 
     @property
-    def devices(self) -> dict[str, Any]:
+    def devices(self) -> dict[str, Device]:
         """Devices associated with the alarm system.
 
         The keys refer to the uniqueid of a light, sensor, or keypad.
@@ -339,14 +350,7 @@ class AlarmSystem(APIItem):
         armed_away: bool = False,
         armed_night: bool = False,
         armed_stay: bool = False,
-        trigger: Literal[
-            "state/presence",
-            "state/open",
-            "state/vibration",
-            "state/buttonevent",
-            "state/on",
-        ]
-        | None = None,
+        trigger: DeviceTrigger | None = None,
         is_keypad: bool = False,
     ) -> dict[str, Any]:
         """Link device with alarm system.
@@ -358,6 +362,7 @@ class AlarmSystem(APIItem):
         The uniqueid refers to sensors, lights or keypads.
           Adding a light can be useful, e.g. when an alarm should be triggered,
           after a light is powered or switched on in the basement.
+        For keypads and keyfobs the request body can be an empty object.
         """
         data = {"armmask": ""}
         data["armmask"] += "A" if armed_away else ""
@@ -365,7 +370,7 @@ class AlarmSystem(APIItem):
         data["armmask"] += "S" if armed_stay else ""
 
         if trigger:
-            data["trigger"] = trigger
+            data["trigger"] = DeviceTrigger(trigger).value
 
         if is_keypad:
             data = {}
