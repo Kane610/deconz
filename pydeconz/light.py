@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final, Literal
+import enum
+from typing import Any, Final
 
 from .api import APIItems
 from .deconz_device import DeconzDevice
@@ -28,6 +29,73 @@ FAN_SPEED_AUTO: Final = 5
 FAN_SPEED_COMFORT_BREEZE: Final = 6
 
 ON_TIME_KEY: Final = "ontime"
+
+
+class Alert(enum.Enum):
+    """Temporary alert effect.
+
+    "none" — light is not performing an alert.
+    "lselect" — light is blinking a longer time.
+    "select" — light is blinking a short time.
+    """
+
+    NONE = "none"
+    LONG = "lselect"
+    SHORT = "select"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return Alert.UNKNOWN
+
+
+class ColorMode(enum.Enum):
+    """Color mode of the light.
+
+    "ct" — color temperature.
+    "hs" — hue and saturation.
+    "xy" — CIE xy values.
+    """
+
+    CT = "ct"
+    HS = "hs"
+    XY = "xy"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return ColorMode.UNKNOWN
+
+
+class Effect(enum.Enum):
+    """Effect of the light.
+
+    "colorloop" — cycle through hue values 0–360.
+    "none" — no effect.
+    """
+
+    COLORLOOP = "colorloop"
+    NONE = "none"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return Effect.UNKNOWN
+
+
+class FanSpeed(enum.IntEnum):
+    """Possible fan speeds."""
+
+    OFF = 0
+    PERCENT_25 = 1
+    PERCENT_50 = 2
+    PERCENT_75 = 3
+    PERCENT_100 = 4
+    AUTO = 5
+    COMFORT_BREEZE = 6
 
 
 class Lights(APIItems):
@@ -75,7 +143,7 @@ class Light(DeconzLight):
     """
 
     @property
-    def alert(self) -> Literal["none", "select", "lselect"] | None:
+    def alert(self) -> Alert | None:
         """Temporary alert effect.
 
         Following values are possible:
@@ -83,7 +151,7 @@ class Light(DeconzLight):
         select - light is blinking a short time
         lselect - light is blinking a longer time
         """
-        return self.raw["state"].get("alert")
+        return Alert(self.raw["state"].get("alert"))
 
     @property
     def brightness(self) -> int | None:
@@ -134,14 +202,14 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
+    def color_mode(self) -> ColorMode | None:
         """Color mode of light.
 
         ct - color temperature
         hs - hue and saturation
         xy - CIE xy values
         """
-        return self.raw["state"].get("colormode")
+        return ColorMode(self.raw["state"].get("colormode"))
 
     @property
     def max_color_temp(self) -> int | None:
@@ -158,14 +226,14 @@ class Light(DeconzLight):
         return ctmin
 
     @property
-    def effect(self) -> Literal["colorloop", "none"] | None:
+    def effect(self) -> Effect | None:
         """Effect of the light.
 
         colorloop — the light will cycle continuously through all colors
                     with the speed specified by colorloopspeed.
         none — no effect.
         """
-        return self.raw["state"].get("effect")
+        return Effect(self.raw["state"].get("effect"))
 
     async def set_attributes(self, name: str) -> dict:
         """Change attributes of a light.
@@ -178,11 +246,11 @@ class Light(DeconzLight):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect"] | None = None,
+        alert: Alert | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none"] | None = None,
+        effect: Effect | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,
@@ -347,11 +415,11 @@ class Fan(Light):
     ZHATYPE = ("Fan",)
 
     @property
-    def speed(self) -> Literal[0, 1, 2, 3, 4, 5, 6]:
+    def speed(self) -> FanSpeed:
         """Speed of the fan."""
-        return self.raw["state"]["speed"]
+        return FanSpeed(self.raw["state"]["speed"])
 
-    async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict:
+    async def set_speed(self, speed: FanSpeed) -> dict:
         """Set speed of fans/ventilators.
 
         Speed [int] between 0-6.
@@ -389,7 +457,7 @@ class Siren(DeconzLight):
     @property
     def is_on(self) -> bool:
         """If device is sounding."""
-        return self.raw["state"][ALERT_KEY] == ALERT_LONG
+        return Alert(self.raw["state"][ALERT_KEY]) == Alert.LONG
 
     async def turn_on(self, duration: int | None = None) -> dict:
         """Turn on device.
