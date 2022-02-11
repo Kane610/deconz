@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
+import enum
 from typing import Any, Final, Literal
 
 from .api import APIItems
@@ -11,44 +12,6 @@ from .deconz_device import DeconzDevice
 RESOURCE_TYPE: Final = "sensors"
 URL: Final = "/sensors"
 
-# Action and Panel
-ANCILLARY_CONTROL_ARMED_AWAY: Final = "armed_away"
-ANCILLARY_CONTROL_ARMED_NIGHT: Final = "armed_night"
-ANCILLARY_CONTROL_ARMED_STAY: Final = "armed_stay"
-ANCILLARY_CONTROL_DISARMED: Final = "disarmed"
-
-# Action only
-ANCILLARY_CONTROL_EMERGENCY: Final = "emergency"
-ANCILLARY_CONTROL_FIRE: Final = "fire"
-ANCILLARY_CONTROL_INVALID_CODE: Final = "invalid_code"
-ANCILLARY_CONTROL_PANIC: Final = "panic"
-
-# Panel only
-ANCILLARY_CONTROL_ARMING_AWAY: Final = "arming_away"
-ANCILLARY_CONTROL_ARMING_NIGHT: Final = "arming_night"
-ANCILLARY_CONTROL_ARMING_STAY: Final = "arming_stay"
-ANCILLARY_CONTROL_ENTRY_DELAY: Final = "entry_delay"
-ANCILLARY_CONTROL_EXIT_DELAY: Final = "exit_delay"
-ANCILLARY_CONTROL_IN_ALARM: Final = "in_alarm"
-ANCILLARY_CONTROL_NOT_READY: Final = "not_ready"
-
-DAYLIGHT_STATUS: Final = {
-    100: "nadir",
-    110: "night_end",
-    120: "nautical_dawn",
-    130: "dawn",
-    140: "sunrise_start",
-    150: "sunrise_end",
-    160: "golden_hour_1",
-    170: "solar_noon",
-    180: "golden_hour_2",
-    190: "sunset_start",
-    200: "sunset_end",
-    210: "dusk",
-    220: "nautical_dusk",
-    230: "night_start",
-}
-
 PRESENCE_DELAY: Final = "delay"
 PRESENCE_DURATION: Final = "duration"
 PRESENCE_SENSITIVITY: Final = "sensitivity"
@@ -56,49 +19,427 @@ PRESENCE_SENSITIVITY_MAX: Final = "sensitivitymax"
 PRESENCE_DARK: Final = "dark"
 PRESENCE_PRESENCE: Final = "presence"
 
-SWITCH_DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
-SWITCH_DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
-SWITCH_DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
-SWITCH_DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
+# SWITCH_DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
+# SWITCH_DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
+# SWITCH_DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
+# SWITCH_DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
 
-SWITCH_MODE_MOMENTARY: Final = "momentary"
-SWITCH_MODE_ROCKER: Final = "rocker"
+# SWITCH_MODE_MOMENTARY: Final = "momentary"
+# SWITCH_MODE_ROCKER: Final = "rocker"
 
-THERMOSTAT_MODE_AUTO: Final = "auto"
-THERMOSTAT_MODE_COOL: Final = "cool"
-THERMOSTAT_MODE_DRY: Final = "dry"
-THERMOSTAT_MODE_FAN_ONLY: Final = "fan only"
-THERMOSTAT_MODE_HEAT: Final = "heat"
-THERMOSTAT_MODE_EMERGENCY_HEATING: Final = "emergency heating"
-THERMOSTAT_MODE_OFF: Final = "off"
-THERMOSTAT_MODE_PRECOOLING: Final = "precooling"
-THERMOSTAT_MODE_SLEEP: Final = "sleep"
+# THERMOSTAT_MODE_AUTO: Final = "auto"
+# THERMOSTAT_MODE_COOL: Final = "cool"
+# THERMOSTAT_MODE_DRY: Final = "dry"
+# THERMOSTAT_MODE_FAN_ONLY: Final = "fan only"
+# THERMOSTAT_MODE_HEAT: Final = "heat"
+# THERMOSTAT_MODE_EMERGENCY_HEATING: Final = "emergency heating"
+# THERMOSTAT_MODE_OFF: Final = "off"
+# THERMOSTAT_MODE_PRECOOLING: Final = "precooling"
+# THERMOSTAT_MODE_SLEEP: Final = "sleep"
 
-THERMOSTAT_FAN_MODE_AUTO: Final = "auto"
-THERMOSTAT_FAN_MODE_HIGH: Final = "high"
-THERMOSTAT_FAN_MODE_LOW: Final = "low"
-THERMOSTAT_FAN_MODE_MEDIUM: Final = "medium"
-THERMOSTAT_FAN_MODE_OFF: Final = "off"
-THERMOSTAT_FAN_MODE_ON: Final = "on"
-THERMOSTAT_FAN_MODE_SMART: Final = "smart"
+# THERMOSTAT_FAN_MODE_AUTO: Final = "auto"
+# THERMOSTAT_FAN_MODE_HIGH: Final = "high"
+# THERMOSTAT_FAN_MODE_LOW: Final = "low"
+# THERMOSTAT_FAN_MODE_MEDIUM: Final = "medium"
+# THERMOSTAT_FAN_MODE_OFF: Final = "off"
+# THERMOSTAT_FAN_MODE_ON: Final = "on"
+# THERMOSTAT_FAN_MODE_SMART: Final = "smart"
 
-THERMOSTAT_PRESET_AUTO: Final = "auto"
-THERMOSTAT_PRESET_BOOST: Final = "boost"
-THERMOSTAT_PRESET_COMFORT: Final = "comfort"
-THERMOSTAT_PRESET_COMPLEX: Final = "complex"
-THERMOSTAT_PRESET_ECO: Final = "eco"
-THERMOSTAT_PRESET_HOLIDAY: Final = "holiday"
-THERMOSTAT_PRESET_MANUAL: Final = "manual"
+# THERMOSTAT_PRESET_AUTO: Final = "auto"
+# THERMOSTAT_PRESET_BOOST: Final = "boost"
+# THERMOSTAT_PRESET_COMFORT: Final = "comfort"
+# THERMOSTAT_PRESET_COMPLEX: Final = "complex"
+# THERMOSTAT_PRESET_ECO: Final = "eco"
+# THERMOSTAT_PRESET_HOLIDAY: Final = "holiday"
+# THERMOSTAT_PRESET_MANUAL: Final = "manual"
 
-THERMOSTAT_SWING_MODE_FULLY_CLOSED: Final = "fully closed"
-THERMOSTAT_SWING_MODE_FULLY_OPEN: Final = "fully open"
-THERMOSTAT_SWING_MODE_HALF_OPEN: Final = "half open"
-THERMOSTAT_SWING_MODE_QUARTER_OPEN: Final = "quarter open"
-THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN: Final = "three quarters open"
+# THERMOSTAT_SWING_MODE_FULLY_CLOSED: Final = "fully closed"
+# THERMOSTAT_SWING_MODE_FULLY_OPEN: Final = "fully open"
+# THERMOSTAT_SWING_MODE_HALF_OPEN: Final = "half open"
+# THERMOSTAT_SWING_MODE_QUARTER_OPEN: Final = "quarter open"
+# THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN: Final = "three quarters open"
 
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR: Final = "air sensor"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION: Final = "floor protection"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR: Final = "floor sensor"
+# THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR: Final = "air sensor"
+# THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION: Final = "floor protection"
+# THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR: Final = "floor sensor"
+
+
+class AirQualityEnum(enum.Enum):
+    """Reported air quality state."""
+
+    EXCELLENT = "excellent"
+    GOOD = "good"
+    MODERATE = "moderate"
+    POOR = "poor"
+    UNHEALTHY = "unhealthy"
+    OUTOFSCALE = "out of scale"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return AirQualityEnum.UNKNOWN
+
+
+class AncillaryControlAction(enum.Enum):
+    """Last action a user invoked on the keypad.
+
+    Supported values:
+    - "armed_away"
+    - "armed_night"
+    - "armed_stay"
+    - "disarmed"
+    - "emergency"
+    - "fire"
+    - "invalid_code"
+    - "panic"
+    """
+
+    ARMEDAWAY = "armed_away"
+    ARMEDNIGHT = "armed_night"
+    ARMEDSTAY = "armed_stay"
+    DISARMED = "disarmed"
+    EMERGENCY = "emergency"
+    FIRE = "fire"
+    INVALIDCODE = "invalid_code"
+    PANIC = "panic"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return AncillaryControlAction.UNKNOWN
+
+
+class AncillaryControlPanel(enum.Enum):
+    """Mirror of alarm system state.armstate attribute.
+
+    It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
+
+    Supported values:
+    - "armed_away"
+    - "armed_night"
+    - "armed_stay"
+    - "arming_away"
+    - "arming_night"
+    - "arming_stay"
+    - "disarmed"
+    - "entry_delay"
+    - "exit_delay"
+    - "in_alarm"
+    - "not_ready"
+    """
+
+    ARMEDAWAY = "armed_away"
+    ARMEDNIGHT = "armed_night"
+    ARMEDSTAY = "armed_stay"
+    ARMINGAWAY = "arming_away"
+    ARMINGNIGHT = "arming_night"
+    ARMINGSTAY = "arming_stay"
+    DISARMED = "disarmed"
+    ENTRYDELAY = "entry_delay"
+    EXITDELAY = "exit_delay"
+    INALARM = "in_alarm"
+    NOTREADY = "not_ready"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return AncillaryControlPanel.UNKNOWN
+
+
+class DayLightStatus(enum.Enum):
+    """Mirror of alarm system state.armstate attribute.
+
+    It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
+
+    Supported values:
+    - "nadir"
+    - "night_end"
+    - "nautical_dawn"
+    - "dawn"
+    - "sunrise_start"
+    - "sunrise_end"
+    - "golden_hour_1"
+    - "solar_noon"
+    - "golden_hour_2"
+    - "sunset_start"
+    - "sunset_end"
+    - "dusk"
+    - "nautical_dusk"
+    - "night_start"
+    """
+
+    NADIR = "nadir"
+    NIGHTEND = "night_end"
+    NAUTICALDAWN = "nautical_dawn"
+    DAWN = "dawn"
+    SUNRISESTART = "sunrise_start"
+    SUNRISEEND = "sunrise_end"
+    GOLDENHOUR1 = "golden_hour_1"
+    SOLARNOON = "solar_noon"
+    GOLDENHOUR2 = "golden_hour_2"
+    SUNSETSTART = "sunset_start"
+    SUNSETEND = "sunset_end"
+    DUSK = "dusk"
+    NAUTICALDUSK = "nautical_dusk"
+    NIGHTSTART = "night_start"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return DayLightStatus.UNKNOWN
+
+
+DAYLIGHT_STATUS: Final = {
+    100: DayLightStatus.NADIR,
+    110: DayLightStatus.NIGHTEND,
+    120: DayLightStatus.NAUTICALDAWN,
+    130: DayLightStatus.DAWN,
+    140: DayLightStatus.SUNRISESTART,
+    150: DayLightStatus.SUNRISEEND,
+    160: DayLightStatus.GOLDENHOUR1,
+    170: DayLightStatus.SOLARNOON,
+    180: DayLightStatus.GOLDENHOUR2,
+    190: DayLightStatus.SUNSETSTART,
+    200: DayLightStatus.SUNSETEND,
+    210: DayLightStatus.DUSK,
+    220: DayLightStatus.NAUTICALDUSK,
+    230: DayLightStatus.NIGHTSTART,
+}
+
+
+class DoorLockState(enum.Enum):
+    """State the lock is in.
+
+    Supported values:
+    - "locked"
+    - "unlocked"
+    - "undefined"
+    - "not fully locked"
+    """
+
+    LOCKED = "locked"
+    UNLOCKED = "unlocked"
+    UNDEFINED = "undefined"
+    NOTFULLYLOCKED = "not fully locked"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return DoorLockState.UNDEFINED
+
+
+class SwitchDeviceMode(enum.Enum):
+    """Different modes for the Hue wall switch module.
+
+    Supported values:
+    - "singlerocker"
+    - "singlepushbutton"
+    - "dualrocker"
+    - "dualpushbutton"
+    """
+
+    SINGLEROCKER = "singlerocker"
+    SINGLEPUSHBUTTON = "singlepushbutton"
+    DUALROCKER = "dualrocker"
+    DUALPUSHBUTTON = "dualpushbutton"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return SwitchDeviceMode.UNKNOWN
+
+
+class SwitchMode(enum.Enum):
+    """For Ubisys S1/S2, operation mode of the switch.
+
+    Supported values:
+    - "momentary"
+    - "rocker"
+    """
+
+    MOMENTARY = "momentary"
+    ROCKER = "rocker"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return SwitchMode.UNKNOWN
+
+
+class SwitchWindowCoveringType(enum.IntEnum):
+    """Set the covering type and starts calibration for Ubisys J1.
+
+    Supported values:
+    - 0 = Roller Shade
+    - 1 = Roller Shade two motors
+    - 2 = Roller Shade exterior
+    - 3 = Roller Shade two motors ext
+    - 4 = Drapery
+    - 5 = Awning
+    - 6 = Shutter
+    - 7 = Tilt Blind Lift only
+    - 8 = Tilt Blind lift & tilt
+    - 9 = Projector Screen
+    """
+
+    ROLLERSHADE = 0
+    ROLLERSHADETWOMOTORS = 1
+    ROLLERSHADEEXTERIOR = 2
+    ROLLERSHADETWOMOTORSEXTERIOR = 3
+    DRAPERY = 4
+    AWNING = 5
+    SHUTTER = 6
+    TILTBLINDLIFTONLY = 7
+    TILTBLINDLIFTANDTILT = 8
+    PROJECTORSCREEN = 9
+    UNKNOWN = 99
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return SwitchWindowCoveringType.UNKNOWN
+
+
+class ThermostatFanMode(enum.Enum):
+    """Fan mode.
+
+    Supported values:
+    - "off"
+    - "low"
+    - "medium"
+    - "high"
+    - "on"
+    - "auto"
+    - "smart"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    OFF = "off"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    ON = "on"
+    AUTO = "auto"
+    SMART = "smart"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatFanMode.UNKNOWN
+
+
+class ThermostatMode(enum.Enum):
+    """Set the current operating mode of a thermostat.
+
+    Supported values:
+    - "off"
+    - "auto"
+    - "cool"
+    - "heat"
+    - "emergency heating"
+    - "precooling"
+    - "fan only"
+    - "dry"
+    - "sleep"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    OFF = "off"
+    AUTO = "auto"
+    COOL = "cool"
+    HEAT = "heat"
+    EMERGENCYHEATING = "emergency heating"
+    PRECOOLING = "precooling"
+    FANONLY = "fan only"
+    DRY = "dry"
+    SLEEP = "sleep"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatMode.UNKNOWN
+
+
+class ThermostatSwingMode(enum.Enum):
+    """Set the AC louvers position.
+
+    Supported values:
+    - "fully closed"
+    - "fully open"
+    - "quarter open"
+    - "half open"
+    - "three quarters open"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    FULLYCLOSED = "fully closed"
+    FULLYOPEN = "fully open"
+    QUARTEROPEN = "quarter open"
+    HALFOPEN = "half open"
+    THREEQUARTERSOPEN = "three quarters open"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatSwingMode.UNKNOWN
+
+
+class ThermostatPreset(enum.Enum):
+    """Set the current operating mode for Tuya thermostats.
+
+    Supported values:
+    - "holiday"
+    - "auto"
+    - "manual"
+    - "comfort"
+    - "eco"
+    - "boost"
+    - "complex"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    HOLIDAY = "holiday"
+    AUTO = "auto"
+    MANUAL = "manual"
+    COMFORT = "comfort"
+    ECO = "eco"
+    BOOST = "boost"
+    COMPLEX = "complex"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatPreset.UNKNOWN
+
+
+class ThermostatTemperatureMeasurement(enum.Enum):
+    """Set the mode of operation for Elko Super TR thermostat.
+
+    Supported values:
+    - "air sensor"
+    - "floor sensor"
+    - "floor protection"
+    """
+
+    AIRSENSOR = "air sensor"
+    FLOORSENSOR = "floor sensor"
+    FLOORPROTECTION = "floor protection"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return ThermostatTemperatureMeasurement.UNKNOWN
 
 
 class Sensors(APIItems):
@@ -198,9 +539,7 @@ class AirQuality(DeconzSensor):
     ZHATYPE = ("ZHAAirQuality",)
 
     @property
-    def air_quality(
-        self,
-    ) -> Literal["excellent", "good", "moderate", "poor", "unhealthy", "out of scale"]:
+    def air_quality(self) -> AirQualityEnum:
         """Air quality.
 
         Supported values:
@@ -211,7 +550,7 @@ class AirQuality(DeconzSensor):
         - "unhealthy"
         - "out of scale"
         """
-        return self.raw["state"]["airquality"]
+        return AirQualityEnum(self.raw["state"]["airquality"])
 
     @property
     def air_quality_ppb(self) -> int:
@@ -238,18 +577,7 @@ class AncillaryControl(DeconzSensor):
     ZHATYPE = ("ZHAAncillaryControl",)
 
     @property
-    def action(
-        self,
-    ) -> Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "disarmed",
-        "emergency",
-        "fire",
-        "invalid_code",
-        "panic",
-    ]:
+    def action(self) -> AncillaryControlAction:
         """Last action a user invoked on the keypad.
 
         Supported values:
@@ -262,24 +590,10 @@ class AncillaryControl(DeconzSensor):
         - "invalid_code"
         - "panic"
         """
-        return self.raw["state"]["action"]
+        return AncillaryControlAction(self.raw["state"]["action"])
 
     @property
-    def panel(
-        self,
-    ) -> Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "arming_away",
-        "arming_night",
-        "arming_stay",
-        "disarmed",
-        "entry_delay",
-        "exit_delay",
-        "in_alarm",
-        "not_ready",
-    ] | None:
+    def panel(self) -> AncillaryControlPanel:
         """Mirror of alarm system state.armstate attribute.
 
         It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
@@ -297,7 +611,7 @@ class AncillaryControl(DeconzSensor):
         - "in_alarm"
         - "not_ready"
         """
-        return self.raw["state"].get("panel")
+        return AncillaryControlPanel(self.raw["state"].get("panel"))
 
     @property
     def seconds_remaining(self) -> int:
@@ -374,9 +688,9 @@ class Daylight(DeconzSensor):
         return self.raw["state"]["daylight"]
 
     @property
-    def status(self) -> str:
+    def status(self) -> DayLightStatus:
         """Return the daylight status string."""
-        return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
+        return DAYLIGHT_STATUS.get(self.raw["state"]["status"], DayLightStatus.UNKNOWN)
 
     @property
     def sunrise_offset(self) -> int:
@@ -407,9 +721,7 @@ class DoorLock(DeconzSensor):
         return self.lock_state == "locked"
 
     @property
-    def lock_state(
-        self,
-    ) -> Literal["locked", "unlocked", "undefined", "not fully locked"]:
+    def lock_state(self) -> DoorLockState:
         """State the lock is in.
 
         Supported values:
@@ -418,7 +730,7 @@ class DoorLock(DeconzSensor):
         - "undefined"
         - "not fully locked"
         """
-        return self.raw["state"]["lockstate"]
+        return DoorLockState(self.raw["state"]["lockstate"])
 
     @property
     def lock_configuration(self) -> bool:
@@ -739,11 +1051,7 @@ class Switch(DeconzSensor):
         return self.raw["state"].get("eventduration")
 
     @property
-    def device_mode(
-        self,
-    ) -> Literal[
-        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
-    ] | None:
+    def device_mode(self) -> SwitchDeviceMode:
         """Different modes for the Hue wall switch module.
 
         Behavior as rocker:
@@ -762,20 +1070,20 @@ class Switch(DeconzSensor):
         - "dualrocker"
         - "dualpushbutton"
         """
-        return self.raw["config"].get("devicemode")
+        return SwitchDeviceMode(self.raw["config"].get("devicemode"))
 
     @property
-    def mode(self) -> Literal["momentary", "rocker"] | None:
+    def mode(self) -> SwitchMode:
         """For Ubisys S1/S2, operation mode of the switch.
 
         Supported values:
         - "momentary"
         - "rocker"
         """
-        return self.raw["config"].get("mode")
+        return SwitchMode(self.raw["config"].get("mode"))
 
     @property
-    def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None:
+    def window_covering_type(self) -> SwitchWindowCoveringType:
         """Set the covering type and starts calibration for Ubisys J1.
 
         Supported values:
@@ -790,7 +1098,7 @@ class Switch(DeconzSensor):
         - 8 = Tilt Blind lift & tilt
         - 9 = Projector Screen
         """
-        return self.raw["config"].get("windowcoveringtype")
+        return SwitchWindowCoveringType(self.raw["config"].get("windowcoveringtype"))
 
     async def set_config(
         self,
@@ -887,9 +1195,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("externalwindowopen")
 
     @property
-    def fan_mode(
-        self,
-    ) -> Literal["off", "low", "medium", "high", "on", "auto", "smart"] | None:
+    def fan_mode(self) -> ThermostatFanMode:
         """Fan mode.
 
         Supported values:
@@ -902,7 +1208,7 @@ class Thermostat(Temperature):
         - "smart"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.raw["config"].get("fanmode")
+        return ThermostatFanMode(self.raw["config"].get("fanmode"))
 
     @property
     def floor_temperature(self) -> float | None:
@@ -928,20 +1234,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("locked")
 
     @property
-    def mode(
-        self,
-    ) -> Literal[
-        "off",
-        "auto",
-        "cool",
-        "heat",
-        "emergency heating",
-        "precooling",
-        "fan only",
-        "dry",
-        "sleep",
-        None,
-    ]:
+    def mode(self) -> ThermostatMode:
         """Set the current operating mode of a thermostat.
 
         Supported values:
@@ -956,7 +1249,7 @@ class Thermostat(Temperature):
         - "sleep"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.raw["config"].get("mode")
+        return ThermostatMode(self.raw["config"].get("mode"))
 
     @property
     def mounting_mode(self) -> bool | None:
@@ -974,11 +1267,7 @@ class Thermostat(Temperature):
         return self.raw["config"].get("offset")
 
     @property
-    def preset(
-        self,
-    ) -> Literal[
-        "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
-    ] | None:
+    def preset(self) -> ThermostatPreset:
         """Set the current operating mode for Tuya thermostats.
 
         Supported values:
@@ -991,7 +1280,7 @@ class Thermostat(Temperature):
         - "complex"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.raw["config"].get("preset")
+        return ThermostatPreset(self.raw["config"].get("preset"))
 
     @property
     def schedule_enabled(self) -> bool | None:
@@ -1004,15 +1293,7 @@ class Thermostat(Temperature):
         return self.raw["state"].get("on")
 
     @property
-    def swing_mode(
-        self,
-    ) -> Literal[
-        "fully closed",
-        "fully open",
-        "quarter open",
-        "half open",
-        "three quarters open",
-    ] | None:
+    def swing_mode(self) -> ThermostatSwingMode:
         """Set the AC louvers position.
 
         Supported values:
@@ -1023,12 +1304,12 @@ class Thermostat(Temperature):
         - "three quarters open"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.raw["config"].get("swingmode")
+        return ThermostatSwingMode(self.raw["config"].get("swingmode"))
 
     @property
     def temperature_measurement(
         self,
-    ) -> Literal["air sensor", "floor sensor", "floor protection"] | None:
+    ) -> ThermostatTemperatureMeasurement:
         """Set the mode of operation for Elko Super TR thermostat.
 
         Supported values:
@@ -1036,7 +1317,9 @@ class Thermostat(Temperature):
         - "floor sensor"
         - "floor protection"
         """
-        return self.raw["config"].get("temperaturemeasurement")
+        return ThermostatTemperatureMeasurement(
+            self.raw["config"].get("temperaturemeasurement")
+        )
 
     @property
     def valve(self) -> int | None:

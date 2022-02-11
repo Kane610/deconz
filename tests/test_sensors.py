@@ -8,14 +8,27 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from pydeconz.sensor import (
-    SWITCH_DEVICE_MODE_DUAL_ROCKER,
+    AirQualityEnum,
+    AncillaryControlAction,
+    AncillaryControlPanel,
+    DayLightStatus,
+    DoorLockState,
+    SwitchDeviceMode,
+    SwitchMode,
+    SwitchWindowCoveringType,
+    ThermostatFanMode,
+    ThermostatMode,
+    ThermostatPreset,
+    ThermostatSwingMode,
+    ThermostatTemperatureMeasurement,
+    # SWITCH_DEVICE_MODE_DUAL_ROCKER,
     SENSOR_CLASSES,
-    THERMOSTAT_FAN_MODE_AUTO,
-    THERMOSTAT_MODE_AUTO,
-    THERMOSTAT_MODE_OFF,
-    THERMOSTAT_PRESET_AUTO,
-    THERMOSTAT_SWING_MODE_HALF_OPEN,
-    THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
+    # THERMOSTAT_FAN_MODE_AUTO,
+    # THERMOSTAT_MODE_AUTO,
+    # THERMOSTAT_MODE_OFF,
+    # THERMOSTAT_PRESET_AUTO,
+    # THERMOSTAT_SWING_MODE_HALF_OPEN,
+    # THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
     Thermostat,
     create_sensor,
     Sensors,
@@ -74,8 +87,8 @@ async def test_air_quality_sensor():
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
-    assert sensor.state == "poor"
-    assert sensor.air_quality == "poor"
+    assert sensor.state == AirQualityEnum.POOR
+    assert sensor.air_quality == AirQualityEnum.POOR
     assert sensor.air_quality_ppb == 809
 
     # DeconzSensor
@@ -193,9 +206,9 @@ async def test_ancillary_control_sensor():
     assert not sensor.BINARY
     assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
 
-    assert sensor.state == "exit_delay"
-    assert sensor.action == "armed_stay"
-    assert sensor.panel == "exit_delay"
+    assert sensor.state == AncillaryControlPanel.EXITDELAY
+    assert sensor.action == AncillaryControlAction.ARMEDSTAY
+    assert sensor.panel == AncillaryControlPanel.EXITDELAY
     assert sensor.seconds_remaining == 55
 
     # DeconzSensor
@@ -406,10 +419,10 @@ async def test_daylight_sensor():
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("Daylight",)
 
-    assert sensor.state == "solar_noon"
+    assert sensor.state == DayLightStatus.SOLARNOON
     assert sensor.configured is True
     assert sensor.daylight is True
-    assert sensor.status == "solar_noon"
+    assert sensor.status == DayLightStatus.SOLARNOON
     assert sensor.sunrise_offset == 30
     assert sensor.sunset_offset == -30
 
@@ -433,21 +446,21 @@ async def test_daylight_sensor():
     assert sensor.unique_id == ""
 
     statuses = {
-        100: "nadir",
-        110: "night_end",
-        120: "nautical_dawn",
-        130: "dawn",
-        140: "sunrise_start",
-        150: "sunrise_end",
-        160: "golden_hour_1",
-        170: "solar_noon",
-        180: "golden_hour_2",
-        190: "sunset_start",
-        200: "sunset_end",
-        210: "dusk",
-        220: "nautical_dusk",
-        230: "night_start",
-        0: "unknown",
+        100: DayLightStatus.NADIR,
+        110: DayLightStatus.NIGHTEND,
+        120: DayLightStatus.NAUTICALDAWN,
+        130: DayLightStatus.DAWN,
+        140: DayLightStatus.SUNRISESTART,
+        150: DayLightStatus.SUNRISEEND,
+        160: DayLightStatus.GOLDENHOUR1,
+        170: DayLightStatus.SOLARNOON,
+        180: DayLightStatus.GOLDENHOUR2,
+        190: DayLightStatus.SUNSETSTART,
+        200: DayLightStatus.SUNSETEND,
+        210: DayLightStatus.DUSK,
+        220: DayLightStatus.NAUTICALDUSK,
+        230: DayLightStatus.NIGHTSTART,
+        0: DayLightStatus.UNKNOWN,
     }
 
     for k, v in statuses.items():
@@ -492,9 +505,9 @@ async def test_door_lock_sensor():
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHADoorLock",)
 
-    assert sensor.state == "unlocked"
+    assert sensor.state == DoorLockState.UNLOCKED
     assert sensor.is_locked is False
-    assert sensor.lock_state == "unlocked"
+    assert sensor.lock_state == DoorLockState.UNLOCKED
     assert sensor.lock_configuration is False
 
     # DeconzSensor
@@ -1307,11 +1320,11 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.state == 1002
     assert sensor.button_event == 1002
     assert sensor.event_duration == 1
-    assert sensor.device_mode == SWITCH_DEVICE_MODE_DUAL_ROCKER
+    assert sensor.device_mode == SwitchDeviceMode.DUALROCKER
     assert not sensor.angle
     assert not sensor.gesture
-    assert not sensor.mode
-    assert not sensor.window_covering_type
+    assert sensor.mode is SwitchMode.UNKNOWN
+    assert sensor.window_covering_type is SwitchWindowCoveringType.UNKNOWN
     assert not sensor.xy
 
     # DeconzSensor
@@ -1334,7 +1347,7 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.type == "ZHASwitch"
     assert sensor.unique_id == "00:17:88:01:0b:00:05:5d-01-fc00"
 
-    await sensor.set_config(device_mode=SWITCH_DEVICE_MODE_DUAL_ROCKER)
+    await sensor.set_config(device_mode=SwitchDeviceMode.DUALROCKER.value)
     mock_request.assert_called_with(
         "put",
         path="/sensors/0/config",
@@ -1431,7 +1444,7 @@ async def test_switch_ubisys_j1():
     assert sensor.button_event is None
     assert sensor.angle is None
     assert sensor.xy is None
-    assert sensor.mode == "momentary"
+    assert sensor.mode == SwitchMode.MOMENTARY
     assert sensor.window_covering_type == 0
 
     # DeconzSensor
@@ -1451,7 +1464,10 @@ async def test_switch_ubisys_j1():
     assert sensor.type == "ZHASwitch"
     assert sensor.unique_id == "00:1f:ee:00:00:00:00:09-02-0102"
 
-    await sensor.set_config(window_covering_type=2)
+    # await sensor.set_config(window_covering_type=2)
+    await sensor.set_config(
+        window_covering_type=SwitchWindowCoveringType.ROLLERSHADEEXTERIOR
+    )
     mock_request.assert_called_with(
         "put",
         path="/sensors/0/config",
@@ -1578,20 +1594,20 @@ async def test_danfoss_thermostat():
     assert sensor.error_code is None
     assert sensor.external_sensor_temperature is None
     assert sensor.external_window_open is None
-    assert sensor.fan_mode is None
+    assert sensor.fan_mode is ThermostatFanMode.UNKNOWN
     assert sensor.floor_temperature is None
     assert sensor.heating is None
     assert sensor.heating_setpoint == 21.00
     assert sensor.locked is None
-    assert sensor.mode is None
+    assert sensor.mode is ThermostatMode.UNKNOWN
     assert sensor.mounting_mode is None
     assert sensor.mounting_mode_active is False
     assert sensor.offset == 0
-    assert sensor.preset is None
+    assert sensor.preset is ThermostatPreset.UNKNOWN
     assert sensor.state_on is True
-    assert sensor.swing_mode is None
+    assert sensor.swing_mode is ThermostatSwingMode.UNKNOWN
     assert sensor.temperature == 21.0
-    assert sensor.temperature_measurement is None
+    assert sensor.temperature_measurement is ThermostatTemperatureMeasurement.UNKNOWN
     assert sensor.valve == 24
     assert sensor.window_open_detection is None
 
@@ -1656,20 +1672,20 @@ async def test_eurotronic_thermostat():
     assert sensor.state == 21.5
     assert sensor.cooling_setpoint is None
     assert sensor.error_code is None
-    assert sensor.fan_mode is None
+    assert sensor.fan_mode is ThermostatFanMode.UNKNOWN
     assert sensor.floor_temperature is None
     assert sensor.heating is None
     assert sensor.heating_setpoint == 21.00
     assert sensor.locked is False
-    assert sensor.mode == "auto"
+    assert sensor.mode is ThermostatMode.AUTO
     assert sensor.mounting_mode is None
     assert sensor.mounting_mode_active is None
     assert sensor.offset == 0
-    assert sensor.preset is None
+    assert sensor.preset is ThermostatPreset.UNKNOWN
     assert sensor.state_on is False
-    assert sensor.swing_mode is None
+    assert sensor.swing_mode is ThermostatSwingMode.UNKNOWN
     assert sensor.temperature == 21.5
-    assert sensor.temperature_measurement is None
+    assert sensor.temperature_measurement is ThermostatTemperatureMeasurement.UNKNOWN
     assert sensor.valve == 0
     assert sensor.window_open_detection is None
 
@@ -1734,7 +1750,7 @@ async def test_tuya_thermostat():
     assert sensor.state == 22.9
     assert sensor.heating_setpoint == 15.50
     assert sensor.locked is None
-    assert sensor.mode is None
+    assert sensor.mode is ThermostatMode.UNKNOWN
     assert sensor.offset == 0
     assert sensor.schedule_enabled is None
     assert sensor.state_on is None
@@ -1765,18 +1781,18 @@ async def test_tuya_thermostat():
         enable_schedule=True,
         external_sensor_temperature=24,
         external_window_open=True,
-        fan_mode=THERMOSTAT_FAN_MODE_AUTO,
+        fan_mode=ThermostatFanMode.AUTO,
         flip_display=False,
         heating_setpoint=500,
         locked=True,
-        mode=THERMOSTAT_MODE_AUTO,
+        mode=ThermostatMode.AUTO,
         mounting_mode=False,
         on=True,
-        preset=THERMOSTAT_PRESET_AUTO,
+        preset=ThermostatPreset.AUTO,
         schedule=[],
         set_valve=True,
-        swing_mode=THERMOSTAT_SWING_MODE_HALF_OPEN,
-        temperature_measurement=THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
+        swing_mode=ThermostatSwingMode.HALFOPEN,
+        temperature_measurement=ThermostatTemperatureMeasurement.FLOORSENSOR,
         window_open_detection=True,
     )
     mock_request.assert_called_with(
