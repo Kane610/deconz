@@ -235,7 +235,7 @@ async def test_create_group():
 
 
 @pytest.mark.parametrize(
-    "light_state,update_all,expected_group_state",
+    "light_state, update_all, expected_group_state",
     [
         (
             {

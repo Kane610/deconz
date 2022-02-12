@@ -13,6 +13,9 @@ from pydeconz.light import (
     EFFECT_COLOR_LOOP,
     FAN_SPEED_100_PERCENT,
     ON_TIME_KEY,
+    Alert,
+    ColorMode,
+    Effect,
     Lights,
 )
 
@@ -54,17 +57,17 @@ async def test_create_light():
     light = lights["0"]
 
     assert light.state is False
-    assert light.alert is None
+    assert light.alert is Alert.UNKNOWN
 
     assert light.brightness == 111
     assert light.hue == 7998
     assert light.saturation == 172
     assert light.color_temp == 307
     assert light.xy == (0.421253, 0.39921)
-    assert light.color_mode == "ct"
+    assert light.color_mode == ColorMode.CT
     assert light.max_color_temp == 500
     assert light.min_color_temp == 153
-    assert light.effect is None
+    assert light.effect is Effect.UNKNOWN
     assert light.reachable is True
 
     assert light.deconz_id == "/lights/0"
@@ -408,17 +411,17 @@ async def test_create_fan():
     fan = lights["0"]
 
     assert fan.state is False
-    assert fan.alert == "none"
+    assert fan.alert == Alert.NONE
 
     assert fan.brightness == 254
     assert fan.hue is None
     assert fan.saturation is None
     assert fan.color_temp is None
     assert fan.xy is None
-    assert fan.color_mode is None
+    assert fan.color_mode is ColorMode.UNKNOWN
     assert fan.max_color_temp is None
     assert fan.min_color_temp is None
-    assert fan.effect is None
+    assert fan.effect is Effect.UNKNOWN
     assert fan.reachable is True
     assert fan.speed == 4
 
