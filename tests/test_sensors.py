@@ -1781,18 +1781,18 @@ async def test_tuya_thermostat():
         enable_schedule=True,
         external_sensor_temperature=24,
         external_window_open=True,
-        fan_mode=ThermostatFanMode.AUTO,
+        fan_mode=ThermostatFanMode.AUTO.value,
         flip_display=False,
         heating_setpoint=500,
         locked=True,
-        mode=ThermostatMode.AUTO,
+        mode=ThermostatMode.AUTO.value,
         mounting_mode=False,
         on=True,
-        preset=ThermostatPreset.AUTO,
+        preset=ThermostatPreset.AUTO.value,
         schedule=[],
         set_valve=True,
-        swing_mode=ThermostatSwingMode.HALFOPEN,
-        temperature_measurement=ThermostatTemperatureMeasurement.FLOORSENSOR,
+        swing_mode=ThermostatSwingMode.HALFOPEN.value,
+        temperature_measurement=ThermostatTemperatureMeasurement.FLOORSENSOR.value,
         window_open_detection=True,
     )
     mock_request.assert_called_with(
@@ -1819,7 +1819,7 @@ async def test_tuya_thermostat():
         },
     )
 
-    await sensor.set_config(mode=THERMOSTAT_MODE_OFF)
+    await sensor.set_config(mode=ThermostatMode.OFF.value)
     mock_request.assert_called_with(
         "put",
         path="/sensors/0/config",

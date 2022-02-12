@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import enum
 import logging
 from pprint import pformat
 from typing import Any, Final
@@ -19,6 +20,28 @@ from .websocket import Signal, State, WSClient
 
 LOGGER = logging.getLogger(__name__)
 
+
+class Event(enum.Enum):
+    """Event keys."""
+
+    TYPE = "t"
+    EVENT = "e"
+    RESOURCE = "r"
+    ID = "id"
+
+    GROUP_ID = "gid"
+    SCENE_ID = "scid"
+
+    CONFIG = "config"
+    NAME = "name"
+    STATE = "state"
+    UNIQUE_ID = "uniqueid"
+
+    GROUP = "group"
+    LIGHT = "light"
+    SENSOR = "sensor"
+
+
 EVENT_ID: Final = "id"
 EVENT_RESOURCE: Final = "r"
 
@@ -28,20 +51,58 @@ EVENT_TYPE_CHANGED: Final = "changed"
 EVENT_TYPE_DELETED: Final = "deleted"
 EVENT_TYPE_SCENE_CALLED: Final = "scene-called"
 
-SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
-SUPPORTED_EVENT_RESOURCES: Final = (
-    ALARM_SYSTEM_RESOURCE,
-    GROUP_RESOURCE,
-    LIGHT_RESOURCE,
-    SENSOR_RESOURCE,
-)
 
+class EventType(enum.Enum):
+    """The event type of the message."""
+
+    ADDED = "added"
+    CHANGED = "changed"
+    DELETED = "deleted"
+    SCENE_CALLED = "scene-called"
+
+
+class EventResource(enum.Enum):
+    """The resource type to which the message belongs."""
+
+    ALARM = ALARM_SYSTEM_RESOURCE
+    GROUP = GROUP_RESOURCE
+    LIGHT = LIGHT_RESOURCE
+    SENSOR = SENSOR_RESOURCE
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Set default enum member if an unknown value is provided."""
+        return EventResource.UNKNOWN
+
+
+SUPPORTED_EVENT_TYPES: Final = (EventType.ADDED, EventType.CHANGED)
+SUPPORTED_EVENT_RESOURCES: Final = (
+    EventResource.ALARM,
+    EventResource.GROUP,
+    EventResource.LIGHT,
+    EventResource.SENSOR,
+)
 RESOURCE_TYPE_TO_DEVICE_TYPE: Final = {
-    ALARM_SYSTEM_RESOURCE: "alarmsystem",
-    GROUP_RESOURCE: "group",
-    LIGHT_RESOURCE: "light",
-    SENSOR_RESOURCE: "sensor",
+    EventResource.ALARM: "alarmsystem",
+    EventResource.GROUP: "group",
+    EventResource.LIGHT: "light",
+    EventResource.SENSOR: "sensor",
 }
+
+# SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
+# SUPPORTED_EVENT_RESOURCES: Final = (
+#     ALARM_SYSTEM_RESOURCE,
+#     GROUP_RESOURCE,
+#     LIGHT_RESOURCE,
+#     SENSOR_RESOURCE,
+# )
+# RESOURCE_TYPE_TO_DEVICE_TYPE: Final = {
+#     ALARM_SYSTEM_RESOURCE: "alarmsystem",
+#     GROUP_RESOURCE: "group",
+#     LIGHT_RESOURCE: "light",
+#     SENSOR_RESOURCE: "sensor",
+# }
 
 
 class DeconzSession:
@@ -196,29 +257,31 @@ class DeconzSession:
 
         Note that only one of config, name, or state will be present per changed event.
         """
-        if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
+        if (event_type := EventType(event[EVENT_TYPE])) not in SUPPORTED_EVENT_TYPES:
             LOGGER.debug("Unsupported event %s", event)
             return
 
-        if (resource_type := event[EVENT_RESOURCE]) not in SUPPORTED_EVENT_RESOURCES:
+        if (
+            resource_type := EventResource(event[EVENT_RESOURCE])
+        ) not in SUPPORTED_EVENT_RESOURCES:
             LOGGER.debug("Unsupported resource %s", event)
             return
 
-        device_class = getattr(self, resource_type)
+        device_class = getattr(self, resource_type.value)
         device_id = event[EVENT_ID]
 
-        if event_type == EVENT_TYPE_CHANGED and device_id in device_class:
+        if event_type == EventType.CHANGED and device_id in device_class:
             device_class.process_raw({device_id: event})
             if resource_type == LIGHT_RESOURCE and "attr" not in event:
                 self.update_group_color([device_id])
             return
 
-        if event_type == EVENT_TYPE_ADDED and device_id not in device_class:
+        if event_type == EventType.ADDED and device_id not in device_class:
             device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
             device_class.process_raw({device_id: event[device_type]})
             device = device_class[device_id]
             if self.add_device_callback:
-                self.add_device_callback(resource_type, device)
+                self.add_device_callback(resource_type.value, device)
             return
 
     def update_group_color(self, lights: list[str]) -> None:
