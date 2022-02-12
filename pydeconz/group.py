@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
 from .api import APIItem, APIItems
-from .deconz_device import DeconzDevice
+from .models.deconz_device import DeconzDevice
 from .light import Light
 
 RESOURCE_TYPE: Final = "groups"
