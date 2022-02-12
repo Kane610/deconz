@@ -20,17 +20,24 @@ async def test_api_items():
     assert [*apiitems.keys()] == ["1", "2"]
     assert [*apiitems.values()] == [apiitems["1"], apiitems["2"]]
 
+    unsub_apiitems = apiitems.subscribe(apiitems_mock_subscribe := Mock())
+    assert len(apiitems._subscribers) == 1
+
     item_1 = apiitems["1"]
-    item_1.register_callback(Mock())
+    item_1.register_callback(item_1_mock_callback := Mock())
     apiitems._request.return_value = {"1": {"key1": ""}, "3": {}}
     await apiitems.update()
 
     apiitems._request.assert_called_with("get", "string_path")
     assert "3" in apiitems
-    item_1._callbacks[0].assert_called()
+    apiitems_mock_subscribe.assert_called_with("added", "3")
+    item_1_mock_callback.assert_called()
     item_1.changed_keys == ("key1")
 
     await item_1.request("field", {"key2": "on"})
+
+    unsub_apiitems()
+    assert len(apiitems._subscribers) == 0
 
 
 @patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
