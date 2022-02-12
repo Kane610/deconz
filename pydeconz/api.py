@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable, ItemsView, KeysView, ValuesView
 import logging
 from typing import Any
 
-from .models.api import APIItem
+from .models.api import APIItem  # noqa: F401
 
 LOGGER = logging.getLogger(__name__)
 
