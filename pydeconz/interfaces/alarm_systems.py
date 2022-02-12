@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final
 
-from .api import APIItems
 from ..models.alarm_system import AlarmSystem
+from .api import APIItems
 
 URL: Final = "/alarmsystems"
 
