@@ -9,12 +9,17 @@ from typing import Any, Final, Literal
 
 import aiohttp
 
-from .alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE, AlarmSystems
 from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
-from .group import RESOURCE_TYPE as GROUP_RESOURCE, Groups, Scene
-from .light import RESOURCE_TYPE as LIGHT_RESOURCE, Light, Lights
-from .sensor import RESOURCE_TYPE as SENSOR_RESOURCE, Sensors
+from .interfaces.alarm_systems import AlarmSystems
+from .interfaces.groups import Groups
+from .interfaces.lights import Lights
+from .interfaces.sensors import Sensors
+from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
+from .models.group import RESOURCE_TYPE as GROUP_RESOURCE, Scene
+from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
+from .models.light.light import Light
+from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
