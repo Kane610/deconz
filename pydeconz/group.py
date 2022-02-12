@@ -13,14 +13,14 @@ RESOURCE_TYPE: Final = "groups"
 RESOURCE_TYPE_SCENE: Final = "scenes"
 URL: Final = "/groups"
 
-GROUP_TO_LIGHT_ATTRIBUTES: Final = {
-    "bri": "brightness",
-    "ct": "color_temp",
-    "hue": "hue",
-    "sat": "saturation",
-    "xy": "xy",
-    "colormode": "color_mode",
-    "effect": "effect",
+COLOR_STATE_ATTRIBUTES: Final = {
+    "bri",
+    "ct",
+    "hue",
+    "sat",
+    "xy",
+    "colormode",
+    "effect",
 }
 
 
@@ -305,15 +305,14 @@ class Group(DeconzDevice):
         """
         data: dict[str, float | int | str | tuple | None] = {}
 
-        for group_key, light_attribute_key in GROUP_TO_LIGHT_ATTRIBUTES.items():
-            light_attribute = getattr(light, light_attribute_key)
+        for attribute in COLOR_STATE_ATTRIBUTES:
 
-            if light_attribute is not None:
-                data[group_key] = light_attribute
+            if (light_attribute := light.raw["state"].get(attribute)) is not None:
+                data[attribute] = light_attribute
                 continue
 
             if update_all_attributes:
-                data[group_key] = None if group_key != "xy" else (None, None)
+                data[attribute] = None if attribute != "xy" else (None, None)
 
         self.update({"action": data})
 
