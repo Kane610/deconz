@@ -7,7 +7,14 @@ from typing import Any, Final
 
 from .api import APIItems
 from .models.light import *  # noqa: F401, F403
-from .models.light import ConfigurationTool, Cover, DeconzLight, Fan, Light, Lock, Siren
+from .models.light import DeconzLight
+from .models.light.configuration_tool import ConfigurationTool
+from .models.light.cover import Cover
+from .models.light.fan import *  # noqa: F401, F403
+from .models.light.fan import Fan
+from .models.light.light import Light
+from .models.light.lock import Lock
+from .models.light.siren import Siren
 
 URL: Final = "/lights"
 NON_LIGHT_CLASSES = (ConfigurationTool, Cover, Fan, Lock, Siren)
