@@ -15,6 +15,7 @@ from pydeconz import (
     websocket,
 )
 from pydeconz.alarm_system import ArmState
+from pydeconz.light import Alert, ColorMode, Effect
 
 import aiohttp
 from aioresponses import aioresponses
@@ -510,7 +511,7 @@ async def test_sensor_events():
 
 
 @pytest.mark.parametrize(
-    "light_ids,expected_group_state",
+    "light_ids, expected_group_state",
     [
         (
             ["l1", "l2", "l3", "l4"],
@@ -520,8 +521,8 @@ async def test_sensor_events():
                 "hue": 1,
                 "sat": 1,
                 "xy": (0.1, 0.1),
-                "colormode": "ct",
-                "effect": None,
+                "colormode": ColorMode.CT,
+                "effect": Effect.UNKNOWN,
             },
         ),
         (
@@ -532,8 +533,8 @@ async def test_sensor_events():
                 "hue": 1,
                 "sat": 1,
                 "xy": (0.1, 0.1),
-                "colormode": "xy",
-                "effect": None,
+                "colormode": ColorMode.XY,
+                "effect": Effect.UNKNOWN,
             },
         ),
         (
@@ -544,8 +545,8 @@ async def test_sensor_events():
                 "hue": None,
                 "sat": None,
                 "xy": None,
-                "colormode": "ct",
-                "effect": None,
+                "colormode": ColorMode.CT,
+                "effect": Effect.UNKNOWN,
             },
         ),
         (
@@ -556,8 +557,8 @@ async def test_sensor_events():
                 "hue": None,
                 "sat": None,
                 "xy": None,
-                "colormode": None,
-                "effect": None,
+                "colormode": ColorMode.UNKNOWN,
+                "effect": Effect.UNKNOWN,
             },
         ),
     ],

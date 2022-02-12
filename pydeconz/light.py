@@ -143,7 +143,7 @@ class Light(DeconzLight):
     """
 
     @property
-    def alert(self) -> Alert | None:
+    def alert(self) -> Alert:
         """Temporary alert effect.
 
         Following values are possible:
@@ -202,7 +202,7 @@ class Light(DeconzLight):
         return (x, y)
 
     @property
-    def color_mode(self) -> ColorMode | None:
+    def color_mode(self) -> ColorMode:
         """Color mode of light.
 
         ct - color temperature
@@ -226,7 +226,7 @@ class Light(DeconzLight):
         return ctmin
 
     @property
-    def effect(self) -> Effect | None:
+    def effect(self) -> Effect:
         """Effect of the light.
 
         colorloop — the light will cycle continuously through all colors

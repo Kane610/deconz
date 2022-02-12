@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final, Literal
+from typing import Any, Final
 
 from .api import APIItem, APIItems
 from .deconz_device import DeconzDevice
-from .light import Light
+from .light import Alert, ColorMode, Effect, Light
 
 RESOURCE_TYPE: Final = "groups"
 RESOURCE_TYPE_SCENE: Final = "scenes"
@@ -125,23 +125,23 @@ class Group(DeconzDevice):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
+    def color_mode(self) -> ColorMode:
         """Color mode of the light.
 
         ct - color temperature
         hs - hue and saturation
         xy - CIE xy values
         """
-        return self.raw["action"].get("colormode")
+        return ColorMode(self.raw["action"].get("colormode"))
 
     @property
-    def effect(self) -> Literal["colorloop", "none"] | None:
+    def effect(self) -> Effect:
         """Effect of the group.
 
         colorloop
         none - no effect
         """
-        return self.raw["action"].get("effect")
+        return Effect(self.raw["action"].get("effect"))
 
     @property
     def reachable(self) -> bool | None:
@@ -237,11 +237,11 @@ class Group(DeconzDevice):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect"] | None = None,
+        alert: Alert | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none"] | None = None,
+        effect: Effect | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

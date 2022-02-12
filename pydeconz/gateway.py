@@ -272,7 +272,7 @@ class DeconzSession:
 
         if event_type == EventType.CHANGED and device_id in device_class:
             device_class.process_raw({device_id: event})
-            if resource_type == LIGHT_RESOURCE and "attr" not in event:
+            if resource_type == EventResource.LIGHT and "attr" not in event:
                 self.update_group_color([device_id])
             return
 

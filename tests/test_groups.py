@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from pydeconz.group import Groups
-from pydeconz.light import Light, ALERT_SHORT, EFFECT_COLOR_LOOP
+from pydeconz.light import ColorMode, Effect, Light, ALERT_SHORT, EFFECT_COLOR_LOOP
 
 
 async def test_create_group():
@@ -66,8 +66,8 @@ async def test_create_group():
     assert group.saturation == 127
     assert group.color_temp == 0
     assert group.xy == (0, 0)
-    assert group.color_mode == "hs"
-    assert group.effect == "none"
+    assert group.color_mode == ColorMode.HS
+    assert group.effect == Effect.NONE
     assert group.reachable is True
 
     assert group.deconz_id == "/groups/0"
@@ -254,8 +254,8 @@ async def test_create_group():
                 "hue": 1,
                 "sat": 1,
                 "xy": (0.1, 0.1),
-                "colormode": "xy",
-                "effect": "none",
+                "colormode": ColorMode.XY,
+                "effect": Effect.NONE,
             },
         ),
         (
@@ -272,8 +272,8 @@ async def test_create_group():
                 "hue": None,
                 "sat": None,
                 "xy": None,
-                "colormode": "ct",
-                "effect": None,
+                "colormode": ColorMode.CT,
+                "effect": Effect.UNKNOWN,
             },
         ),
     ],
