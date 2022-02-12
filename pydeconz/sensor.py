@@ -6,33 +6,35 @@ from collections.abc import Awaitable, Callable
 from typing import Any, Final
 
 from .api import APIItems
-from .models.sensor import (
-    AirQuality,
-    Alarm,
-    AncillaryControl,
-    Battery,
-    CarbonMonoxide,
-    Consumption,
-    Daylight,
-    DeconzSensor,
-    DoorLock,
-    Fire,
-    GenericFlag,
-    GenericStatus,
-    Humidity,
-    LightLevel,
-    OpenClose,
-    Power,
-    Presence,
-    Pressure,
-    Switch,
-    Temperature,
-    Thermostat,
-    Time,
-    Vibration,
-    Water,
-)
 from .models.sensor import *  # noqa: F401, F403
+from .models.sensor import DeconzSensor
+from .models.sensor.air_quality import AirQuality
+from .models.sensor.alarm import Alarm
+from .models.sensor.ancillary_control import *  # noqa: F401, F403
+from .models.sensor.ancillary_control import AncillaryControl
+from .models.sensor.battery import Battery
+from .models.sensor.carbon_monoxide import CarbonMonoxide
+from .models.sensor.consumption import Consumption
+from .models.sensor.daylight import Daylight
+from .models.sensor.door_lock import DoorLock
+from .models.sensor.fire import Fire
+from .models.sensor.generic_flag import GenericFlag
+from .models.sensor.generic_status import GenericStatus
+from .models.sensor.humidity import Humidity
+from .models.sensor.light_level import LightLevel
+from .models.sensor.open_close import OpenClose
+from .models.sensor.power import Power
+from .models.sensor.presence import *  # noqa: F401, F403
+from .models.sensor.presence import Presence
+from .models.sensor.pressure import Pressure
+from .models.sensor.switch import *  # noqa: F401, F403
+from .models.sensor.switch import Switch
+from .models.sensor.temperature import Temperature
+from .models.sensor.thermostat import *  # noqa: F401, F403
+from .models.sensor.thermostat import Thermostat
+from .models.sensor.time import Time
+from .models.sensor.vibration import Vibration
+from .models.sensor.water import Water
 
 URL: Final = "/sensors"
 
