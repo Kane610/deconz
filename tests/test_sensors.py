@@ -1760,6 +1760,24 @@ async def test_tuya_thermostat():
     assert sensor.type == "ZHAThermostat"
     assert sensor.unique_id == "bc:33:ac:ff:fe:47:a1:95-01-0201"
 
+    # Verify temperature conversion to increase coverage
+    sensor.update(
+        {
+            "config": {
+                "coolsetpoint": 1000,
+                "externalsensortemp": 2000,
+                "heatsetpoint": None,
+            },
+            "state": {
+                "floortemperature": 4000,
+            },
+        }
+    )
+    assert sensor.cooling_setpoint == 10
+    assert sensor.external_sensor_temperature == 20
+    assert sensor.heating_setpoint is None
+    assert sensor.floor_temperature == 40
+
     await sensor.set_config(
         cooling_setpoint=1000,
         enable_schedule=True,

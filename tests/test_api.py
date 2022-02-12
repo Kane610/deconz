@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz.api import APIItems
-from pydeconz.deconz_device import DeconzDevice
+from pydeconz.models.deconz_device import DeconzDevice
 from pydeconz.errors import BridgeBusy
 
 
@@ -33,7 +33,7 @@ async def test_api_items():
     await item_1.request("field", {"key2": "on"})
 
 
-@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+@patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
 async def test_retry_on_bridge_busy(_):
     """Verify a max count of 4 bridge busy messages."""
     request_mock = AsyncMock(side_effect=BridgeBusy)
@@ -47,7 +47,7 @@ async def test_retry_on_bridge_busy(_):
     assert not item_1._sleep_task
 
 
-@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+@patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
 async def test_request_exception_bridge_busy_pass_on_retry(_):
     """Verify retry can return an expected response."""
     request_mock = AsyncMock(side_effect=(BridgeBusy, {"response": "ok"}))
@@ -60,7 +60,7 @@ async def test_request_exception_bridge_busy_pass_on_retry(_):
     assert not item_1._sleep_task
 
 
-@patch("pydeconz.api.sleep", new_callable=AsyncMock)
+@patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
 async def test_reset_retry_with_a_second_request(_):
     """Verify an ongoing retry can be reset by a new request."""
     request_mock = AsyncMock(side_effect=(BridgeBusy, BridgeBusy, {"response": "ok"}))
