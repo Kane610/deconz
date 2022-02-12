@@ -76,7 +76,7 @@ class APIItem:
     ) -> None:
         """Initialize API item."""
         self._resource_id = resource_id
-        self._raw = raw
+        self.raw = raw
         self._request = request
 
         self._callbacks: list = []
@@ -87,11 +87,6 @@ class APIItem:
     def resource_id(self) -> str:
         """Read only resource ID."""
         return self._resource_id
-
-    @property
-    def raw(self) -> dict:
-        """Read only raw data."""
-        return self._raw
 
     @property
     def changed_keys(self) -> set:
@@ -120,10 +115,10 @@ class APIItem:
 
             if isinstance(self.raw.get(k), dict) and isinstance(v, dict):
                 changed_keys.update(set(v.keys()))
-                self._raw[k].update(v)
+                self.raw[k].update(v)
 
             else:
-                self._raw[k] = v
+                self.raw[k] = v
 
         self._changed_keys = changed_keys
 
