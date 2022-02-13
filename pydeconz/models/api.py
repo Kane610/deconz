@@ -11,6 +11,8 @@ from ..errors import BridgeBusy
 
 LOGGER = logging.getLogger(__name__)
 
+SubscriptionType = Callable[..., None]
+
 
 class APIItem:
     """Base class for an API item."""
@@ -26,9 +28,10 @@ class APIItem:
         self.raw = raw
         self._request = request
 
-        self._callbacks: list = []
+        self._callbacks: list[SubscriptionType] = []
+        self._subscribers: list[SubscriptionType] = []
         self._sleep_task: Task | None = None
-        self._changed_keys: set = set()
+        self._changed_keys: set[str] = set()
 
     @property
     def resource_id(self) -> str:
@@ -40,20 +43,31 @@ class APIItem:
         """Read only changed keys data."""
         return self._changed_keys
 
-    def register_callback(self, callback: Callable[..., None]) -> None:
+    def register_callback(self, callback: SubscriptionType) -> None:
         """Register callback for signalling."""
         self._callbacks.append(callback)
 
-    def remove_callback(self, callback: Callable[..., None]) -> None:
+    def remove_callback(self, callback: SubscriptionType) -> None:
         """Remove callback previously registered."""
         if callback in self._callbacks:
             self._callbacks.remove(callback)
 
-    def update(self, raw: dict) -> None:
+    def subscribe(self, callback: SubscriptionType) -> Callable:
+        """Subscribe to events.
+
+        Return function to unsubscribe.
+        """
+        self._subscribers.append(callback)
+
+        def unsubscribe():
+            self._subscribers.remove(callback)
+
+        return unsubscribe
+
+    def update(self, raw: dict[str, dict[str, Any]]) -> None:
         """Update input attr in self.
 
         Store a set of keys with changed values.
-        Kwargs will be passed on to callbacks.
         """
         changed_keys = set()
 
@@ -69,8 +83,8 @@ class APIItem:
 
         self._changed_keys = changed_keys
 
-        for signal_update_callback in self._callbacks:
-            signal_update_callback()
+        for callback in self._callbacks + self._subscribers:
+            callback()
 
     async def request(self, field: str, data: dict, tries: int = 0) -> dict:
         """Set state of device."""

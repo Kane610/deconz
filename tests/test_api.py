@@ -25,6 +25,7 @@ async def test_api_items():
 
     item_1 = apiitems["1"]
     item_1.register_callback(item_1_mock_callback := Mock())
+    unsub_item_1 = item_1.subscribe(item_1_mock_subscribe := Mock())
     apiitems._request.return_value = {"1": {"key1": ""}, "3": {}}
     await apiitems.update()
 
@@ -32,9 +33,13 @@ async def test_api_items():
     assert "3" in apiitems
     apiitems_mock_subscribe.assert_called_with("added", "3")
     item_1_mock_callback.assert_called()
+    item_1_mock_subscribe.assert_called()
     item_1.changed_keys == ("key1")
 
     await item_1.request("field", {"key2": "on"})
+
+    unsub_item_1()
+    assert len(item_1._subscribers) == 0
 
     unsub_apiitems()
     assert len(apiitems._subscribers) == 0
