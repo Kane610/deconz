@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from ..api import APIItems
+from .api import APIItems
 from ..models.scene import RESOURCE_TYPE, Scene
 
 
