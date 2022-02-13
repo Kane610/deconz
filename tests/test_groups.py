@@ -6,8 +6,9 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pydeconz.group import Groups
-from pydeconz.light import Light, ALERT_SHORT, EFFECT_COLOR_LOOP
+from pydeconz.interfaces.groups import Groups
+from pydeconz.models.light import ALERT_SHORT, EFFECT_COLOR_LOOP
+from pydeconz.models.light.light import Light
 
 
 async def test_create_group():
