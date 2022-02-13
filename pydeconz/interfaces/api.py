@@ -4,19 +4,21 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, ItemsView, KeysView, ValuesView
 import logging
-from typing import Any
+from typing import Any, Generic, Iterator
+
+from ..models import DataResource
 
 LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = Callable[[str, str], None]
 
 
-class APIItems:
+class APIItems(Generic[DataResource]):
     """Base class for a map of API Items."""
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
         path: str,
         item_cls: Any,
@@ -25,7 +27,7 @@ class APIItems:
         self._request = request
         self._path = path
         self._item_cls = item_cls
-        self._items: dict = {}
+        self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
         self.process_raw(raw)
 
@@ -38,7 +40,8 @@ class APIItems:
         """Process data."""
         for id, raw_item in raw.items():
 
-            if (obj := self._items.get(id)) is not None:
+            if id in self._items:
+                obj = self._items[id]
                 obj.update(raw_item)
                 continue
 
@@ -60,22 +63,22 @@ class APIItems:
 
         return unsubscribe
 
-    def items(self) -> ItemsView[str, Any]:
+    def items(self) -> ItemsView[str, DataResource]:
         """Return items."""
         return self._items.items()
 
-    def keys(self) -> KeysView[Any]:
+    def keys(self) -> KeysView[str]:
         """Return item keys."""
         return self._items.keys()
 
-    def values(self) -> ValuesView[Any]:
+    def values(self) -> ValuesView[DataResource]:
         """Return item values."""
         return self._items.values()
 
-    def __getitem__(self, obj_id: str) -> Any:
+    def __getitem__(self, obj_id: str) -> DataResource:
         """Get item value based on key."""
         return self._items[obj_id]
 
-    def __iter__(self) -> Any:
+    def __iter__(self) -> Iterator[str]:
         """Allow iterate over items."""
         return iter(self._items)

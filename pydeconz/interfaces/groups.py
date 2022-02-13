@@ -11,7 +11,7 @@ from .api import APIItems
 URL: Final = "/groups"
 
 
-class Groups(APIItems):
+class Groups(APIItems[Group]):
     """Represent deCONZ groups."""
 
     def __init__(
