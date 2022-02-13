@@ -5,13 +5,12 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from ..api import APIItems
+from ..interfaces.scenes import Scenes
 from ..light import Light
-from .api import APIItem
 from .deconz_device import DeconzDevice
+from .scene import Scene, RESOURCE_TYPE as RESOURCE_TYPE_SCENE  # noqa: F401
 
 RESOURCE_TYPE: Final = "groups"
-RESOURCE_TYPE_SCENE: Final = "scenes"
 
 COLOR_STATE_ATTRIBUTES: Final = {
     "bri",
@@ -303,120 +302,3 @@ class Group(DeconzDevice):
                 data[attribute] = None if attribute != "xy" else (None, None)
 
         self.update({"action": data})
-
-
-class Scenes(APIItems):
-    """Represent scenes of a deCONZ group."""
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-        group_id: str,
-        group_name: str,
-    ) -> None:
-        """Initialize scene manager."""
-        raw = self.pre_process_raw(raw, group_id, group_name)
-        url = f"{group_id}/{RESOURCE_TYPE_SCENE}"
-        super().__init__(raw, request, url, Scene)
-
-    async def create_scene(self, name: str) -> dict[str, Any]:
-        """Create a new scene.
-
-        The actual state of each light will become the lights scene state.
-        """
-        return await self._request("post", path=self._path, json={"name": name})
-
-    @staticmethod
-    def pre_process_raw(
-        raw: dict[str, Any], group_id: str, group_name: str
-    ) -> dict[str, dict[str, Any]]:
-        """Transform scenes raw from list to dict."""
-        return {
-            scene["id"]: scene | {"group_deconz_id": group_id, "group_name": group_name}
-            for scene in raw["scenes"]
-        }
-
-
-class Scene(APIItem):
-    """deCONZ scene representation.
-
-    Dresden Elektroniks documentation of scenes in deCONZ
-    http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
-    """
-
-    def __init__(
-        self,
-        resource_id: str,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Set initial information about scene."""
-        super().__init__(resource_id, raw, request)
-
-        self.group_deconz_id = raw["group_deconz_id"]
-        self.group_name = raw["group_name"]
-
-    @property
-    def resource_type(self) -> str:
-        """Resource type."""
-        return RESOURCE_TYPE_SCENE
-
-    async def recall(self) -> dict:
-        """Recall scene to group."""
-        return await self.request(field=f"{self.deconz_id}/recall", data={})
-
-    async def store(self) -> dict:
-        """Store current group state in scene.
-
-        The actual state of each light in the group will become the lights scene state.
-        """
-        return await self.request(field=f"{self.deconz_id}/store", data={})
-
-    async def set_attributes(
-        self,
-        name: str | None = None,
-    ) -> dict:
-        """Change attributes of scene.
-
-        Supported values:
-        - name [str]
-        """
-        data = {
-            key: value
-            for key, value in {
-                "name": name,
-            }.items()
-            if value is not None
-        }
-        return await self.request(field=f"{self.deconz_id}", data=data)
-
-    @property
-    def deconz_id(self) -> str:
-        """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group_deconz_id}/{self.resource_type}/{self.id}"
-
-    @property
-    def id(self) -> str:
-        """Scene ID."""
-        return self.raw["id"]
-
-    @property
-    def light_count(self) -> int:
-        """Lights in group."""
-        return self.raw["lightcount"]
-
-    @property
-    def transition_time(self) -> int:
-        """Transition time for scene."""
-        return self.raw["transitiontime"]
-
-    @property
-    def name(self) -> str:
-        """Scene name."""
-        return self.raw["name"]
-
-    @property
-    def full_name(self) -> str:
-        """Full name."""
-        return f"{self.group_name} {self.name}"
