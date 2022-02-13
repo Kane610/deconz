@@ -8,7 +8,7 @@ from typing import Any, Final, Literal
 from ..interfaces.scenes import Scenes
 from ..light import Light
 from .deconz_device import DeconzDevice
-from .scene import Scene, RESOURCE_TYPE as RESOURCE_TYPE_SCENE  # noqa: F401
+from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene  # noqa: F401
 
 RESOURCE_TYPE: Final = "groups"
 

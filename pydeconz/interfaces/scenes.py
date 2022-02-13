@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from ..api import APIItems
-from ..models.scene import Scene, RESOURCE_TYPE
+from ..models.scene import RESOURCE_TYPE, Scene
 
 
 class Scenes(APIItems):
