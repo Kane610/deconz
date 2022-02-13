@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pydeconz.sensor import (
-    SWITCH_DEVICE_MODE_DUAL_ROCKER,
-    SENSOR_CLASSES,
+from pydeconz.interfaces.sensors import create_sensor, Sensors, SENSOR_CLASSES
+from pydeconz.models.sensor.switch import SWITCH_DEVICE_MODE_DUAL_ROCKER
+from pydeconz.models.sensor.thermostat import (
     THERMOSTAT_FAN_MODE_AUTO,
     THERMOSTAT_MODE_AUTO,
     THERMOSTAT_MODE_OFF,
@@ -17,8 +17,6 @@ from pydeconz.sensor import (
     THERMOSTAT_SWING_MODE_HALF_OPEN,
     THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
     Thermostat,
-    create_sensor,
-    Sensors,
 )
 
 

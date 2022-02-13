@@ -4,10 +4,10 @@ pytest --cov-report term-missing --cov=pydeconz.alarm_system tests/test_alarm_sy
 """
 from unittest.mock import AsyncMock
 
-from pydeconz.alarm_system import (
+from pydeconz.interfaces.alarm_systems import AlarmSystems
+from pydeconz.models.alarm_system import (
     ARM_MODE_ARMED_AWAY,
     ARM_STATE_ARMED_AWAY,
-    AlarmSystems,
     DEVICE_TRIGGER_ON,
     RESOURCE_TYPE,
 )

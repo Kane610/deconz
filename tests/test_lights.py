@@ -3,17 +3,18 @@
 pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 """
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
-from pydeconz.light import (
+from pydeconz.interfaces.lights import Lights
+
+from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
+from pydeconz.models.light import (
     ALERT_KEY,
     ALERT_LONG,
     ALERT_NONE,
     ALERT_SHORT,
     EFFECT_COLOR_LOOP,
-    FAN_SPEED_100_PERCENT,
     ON_TIME_KEY,
-    Lights,
 )
 
 
