@@ -14,7 +14,7 @@ from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
-from .interfaces.sensors import Sensors
+from .interfaces.sensors import SensorResourceManager
 from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
 from .models.group import RESOURCE_TYPE as GROUP_RESOURCE, Scene
 from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
@@ -75,7 +75,7 @@ class DeconzSession:
         self.groups = Groups({}, self.request)
         self.lights = LightResourceManager({}, self.request)
         self.scenes: dict[str, Scene] = {}
-        self.sensors = Sensors({}, self.request)
+        self.sensors = SensorResourceManager({}, self.request)
         self.websocket: WSClient | None = None
 
     async def get_api_key(
