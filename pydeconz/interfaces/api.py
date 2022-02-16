@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, ItemsView, KeysView, ValuesView
+from collections.abc import Awaitable, Callable, ItemsView, ValuesView
 import logging
-from typing import Any, Generic, Iterator
+from typing import Any, Generic, Iterator, KeysView
 
 from ..models import DataResource
 

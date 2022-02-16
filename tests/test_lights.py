@@ -5,7 +5,7 @@ pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 
 from unittest.mock import AsyncMock, Mock
 
-from pydeconz.interfaces.lights import Lights
+from pydeconz.interfaces.lights import LightResourceManager
 
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
 from pydeconz.models.light import (
@@ -21,7 +21,7 @@ from pydeconz.models.light import (
 async def test_create_light():
     """Verify that creating a light works."""
     mock_request = AsyncMock()
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "ctmax": 500,
@@ -161,7 +161,7 @@ async def test_create_light():
 
 async def test_configuration_tool():
     """Verify that locks work."""
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "etag": "26839cb118f5bf7ba1f2108256644010",
@@ -198,7 +198,7 @@ async def test_configuration_tool():
 async def test_create_cover():
     """Verify that covers work."""
     mock_request = AsyncMock()
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "etag": "87269755b9b3a046485fdae8d96b252c",
@@ -286,7 +286,7 @@ async def test_create_cover():
 async def test_create_cover_without_lift():
     """Verify that covers work with older deconz versions."""
     mock_request = AsyncMock()
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "etag": "87269755b9b3a046485fdae8d96b252c",
@@ -384,7 +384,7 @@ async def test_create_cover_without_lift():
 async def test_create_fan():
     """Verify light fixture with fan work."""
     mock_request = AsyncMock()
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "etag": "432f3de28965052961a99e3c5494daf4",
@@ -454,7 +454,7 @@ async def test_create_fan():
 async def test_create_lock():
     """Verify that locks work."""
     mock_request = AsyncMock()
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
@@ -511,7 +511,7 @@ async def test_create_lock():
 async def test_create_siren():
     """Verify that sirens work."""
     mock_request = AsyncMock()
-    lights = Lights(
+    lights = LightResourceManager(
         {
             "0": {
                 "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
@@ -576,3 +576,115 @@ async def test_create_siren():
 
     siren.remove_callback(mock_callback)
     assert not siren._callbacks
+
+
+async def test_create_all_light_types():
+    """Verify that sirens work."""
+    mock_request = AsyncMock()
+    lights = LightResourceManager(
+        {
+            "0": {
+                "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
+                "hascolor": False,
+                "manufacturername": "Heiman",
+                "modelid": "WarningDevice",
+                "name": "alarm_tuin",
+                "state": {"alert": "none", "reachable": True},
+                "swversion": None,
+                "type": "Warning device",
+                "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
+            },
+            "1": {
+                "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-08-22T15:29:03Z",
+                "manufacturername": "Danalock",
+                "modelid": "V3-BTZB",
+                "name": "Door lock",
+                "state": {"alert": "none", "on": False, "reachable": True},
+                "swversion": "19042019",
+                "type": "Door Lock",
+                "uniqueid": "00:00:00:00:00:00:00:00-00",
+            },
+            "2": {
+                "etag": "432f3de28965052961a99e3c5494daf4",
+                "hascolor": False,
+                "manufacturername": "King Of Fans,  Inc.",
+                "modelid": "HDC52EastwindFan",
+                "name": "Ceiling fan",
+                "state": {
+                    "alert": "none",
+                    "bri": 254,
+                    "on": False,
+                    "reachable": True,
+                    "speed": 4,
+                },
+                "swversion": "0000000F",
+                "type": "Fan",
+                "uniqueid": "00:22:a3:00:00:27:8b:81-01",
+            },
+            "3": {
+                "etag": "87269755b9b3a046485fdae8d96b252c",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-08-01T16:22:05Z",
+                "manufacturername": "AXIS",
+                "modelid": "Gear",
+                "name": "Covering device",
+                "state": {"bri": 0, "on": False, "reachable": True},
+                "swversion": "100-5.3.5.1122",
+                "type": "Window covering device",
+                "uniqueid": "00:24:46:00:00:12:34:56-01",
+            },
+            "4": {
+                "etag": "26839cb118f5bf7ba1f2108256644010",
+                "hascolor": False,
+                "lastannounced": None,
+                "lastseen": "2020-11-22T11:27Z",
+                "manufacturername": "dresden elektronik",
+                "modelid": "ConBee II",
+                "name": "Configuration tool 1",
+                "state": {"reachable": True},
+                "swversion": "0x264a0700",
+                "type": "Configuration tool",
+                "uniqueid": "00:21:2e:ff:ff:05:a7:a3-01",
+            },
+            "5": {
+                "ctmax": 500,
+                "ctmin": 153,
+                "etag": "026bcfe544ad76c7534e5ca8ed39047c",
+                "hascolor": True,
+                "manufacturername": "dresden elektronik",
+                "modelid": "FLS-PP3",
+                "name": "Light 1",
+                "pointsymbol": {},
+                "state": {
+                    "alert": None,
+                    "bri": 111,
+                    "colormode": "ct",
+                    "ct": 307,
+                    "effect": None,
+                    "hascolor": True,
+                    "hue": 7998,
+                    "on": False,
+                    "reachable": True,
+                    "sat": 172,
+                    "xy": [0.421253, 0.39921],
+                },
+                "swversion": "020C.201000A0",
+                "type": "Extended color light",
+                "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
+            },
+            "6": {"type": "unsupported device"},
+        },
+        mock_request,
+    )
+    assert len(lights.keys()) == 7
+    assert lights["0"].type == "Warning device"
+    assert lights["1"].type == "Door Lock"
+    assert lights["2"].type == "Fan"
+    assert lights["3"].type == "Window covering device"
+    assert lights["4"].type == "Configuration tool"
+    assert lights["5"].type == "Extended color light"
+    assert lights["6"].type == "unsupported device"  # legacy support

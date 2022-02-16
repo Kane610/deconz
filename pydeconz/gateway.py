@@ -13,7 +13,7 @@ from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
 from .interfaces.groups import Groups
-from .interfaces.lights import Lights
+from .interfaces.lights import LightResourceManager
 from .interfaces.sensors import Sensors
 from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
 from .models.group import RESOURCE_TYPE as GROUP_RESOURCE, Scene
@@ -73,7 +73,7 @@ class DeconzSession:
         self.alarmsystems = AlarmSystems({}, self.request)
         self.config: Config | None = None
         self.groups = Groups({}, self.request)
-        self.lights = Lights({}, self.request)
+        self.lights = LightResourceManager({}, self.request)
         self.scenes: dict[str, Scene] = {}
         self.sensors = Sensors({}, self.request)
         self.websocket: WSClient | None = None
