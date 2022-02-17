@@ -1,9 +1,12 @@
 """Data models."""
 
 from enum import Enum
+import logging
 from typing import TypeVar
 
 from .api import APIItem
+
+LOGGER = logging.getLogger(__name__)
 
 DataResource = TypeVar("DataResource", bound=APIItem)
 
@@ -131,4 +134,5 @@ class ResourceTypes(Enum):
     @classmethod
     def _missing_(cls, value):
         """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unsupported device type %s", type)
         return ResourceTypes.UNKNOWN
