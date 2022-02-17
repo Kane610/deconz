@@ -119,14 +119,6 @@ class SirenHandler(APIItems[Siren]):
         super().__init__(raw, request, URL, Siren)
 
 
-HANDLER_TYPES = Union[
-    ConfigurationToolHandler,
-    CoverHandler,
-    FanHandler,
-    LightHandler,
-    LockHandler,
-    SirenHandler,
-]
 LIGHT_RESOURCES = Union[
     ConfigurationTool,
     Cover,

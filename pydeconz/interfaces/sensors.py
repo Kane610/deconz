@@ -386,31 +386,6 @@ class WaterHandler(APIItems[Water]):
         super().__init__(raw, request, URL, Water)
 
 
-HANDLER_TYPES = Union[
-    AirQualityHandler,
-    AlarmHandler,
-    AncillaryControlHandler,
-    BatteryHandler,
-    CarbonMonoxideHandler,
-    ConsumptionHandler,
-    DaylightHandler,
-    DoorLockHandler,
-    FireHandler,
-    GenericFlagHandler,
-    GenericStatusHandler,
-    HumidityHandler,
-    LightLevelHandler,
-    OpenCloseHandler,
-    PowerHandler,
-    PresenceHandler,
-    PressureHandler,
-    SwitchHandler,
-    TemperatureHandler,
-    ThermostatHandler,
-    TimeHandler,
-    VibrationHandler,
-    WaterHandler,
-]
 SENSOR_RESOURCES = Union[
     AirQuality,
     Alarm,
