@@ -7,7 +7,6 @@ from typing import Any, Final, Union
 
 from ..models import ResourceTypes
 from ..models.sensor import *  # noqa: F401, F403
-from ..models.sensor import DeconzSensor
 from ..models.sensor.air_quality import AirQuality
 from ..models.sensor.alarm import Alarm
 from ..models.sensor.ancillary_control import *  # noqa: F401, F403
@@ -35,13 +34,15 @@ from ..models.sensor.thermostat import Thermostat
 from ..models.sensor.time import Time
 from ..models.sensor.vibration import Vibration
 from ..models.sensor.water import Water
-from .api import APIItems
+from .api import APIItems, GroupedAPIItems
 
 URL: Final = "/sensors"
 
 
 class AirQualityHandler(APIItems[AirQuality]):
     """Handler for air quality sensor."""
+
+    resource_type = ResourceTypes.ZHA_AIR_QUALITY
 
     def __init__(
         self,
@@ -55,6 +56,8 @@ class AirQualityHandler(APIItems[AirQuality]):
 class AlarmHandler(APIItems[Alarm]):
     """Handler for alarm sensor."""
 
+    resource_type = ResourceTypes.ZHA_ALARM
+
     def __init__(
         self,
         raw: dict,
@@ -66,6 +69,8 @@ class AlarmHandler(APIItems[Alarm]):
 
 class AncillaryControlHandler(APIItems[AncillaryControl]):
     """Handler for ancillary control sensor."""
+
+    resource_type = ResourceTypes.ZHA_ANCILLARY_CONTROL
 
     def __init__(
         self,
@@ -79,6 +84,8 @@ class AncillaryControlHandler(APIItems[AncillaryControl]):
 class BatteryHandler(APIItems[Battery]):
     """Handler for battery sensor."""
 
+    resource_type = ResourceTypes.ZHA_BATTERY
+
     def __init__(
         self,
         raw: dict,
@@ -90,6 +97,8 @@ class BatteryHandler(APIItems[Battery]):
 
 class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
     """Handler for carbon monoxide sensor."""
+
+    resource_type = ResourceTypes.ZHA_CARBON_MONOXIDE
 
     def __init__(
         self,
@@ -103,6 +112,8 @@ class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
 class ConsumptionHandler(APIItems[Consumption]):
     """Handler for consumption sensor."""
 
+    resource_type = ResourceTypes.ZHA_CONSUMPTION
+
     def __init__(
         self,
         raw: dict,
@@ -114,6 +125,8 @@ class ConsumptionHandler(APIItems[Consumption]):
 
 class DaylightHandler(APIItems[Daylight]):
     """Handler for daylight sensor."""
+
+    resource_type = ResourceTypes.DAYLIGHT
 
     def __init__(
         self,
@@ -127,6 +140,8 @@ class DaylightHandler(APIItems[Daylight]):
 class DoorLockHandler(APIItems[DoorLock]):
     """Handler for door lock sensor."""
 
+    resource_type = ResourceTypes.ZHA_DOOR_LOCK
+
     def __init__(
         self,
         raw: dict,
@@ -138,6 +153,8 @@ class DoorLockHandler(APIItems[DoorLock]):
 
 class FireHandler(APIItems[Fire]):
     """Handler for fire sensor."""
+
+    resource_type = ResourceTypes.ZHA_FIRE
 
     def __init__(
         self,
@@ -151,6 +168,8 @@ class FireHandler(APIItems[Fire]):
 class GenericFlagHandler(APIItems[GenericFlag]):
     """Handler for generic flag sensor."""
 
+    resource_type = ResourceTypes.CLIP_GENERIC_FLAG
+
     def __init__(
         self,
         raw: dict,
@@ -162,6 +181,8 @@ class GenericFlagHandler(APIItems[GenericFlag]):
 
 class GenericStatusHandler(APIItems[GenericStatus]):
     """Handler for generic status sensor."""
+
+    resource_type = ResourceTypes.CLIP_GENERIC_STATUS
 
     def __init__(
         self,
@@ -175,6 +196,11 @@ class GenericStatusHandler(APIItems[GenericStatus]):
 class HumidityHandler(APIItems[Humidity]):
     """Handler for humidity sensor."""
 
+    resource_types = {
+        ResourceTypes.ZHA_HUMIDITY,
+        ResourceTypes.CLIP_HUMIDITY,
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -186,6 +212,11 @@ class HumidityHandler(APIItems[Humidity]):
 
 class LightLevelHandler(APIItems[LightLevel]):
     """Handler for light level sensor."""
+
+    resource_types = {
+        ResourceTypes.ZHA_LIGHT_LEVEL,
+        ResourceTypes.CLIP_LIGHT_LEVEL,
+    }
 
     def __init__(
         self,
@@ -199,6 +230,11 @@ class LightLevelHandler(APIItems[LightLevel]):
 class OpenCloseHandler(APIItems[OpenClose]):
     """Handler for open/close sensor."""
 
+    resource_types = {
+        ResourceTypes.ZHA_OPEN_CLOSE,
+        ResourceTypes.CLIP_OPEN_CLOSE,
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -210,6 +246,8 @@ class OpenCloseHandler(APIItems[OpenClose]):
 
 class PowerHandler(APIItems[Power]):
     """Handler for power sensor."""
+
+    resource_type = ResourceTypes.ZHA_POWER
 
     def __init__(
         self,
@@ -223,6 +261,11 @@ class PowerHandler(APIItems[Power]):
 class PresenceHandler(APIItems[Presence]):
     """Handler for presence sensor."""
 
+    resource_types = {
+        ResourceTypes.ZHA_PRESENCE,
+        ResourceTypes.CLIP_PRESENCE,
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -234,6 +277,11 @@ class PresenceHandler(APIItems[Presence]):
 
 class PressureHandler(APIItems[Pressure]):
     """Handler for pressure sensor."""
+
+    resource_types = {
+        ResourceTypes.ZHA_PRESSURE,
+        ResourceTypes.CLIP_PRESSURE,
+    }
 
     def __init__(
         self,
@@ -247,6 +295,12 @@ class PressureHandler(APIItems[Pressure]):
 class SwitchHandler(APIItems[Switch]):
     """Handler for switch sensor."""
 
+    resource_types = {
+        ResourceTypes.ZHA_SWITCH,
+        ResourceTypes.ZGP_SWITCH,
+        ResourceTypes.CLIP_SWITCH,
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -258,6 +312,11 @@ class SwitchHandler(APIItems[Switch]):
 
 class TemperatureHandler(APIItems[Temperature]):
     """Handler for temperature sensor."""
+
+    resource_types = {
+        ResourceTypes.ZHA_TEMPERATURE,
+        ResourceTypes.CLIP_TEMPERATURE,
+    }
 
     def __init__(
         self,
@@ -271,6 +330,11 @@ class TemperatureHandler(APIItems[Temperature]):
 class ThermostatHandler(APIItems[Thermostat]):
     """Handler for thermostat sensor."""
 
+    resource_types = {
+        ResourceTypes.ZHA_THERMOSTAT,
+        ResourceTypes.CLIP_THERMOSTAT,
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -282,6 +346,8 @@ class ThermostatHandler(APIItems[Thermostat]):
 
 class TimeHandler(APIItems[Time]):
     """Handler for time sensor."""
+
+    resource_type = ResourceTypes.ZHA_TIME
 
     def __init__(
         self,
@@ -295,6 +361,8 @@ class TimeHandler(APIItems[Time]):
 class VibrationHandler(APIItems[Vibration]):
     """Handler for vibration sensor."""
 
+    resource_type = ResourceTypes.ZHA_VIBRATION
+
     def __init__(
         self,
         raw: dict,
@@ -306,6 +374,8 @@ class VibrationHandler(APIItems[Vibration]):
 
 class WaterHandler(APIItems[Water]):
     """Handler for water sensor."""
+
+    resource_type = ResourceTypes.ZHA_WATER
 
     def __init__(
         self,
@@ -368,7 +438,7 @@ SENSOR_RESOURCES = Union[
 ]
 
 
-class SensorResourceManager(APIItems[SENSOR_RESOURCES]):
+class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
     """Represent deCONZ sensors."""
 
     def __init__(
@@ -402,7 +472,7 @@ class SensorResourceManager(APIItems[SENSOR_RESOURCES]):
         self.vibration = VibrationHandler({}, request)
         self.water = WaterHandler({}, request)
 
-        self.handlers: list[HANDLER_TYPES] = [
+        handlers: list[APIItems] = [
             self.air_quality,
             self.alarm,
             self.ancillary_control,
@@ -428,77 +498,4 @@ class SensorResourceManager(APIItems[SENSOR_RESOURCES]):
             self.water,
         ]
 
-        self.type_to_handler: dict[ResourceTypes, HANDLER_TYPES] = {
-            ResourceTypes.ZHA_AIR_QUALITY: self.air_quality,
-            ResourceTypes.ZHA_ALARM: self.alarm,
-            ResourceTypes.ZHA_ANCILLARY_CONTROL: self.ancillary_control,
-            ResourceTypes.ZHA_BATTERY: self.battery,
-            ResourceTypes.ZHA_CARBON_MONOXIDE: self.carbon_monoxide,
-            ResourceTypes.ZHA_CONSUMPTION: self.consumption,
-            ResourceTypes.DAYLIGHT: self.daylight,
-            ResourceTypes.ZHA_DOOR_LOCK: self.door_lock,
-            ResourceTypes.ZHA_FIRE: self.fire,
-            ResourceTypes.CLIP_GENERIC_FLAG: self.generic_flag,
-            ResourceTypes.CLIP_GENERIC_STATUS: self.generic_status,
-            ResourceTypes.ZHA_HUMIDITY: self.humidity,
-            ResourceTypes.CLIP_HUMIDITY: self.humidity,
-            ResourceTypes.ZHA_LIGHT_LEVEL: self.light_level,
-            ResourceTypes.CLIP_LIGHT_LEVEL: self.light_level,
-            ResourceTypes.ZHA_OPEN_CLOSE: self.open_close,
-            ResourceTypes.CLIP_OPEN_CLOSE: self.open_close,
-            ResourceTypes.ZHA_POWER: self.power,
-            ResourceTypes.ZHA_PRESENCE: self.presence,
-            ResourceTypes.CLIP_PRESENCE: self.presence,
-            ResourceTypes.ZHA_PRESSURE: self.pressure,
-            ResourceTypes.CLIP_PRESSURE: self.pressure,
-            ResourceTypes.ZHA_SWITCH: self.switch,
-            ResourceTypes.ZGP_SWITCH: self.switch,
-            ResourceTypes.CLIP_SWITCH: self.switch,
-            ResourceTypes.ZHA_TEMPERATURE: self.temperature,
-            ResourceTypes.CLIP_TEMPERATURE: self.temperature,
-            ResourceTypes.ZHA_THERMOSTAT: self.thermostat,
-            ResourceTypes.CLIP_THERMOSTAT: self.thermostat,
-            ResourceTypes.ZHA_TIME: self.time,
-            ResourceTypes.ZHA_VIBRATION: self.vibration,
-            ResourceTypes.ZHA_WATER: self.water,
-        }
-
-        super().__init__(raw, request, URL, DeconzSensor)
-
-    def process_raw(self, raw: dict[str, Any]) -> None:
-        """Process data."""
-        for id, raw_item in raw.items():
-
-            if obj := self.get(id):
-                obj.update(raw_item)
-                continue
-
-            handler = self.type_to_handler[ResourceTypes(raw_item.get("type"))]
-            handler.process_raw({id: raw_item})
-
-            for callback in self._subscribers:
-                callback("added", id)
-
-    def items(self):
-        """Return items."""
-        return {y: x[y] for x in self.handlers for y in x}
-
-    def keys(self):
-        """Return item keys."""
-        return [y for x in self.handlers for y in x]
-
-    def values(self):
-        """Return item values."""
-        return [y for x in self.handlers for y in x.values()]
-
-    def get(self, id: str, default: Any = None):
-        """Get item value based on key, if no match return default."""
-        return next((x[id] for x in self.handlers if id in x), default)
-
-    def __getitem__(self, obj_id: str):
-        """Get item value based on key."""
-        return self.items()[obj_id]
-
-    def __iter__(self):
-        """Allow iterate over items."""
-        return iter(self.items())
+        super().__init__(handlers, raw, request)

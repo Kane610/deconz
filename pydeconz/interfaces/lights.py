@@ -14,13 +14,15 @@ from ..models.light.fan import Fan
 from ..models.light.light import Light
 from ..models.light.lock import Lock
 from ..models.light.siren import Siren
-from .api import APIItems
+from .api import APIItems, GroupedAPIItems
 
 URL: Final = "/lights"
 
 
 class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     """Handler for configuration tool."""
+
+    resource_type = ResourceTypes.CONFIGURATION_TOOL
 
     def __init__(
         self,
@@ -34,6 +36,12 @@ class ConfigurationToolHandler(APIItems[ConfigurationTool]):
 class CoverHandler(APIItems[Cover]):
     """Handler for covers."""
 
+    resource_types = {
+        ResourceTypes.LEVEL_CONTROLLABLE_OUTPUT,
+        ResourceTypes.WINDOW_COVERING_CONTROLLER,
+        ResourceTypes.WINDOW_COVERING_DEVICE,
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -45,6 +53,8 @@ class CoverHandler(APIItems[Cover]):
 
 class FanHandler(APIItems[Fan]):
     """Handler for locks."""
+
+    resource_type = ResourceTypes.FAN
 
     def __init__(
         self,
@@ -58,6 +68,20 @@ class FanHandler(APIItems[Fan]):
 class LightHandler(APIItems[Light]):
     """Handler for lights."""
 
+    resource_types = {
+        ResourceTypes.COLOR_DIMMABLE_LIGHT,
+        ResourceTypes.COLOR_LIGHT,
+        ResourceTypes.COLOR_TEMPERATURE_LIGHT,
+        ResourceTypes.EXTENDED_COLOR_LIGHT,
+        ResourceTypes.DIMMABLE_LIGHT,
+        ResourceTypes.DIMMABLE_PLUGIN_UNIT,
+        ResourceTypes.ON_OFF_LIGHT,
+        ResourceTypes.ON_OFF_OUTPUT,
+        ResourceTypes.ON_OFF_PLUGIN_UNIT,
+        ResourceTypes.SMART_PLUG,
+        ResourceTypes.UNKNOWN,  # Legacy support
+    }
+
     def __init__(
         self,
         raw: dict,
@@ -70,6 +94,8 @@ class LightHandler(APIItems[Light]):
 class LockHandler(APIItems[Lock]):
     """Handler for fans."""
 
+    resource_type = ResourceTypes.DOOR_LOCK
+
     def __init__(
         self,
         raw: dict,
@@ -81,6 +107,8 @@ class LockHandler(APIItems[Lock]):
 
 class SirenHandler(APIItems[Siren]):
     """Handler for sirens."""
+
+    resource_type = ResourceTypes.WARNING_DEVICE
 
     def __init__(
         self,
@@ -109,7 +137,7 @@ LIGHT_RESOURCES = Union[
 ]
 
 
-class LightResourceManager(APIItems[LIGHT_RESOURCES]):
+class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
     """Represent deCONZ lights."""
 
     def __init__(
@@ -125,7 +153,7 @@ class LightResourceManager(APIItems[LIGHT_RESOURCES]):
         self.locks = LockHandler({}, request)
         self.sirens = SirenHandler({}, request)
 
-        self.handlers: list[HANDLER_TYPES] = [
+        handlers: list[APIItems] = [
             self.configuration_tool,
             self.covers,
             self.fans,
@@ -134,63 +162,4 @@ class LightResourceManager(APIItems[LIGHT_RESOURCES]):
             self.sirens,
         ]
 
-        self.type_to_handler: dict[ResourceTypes, HANDLER_TYPES] = {
-            ResourceTypes.CONFIGURATION_TOOL: self.configuration_tool,
-            ResourceTypes.LEVEL_CONTROLLABLE_OUTPUT: self.covers,
-            ResourceTypes.WINDOW_COVERING_CONTROLLER: self.covers,
-            ResourceTypes.WINDOW_COVERING_DEVICE: self.covers,
-            ResourceTypes.COLOR_DIMMABLE_LIGHT: self.lights,
-            ResourceTypes.COLOR_LIGHT: self.lights,
-            ResourceTypes.COLOR_TEMPERATURE_LIGHT: self.lights,
-            ResourceTypes.EXTENDED_COLOR_LIGHT: self.lights,
-            ResourceTypes.DIMMABLE_LIGHT: self.lights,
-            ResourceTypes.DIMMABLE_PLUGIN_UNIT: self.lights,
-            ResourceTypes.ON_OFF_LIGHT: self.lights,
-            ResourceTypes.ON_OFF_OUTPUT: self.lights,
-            ResourceTypes.ON_OFF_PLUGIN_UNIT: self.lights,
-            ResourceTypes.SMART_PLUG: self.lights,
-            ResourceTypes.UNKNOWN: self.lights,  # Legacy compatibility without light type check
-            ResourceTypes.FAN: self.fans,
-            ResourceTypes.DOOR_LOCK: self.locks,
-            ResourceTypes.WARNING_DEVICE: self.sirens,
-        }
-
-        super().__init__(raw, request, URL, Light)
-
-    def process_raw(self, raw: dict[str, Any]) -> None:
-        """Process data."""
-        for id, raw_item in raw.items():
-
-            if obj := self.get(id):
-                obj.update(raw_item)
-                continue
-
-            handler = self.type_to_handler[ResourceTypes(raw_item.get("type"))]
-            handler.process_raw({id: raw_item})
-
-            for callback in self._subscribers:
-                callback("added", id)
-
-    def items(self):
-        """Return items."""
-        return {y: x[y] for x in self.handlers for y in x}
-
-    def keys(self):
-        """Return item keys."""
-        return [y for x in self.handlers for y in x]
-
-    def values(self):
-        """Return item values."""
-        return [y for x in self.handlers for y in x.values()]
-
-    def get(self, id: str, default: Any = None):
-        """Get item value based on key, if no match return default."""
-        return next((x[id] for x in self.handlers if id in x), default)
-
-    def __getitem__(self, obj_id: str):
-        """Get item value based on key."""
-        return self.items()[obj_id]
-
-    def __iter__(self):
-        """Allow iterate over items."""
-        return iter(self.items())
+        super().__init__(handlers, raw, request)
