@@ -10,6 +10,7 @@ from typing import Any, Final, Literal
 import aiohttp
 
 from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
+from .device import Devices
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
 from .interfaces.groups import Groups
@@ -72,6 +73,7 @@ class DeconzSession:
 
         self.alarmsystems = AlarmSystems({}, self.request)
         self.config: Config | None = None
+        self.devices = Devices({}, self.request)
         self.groups = Groups({}, self.request)
         self.lights = Lights({}, self.request)
         self.scenes: dict[str, Scene] = {}

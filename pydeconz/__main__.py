@@ -67,6 +67,17 @@ async def main(host: str, port: int, api_key: str) -> None:
     await gateway.refresh_state()
     gateway.start()
 
+    #####
+    from pprint import pprint
+
+    model_unique_ids = {
+        sensor.modelid: sensor.uniqueid
+        for sensor in gateway.sensors.values()
+        if sensor.type == "ZHASwitch"
+    }
+    button_events = await gateway.devices.introspect_button_event(model_unique_ids)
+    pprint(button_events)
+    #####
     try:
         while True:
             await asyncio.sleep(1)
