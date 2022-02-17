@@ -9,7 +9,7 @@ from ..models.scene import RESOURCE_TYPE, Scene
 from .api import APIItems
 
 
-class Scenes(APIItems):
+class Scenes(APIItems[Scene]):
     """Represent scenes of a deCONZ group."""
 
     def __init__(

@@ -95,7 +95,7 @@ async def test_initial_state(mock_aioresponse):
             }
         },
         "lights": {"l1": {"type": "light"}},
-        "sensors": {"s1": {"type": "sensor"}},
+        "sensors": {"s1": {"type": "ZHAPresence"}},
     }
     mock_aioresponse.get(
         f"http://{HOST}:{PORT}/api/{API_KEY}",
@@ -176,7 +176,7 @@ async def test_refresh_state(mock_aioresponse):
             }
         },
         "lights": {"l1": {"type": "light"}},
-        "sensors": {"s1": {"type": "sensor"}},
+        "sensors": {"s1": {"type": "ZHAPresence"}},
     }
     mock_aioresponse.get(
         f"http://{HOST}:{PORT}/api/{API_KEY}",
@@ -482,7 +482,7 @@ async def test_sensor_events():
             "id": "1",
             "r": "sensors",
             "sensor": {
-                "type": "",
+                "type": "ZHAPresence",
                 "config": {
                     "reachable": True,
                 },

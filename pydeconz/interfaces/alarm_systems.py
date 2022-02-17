@@ -11,7 +11,7 @@ from .api import APIItems
 URL: Final = "/alarmsystems"
 
 
-class AlarmSystems(APIItems):
+class AlarmSystems(APIItems[AlarmSystem]):
     """Manager of deCONZ alarm systems."""
 
     def __init__(

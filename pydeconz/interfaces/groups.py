@@ -5,14 +5,17 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final
 
+from ..models import ResourceTypes
 from ..models.group import Group
 from .api import APIItems
 
 URL: Final = "/groups"
 
 
-class Groups(APIItems):
+class Groups(APIItems[Group]):
     """Represent deCONZ groups."""
+
+    resource_type = ResourceTypes.GROUP
 
     def __init__(
         self,

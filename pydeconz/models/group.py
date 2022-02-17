@@ -169,7 +169,7 @@ class Group(DeconzDevice):
         return self.raw.get("id")
 
     @property
-    def lights(self) -> list:
+    def lights(self) -> list[str]:
         """List of all light IDs in group.
 
         Sequence is defined by the gateway.
