@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 from .light import Light
 
@@ -34,7 +34,7 @@ class Fan(Light):
         """Speed of the fan."""
         return self.raw["state"]["speed"]
 
-    async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict:
+    async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict[str, Any]:
         """Set speed of fans/ventilators.
 
         Speed [int] between 0-6.

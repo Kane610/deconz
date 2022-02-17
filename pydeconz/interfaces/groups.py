@@ -19,7 +19,7 @@ class Groups(APIItems[Group]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize group manager."""

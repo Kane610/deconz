@@ -16,7 +16,7 @@ class AlarmSystems(APIItems[AlarmSystem]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize alarm system manager."""

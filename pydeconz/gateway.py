@@ -196,7 +196,7 @@ class DeconzSession:
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
 
-    def event_handler(self, event: dict) -> None:
+    def event_handler(self, event: dict[str, Any]) -> None:
         """Receive event from websocket and identifies where the event belong.
 
         Note that only one of config, name, or state will be present per changed event.
@@ -263,7 +263,7 @@ class DeconzSession:
         )
 
 
-def _raise_on_error(data: list | dict) -> None:
+def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:
     """Check response for error message."""
     if isinstance(data, list) and data:
         data = data[0]

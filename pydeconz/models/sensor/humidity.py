@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from . import DeconzSensor
 
 
@@ -35,7 +37,7 @@ class Humidity(DeconzSensor):
     async def set_config(
         self,
         offset: int | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change config of humidity sensor.
 
         Supported values:

@@ -1,6 +1,9 @@
 """deCONZ errors."""
 
 
+from typing import Any
+
+
 class pydeconzException(Exception):
     """Base error for pydeconz.
 
@@ -52,7 +55,7 @@ ERRORS = {
 }
 
 
-def raise_error(error):
+def raise_error(error: dict[str, Any]) -> None:
     """Raise error."""
     if error:
         cls = ERRORS.get(error["type"], pydeconzException)

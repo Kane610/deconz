@@ -20,7 +20,7 @@ class APIItem:
     def __init__(
         self,
         resource_id: str,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
@@ -59,7 +59,8 @@ class APIItem:
         """
         self._subscribers.append(callback)
 
-        def unsubscribe():
+        def unsubscribe() -> None:
+            """Unsubscribe callback."""
             self._subscribers.remove(callback)
 
         return unsubscribe
@@ -86,7 +87,9 @@ class APIItem:
         for callback in self._callbacks + self._subscribers:
             callback()
 
-    async def request(self, field: str, data: dict, tries: int = 0) -> dict:
+    async def request(
+        self, field: str, data: dict[str, Any], tries: int = 0
+    ) -> dict[str, Any]:
         """Set state of device."""
         if self._sleep_task is not None:
             self._sleep_task.cancel()

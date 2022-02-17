@@ -97,7 +97,7 @@ class GroupedAPIItems(Generic[DataResource]):
     def __init__(
         self,
         api_items: list[APIItems],
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize sensor manager."""

@@ -46,7 +46,7 @@ class AirQualityHandler(APIItems[AirQuality]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize air quality sensor handler."""
@@ -60,7 +60,7 @@ class AlarmHandler(APIItems[Alarm]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize alarm sensor handler."""
@@ -74,7 +74,7 @@ class AncillaryControlHandler(APIItems[AncillaryControl]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize ancillary control sensor handler."""
@@ -88,7 +88,7 @@ class BatteryHandler(APIItems[Battery]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize battery sensor handler."""
@@ -102,7 +102,7 @@ class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize carbon monoxide sensor handler."""
@@ -116,7 +116,7 @@ class ConsumptionHandler(APIItems[Consumption]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize consumption sensor handler."""
@@ -130,7 +130,7 @@ class DaylightHandler(APIItems[Daylight]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize daylight sensor handler."""
@@ -144,7 +144,7 @@ class DoorLockHandler(APIItems[DoorLock]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize door lock sensor handler."""
@@ -158,7 +158,7 @@ class FireHandler(APIItems[Fire]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize fire sensor handler."""
@@ -172,7 +172,7 @@ class GenericFlagHandler(APIItems[GenericFlag]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize generic flag sensor handler."""
@@ -186,7 +186,7 @@ class GenericStatusHandler(APIItems[GenericStatus]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize generic status sensor handler."""
@@ -203,7 +203,7 @@ class HumidityHandler(APIItems[Humidity]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize humidity sensor handler."""
@@ -220,7 +220,7 @@ class LightLevelHandler(APIItems[LightLevel]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize light level sensor handler."""
@@ -237,7 +237,7 @@ class OpenCloseHandler(APIItems[OpenClose]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize open/close sensor handler."""
@@ -251,7 +251,7 @@ class PowerHandler(APIItems[Power]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize power sensor handler."""
@@ -268,7 +268,7 @@ class PresenceHandler(APIItems[Presence]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize presence sensor handler."""
@@ -285,7 +285,7 @@ class PressureHandler(APIItems[Pressure]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize pressure sensor handler."""
@@ -303,7 +303,7 @@ class SwitchHandler(APIItems[Switch]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize switch sensor handler."""
@@ -320,7 +320,7 @@ class TemperatureHandler(APIItems[Temperature]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize temperature sensor handler."""
@@ -337,7 +337,7 @@ class ThermostatHandler(APIItems[Thermostat]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize thermostat sensor handler."""
@@ -351,7 +351,7 @@ class TimeHandler(APIItems[Time]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize time sensor handler."""
@@ -365,7 +365,7 @@ class VibrationHandler(APIItems[Vibration]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize vibration sensor handler."""
@@ -379,7 +379,7 @@ class WaterHandler(APIItems[Water]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize water sensor handler."""
@@ -418,7 +418,7 @@ class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize sensor manager."""
@@ -447,7 +447,7 @@ class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
         self.vibration = VibrationHandler({}, request)
         self.water = WaterHandler({}, request)
 
-        handlers: list[APIItems] = [
+        handlers: list[APIItems[Any]] = [
             self.air_quality,
             self.alarm,
             self.ancillary_control,

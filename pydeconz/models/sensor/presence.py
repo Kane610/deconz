@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final
+from typing import Any, Final
 
 from . import DeconzBinarySensor
 
@@ -59,7 +59,7 @@ class Presence(DeconzBinarySensor):
         delay: int | None = None,
         duration: int | None = None,
         sensitivity: int | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change config of presence sensor.
 
         Supported values:

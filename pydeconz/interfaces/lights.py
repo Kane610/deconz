@@ -26,7 +26,7 @@ class ConfigurationToolHandler(APIItems[ConfigurationTool]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize configuration tool handler."""
@@ -44,7 +44,7 @@ class CoverHandler(APIItems[Cover]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize cover handler."""
@@ -58,7 +58,7 @@ class FanHandler(APIItems[Fan]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize lock handler."""
@@ -84,7 +84,7 @@ class LightHandler(APIItems[Light]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize light handler."""
@@ -98,7 +98,7 @@ class LockHandler(APIItems[Lock]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize fan handler."""
@@ -112,7 +112,7 @@ class SirenHandler(APIItems[Siren]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize siren handler."""
@@ -134,7 +134,7 @@ class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize light manager."""
@@ -145,7 +145,7 @@ class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
         self.locks = LockHandler({}, request)
         self.sirens = SirenHandler({}, request)
 
-        handlers: list[APIItems] = [
+        handlers: list[APIItems[Any]] = [
             self.configuration_tool,
             self.covers,
             self.fans,
