@@ -30,7 +30,7 @@ class APIItem:
 
         self._callbacks: list[SubscriptionType] = []
         self._subscribers: list[SubscriptionType] = []
-        self._sleep_task: Task | None = None
+        self._sleep_task: Task[Callable[..., Any]] | None = None
         self._changed_keys: set[str] = set()
 
     @property
@@ -39,7 +39,7 @@ class APIItem:
         return self._resource_id
 
     @property
-    def changed_keys(self) -> set:
+    def changed_keys(self) -> set[str]:
         """Read only changed keys data."""
         return self._changed_keys
 
@@ -52,7 +52,7 @@ class APIItem:
         if callback in self._callbacks:
             self._callbacks.remove(callback)
 
-    def subscribe(self, callback: SubscriptionType) -> Callable:
+    def subscribe(self, callback: SubscriptionType) -> Callable[[], None]:
         """Subscribe to events.
 
         Return function to unsubscribe.

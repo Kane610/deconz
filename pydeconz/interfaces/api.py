@@ -57,7 +57,7 @@ class APIItems(Generic[DataResource]):
             for callback in self._subscribers:
                 callback("added", id)
 
-    def subscribe(self, callback: SubscriptionType) -> Callable:
+    def subscribe(self, callback: SubscriptionType) -> Callable[..., Any]:
         """Subscribe to added events.
 
         "callback" - callback function to call when an event emits.
@@ -65,7 +65,7 @@ class APIItems(Generic[DataResource]):
         """
         self._subscribers.append(callback)
 
-        def unsubscribe():
+        def unsubscribe() -> None:
             self._subscribers.remove(callback)
 
         return unsubscribe
@@ -96,7 +96,7 @@ class GroupedAPIItems(Generic[DataResource]):
 
     def __init__(
         self,
-        api_items: list[APIItems],
+        api_items: list[APIItems[Any]],
         raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
@@ -104,7 +104,7 @@ class GroupedAPIItems(Generic[DataResource]):
         self._items = api_items
         self._subscribers: list[SubscriptionType] = []
 
-        self._type_to_handler: dict[ResourceTypes, APIItems] = {
+        self._type_to_handler: dict[ResourceTypes, APIItems[Any]] = {
             resource_type: handler
             for handler in api_items
             if handler.resource_types is not None

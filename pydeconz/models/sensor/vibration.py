@@ -12,7 +12,7 @@ class Vibration(DeconzBinarySensor):
     ZHATYPE = ("ZHAVibration",)
 
     @property
-    def orientation(self) -> list | None:
+    def orientation(self) -> list[str] | None:
         """Orientation."""
         return self.raw["state"].get("orientation")
 

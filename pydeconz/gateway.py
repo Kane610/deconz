@@ -16,9 +16,10 @@ from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.sensors import SensorResourceManager
 from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
-from .models.group import RESOURCE_TYPE as GROUP_RESOURCE, Scene
+from .models.group import RESOURCE_TYPE as GROUP_RESOURCE
 from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
 from .models.light.light import Light
+from .models.scene import Scene
 from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
@@ -169,7 +170,7 @@ class DeconzSession:
                         "Invalid content type: {}".format(res.content_type)
                     )
 
-                response = await res.json()
+                response: dict[str, Any] = await res.json()
                 LOGGER.debug("HTTP request response: %s", pformat(response))
 
                 _raise_on_error(response)

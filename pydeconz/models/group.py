@@ -283,14 +283,18 @@ class Group(DeconzDevice):
         }
         return await self.request(field=f"{self.deconz_id}/action", data=data)
 
-    def update_color_state(self, light: Light, update_all_attributes=False) -> None:
+    def update_color_state(
+        self, light: Light, update_all_attributes: bool = False
+    ) -> None:
         """Sync color state with light.
 
           update_all_attributes is used to control whether or not to
         write light attributes with the value None to the group.
         This is used to not keep any bad values from the group.
         """
-        data: dict[str, float | int | str | tuple | None] = {}
+        data: dict[
+            str, float | int | str | tuple[int, int] | tuple[None, None] | None
+        ] = {}
 
         for attribute in COLOR_STATE_ATTRIBUTES:
 

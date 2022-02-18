@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Final
+from typing import Any, Callable, Final
 
 import aiohttp
 
@@ -14,7 +14,9 @@ LOGGER = logging.getLogger(__name__)
 URL_DISCOVER: Final = "https://phoscon.de/discover"
 
 
-async def delete_api_key(session, host, port, api_key):
+async def delete_api_key(
+    session: aiohttp.ClientSession, host: str, port: int, api_key: str
+) -> None:
     """Delete API key from deCONZ."""
     url = f"http://{host}:{port}/api/{api_key}/config/whitelist/{api_key}"
 
@@ -23,7 +25,13 @@ async def delete_api_key(session, host, port, api_key):
     LOGGER.info(response)
 
 
-async def delete_all_keys(session, host, port, api_key, api_keys=[]):
+async def delete_all_keys(
+    session: aiohttp.ClientSession,
+    host: str,
+    port: int,
+    api_key: str,
+    api_keys: list[str] = [],
+) -> None:
     """Delete all API keys except for the ones provided to the method."""
     url = f"http://{host}:{port}/api/{api_key}/config"
 
@@ -35,7 +43,9 @@ async def delete_all_keys(session, host, port, api_key, api_keys=[]):
             await delete_api_key(session, host, port, key)
 
 
-async def get_bridge_id(session, host, port, api_key):
+async def get_bridge_id(
+    session: aiohttp.ClientSession, host: str, port: int, api_key: str
+) -> str:
     """Get bridge id for bridge."""
     url = f"http://{host}:{port}/api/{api_key}/config"
 
@@ -46,7 +56,7 @@ async def get_bridge_id(session, host, port, api_key):
     return bridge_id
 
 
-async def discovery(session):
+async def discovery(session: aiohttp.ClientSession) -> list[dict[str, int | str]]:
     """Find bridges allowing gateway discovery."""
     response = await request(session.get, URL_DISCOVER)
     LOGGER.info("Discovered the following bridges: %s.", response)
@@ -61,7 +71,11 @@ async def discovery(session):
     ]
 
 
-async def request(session, url, **kwargs):
+async def request(
+    session: Callable[[Any], Any],
+    url: str,
+    **kwargs: Any,
+) -> dict[str, Any]:
     """Do a web request and manage response."""
     LOGGER.debug("Sending %s to %s", kwargs, url)
 
@@ -84,7 +98,7 @@ async def request(session, url, **kwargs):
         ) from None
 
 
-def _raise_on_error(data):
+def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:
     """Check response for error message."""
     if isinstance(data, list) and data:
         data = data[0]
@@ -93,7 +107,7 @@ def _raise_on_error(data):
         raise_error(data["error"])
 
 
-def normalize_bridge_id(bridge_id: str):
+def normalize_bridge_id(bridge_id: str) -> str:
     """Normalize a bridge identifier."""
     bridge_id = bridge_id.upper()
 
