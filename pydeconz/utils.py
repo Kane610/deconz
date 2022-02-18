@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Final
+from typing import Any, Callable, Final, cast
 
 import aiohttp
 
@@ -58,7 +58,7 @@ async def get_bridge_id(
 
 async def discovery(session: aiohttp.ClientSession) -> list[dict[str, int | str]]:
     """Find bridges allowing gateway discovery."""
-    response = await request(session.get, URL_DISCOVER)
+    response = cast(list[dict[str, Any]], await request(session.get, URL_DISCOVER))
     LOGGER.info("Discovered the following bridges: %s.", response)
 
     return [
