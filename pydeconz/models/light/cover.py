@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from . import DeconzLight
 
 
@@ -50,7 +52,7 @@ class Cover(DeconzLight):
 
     async def set_position(
         self, *, lift: int | None = None, tilt: int | None = None
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Set amount of closed position and/or tilt of cover.
 
         Lift [int] between 0-100.
@@ -74,21 +76,21 @@ class Cover(DeconzLight):
 
         return await self.request(field=f"{self.deconz_id}/state", data=data)
 
-    async def open(self) -> dict:
+    async def open(self) -> dict[str, Any]:
         """Fully open cover."""
         data = {"open": True}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": False}
         return await self.request(field=f"{self.deconz_id}/state", data=data)
 
-    async def close(self) -> dict:
+    async def close(self) -> dict[str, Any]:
         """Fully close cover."""
         data = {"open": False}
         if "open" not in self.raw["state"]:  # Legacy support
             data = {"on": True}
         return await self.request(field=f"{self.deconz_id}/state", data=data)
 
-    async def stop(self) -> dict:
+    async def stop(self) -> dict[str, Any]:
         """Stop cover motion."""
         data: dict[str, bool | int]
         data = {"stop": True}

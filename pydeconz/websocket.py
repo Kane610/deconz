@@ -4,7 +4,7 @@ from asyncio import create_task, get_running_loop
 from collections import deque
 from collections.abc import Awaitable, Callable
 import logging
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 import aiohttp
 
@@ -38,12 +38,12 @@ class WSClient:
 
         self.loop = get_running_loop()
 
-        self._data: deque = deque()
+        self._data: deque[dict[str, Any]] = deque()
         self._state: str = ""
         self._previous_state: str = ""
 
     @property
-    def data(self) -> dict:
+    def data(self) -> dict[str, Any]:
         """Return data from data queue."""
         try:
             return self._data.popleft()

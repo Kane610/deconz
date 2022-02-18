@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from . import DeconzLight
 
@@ -107,7 +107,7 @@ class Light(DeconzLight):
         """
         return self.raw["state"].get("effect")
 
-    async def set_attributes(self, name: str) -> dict:
+    async def set_attributes(self, name: str) -> dict[str, Any]:
         """Change attributes of a light.
 
         Supported values:
@@ -129,7 +129,7 @@ class Light(DeconzLight):
         saturation: int | None = None,
         transition_time: int | None = None,
         xy: tuple[float, float] | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change state of a light.
 
         Supported values:

@@ -33,7 +33,7 @@ class Group(DeconzDevice):
     def __init__(
         self,
         resource_id: str,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Set initial information about light group.
@@ -151,7 +151,7 @@ class Group(DeconzDevice):
         return self.raw["state"].get("any_on")
 
     @property
-    def device_membership(self) -> list | None:
+    def device_membership(self) -> list[str] | None:
         """List of device ids (sensors) when group was created by a device."""
         return self.raw.get("devicemembership")
 
@@ -177,7 +177,7 @@ class Group(DeconzDevice):
         return self.raw.get("lights", [])
 
     @property
-    def light_sequence(self) -> list | None:
+    def light_sequence(self) -> list[str] | None:
         """List of light IDs in group that can be sorted by the user.
 
         Need not to contain all light ids of this group.
@@ -185,7 +185,7 @@ class Group(DeconzDevice):
         return self.raw.get("lightsequence")
 
     @property
-    def multi_device_ids(self) -> list | None:
+    def multi_device_ids(self) -> list[str] | None:
         """List of light IDs in group.
 
         Subsequent ids from multidevices with multiple endpoints.
@@ -199,7 +199,7 @@ class Group(DeconzDevice):
         lights: list[str] | None = None,
         multi_device_ids: list[str] | None = None,
         name: str | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change attributes of a group.
 
         Supported values:
@@ -236,7 +236,7 @@ class Group(DeconzDevice):
         toggle: bool | None = None,
         transition_time: int | None = None,
         xy: tuple[float, float] | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change state of a group.
 
         Supported values:
@@ -283,14 +283,18 @@ class Group(DeconzDevice):
         }
         return await self.request(field=f"{self.deconz_id}/action", data=data)
 
-    def update_color_state(self, light: Light, update_all_attributes=False) -> None:
+    def update_color_state(
+        self, light: Light, update_all_attributes: bool = False
+    ) -> None:
         """Sync color state with light.
 
           update_all_attributes is used to control whether or not to
         write light attributes with the value None to the group.
         This is used to not keep any bad values from the group.
         """
-        data: dict[str, float | int | str | tuple | None] = {}
+        data: dict[
+            str, float | int | str | tuple[int, int] | tuple[None, None] | None
+        ] = {}
 
         for attribute in COLOR_STATE_ATTRIBUTES:
 

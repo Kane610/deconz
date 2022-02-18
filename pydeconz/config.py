@@ -21,7 +21,7 @@ class Config:
 
     def __init__(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Set configuration about deCONZ gateway."""
@@ -128,7 +128,7 @@ class Config:
         return self.raw.get("rfconnected")
 
     @property
-    def software_update(self) -> dict | None:
+    def software_update(self) -> dict[str, Any] | None:
         """Contains information related to software updates."""
         return self.raw.get("swupdate")
 
@@ -179,7 +179,7 @@ class Config:
         return self.raw.get("websocketport")
 
     @property
-    def whitelist(self) -> dict | None:
+    def whitelist(self) -> dict[str, Any] | None:
         """Array of whitelisted API keys."""
         return self.raw.get("whitelist")
 

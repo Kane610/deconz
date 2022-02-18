@@ -16,7 +16,7 @@ from pydeconz import DeconzSession, errors
 LOGGER = logging.getLogger(__name__)
 
 
-def new_device_callback(resource: str, device: Any):
+def new_device_callback(resource: str, device: Any) -> None:
     """Signal new device is available."""
     LOGGER.info(f"{resource}, {device._raw}")
 
@@ -26,7 +26,7 @@ async def deconz_gateway(
     host: str,
     port: int,
     api_key: str,
-    callback: Callable,
+    callback: Callable[[str, Any], None],
 ) -> DeconzSession | None:
     """Create a gateway object and verify configuration."""
     deconz = DeconzSession(session, host, port, api_key, add_device=callback)

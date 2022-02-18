@@ -42,7 +42,7 @@ class DeconzSensor(DeconzDevice):
         return self.raw["config"].get("battery")
 
     @property
-    def config_pending(self) -> list | None:
+    def config_pending(self) -> list[str] | None:
         """List of configurations pending device acceptance.
 
         Only supported by Hue devices.

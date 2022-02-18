@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from . import DeconzSensor
 
 
@@ -53,7 +55,7 @@ class LightLevel(DeconzSensor):
         self,
         threshold_dark: int | None = None,
         threshold_offset: int | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change config of presence sensor.
 
         Supported values:

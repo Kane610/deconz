@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from . import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, DeconzLight
 
 
@@ -15,7 +17,7 @@ class Siren(DeconzLight):
         """If device is sounding."""
         return self.raw["state"][ALERT_KEY] == ALERT_LONG
 
-    async def turn_on(self, duration: int | None = None) -> dict:
+    async def turn_on(self, duration: int | None = None) -> dict[str, Any]:
         """Turn on device.
 
         Duration is counted as 1/10 of a second.
@@ -25,7 +27,7 @@ class Siren(DeconzLight):
             data[ON_TIME_KEY] = duration
         return await self.request(field=f"{self.deconz_id}/state", data=data)
 
-    async def turn_off(self) -> dict:
+    async def turn_off(self) -> dict[str, Any]:
         """Turn off device."""
         return await self.request(
             field=f"{self.deconz_id}/state",

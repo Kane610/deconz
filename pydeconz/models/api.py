@@ -20,7 +20,7 @@ class APIItem:
     def __init__(
         self,
         resource_id: str,
-        raw: dict,
+        raw: dict[str, Any],
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
@@ -30,7 +30,7 @@ class APIItem:
 
         self._callbacks: list[SubscriptionType] = []
         self._subscribers: list[SubscriptionType] = []
-        self._sleep_task: Task | None = None
+        self._sleep_task: Task[Callable[..., Any]] | None = None
         self._changed_keys: set[str] = set()
 
     @property
@@ -39,7 +39,7 @@ class APIItem:
         return self._resource_id
 
     @property
-    def changed_keys(self) -> set:
+    def changed_keys(self) -> set[str]:
         """Read only changed keys data."""
         return self._changed_keys
 
@@ -52,14 +52,15 @@ class APIItem:
         if callback in self._callbacks:
             self._callbacks.remove(callback)
 
-    def subscribe(self, callback: SubscriptionType) -> Callable:
+    def subscribe(self, callback: SubscriptionType) -> Callable[[], None]:
         """Subscribe to events.
 
         Return function to unsubscribe.
         """
         self._subscribers.append(callback)
 
-        def unsubscribe():
+        def unsubscribe() -> None:
+            """Unsubscribe callback."""
             self._subscribers.remove(callback)
 
         return unsubscribe
@@ -86,7 +87,9 @@ class APIItem:
         for callback in self._callbacks + self._subscribers:
             callback()
 
-    async def request(self, field: str, data: dict, tries: int = 0) -> dict:
+    async def request(
+        self, field: str, data: dict[str, Any], tries: int = 0
+    ) -> dict[str, Any]:
         """Set state of device."""
         if self._sleep_task is not None:
             self._sleep_task.cancel()

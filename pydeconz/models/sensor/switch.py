@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 from . import DeconzSensor
 
@@ -111,7 +111,7 @@ class Switch(DeconzSensor):
         | None = None,
         mode: Literal["momentary", "rocker"] | None = None,
         window_covering_type: Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change config of presence sensor.
 
         Supported values:

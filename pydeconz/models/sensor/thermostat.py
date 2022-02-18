@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 from . import convert_temperature
 from .temperature import Temperature
@@ -294,7 +294,7 @@ class Thermostat(Temperature):
             "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
         ]
         | None = None,
-        schedule: list | None = None,
+        schedule: list[str] | None = None,
         set_valve: bool | None = None,
         swing_mode: Literal[
             "fully closed",
@@ -309,7 +309,7 @@ class Thermostat(Temperature):
         ]
         | None = None,
         window_open_detection: bool | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change config of thermostat.
 
         Supported values:

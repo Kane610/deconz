@@ -16,9 +16,10 @@ from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.sensors import SensorResourceManager
 from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
-from .models.group import RESOURCE_TYPE as GROUP_RESOURCE, Scene
+from .models.group import RESOURCE_TYPE as GROUP_RESOURCE
 from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
 from .models.light.light import Light
+from .models.scene import Scene
 from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
@@ -169,7 +170,7 @@ class DeconzSession:
                         "Invalid content type: {}".format(res.content_type)
                     )
 
-                response = await res.json()
+                response: dict[str, Any] = await res.json()
                 LOGGER.debug("HTTP request response: %s", pformat(response))
 
                 _raise_on_error(response)
@@ -196,7 +197,7 @@ class DeconzSession:
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
 
-    def event_handler(self, event: dict) -> None:
+    def event_handler(self, event: dict[str, Any]) -> None:
         """Receive event from websocket and identifies where the event belong.
 
         Note that only one of config, name, or state will be present per changed event.
@@ -263,7 +264,7 @@ class DeconzSession:
         )
 
 
-def _raise_on_error(data: list | dict) -> None:
+def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:
     """Check response for error message."""
     if isinstance(data, list) and data:
         data = data[0]

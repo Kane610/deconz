@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from . import DeconzSensor
 
@@ -35,14 +35,14 @@ class DoorLock(DeconzSensor):
         """Lock configuration."""
         return self.raw["config"]["lock"]
 
-    async def lock(self) -> dict:
+    async def lock(self) -> dict[str, Any]:
         """Lock the lock."""
         return await self.request(
             field=f"{self.deconz_id}/config",
             data={"lock": True},
         )
 
-    async def unlock(self) -> dict:
+    async def unlock(self) -> dict[str, Any]:
         """Unlock the lock."""
         return await self.request(
             field=f"{self.deconz_id}/config",

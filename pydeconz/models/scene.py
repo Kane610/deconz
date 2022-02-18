@@ -34,11 +34,11 @@ class Scene(APIItem):
         """Resource type."""
         return RESOURCE_TYPE
 
-    async def recall(self) -> dict:
+    async def recall(self) -> dict[str, Any]:
         """Recall scene to group."""
         return await self.request(field=f"{self.deconz_id}/recall", data={})
 
-    async def store(self) -> dict:
+    async def store(self) -> dict[str, Any]:
         """Store current group state in scene.
 
         The actual state of each light in the group will become the lights scene state.
@@ -48,7 +48,7 @@ class Scene(APIItem):
     async def set_attributes(
         self,
         name: str | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Change attributes of scene.
 
         Supported values:
