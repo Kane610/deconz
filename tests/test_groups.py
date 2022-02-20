@@ -6,16 +6,15 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pydeconz.interfaces.groups import Groups
 from pydeconz.models.light import ALERT_SHORT, EFFECT_COLOR_LOOP
 from pydeconz.models.light.light import Light
 
 
-async def test_create_group():
+async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that groups works."""
-    mock_request = AsyncMock()
-    groups = Groups(
-        {
+    data = {
+        "config": {},
+        "groups": {
             "0": {
                 "action": {
                     "bri": 132,
@@ -45,9 +44,20 @@ async def test_create_group():
                 "type": "LightGroup",
             }
         },
-        mock_request,
-    )
-    group = groups["0"]
+        "lights": {},
+        "sensors": {},
+        "alarmsystems": {},
+    }
+
+    assert len(deconz_session.groups.keys()) == 0
+
+    mock_aioresponse.get("http://host:80/api/apikey", payload=data)
+    await deconz_session.refresh_state()
+    assert len(deconz_session.groups.keys()) == 1
+
+    group = deconz_session.groups["0"]
+
+    # group = groups["0"]
 
     assert group.state is True
     assert group.group_class is None
@@ -103,6 +113,7 @@ async def test_create_group():
 
     # Set attributes
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0")
     await group.set_attributes(
         hidden=False,
         light_sequence=["1", "2"],
@@ -110,7 +121,7 @@ async def test_create_group():
         multi_device_ids=["5", "6"],
         name="Group",
     )
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0",
         json={
@@ -122,8 +133,9 @@ async def test_create_group():
         },
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0")
     await group.set_attributes(name="Group")
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0",
         json={"name": "Group"},
@@ -131,6 +143,7 @@ async def test_create_group():
 
     # Set state
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/action")
     await group.set_state(
         alert=ALERT_SHORT,
         brightness=200,
@@ -145,7 +158,7 @@ async def test_create_group():
         transition_time=250,
         xy=(0.1, 0.1),
     )
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0/action",
         json={
@@ -164,8 +177,9 @@ async def test_create_group():
         },
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/action")
     await group.set_state(on=True)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0/action",
         json={"on": True},
@@ -173,10 +187,9 @@ async def test_create_group():
 
     # Scene
 
+    mock_aioresponse.post("http://host:80/api/apikey/groups/0/scenes")
     await group.scenes.create_scene(name="Garage")
-    mock_request.assert_called_with(
-        "post", path="/groups/0/scenes", json={"name": "Garage"}
-    )
+    assert deconz_called_with("post", path="/groups/0/scenes", json={"name": "Garage"})
 
     scene = group.scenes["1"]
     assert scene.deconz_id == "/groups/0/scenes/1"
@@ -186,29 +199,33 @@ async def test_create_group():
     assert scene.name == "warmlight"
     assert scene.full_name == "Hall warmlight"
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/recall")
     await scene.recall()
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0/scenes/1/recall",
         json={},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/store")
     await scene.store()
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0/scenes/1/store",
         json={},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1")
     await scene.set_attributes(name="new name")
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0/scenes/1",
         json={"name": "new name"},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1")
     await scene.set_attributes()
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/groups/0/scenes/1",
         json={},
@@ -236,7 +253,7 @@ async def test_create_group():
 
 
 @pytest.mark.parametrize(
-    "light_state,update_all,expected_group_state",
+    "light_state, update_all, expected_group_state",
     [
         (
             {
@@ -279,10 +296,13 @@ async def test_create_group():
         ),
     ],
 )
-async def test_update_color_state(light_state, update_all, expected_group_state):
+async def test_update_color_state(
+    light_state, update_all, expected_group_state, mock_aioresponse, deconz_session
+):
     """Verify that groups works."""
-    groups = Groups(
-        {
+    data = {
+        "config": {},
+        "groups": {
             "0": {
                 "action": {
                     "bri": 132,
@@ -305,10 +325,17 @@ async def test_update_color_state(light_state, update_all, expected_group_state)
                 "type": "LightGroup",
             }
         },
-        AsyncMock(),
-    )
-    group = groups["0"]
+        "lights": {},
+        "sensors": {},
+        "alarmsystems": {},
+    }
 
+    assert len(deconz_session.groups.keys()) == 0
+
+    mock_aioresponse.get("http://host:80/api/apikey", payload=data)
+    await deconz_session.refresh_state()
+
+    group = deconz_session.groups["0"]
     light = Light("0", {"type": "light", "state": light_state}, AsyncMock())
 
     group.update_color_state(light, update_all_attributes=update_all)
