@@ -10,11 +10,10 @@ from pydeconz.models.light import ALERT_SHORT, EFFECT_COLOR_LOOP
 from pydeconz.models.light.light import Light
 
 
-async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with):
+async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh_state):
     """Verify that groups works."""
-    data = {
-        "config": {},
-        "groups": {
+    deconz_session = await deconz_refresh_state(
+        groups={
             "0": {
                 "action": {
                     "bri": 132,
@@ -43,21 +42,11 @@ async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with
                 "state": {"all_on": False, "any_on": True},
                 "type": "LightGroup",
             }
-        },
-        "lights": {},
-        "sensors": {},
-        "alarmsystems": {},
-    }
-
-    assert len(deconz_session.groups.keys()) == 0
-
-    mock_aioresponse.get("http://host:80/api/apikey", payload=data)
-    await deconz_session.refresh_state()
+        }
+    )
     assert len(deconz_session.groups.keys()) == 1
 
     group = deconz_session.groups["0"]
-
-    # group = groups["0"]
 
     assert group.state is True
     assert group.group_class is None
@@ -253,7 +242,7 @@ async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with
 
 
 @pytest.mark.parametrize(
-    "light_state, update_all, expected_group_state",
+    "light_state, expected_group_state",
     [
         (
             {
@@ -265,7 +254,6 @@ async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with
                 "colormode": "xy",
                 "reachable": True,
             },
-            False,
             {
                 "brightness": 1,
                 "ct": 1,
@@ -273,7 +261,7 @@ async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with
                 "sat": 1,
                 "xy": (0.1, 0.1),
                 "colormode": "xy",
-                "effect": "none",
+                "effect": None,
             },
         ),
         (
@@ -283,7 +271,6 @@ async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with
                 "colormode": "ct",
                 "reachable": True,
             },
-            True,
             {
                 "brightness": 1,
                 "ct": 1,
@@ -297,12 +284,13 @@ async def test_create_group(mock_aioresponse, deconz_session, deconz_called_with
     ],
 )
 async def test_update_color_state(
-    light_state, update_all, expected_group_state, mock_aioresponse, deconz_session
+    light_state,
+    expected_group_state,
+    deconz_refresh_state,
 ):
     """Verify that groups works."""
-    data = {
-        "config": {},
-        "groups": {
+    deconz_session = await deconz_refresh_state(
+        groups={
             "0": {
                 "action": {
                     "bri": 132,
@@ -325,21 +313,10 @@ async def test_update_color_state(
                 "type": "LightGroup",
             }
         },
-        "lights": {},
-        "sensors": {},
-        "alarmsystems": {},
-    }
-
-    assert len(deconz_session.groups.keys()) == 0
-
-    mock_aioresponse.get("http://host:80/api/apikey", payload=data)
-    await deconz_session.refresh_state()
+        lights={"14": {"type": "light", "state": light_state}},
+    )
 
     group = deconz_session.groups["0"]
-    light = Light("0", {"type": "light", "state": light_state}, AsyncMock())
-
-    group.update_color_state(light, update_all_attributes=update_all)
-
     assert group.brightness == expected_group_state["brightness"]
     assert group.color_temp == expected_group_state["ct"]
     assert group.hue == expected_group_state["hue"]

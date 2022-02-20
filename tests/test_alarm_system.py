@@ -12,26 +12,12 @@ from pydeconz.models.alarm_system import (
 
 
 async def test_create_alarm_system(
-    mock_aioresponse, deconz_session, deconz_called_with
+    mock_aioresponse, deconz_refresh_state, deconz_called_with
 ):
     """Verify that alarm system works."""
 
-    alarm_systems = deconz_session.alarmsystems
-
-    mock_aioresponse.post("http://host:80/api/apikey/alarmsystems")
-    await alarm_systems.create_alarm_system(name="not_default")
-    assert deconz_called_with(
-        "post",
-        path="/alarmsystems",
-        json={"name": "not_default"},
-    )
-
-    data = {
-        "config": {},
-        "groups": {},
-        "lights": {},
-        "sensors": {},
-        "alarmsystems": {
+    deconz_session = await deconz_refresh_state(
+        alarm_systems={
             "0": {
                 "name": "default",
                 "config": {
@@ -58,13 +44,19 @@ async def test_create_alarm_system(
                     },
                 },
             }
-        },
-    }
+        }
+    )
 
-    assert len(alarm_systems.keys()) == 0
+    alarm_systems = deconz_session.alarmsystems
 
-    mock_aioresponse.get("http://host:80/api/apikey", payload=data)
-    await deconz_session.refresh_state()
+    mock_aioresponse.post("http://host:80/api/apikey/alarmsystems")
+    await alarm_systems.create_alarm_system(name="not_default")
+    assert deconz_called_with(
+        "post",
+        path="/alarmsystems",
+        json={"name": "not_default"},
+    )
+
     assert len(alarm_systems.keys()) == 1
 
     alarm_system_0 = alarm_systems["0"]

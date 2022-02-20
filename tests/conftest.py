@@ -1,7 +1,6 @@
 """Setup common test helpers."""
 
 from typing import Iterator
-from unittest.mock import Mock
 
 import aiohttp
 from aioresponses import aioresponses
@@ -49,3 +48,26 @@ def deconz_called_with(mock_aioresponse):
         return False
 
     yield verify_call
+
+
+@pytest.fixture
+def deconz_refresh_state(mock_aioresponse, deconz_session) -> Iterator[DeconzSession]:
+    """Comfort fixture to initialize deCONZ session."""
+
+    async def data_to_deconz_session(
+        alarm_systems=None, config=None, groups=None, lights=None, sensors=None
+    ) -> DeconzSession:
+        """Initialize deCONZ session."""
+        data = {
+            "alarmsystems": alarm_systems or {},
+            "config": config or {},
+            "groups": groups or {},
+            "lights": lights or {},
+            "sensors": sensors or {},
+        }
+        mock_aioresponse.get("http://host:80/api/apikey", payload=data)
+
+        await deconz_session.refresh_state()
+        return deconz_session
+
+    yield data_to_deconz_session
