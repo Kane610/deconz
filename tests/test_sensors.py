@@ -3,11 +3,10 @@
 pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 """
 
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.interfaces.sensors import SensorResourceManager
 from pydeconz.models.sensor.switch import SWITCH_DEVICE_MODE_DUAL_ROCKER
 from pydeconz.models.sensor.thermostat import (
     THERMOSTAT_FAN_MODE_AUTO,
@@ -20,31 +19,39 @@ from pydeconz.models.sensor.thermostat import (
 )
 
 
-async def test_air_quality_sensor():
+@pytest.fixture
+def deconz_sensor(deconz_refresh_state):
+    """Comfort fixture to initialize deCONZ sensor."""
+
+    async def data_to_deconz_session(sensor):
+        """Initialize deCONZ sensor."""
+        deconz_session = await deconz_refresh_state(sensors={"0": sensor})
+        return deconz_session.sensors["0"]
+
+    yield data_to_deconz_session
+
+
+async def test_air_quality_sensor(deconz_sensor):
     """Verify that air quality sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"on": True, "reachable": True},
-                "ep": 2,
-                "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
-                "lastseen": "2020-11-20T22:48Z",
-                "manufacturername": "BOSCH",
-                "modelid": "AIR",
-                "name": "BOSCH Air quality sensor",
-                "state": {
-                    "airquality": "poor",
-                    "airqualityppb": 809,
-                    "lastupdated": "2020-11-20T22:48:00.209",
-                },
-                "swversion": "20200402",
-                "type": "ZHAAirQuality",
-                "uniqueid": "00:12:4b:00:14:4d:00:07-02-fdef",
+            "config": {"on": True, "reachable": True},
+            "ep": 2,
+            "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
+            "lastseen": "2020-11-20T22:48Z",
+            "manufacturername": "BOSCH",
+            "modelid": "AIR",
+            "name": "BOSCH Air quality sensor",
+            "state": {
+                "airquality": "poor",
+                "airqualityppb": 809,
+                "lastupdated": "2020-11-20T22:48:00.209",
             },
+            "swversion": "20200402",
+            "type": "ZHAAirQuality",
+            "uniqueid": "00:12:4b:00:14:4d:00:07-02-fdef",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
@@ -73,36 +80,32 @@ async def test_air_quality_sensor():
     assert sensor.unique_id == "00:12:4b:00:14:4d:00:07-02-fdef"
 
 
-async def test_alarm_sensor():
+async def test_alarm_sensor(deconz_sensor):
     """Verify that alarm sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 2600,
-                },
-                "ep": 1,
-                "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
-                "manufacturername": "dresden elektronik",
-                "modelid": "lumi.sensor_motion.aq2",
-                "name": "Alarm 10",
-                "state": {
-                    "alarm": False,
-                    "lastupdated": "none",
-                    "lowbattery": None,
-                    "tampered": None,
-                },
-                "swversion": "20170627",
-                "type": "ZHAAlarm",
-                "uniqueid": "00:15:8d:00:02:b5:d1:80-01-0500",
+            "config": {
+                "battery": 100,
+                "on": True,
+                "reachable": True,
+                "temperature": 2600,
             },
+            "ep": 1,
+            "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
+            "manufacturername": "dresden elektronik",
+            "modelid": "lumi.sensor_motion.aq2",
+            "name": "Alarm 10",
+            "state": {
+                "alarm": False,
+                "lastupdated": "none",
+                "lowbattery": None,
+                "tampered": None,
+            },
+            "swversion": "20170627",
+            "type": "ZHAAlarm",
+            "uniqueid": "00:15:8d:00:02:b5:d1:80-01-0500",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAAlarm",)
@@ -130,40 +133,36 @@ async def test_alarm_sensor():
     assert sensor.unique_id == "00:15:8d:00:02:b5:d1:80-01-0500"
 
 
-async def test_ancillary_control_sensor():
+async def test_ancillary_control_sensor(deconz_sensor):
     """Verify that ancillary control sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 95,
-                    "enrolled": 1,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
-                "lastseen": "2021-07-25T18:07Z",
-                "manufacturername": "lk",
-                "modelid": "ZB-KeypadGeneric-D0002",
-                "name": "Keypad",
-                "state": {
-                    "action": "armed_stay",
-                    "lastupdated": "2021-07-25T18:02:51.172",
-                    "lowbattery": False,
-                    "panel": "exit_delay",
-                    "seconds_remaining": 55,
-                    "tampered": False,
-                },
-                "swversion": "3.13",
-                "type": "ZHAAncillaryControl",
-                "uniqueid": "ec:1b:bd:ff:fe:6f:c3:4d-01-0501",
+            "config": {
+                "battery": 95,
+                "enrolled": 1,
+                "on": True,
+                "pending": [],
+                "reachable": True,
             },
+            "ep": 1,
+            "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
+            "lastseen": "2021-07-25T18:07Z",
+            "manufacturername": "lk",
+            "modelid": "ZB-KeypadGeneric-D0002",
+            "name": "Keypad",
+            "state": {
+                "action": "armed_stay",
+                "lastupdated": "2021-07-25T18:02:51.172",
+                "lowbattery": False,
+                "panel": "exit_delay",
+                "seconds_remaining": 55,
+                "tampered": False,
+            },
+            "swversion": "3.13",
+            "type": "ZHAAncillaryControl",
+            "uniqueid": "ec:1b:bd:ff:fe:6f:c3:4d-01-0501",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert not sensor.BINARY
     assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
@@ -193,26 +192,22 @@ async def test_ancillary_control_sensor():
     assert sensor.unique_id == "ec:1b:bd:ff:fe:6f:c3:4d-01-0501"
 
 
-async def test_battery_sensor():
+async def test_battery_sensor(deconz_sensor):
     """Verify that alarm sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"alert": "none", "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
-                "manufacturername": "IKEA of Sweden",
-                "modelid": "FYRTUR block-out roller blind",
-                "name": "FYRTUR block-out roller blind",
-                "state": {"battery": 100, "lastupdated": "none"},
-                "swversion": "2.2.007",
-                "type": "ZHABattery",
-                "uniqueid": "00:0d:6f:ff:fe:01:23:45-01-0001",
-            },
+            "config": {"alert": "none", "on": True, "reachable": True},
+            "ep": 1,
+            "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
+            "manufacturername": "IKEA of Sweden",
+            "modelid": "FYRTUR block-out roller blind",
+            "name": "FYRTUR block-out roller blind",
+            "state": {"battery": 100, "lastupdated": "none"},
+            "swversion": "2.2.007",
+            "type": "ZHABattery",
+            "uniqueid": "00:0d:6f:ff:fe:01:23:45-01-0001",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHABattery",)
@@ -239,36 +234,32 @@ async def test_battery_sensor():
     assert sensor.unique_id == "00:0d:6f:ff:fe:01:23:45-01-0001"
 
 
-async def test_carbonmonoxide_sensor():
+async def test_carbonmonoxide_sensor(deconz_sensor):
     """Verify that carbon monoxide sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "b7599df551944df97b2aa87d160b9c45",
-                "manufacturername": "Heiman",
-                "modelid": "CO_V16",
-                "name": "Cave, CO",
-                "state": {
-                    "carbonmonoxide": False,
-                    "lastupdated": "none",
-                    "lowbattery": False,
-                    "tampered": False,
-                },
-                "swversion": "20150330",
-                "type": "ZHACarbonMonoxide",
-                "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
+            "config": {
+                "battery": 100,
+                "on": True,
+                "pending": [],
+                "reachable": True,
             },
+            "ep": 1,
+            "etag": "b7599df551944df97b2aa87d160b9c45",
+            "manufacturername": "Heiman",
+            "modelid": "CO_V16",
+            "name": "Cave, CO",
+            "state": {
+                "carbonmonoxide": False,
+                "lastupdated": "none",
+                "lowbattery": False,
+                "tampered": False,
+            },
+            "swversion": "20150330",
+            "type": "ZHACarbonMonoxide",
+            "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
@@ -296,29 +287,25 @@ async def test_carbonmonoxide_sensor():
     assert sensor.unique_id == "00:15:8d:00:02:a5:21:24-01-0101"
 
 
-async def test_consumption_sensor():
+async def test_consumption_sensor(deconz_sensor):
     """Verify that consumption sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"on": True, "reachable": True},
-                "ep": 1,
-                "etag": "a99e5bc463d15c23af7e89946e784cca",
-                "manufacturername": "Heiman",
-                "modelid": "SmartPlug",
-                "name": "Consumption 15",
-                "state": {
-                    "consumption": 11342,
-                    "lastupdated": "2018-03-12T19:19:08",
-                    "power": 123,
-                },
-                "type": "ZHAConsumption",
-                "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0702",
+            "config": {"on": True, "reachable": True},
+            "ep": 1,
+            "etag": "a99e5bc463d15c23af7e89946e784cca",
+            "manufacturername": "Heiman",
+            "modelid": "SmartPlug",
+            "name": "Consumption 15",
+            "state": {
+                "consumption": 11342,
+                "lastupdated": "2018-03-12T19:19:08",
+                "power": 123,
             },
+            "type": "ZHAConsumption",
+            "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0702",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAConsumption",)
@@ -350,33 +337,29 @@ async def test_consumption_sensor():
     assert sensor.state is None
 
 
-async def test_daylight_sensor():
+async def test_daylight_sensor(deconz_sensor):
     """Verify that daylight sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "configured": True,
-                    "on": True,
-                    "sunriseoffset": 30,
-                    "sunsetoffset": -30,
-                },
-                "etag": "55047cf652a7e594d0ee7e6fae01dd38",
-                "manufacturername": "Philips",
-                "modelid": "PHDL00",
-                "name": "Daylight",
-                "state": {
-                    "daylight": True,
-                    "lastupdated": "2018-03-24T17:26:12",
-                    "status": 170,
-                },
-                "swversion": "1.0",
-                "type": "Daylight",
+            "config": {
+                "configured": True,
+                "on": True,
+                "sunriseoffset": 30,
+                "sunsetoffset": -30,
             },
+            "etag": "55047cf652a7e594d0ee7e6fae01dd38",
+            "manufacturername": "Philips",
+            "modelid": "PHDL00",
+            "name": "Daylight",
+            "state": {
+                "daylight": True,
+                "lastupdated": "2018-03-24T17:26:12",
+                "status": 170,
+            },
+            "swversion": "1.0",
+            "type": "Daylight",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("Daylight",)
@@ -433,36 +416,31 @@ async def test_daylight_sensor():
         assert sensor.changed_keys == {"state", "status"}
 
 
-async def test_door_lock_sensor():
+async def test_door_lock_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that door lock sensor works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "lock": False,
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 11,
-                "etag": "a43862f76b7fa48b0fbb9107df123b0e",
-                "lastseen": "2021-03-06T22:25Z",
-                "manufacturername": "Onesti Products AS",
-                "modelid": "easyCodeTouch_v1",
-                "name": "easyCodeTouch_v1",
-                "state": {
-                    "lastupdated": "2021-03-06T21:25:45.624",
-                    "lockstate": "unlocked",
-                },
-                "swversion": "20201211",
-                "type": "ZHADoorLock",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101",
+            "config": {
+                "battery": 100,
+                "lock": False,
+                "on": True,
+                "reachable": True,
             },
+            "ep": 11,
+            "etag": "a43862f76b7fa48b0fbb9107df123b0e",
+            "lastseen": "2021-03-06T22:25Z",
+            "manufacturername": "Onesti Products AS",
+            "modelid": "easyCodeTouch_v1",
+            "name": "easyCodeTouch_v1",
+            "state": {
+                "lastupdated": "2021-03-06T21:25:45.624",
+                "lockstate": "unlocked",
+            },
+            "swversion": "20201211",
+            "type": "ZHADoorLock",
+            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHADoorLock",)
@@ -491,36 +469,30 @@ async def test_door_lock_sensor():
     assert sensor.type == "ZHADoorLock"
     assert sensor.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101"
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.lock()
-    mock_request.assert_called_with(
-        "put", path="/sensors/0/config", json={"lock": True}
-    )
+    assert deconz_called_with("put", path="/sensors/0/config", json={"lock": True})
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.unlock()
-    mock_request.assert_called_with(
-        "put", path="/sensors/0/config", json={"lock": False}
-    )
+    assert deconz_called_with("put", path="/sensors/0/config", json={"lock": False})
 
 
-async def test_fire_sensor():
+async def test_fire_sensor(deconz_sensor):
     """Verify that fire sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"on": True, "reachable": True},
-                "ep": 1,
-                "etag": "2b585d2c016bfd665ba27a8fdad28670",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.sensor_smoke",
-                "name": "sensor_kitchen_smoke",
-                "state": {"fire": False, "lastupdated": "2018-02-20T11:25:02"},
-                "type": "ZHAFire",
-                "uniqueid": "00:15:8d:00:01:d9:3e:7c-01-0500",
-            },
+            "config": {"on": True, "reachable": True},
+            "ep": 1,
+            "etag": "2b585d2c016bfd665ba27a8fdad28670",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.sensor_smoke",
+            "name": "sensor_kitchen_smoke",
+            "state": {"fire": False, "lastupdated": "2018-02-20T11:25:02"},
+            "type": "ZHAFire",
+            "uniqueid": "00:15:8d:00:01:d9:3e:7c-01-0500",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
@@ -549,31 +521,27 @@ async def test_fire_sensor():
     assert sensor.unique_id == "00:15:8d:00:01:d9:3e:7c-01-0500"
 
 
-async def test_fire_sensor_test_develco():
+async def test_fire_sensor_test_develco(deconz_sensor):
     """Verify that develco/frient fire sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"on": True, "battery": 90, "reachable": True},
-                "ep": 1,
-                "etag": "abcdef1234567890abcdef1234567890",
-                "manufacturername": "frient A/S",
-                "modelid": "SMSZB-120",
-                "name": "Fire alarm",
-                "state": {
-                    "fire": False,
-                    "lastupdated": "2021-11-25T08:00:02.003",
-                    "lowbattery": False,
-                    "test": True,
-                },
-                "swversion": "20210526 05:57",
-                "type": "ZHAFire",
-                "uniqueid": "00:11:22:33:44:55:66:77-88-9900",
-            }
-        },
-        AsyncMock(),
+            "config": {"on": True, "battery": 90, "reachable": True},
+            "ep": 1,
+            "etag": "abcdef1234567890abcdef1234567890",
+            "manufacturername": "frient A/S",
+            "modelid": "SMSZB-120",
+            "name": "Fire alarm",
+            "state": {
+                "fire": False,
+                "lastupdated": "2021-11-25T08:00:02.003",
+                "lowbattery": False,
+                "test": True,
+            },
+            "swversion": "20210526 05:57",
+            "type": "ZHAFire",
+            "uniqueid": "00:11:22:33:44:55:66:77-88-9900",
+        }
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
@@ -602,23 +570,19 @@ async def test_fire_sensor_test_develco():
     assert sensor.unique_id == "00:11:22:33:44:55:66:77-88-9900"
 
 
-async def test_genericflag_sensor():
+async def test_genericflag_sensor(deconz_sensor):
     """Verify that generic flag sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"on": True, "reachable": True},
-                "modelid": "Switch",
-                "name": "Kitchen Switch",
-                "state": {"flag": True, "lastupdated": "2018-07-01T10:40:35"},
-                "swversion": "1.0.0",
-                "type": "CLIPGenericFlag",
-                "uniqueid": "kitchen-switch",
-            },
+            "config": {"on": True, "reachable": True},
+            "modelid": "Switch",
+            "name": "Kitchen Switch",
+            "state": {"flag": True, "lastupdated": "2018-07-01T10:40:35"},
+            "swversion": "1.0.0",
+            "type": "CLIPGenericFlag",
+            "uniqueid": "kitchen-switch",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("CLIPGenericFlag",)
@@ -646,25 +610,21 @@ async def test_genericflag_sensor():
     assert sensor.unique_id == "kitchen-switch"
 
 
-async def test_genericstatus_sensor():
+async def test_genericstatus_sensor(deconz_sensor):
     """Verify that generic flag sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"on": True, "reachable": True},
-                "etag": "aacc83bc7d6e4af7e44014e9f776b206",
-                "manufacturername": "Phoscon",
-                "modelid": "PHOSCON_FSM_STATE",
-                "name": "FSM_STATE Motion stair",
-                "state": {"lastupdated": "2019-04-24T00:00:25", "status": 0},
-                "swversion": "1.0",
-                "type": "CLIPGenericStatus",
-                "uniqueid": "fsm-state-1520195376277",
-            },
+            "config": {"on": True, "reachable": True},
+            "etag": "aacc83bc7d6e4af7e44014e9f776b206",
+            "manufacturername": "Phoscon",
+            "modelid": "PHOSCON_FSM_STATE",
+            "name": "FSM_STATE Motion stair",
+            "state": {"lastupdated": "2019-04-24T00:00:25", "status": 0},
+            "swversion": "1.0",
+            "type": "CLIPGenericStatus",
+            "uniqueid": "fsm-state-1520195376277",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("CLIPGenericStatus",)
@@ -692,27 +652,22 @@ async def test_genericstatus_sensor():
     assert sensor.unique_id == "fsm-state-1520195376277"
 
 
-async def test_humidity_sensor():
+async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that humidity sensor works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "1220e5d026493b6e86207993703a8a71",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.weather",
-                "name": "Mi temperature 1",
-                "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
-                "swversion": "20161129",
-                "type": "ZHAHumidity",
-                "uniqueid": "00:15:8d:00:02:45:dc:53-01-0405",
-            },
+            "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
+            "ep": 1,
+            "etag": "1220e5d026493b6e86207993703a8a71",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.weather",
+            "name": "Mi temperature 1",
+            "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
+            "swversion": "20161129",
+            "type": "ZHAHumidity",
+            "uniqueid": "00:15:8d:00:02:45:dc:53-01-0405",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
@@ -743,51 +698,43 @@ async def test_humidity_sensor():
     del sensor.raw["state"]["humidity"]
     assert sensor.state is None
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(offset=1)
-    mock_request.assert_called_with(
-        "put",
-        path="/sensors/0/config",
-        json={"offset": 1},
-    )
+    assert deconz_called_with("put", path="/sensors/0/config", json={"offset": 1})
 
 
-async def test_lightlevel_sensor():
+async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that light level sensor works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "alert": "none",
-                    "battery": 100,
-                    "ledindication": False,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                    "tholddark": 12000,
-                    "tholdoffset": 7000,
-                    "usertest": False,
-                },
-                "ep": 2,
-                "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-                "manufacturername": "Philips",
-                "modelid": "SML001",
-                "name": "Motion sensor 4",
-                "state": {
-                    "dark": True,
-                    "daylight": False,
-                    "lastupdated": "2019-05-05T14:37:06",
-                    "lightlevel": 6955,
-                    "lux": 5,
-                },
-                "swversion": "6.1.0.18912",
-                "type": "ZHALightLevel",
-                "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
+            "config": {
+                "alert": "none",
+                "battery": 100,
+                "ledindication": False,
+                "on": True,
+                "pending": [],
+                "reachable": True,
+                "tholddark": 12000,
+                "tholdoffset": 7000,
+                "usertest": False,
             },
+            "ep": 2,
+            "etag": "5cfb81765e86aa53ace427cfd52c6d52",
+            "manufacturername": "Philips",
+            "modelid": "SML001",
+            "name": "Motion sensor 4",
+            "state": {
+                "dark": True,
+                "daylight": False,
+                "lastupdated": "2019-05-05T14:37:06",
+                "lightlevel": 6955,
+                "lux": 5,
+            },
+            "swversion": "6.1.0.18912",
+            "type": "ZHALightLevel",
+            "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
@@ -822,53 +769,52 @@ async def test_lightlevel_sensor():
     del sensor.raw["state"]["lightlevel"]
     assert sensor.state is None
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(threshold_dark=10, threshold_offset=20)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"tholddark": 10, "tholdoffset": 20},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(threshold_dark=1)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"tholddark": 1},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(threshold_offset=2)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"tholdoffset": 2},
     )
 
 
-async def test_openclose_sensor():
+async def test_openclose_sensor(deconz_sensor):
     """Verify that open/close sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 95,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 3300,
-                },
-                "ep": 1,
-                "etag": "66cc641d0368110da6882b50090174ac",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.sensor_magnet.aq2",
-                "name": "Back Door",
-                "state": {"lastupdated": "2019-05-05T14:54:32", "open": False},
-                "swversion": "20161128",
-                "type": "ZHAOpenClose",
-                "uniqueid": "00:15:8d:00:02:2b:96:b4-01-0006",
+            "config": {
+                "battery": 95,
+                "on": True,
+                "reachable": True,
+                "temperature": 3300,
             },
+            "ep": 1,
+            "etag": "66cc641d0368110da6882b50090174ac",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.sensor_magnet.aq2",
+            "name": "Back Door",
+            "state": {"lastupdated": "2019-05-05T14:54:32", "open": False},
+            "swversion": "20161128",
+            "type": "ZHAOpenClose",
+            "uniqueid": "00:15:8d:00:02:2b:96:b4-01-0006",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
@@ -981,46 +927,41 @@ async def test_openclose_sensor():
         ),
     ],
 )
-async def test_power_sensor(input, expected):
+async def test_power_sensor(input, expected, deconz_sensor):
     """Verify that power sensor works."""
-    sensor = SensorResourceManager({"0": input}, AsyncMock())["0"]
+    sensor = await deconz_sensor(input)
 
     for attr, value in expected.items():
         assert getattr(sensor, attr) == value
 
 
-async def test_presence_sensor():
+async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that presence sensor works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "alert": "none",
-                    "battery": 100,
-                    "delay": 0,
-                    "ledindication": False,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                    "sensitivity": 1,
-                    "sensitivitymax": 2,
-                    "usertest": False,
-                },
-                "ep": 2,
-                "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-                "manufacturername": "Philips",
-                "modelid": "SML001",
-                "name": "Motion sensor 4",
-                "state": {"lastupdated": "2019-05-05T14:37:06", "presence": False},
-                "swversion": "6.1.0.18912",
-                "type": "ZHAPresence",
-                "uniqueid": "00:17:88:01:03:28:8c:9b-02-0406",
+            "config": {
+                "alert": "none",
+                "battery": 100,
+                "delay": 0,
+                "ledindication": False,
+                "on": True,
+                "pending": [],
+                "reachable": True,
+                "sensitivity": 1,
+                "sensitivitymax": 2,
+                "usertest": False,
             },
+            "ep": 2,
+            "etag": "5cfb81765e86aa53ace427cfd52c6d52",
+            "manufacturername": "Philips",
+            "modelid": "SML001",
+            "name": "Motion sensor 4",
+            "state": {"lastupdated": "2019-05-05T14:37:06", "presence": False},
+            "swversion": "6.1.0.18912",
+            "type": "ZHAPresence",
+            "uniqueid": "00:17:88:01:03:28:8c:9b-02-0406",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
@@ -1052,55 +993,55 @@ async def test_presence_sensor():
     assert sensor.type == "ZHAPresence"
     assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0406"
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(delay=10, duration=20, sensitivity=1)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"delay": 10, "duration": 20, "sensitivity": 1},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(delay=1)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"delay": 1},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(duration=2)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"duration": 2},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(sensitivity=3)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"sensitivity": 3},
     )
 
 
-async def test_pressure_sensor():
+async def test_pressure_sensor(deconz_sensor):
     """Verify that pressure sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"battery": 100, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "1220e5d026493b6e86207993703a8a71",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.weather",
-                "name": "Mi temperature 1",
-                "state": {"lastupdated": "2019-05-05T14:39:00", "pressure": 1010},
-                "swversion": "20161129",
-                "type": "ZHAPressure",
-                "uniqueid": "00:15:8d:00:02:45:dc:53-01-0403",
-            },
+            "config": {"battery": 100, "on": True, "reachable": True},
+            "ep": 1,
+            "etag": "1220e5d026493b6e86207993703a8a71",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.weather",
+            "name": "Mi temperature 1",
+            "state": {"lastupdated": "2019-05-05T14:39:00", "pressure": 1010},
+            "swversion": "20161129",
+            "type": "ZHAPressure",
+            "uniqueid": "00:15:8d:00:02:45:dc:53-01-0403",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
@@ -1128,32 +1069,28 @@ async def test_pressure_sensor():
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0403"
 
 
-async def test_switch_sensor():
+async def test_switch_sensor(deconz_sensor):
     """Verify that switch sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 90,
-                    "group": "201",
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 2,
-                "etag": "233ae541bbb7ac98c42977753884b8d2",
-                "manufacturername": "Philips",
-                "mode": 1,
-                "modelid": "RWL021",
-                "name": "Dimmer switch 3",
-                "state": {"buttonevent": 1002, "lastupdated": "2019-04-28T20:29:13"},
-                "swversion": "5.45.1.17846",
-                "type": "ZHASwitch",
-                "uniqueid": "00:17:88:01:02:0e:32:a3-02-fc00",
+            "config": {
+                "battery": 90,
+                "group": "201",
+                "on": True,
+                "reachable": True,
             },
+            "ep": 2,
+            "etag": "233ae541bbb7ac98c42977753884b8d2",
+            "manufacturername": "Philips",
+            "mode": 1,
+            "modelid": "RWL021",
+            "name": "Dimmer switch 3",
+            "state": {"buttonevent": 1002, "lastupdated": "2019-04-28T20:29:13"},
+            "swversion": "5.45.1.17846",
+            "type": "ZHASwitch",
+            "uniqueid": "00:17:88:01:02:0e:32:a3-02-fc00",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -1184,36 +1121,32 @@ async def test_switch_sensor():
     assert sensor.unique_id == "00:17:88:01:02:0e:32:a3-02-fc00"
 
 
-async def test_switch_sensor_cube():
+async def test_switch_sensor_cube(deconz_sensor):
     """Verify that cube switch sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 90,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 1100,
-                },
-                "ep": 3,
-                "etag": "e34fa1c7a19d960e35a1f4d56ac475af",
-                "manufacturername": "LUMI",
-                "mode": 1,
-                "modelid": "lumi.sensor_cube.aqgl01",
-                "name": "Mi Magic Cube",
-                "state": {
-                    "buttonevent": 747,
-                    "gesture": 7,
-                    "lastupdated": "2019-12-12T18:50:40",
-                },
-                "swversion": "20160704",
-                "type": "ZHASwitch",
-                "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c",
+            "config": {
+                "battery": 90,
+                "on": True,
+                "reachable": True,
+                "temperature": 1100,
             },
+            "ep": 3,
+            "etag": "e34fa1c7a19d960e35a1f4d56ac475af",
+            "manufacturername": "LUMI",
+            "mode": 1,
+            "modelid": "lumi.sensor_cube.aqgl01",
+            "name": "Mi Magic Cube",
+            "state": {
+                "buttonevent": 747,
+                "gesture": 7,
+                "lastupdated": "2019-12-12T18:50:40",
+            },
+            "swversion": "20160704",
+            "type": "ZHASwitch",
+            "uniqueid": "00:15:8d:00:02:8b:3b:24-03-000c",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -1242,39 +1175,36 @@ async def test_switch_sensor_cube():
     assert sensor.unique_id == "00:15:8d:00:02:8b:3b:24-03-000c"
 
 
-async def test_switch_sensor_hue_wall_switch_module():
+async def test_switch_sensor_hue_wall_switch_module(
+    mock_aioresponse, deconz_sensor, deconz_called_with
+):
     """Verify that cube switch sensor works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "devicemode": "dualrocker",
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "01173dc5b19bb0a976006eee8d0d3718",
-                "lastseen": "2021-03-12T22:55Z",
-                "manufacturername": "Signify Netherlands B.V.",
-                "mode": 1,
-                "modelid": "RDM001",
-                "name": "RDM001 15",
-                "state": {
-                    "buttonevent": 1002,
-                    "eventduration": 1,
-                    "lastupdated": "2021-03-12T22:21:20.017",
-                },
-                "swversion": "20210115",
-                "type": "ZHASwitch",
-                "uniqueid": "00:17:88:01:0b:00:05:5d-01-fc00",
+            "config": {
+                "battery": 100,
+                "devicemode": "dualrocker",
+                "on": True,
+                "pending": [],
+                "reachable": True,
             },
+            "ep": 1,
+            "etag": "01173dc5b19bb0a976006eee8d0d3718",
+            "lastseen": "2021-03-12T22:55Z",
+            "manufacturername": "Signify Netherlands B.V.",
+            "mode": 1,
+            "modelid": "RDM001",
+            "name": "RDM001 15",
+            "state": {
+                "buttonevent": 1002,
+                "eventduration": 1,
+                "lastupdated": "2021-03-12T22:21:20.017",
+            },
+            "swversion": "20210115",
+            "type": "ZHASwitch",
+            "uniqueid": "00:17:88:01:0b:00:05:5d-01-fc00",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -1309,40 +1239,37 @@ async def test_switch_sensor_hue_wall_switch_module():
     assert sensor.type == "ZHASwitch"
     assert sensor.unique_id == "00:17:88:01:0b:00:05:5d-01-fc00"
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(device_mode=SWITCH_DEVICE_MODE_DUAL_ROCKER)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"devicemode": "dualrocker"},
     )
 
 
-async def test_switch_sensor_tint_remote():
+async def test_switch_sensor_tint_remote(deconz_sensor):
     """Verify that tint remote sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"group": "16388,16389,16390", "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "b1336f750d31300afa441a04f2c69b68",
-                "manufacturername": "MLI",
-                "mode": 1,
-                "modelid": "ZBT-Remote-ALL-RGBW",
-                "name": "ZHA Remote 1",
-                "state": {
-                    "angle": 10,
-                    "buttonevent": 6002,
-                    "lastupdated": "2020-09-08T18:58:24.193",
-                    "xy": [0.3381, 0.1627],
-                },
-                "swversion": "2.0",
-                "type": "ZHASwitch",
-                "uniqueid": "00:11:22:33:44:55:66:77-01-1000",
+            "config": {"group": "16388,16389,16390", "on": True, "reachable": True},
+            "ep": 1,
+            "etag": "b1336f750d31300afa441a04f2c69b68",
+            "manufacturername": "MLI",
+            "mode": 1,
+            "modelid": "ZBT-Remote-ALL-RGBW",
+            "name": "ZHA Remote 1",
+            "state": {
+                "angle": 10,
+                "buttonevent": 6002,
+                "lastupdated": "2020-09-08T18:58:24.193",
+                "xy": [0.3381, 0.1627],
             },
+            "swversion": "2.0",
+            "type": "ZHASwitch",
+            "uniqueid": "00:11:22:33:44:55:66:77-01-1000",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -1370,34 +1297,29 @@ async def test_switch_sensor_tint_remote():
     assert sensor.unique_id == "00:11:22:33:44:55:66:77-01-1000"
 
 
-async def test_switch_ubisys_j1():
+async def test_switch_ubisys_j1(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that tint remote sensor works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "mode": "momentary",
-                    "on": True,
-                    "reachable": False,
-                    "windowcoveringtype": 0,
-                },
-                "ep": 2,
-                "etag": "da5fbb89eca4133b6949537e73b31f77",
-                "lastseen": "2020-11-21T15:47Z",
-                "manufacturername": "ubisys",
-                "mode": 1,
-                "modelid": "J1 (5502)",
-                "name": "J1",
-                "state": {"buttonevent": None, "lastupdated": "none"},
-                "swversion": "20190129-DE-FB0",
-                "type": "ZHASwitch",
-                "uniqueid": "00:1f:ee:00:00:00:00:09-02-0102",
+            "config": {
+                "mode": "momentary",
+                "on": True,
+                "reachable": False,
+                "windowcoveringtype": 0,
             },
+            "ep": 2,
+            "etag": "da5fbb89eca4133b6949537e73b31f77",
+            "lastseen": "2020-11-21T15:47Z",
+            "manufacturername": "ubisys",
+            "mode": 1,
+            "modelid": "J1 (5502)",
+            "name": "J1",
+            "state": {"buttonevent": None, "lastupdated": "none"},
+            "swversion": "20190129-DE-FB0",
+            "type": "ZHASwitch",
+            "uniqueid": "00:1f:ee:00:00:00:00:09-02-0102",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
@@ -1426,34 +1348,31 @@ async def test_switch_ubisys_j1():
     assert sensor.type == "ZHASwitch"
     assert sensor.unique_id == "00:1f:ee:00:00:00:00:09-02-0102"
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(window_covering_type=2)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"windowcoveringtype": 2},
     )
 
 
-async def test_temperature_sensor():
+async def test_temperature_sensor(deconz_sensor):
     """Verify that temperature sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "1220e5d026493b6e86207993703a8a71",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.weather",
-                "name": "Mi temperature 1",
-                "state": {"lastupdated": "2019-05-05T14:39:00", "temperature": 2182},
-                "swversion": "20161129",
-                "type": "ZHATemperature",
-                "uniqueid": "00:15:8d:00:02:45:dc:53-01-0402",
-            },
+            "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
+            "ep": 1,
+            "etag": "1220e5d026493b6e86207993703a8a71",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.weather",
+            "name": "Mi temperature 1",
+            "state": {"lastupdated": "2019-05-05T14:39:00", "temperature": 2182},
+            "swversion": "20161129",
+            "type": "ZHATemperature",
+            "uniqueid": "00:15:8d:00:02:45:dc:53-01-0402",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
@@ -1484,65 +1403,43 @@ async def test_temperature_sensor():
     assert sensor.state is None
 
 
-async def test_danfoss_thermostat():
+async def test_danfoss_thermostat(deconz_sensor):
     """Verify that Danfoss thermostat works.
 
-    Danfoss thermostat is the simplest kind with only control over temperature.
+    Danfoss thermostat is the simplest kind with only control over temperaturdeconz_sensore.
     """
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 59,
-                    "displayflipped": None,
-                    "heatsetpoint": 2100,
-                    "locked": None,
-                    "mountingmode": None,
-                    "offset": 0,
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "6130553ac247174809bae47144ee23f8",
-                "lastseen": "2020-11-29T19:31Z",
-                "manufacturername": "Danfoss",
-                "modelid": "eTRV0100",
-                "name": "Thermostat_stue_sofa",
-                "state": {
-                    "errorcode": None,
-                    "lastupdated": "2020-11-29T19:28:40.665",
-                    "mountingmodeactive": False,
-                    "on": True,
-                    "temperature": 2102,
-                    "valve": 24,
-                    "windowopen": "Closed",
-                },
-                "swversion": "01.02.0008 01.02",
-                "type": "ZHAThermostat",
-                "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-0201",
+            "config": {
+                "battery": 59,
+                "displayflipped": None,
+                "heatsetpoint": 2100,
+                "locked": None,
+                "mountingmode": None,
+                "offset": 0,
+                "on": True,
+                "reachable": True,
             },
-            "1": {
-                "config": {"battery": 59, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "05f880e68da6c1fcadbc471c632e85c8",
-                "lastseen": "2020-11-29T19:31Z",
-                "manufacturername": "Danfoss",
-                "modelid": "eTRV0100",
-                "name": "Thermostat_stue_sofa",
-                "state": {
-                    "lastset": "2020-11-24T21:03:15Z",
-                    "lastupdated": "2020-11-29T16:25:50.359",
-                    "localtime": "2020-11-29T17:25:45",
-                    "utc": "2020-11-29T16:25:45Z",
-                },
-                "swversion": "01.02.0008 01.02",
-                "type": "ZHATime",
-                "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-000a",
+            "ep": 1,
+            "etag": "6130553ac247174809bae47144ee23f8",
+            "lastseen": "2020-11-29T19:31Z",
+            "manufacturername": "Danfoss",
+            "modelid": "eTRV0100",
+            "name": "Thermostat_stue_sofa",
+            "state": {
+                "errorcode": None,
+                "lastupdated": "2020-11-29T19:28:40.665",
+                "mountingmodeactive": False,
+                "on": True,
+                "temperature": 2102,
+                "valve": 24,
+                "windowopen": "Closed",
             },
+            "swversion": "01.02.0008 01.02",
+            "type": "ZHAThermostat",
+            "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-0201",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
@@ -1590,40 +1487,36 @@ async def test_danfoss_thermostat():
     assert sensor.unique_id == "14:b4:57:ff:fe:d5:4e:77-01-0201"
 
 
-async def test_eurotronic_thermostat():
+async def test_eurotronic_thermostat(deconz_sensor):
     """Verify that thermostat sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "displayflipped": True,
-                    "heatsetpoint": 2100,
-                    "locked": False,
-                    "mode": "auto",
-                    "offset": 0,
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "25aac331bc3c4b465cfb2197f6243ea4",
-                "manufacturername": "Eurotronic",
-                "modelid": "SPZB0001",
-                "name": "Living Room Radiator",
-                "state": {
-                    "lastupdated": "2019-02-10T22:41:32",
-                    "on": False,
-                    "temperature": 2149,
-                    "valve": 0,
-                },
-                "swversion": "15181120",
-                "type": "ZHAThermostat",
-                "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201",
+            "config": {
+                "battery": 100,
+                "displayflipped": True,
+                "heatsetpoint": 2100,
+                "locked": False,
+                "mode": "auto",
+                "offset": 0,
+                "on": True,
+                "reachable": True,
             },
+            "ep": 1,
+            "etag": "25aac331bc3c4b465cfb2197f6243ea4",
+            "manufacturername": "Eurotronic",
+            "modelid": "SPZB0001",
+            "name": "Living Room Radiator",
+            "state": {
+                "lastupdated": "2019-02-10T22:41:32",
+                "on": False,
+                "temperature": 2149,
+                "valve": 0,
+            },
+            "swversion": "15181120",
+            "type": "ZHAThermostat",
+            "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
@@ -1668,40 +1561,35 @@ async def test_eurotronic_thermostat():
     assert sensor.unique_id == "00:15:8d:00:01:92:d2:51-01-0201"
 
 
-async def test_tuya_thermostat():
+async def test_tuya_thermostat(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that Tuya thermostat works."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "heatsetpoint": 1550,
-                    "locked": None,
-                    "offset": 0,
-                    "on": True,
-                    "preset": "auto",
-                    "reachable": True,
-                    "schedule": {},
-                    "schedule_on": None,
-                    "setvalve": True,
-                    "windowopen_set": True,
-                },
-                "ep": 1,
-                "etag": "36850fc8521f7c23606c9304b2e1f7bb",
-                "lastseen": "2020-11-11T21:23Z",
-                "manufacturername": "_TYST11_kfvq6avy",
-                "modelid": "fvq6avy",
-                "name": "fvq6avy",
-                "state": {"lastupdated": "none", "on": None, "temperature": 2290},
-                "swversion": "20180727",
-                "type": "ZHAThermostat",
-                "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
+            "config": {
+                "battery": 100,
+                "heatsetpoint": 1550,
+                "locked": None,
+                "offset": 0,
+                "on": True,
+                "preset": "auto",
+                "reachable": True,
+                "schedule": {},
+                "schedule_on": None,
+                "setvalve": True,
+                "windowopen_set": True,
             },
+            "ep": 1,
+            "etag": "36850fc8521f7c23606c9304b2e1f7bb",
+            "lastseen": "2020-11-11T21:23Z",
+            "manufacturername": "_TYST11_kfvq6avy",
+            "modelid": "fvq6avy",
+            "name": "fvq6avy",
+            "state": {"lastupdated": "none", "on": None, "temperature": 2290},
+            "swversion": "20180727",
+            "type": "ZHAThermostat",
+            "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
         },
-        mock_request,
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == Thermostat.ZHATYPE
@@ -1753,6 +1641,7 @@ async def test_tuya_thermostat():
     assert sensor.heating_setpoint is None
     assert sensor.floor_temperature == 40
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(
         cooling_setpoint=1000,
         enable_schedule=True,
@@ -1772,7 +1661,7 @@ async def test_tuya_thermostat():
         temperature_measurement=THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR,
         window_open_detection=True,
     )
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={
@@ -1796,40 +1685,37 @@ async def test_tuya_thermostat():
         },
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(mode=THERMOSTAT_MODE_OFF)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/sensors/0/config",
         json={"mode": "off"},
     )
 
 
-async def test_time_sensor():
+async def test_time_sensor(deconz_sensor):
     """Verify that time sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {"battery": 40, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "28e796678d9a24712feef59294343bb6",
-                "lastseen": "2020-11-22T11:26Z",
-                "manufacturername": "Danfoss",
-                "modelid": "eTRV0100",
-                "name": "eTRV Séjour",
-                "state": {
-                    "lastset": "2020-11-19T08:07:08Z",
-                    "lastupdated": "2020-11-22T10:51:03.444",
-                    "localtime": "2020-11-22T10:51:01",
-                    "utc": "2020-11-22T10:51:01Z",
-                },
-                "swversion": "20200429",
-                "type": "ZHATime",
-                "uniqueid": "cc:cc:cc:ff:fe:38:4d:b3-01-000a",
+            "config": {"battery": 40, "on": True, "reachable": True},
+            "ep": 1,
+            "etag": "28e796678d9a24712feef59294343bb6",
+            "lastseen": "2020-11-22T11:26Z",
+            "manufacturername": "Danfoss",
+            "modelid": "eTRV0100",
+            "name": "eTRV Séjour",
+            "state": {
+                "lastset": "2020-11-19T08:07:08Z",
+                "lastupdated": "2020-11-22T10:51:03.444",
+                "localtime": "2020-11-22T10:51:01",
+                "utc": "2020-11-22T10:51:01Z",
             },
+            "swversion": "20200429",
+            "type": "ZHATime",
+            "uniqueid": "cc:cc:cc:ff:fe:38:4d:b3-01-000a",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATime",)
@@ -1857,40 +1743,36 @@ async def test_time_sensor():
     assert sensor.unique_id == "cc:cc:cc:ff:fe:38:4d:b3-01-000a"
 
 
-async def test_vibration_sensor():
+async def test_vibration_sensor(deconz_sensor):
     """Verify that vibration sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 91,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                    "sensitivity": 21,
-                    "sensitivitymax": 21,
-                    "temperature": 3200,
-                },
-                "ep": 1,
-                "etag": "b7599df551944df97b2aa87d160b9c45",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.vibration.aq1",
-                "name": "Vibration 1",
-                "state": {
-                    "lastupdated": "2019-03-09T15:53:07",
-                    "orientation": [10, 1059, 0],
-                    "tiltangle": 83,
-                    "vibration": True,
-                    "vibrationstrength": 114,
-                },
-                "swversion": "20180130",
-                "type": "ZHAVibration",
-                "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
+            "config": {
+                "battery": 91,
+                "on": True,
+                "pending": [],
+                "reachable": True,
+                "sensitivity": 21,
+                "sensitivitymax": 21,
+                "temperature": 3200,
             },
+            "ep": 1,
+            "etag": "b7599df551944df97b2aa87d160b9c45",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.vibration.aq1",
+            "name": "Vibration 1",
+            "state": {
+                "lastupdated": "2019-03-09T15:53:07",
+                "orientation": [10, 1059, 0],
+                "tiltangle": 83,
+                "vibration": True,
+                "vibrationstrength": 114,
+            },
+            "swversion": "20180130",
+            "type": "ZHAVibration",
+            "uniqueid": "00:15:8d:00:02:a5:21:24-01-0101",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAVibration",)
@@ -1936,36 +1818,32 @@ async def test_vibration_sensor():
     assert not sensor._callbacks
 
 
-async def test_water_sensor():
+async def test_water_sensor(deconz_sensor):
     """Verify that water sensor works."""
-    sensors = SensorResourceManager(
+    sensor = await deconz_sensor(
         {
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 2500,
-                },
-                "ep": 1,
-                "etag": "fae893708dfe9b358df59107d944fa1c",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.sensor_wleak.aq1",
-                "name": "water2",
-                "state": {
-                    "lastupdated": "2019-01-29T07:13:20",
-                    "lowbattery": False,
-                    "tampered": False,
-                    "water": False,
-                },
-                "swversion": "20170721",
-                "type": "ZHAWater",
-                "uniqueid": "00:15:8d:00:02:2f:07:db-01-0500",
+            "config": {
+                "battery": 100,
+                "on": True,
+                "reachable": True,
+                "temperature": 2500,
             },
+            "ep": 1,
+            "etag": "fae893708dfe9b358df59107d944fa1c",
+            "manufacturername": "LUMI",
+            "modelid": "lumi.sensor_wleak.aq1",
+            "name": "water2",
+            "state": {
+                "lastupdated": "2019-01-29T07:13:20",
+                "lowbattery": False,
+                "tampered": False,
+                "water": False,
+            },
+            "swversion": "20170721",
+            "type": "ZHAWater",
+            "uniqueid": "00:15:8d:00:02:2f:07:db-01-0500",
         },
-        AsyncMock(),
     )
-    sensor = sensors["0"]
 
     assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAWater",)
@@ -1993,11 +1871,10 @@ async def test_water_sensor():
     assert sensor.unique_id == "00:15:8d:00:02:2f:07:db-01-0500"
 
 
-async def test_create_all_sensor_types():
+async def test_create_all_sensor_types(deconz_refresh_state):
     """Verify that creating all sensors work."""
-    mock_request = AsyncMock()
-    sensors = SensorResourceManager(
-        {
+    deconz_session = await deconz_refresh_state(
+        sensors={
             "0": {
                 "config": {
                     "battery": 100,
@@ -2430,8 +2307,8 @@ async def test_create_all_sensor_types():
                 "uniqueid": "00:12:4b:00:14:4d:00:07-02-fdef",
             },
         },
-        mock_request,
     )
+    sensors = deconz_session.sensors
     assert len(sensors.keys()) == 23
     assert sensors["0"].type == "ZHAWater"
     assert sensors["1"].type == "ZHAVibration"
