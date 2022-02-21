@@ -3,15 +3,13 @@
 pytest --cov-report term-missing --cov=pydeconz.config tests/test_config.py
 """
 
-from unittest.mock import AsyncMock
 
-from pydeconz.config import Config
-
-
-async def test_create_config():
+async def test_create_config(
+    mock_aioresponse, deconz_refresh_state, deconz_called_with
+):
     """Verify that creating a config works."""
-    mock_request = AsyncMock()
-    config = Config(FIXTURE_CONFIG, mock_request)
+    deconz_session = await deconz_refresh_state(config=FIXTURE_CONFIG)
+    config = deconz_session.config
 
     assert config.api_version == "1.0.4"
     assert config.bridge_id == "0123456789AB"
@@ -61,6 +59,7 @@ async def test_create_config():
     config.raw["bridgeid"] = "00212EFFFF012345"
     assert config.bridge_id == "00212E012345"
 
+    mock_aioresponse.put("http://host:80/api/apikey/config")
     await config.set_config(
         discovery=True,
         group_delay=1000,
@@ -78,7 +77,7 @@ async def test_create_config():
         zigbee_channel=15,
         websocket_notify_all=False,
     )
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/config",
         json={
