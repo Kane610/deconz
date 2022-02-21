@@ -3,9 +3,7 @@
 pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 """
 
-from unittest.mock import AsyncMock, Mock
-
-from pydeconz.interfaces.lights import LightResourceManager
+from unittest.mock import Mock
 
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
 from pydeconz.models.light import (
@@ -16,43 +14,51 @@ from pydeconz.models.light import (
     EFFECT_COLOR_LOOP,
     ON_TIME_KEY,
 )
+import pytest
 
 
-async def test_create_light():
+@pytest.fixture
+def deconz_light(deconz_refresh_state):
+    """Comfort fixture to initialize deCONZ light."""
+
+    async def data_to_deconz_session(light):
+        """Initialize deCONZ light."""
+        deconz_session = await deconz_refresh_state(lights={"0": light})
+        return deconz_session.lights["0"]
+
+    yield data_to_deconz_session
+
+
+async def test_create_light(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that creating a light works."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
+    light = await deconz_light(
         {
-            "0": {
-                "ctmax": 500,
-                "ctmin": 153,
-                "etag": "026bcfe544ad76c7534e5ca8ed39047c",
+            "ctmax": 500,
+            "ctmin": 153,
+            "etag": "026bcfe544ad76c7534e5ca8ed39047c",
+            "hascolor": True,
+            "manufacturername": "dresden elektronik",
+            "modelid": "FLS-PP3",
+            "name": "Light 1",
+            "pointsymbol": {},
+            "state": {
+                "alert": None,
+                "bri": 111,
+                "colormode": "ct",
+                "ct": 307,
+                "effect": None,
                 "hascolor": True,
-                "manufacturername": "dresden elektronik",
-                "modelid": "FLS-PP3",
-                "name": "Light 1",
-                "pointsymbol": {},
-                "state": {
-                    "alert": None,
-                    "bri": 111,
-                    "colormode": "ct",
-                    "ct": 307,
-                    "effect": None,
-                    "hascolor": True,
-                    "hue": 7998,
-                    "on": False,
-                    "reachable": True,
-                    "sat": 172,
-                    "xy": [0.421253, 0.39921],
-                },
-                "swversion": "020C.201000A0",
-                "type": "Extended color light",
-                "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
-            }
-        },
-        mock_request,
+                "hue": 7998,
+                "on": False,
+                "reachable": True,
+                "sat": 172,
+                "xy": [0.421253, 0.39921],
+            },
+            "swversion": "020C.201000A0",
+            "type": "Extended color light",
+            "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
+        }
     )
-    light = lights["0"]
 
     assert light.state is False
     assert light.alert is None
@@ -110,13 +116,15 @@ async def test_create_light():
     del light.raw["ctmin"]
     assert light.min_color_temp is None
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0")
     await light.set_attributes(name="light")
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/lights/0",
         json={"name": "light"},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await light.set_state(
         alert=ALERT_SHORT,
         brightness=200,
@@ -130,7 +138,7 @@ async def test_create_light():
         transition_time=250,
         xy=(0.1, 0.1),
     )
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/lights/0/state",
         json={
@@ -148,41 +156,37 @@ async def test_create_light():
         },
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await light.set_state(on=False)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/lights/0/state",
         json={"on": False},
     )
 
-    lights.process_raw({"0": {"state": {"bri": 2}}})
+    light.update({"state": {"bri": 2}})
     assert light.brightness == 2
 
 
-async def test_configuration_tool():
+async def test_configuration_tool(deconz_light):
     """Verify that locks work."""
-    lights = LightResourceManager(
+    configuration_tool = await deconz_light(
         {
-            "0": {
-                "etag": "26839cb118f5bf7ba1f2108256644010",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-11-22T11:27Z",
-                "manufacturername": "dresden elektronik",
-                "modelid": "ConBee II",
-                "name": "Configuration tool 1",
-                "state": {"reachable": True},
-                "swversion": "0x264a0700",
-                "type": "Configuration tool",
-                "uniqueid": "00:21:2e:ff:ff:05:a7:a3-01",
-            }
-        },
-        AsyncMock(),
+            "etag": "26839cb118f5bf7ba1f2108256644010",
+            "hascolor": False,
+            "lastannounced": None,
+            "lastseen": "2020-11-22T11:27Z",
+            "manufacturername": "dresden elektronik",
+            "modelid": "ConBee II",
+            "name": "Configuration tool 1",
+            "state": {"reachable": True},
+            "swversion": "0x264a0700",
+            "type": "Configuration tool",
+            "uniqueid": "00:21:2e:ff:ff:05:a7:a3-01",
+        }
     )
-    configuration_tool = lights["0"]
 
     assert configuration_tool.state is None
-
     assert configuration_tool.reachable is True
 
     assert configuration_tool.deconz_id == "/lights/0"
@@ -195,34 +199,29 @@ async def test_configuration_tool():
     assert configuration_tool.unique_id == "00:21:2e:ff:ff:05:a7:a3-01"
 
 
-async def test_create_cover():
+async def test_create_cover(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that covers work."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
+    cover = await deconz_light(
         {
-            "0": {
-                "etag": "87269755b9b3a046485fdae8d96b252c",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-08-01T16:22:05Z",
-                "manufacturername": "AXIS",
-                "modelid": "Gear",
-                "name": "Covering device",
-                "state": {
-                    "bri": 0,
-                    "lift": 0,
-                    "on": False,
-                    "open": True,
-                    "reachable": True,
-                },
-                "swversion": "100-5.3.5.1122",
-                "type": "Window covering device",
-                "uniqueid": "00:24:46:00:00:12:34:56-01",
-            }
-        },
-        mock_request,
+            "etag": "87269755b9b3a046485fdae8d96b252c",
+            "hascolor": False,
+            "lastannounced": None,
+            "lastseen": "2020-08-01T16:22:05Z",
+            "manufacturername": "AXIS",
+            "modelid": "Gear",
+            "name": "Covering device",
+            "state": {
+                "bri": 0,
+                "lift": 0,
+                "on": False,
+                "open": True,
+                "reachable": True,
+            },
+            "swversion": "100-5.3.5.1122",
+            "type": "Window covering device",
+            "uniqueid": "00:24:46:00:00:12:34:56-01",
+        }
     )
-    cover = lights["0"]
 
     assert cover.state is False
     assert cover.is_open is True
@@ -256,26 +255,31 @@ async def test_create_cover():
     assert cover.is_open is True
     assert cover.lift == 50
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.open()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": True})
+    assert deconz_called_with("put", path="/lights/0/state", json={"open": True})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.close()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": False})
+    assert deconz_called_with("put", path="/lights/0/state", json={"open": False})
 
     # Tilt not supported
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.set_position(lift=30, tilt=60)
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"lift": 30})
+    assert deconz_called_with("put", path="/lights/0/state", json={"lift": 30})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.stop()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"stop": True})
+    assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
 
     # Verify tilt works as well
-
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     cover.raw["state"]["tilt"] = 40
     assert cover.tilt == 40
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.set_position(lift=20, tilt=60)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
     )
 
@@ -283,28 +287,25 @@ async def test_create_cover():
     assert not cover._callbacks
 
 
-async def test_create_cover_without_lift():
+async def test_create_cover_without_lift(
+    mock_aioresponse, deconz_light, deconz_called_with
+):
     """Verify that covers work with older deconz versions."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
+    cover = await deconz_light(
         {
-            "0": {
-                "etag": "87269755b9b3a046485fdae8d96b252c",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-08-01T16:22:05Z",
-                "manufacturername": "AXIS",
-                "modelid": "Gear",
-                "name": "Covering device",
-                "state": {"bri": 0, "on": False, "reachable": True},
-                "swversion": "100-5.3.5.1122",
-                "type": "Window covering device",
-                "uniqueid": "00:24:46:00:00:12:34:56-01",
-            }
-        },
-        mock_request,
+            "etag": "87269755b9b3a046485fdae8d96b252c",
+            "hascolor": False,
+            "lastannounced": None,
+            "lastseen": "2020-08-01T16:22:05Z",
+            "manufacturername": "AXIS",
+            "modelid": "Gear",
+            "name": "Covering device",
+            "state": {"bri": 0, "on": False, "reachable": True},
+            "swversion": "100-5.3.5.1122",
+            "type": "Window covering device",
+            "uniqueid": "00:24:46:00:00:12:34:56-01",
+        }
     )
-    cover = lights["0"]
 
     assert cover.state is False
     assert cover.is_open is True
@@ -338,25 +339,29 @@ async def test_create_cover_without_lift():
     assert cover.is_open is True
     assert cover.lift == 11
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.open()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": False})
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": False})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.close()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": True})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.set_position(lift=30)
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"bri": 76})
+    assert deconz_called_with("put", path="/lights/0/state", json={"bri": 76})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.stop()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"bri_inc": 0})
+    assert deconz_called_with("put", path="/lights/0/state", json={"bri_inc": 0})
 
     # Verify sat (for tilt) works as well
-
     cover.raw["state"]["sat"] = 40
     assert cover.tilt == 15
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.set_position(lift=20, tilt=60)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/lights/0/state", json={"bri": 50, "sat": 152}
     )
 
@@ -366,14 +371,17 @@ async def test_create_cover_without_lift():
 
     assert cover.tilt == 0
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.open()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": True})
+    assert deconz_called_with("put", path="/lights/0/state", json={"open": True})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.close()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"open": False})
+    assert deconz_called_with("put", path="/lights/0/state", json={"open": False})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await cover.set_position(lift=20, tilt=60)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
     )
 
@@ -381,32 +389,27 @@ async def test_create_cover_without_lift():
     assert not cover._callbacks
 
 
-async def test_create_fan():
+async def test_create_fan(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify light fixture with fan work."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
+    fan = await deconz_light(
         {
-            "0": {
-                "etag": "432f3de28965052961a99e3c5494daf4",
-                "hascolor": False,
-                "manufacturername": "King Of Fans,  Inc.",
-                "modelid": "HDC52EastwindFan",
-                "name": "Ceiling fan",
-                "state": {
-                    "alert": "none",
-                    "bri": 254,
-                    "on": False,
-                    "reachable": True,
-                    "speed": 4,
-                },
-                "swversion": "0000000F",
-                "type": "Fan",
-                "uniqueid": "00:22:a3:00:00:27:8b:81-01",
-            }
-        },
-        mock_request,
+            "etag": "432f3de28965052961a99e3c5494daf4",
+            "hascolor": False,
+            "manufacturername": "King Of Fans,  Inc.",
+            "modelid": "HDC52EastwindFan",
+            "name": "Ceiling fan",
+            "state": {
+                "alert": "none",
+                "bri": 254,
+                "on": False,
+                "reachable": True,
+                "speed": 4,
+            },
+            "swversion": "0000000F",
+            "type": "Fan",
+            "uniqueid": "00:22:a3:00:00:27:8b:81-01",
+        }
     )
-    fan = lights["0"]
 
     assert fan.state is False
     assert fan.alert == "none"
@@ -444,35 +447,31 @@ async def test_create_fan():
     mock_callback.assert_called_once()
     assert fan.changed_keys == {"state", "speed"}
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await fan.set_speed(FAN_SPEED_100_PERCENT)
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"speed": 4})
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 4})
 
     fan.remove_callback(mock_callback)
     assert not fan._callbacks
 
 
-async def test_create_lock():
+async def test_create_lock(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that locks work."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
+    lock = await deconz_light(
         {
-            "0": {
-                "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-08-22T15:29:03Z",
-                "manufacturername": "Danalock",
-                "modelid": "V3-BTZB",
-                "name": "Door lock",
-                "state": {"alert": "none", "on": False, "reachable": True},
-                "swversion": "19042019",
-                "type": "Door Lock",
-                "uniqueid": "00:00:00:00:00:00:00:00-00",
-            }
-        },
-        mock_request,
+            "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
+            "hascolor": False,
+            "lastannounced": None,
+            "lastseen": "2020-08-22T15:29:03Z",
+            "manufacturername": "Danalock",
+            "modelid": "V3-BTZB",
+            "name": "Door lock",
+            "state": {"alert": "none", "on": False, "reachable": True},
+            "swversion": "19042019",
+            "type": "Door Lock",
+            "uniqueid": "00:00:00:00:00:00:00:00-00",
+        }
     )
-    lock = lights["0"]
 
     assert lock.state is False
     assert lock.is_locked is False
@@ -498,36 +497,33 @@ async def test_create_lock():
     mock_callback.assert_called_once()
     assert lock.changed_keys == {"state", "on"}
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await lock.lock()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": True})
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": True})
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await lock.unlock()
-    mock_request.assert_called_with("put", path="/lights/0/state", json={"on": False})
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": False})
 
     lock.remove_callback(mock_callback)
     assert not lock._callbacks
 
 
-async def test_create_siren():
+async def test_create_siren(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that sirens work."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
+    siren = await deconz_light(
         {
-            "0": {
-                "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
-                "hascolor": False,
-                "manufacturername": "Heiman",
-                "modelid": "WarningDevice",
-                "name": "alarm_tuin",
-                "state": {"alert": "none", "reachable": True},
-                "swversion": None,
-                "type": "Warning device",
-                "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
-            }
-        },
-        mock_request,
+            "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
+            "hascolor": False,
+            "manufacturername": "Heiman",
+            "modelid": "WarningDevice",
+            "name": "alarm_tuin",
+            "state": {"alert": "none", "reachable": True},
+            "swversion": None,
+            "type": "Warning device",
+            "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
+        }
     )
-    siren = lights["0"]
 
     assert siren.state is None
     assert siren.is_on is False
@@ -553,22 +549,25 @@ async def test_create_siren():
     mock_callback.assert_called_once()
     assert siren.changed_keys == {"state", ALERT_KEY}
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await siren.turn_on()
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await siren.turn_on(duration=10)
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await siren.turn_off()
-    mock_request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/lights/0/state",
         json={ALERT_KEY: ALERT_NONE},
@@ -578,11 +577,10 @@ async def test_create_siren():
     assert not siren._callbacks
 
 
-async def test_create_all_light_types():
+async def test_create_all_light_types(deconz_refresh_state):
     """Verify that sirens work."""
-    mock_request = AsyncMock()
-    lights = LightResourceManager(
-        {
+    deconz_session = await deconz_refresh_state(
+        lights={
             "0": {
                 "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
                 "hascolor": False,
@@ -678,8 +676,9 @@ async def test_create_all_light_types():
             },
             "6": {"type": "unsupported device"},
         },
-        mock_request,
     )
+
+    lights = deconz_session.lights
     assert len(lights.keys()) == 7
     assert lights["0"].type == "Warning device"
     assert lights["1"].type == "Door Lock"
