@@ -7,46 +7,37 @@ from unittest.mock import Mock, patch
 import pytest
 
 from pydeconz import RequestError, ResponseError, ERRORS, pydeconzException
+from pydeconz.websocket import STATE_RUNNING, STATE_STOPPED
 
 import aiohttp
 
-API_KEY = "1234567890"
-HOST = "127.0.0.1"
-PORT = "80"
 
-
-async def test_websocket_not_setup(deconz_session):
+async def test_websocket_not_setup(deconz_session, mock_wsclient):
     """Test websocket method is not set up if websocket port is not provided."""
-    session = deconz_session
-
-    with patch("pydeconz.gateway.WSClient") as mock_wsclient:
-        session.start()
-        assert not session.websocket
-        mock_wsclient.assert_not_called()
+    deconz_session.start()
+    assert not deconz_session.websocket
+    mock_wsclient.assert_not_called()
 
 
-async def test_websocket_setup(deconz_session):
+async def test_websocket_setup(deconz_session, mock_wsclient):
     """Test websocket methods work."""
-    session = deconz_session
+    deconz_session.start(websocketport=443)
+    mock_wsclient.assert_called()
+    deconz_session.websocket.start.assert_called()
 
-    with patch("pydeconz.gateway.WSClient") as mock_wsclient:
-        session.start(websocketport=443)
-        assert session.websocket
-        mock_wsclient.assert_called()
-        session.websocket.start.assert_called()
-
-    session.close()
-    session.websocket.stop.assert_called()
+    deconz_session.close()
+    deconz_session.websocket.stop.assert_called()
 
 
-async def test_websocket_config_provided_websocket_port(deconz_refresh_state):
+async def test_websocket_config_provided_websocket_port(
+    deconz_refresh_state, mock_wsclient
+):
     """Test websocket methods work."""
     session = await deconz_refresh_state(config={"websocketport": 8080})
 
-    with patch("pydeconz.gateway.WSClient") as mock_wsclient:
-        session.start()
-        mock_wsclient.assert_called()
-        session.websocket.start.assert_called()
+    session.start()
+    mock_wsclient.assert_called()
+    session.websocket.start.assert_called()
 
     session.close()
     session.websocket.stop.assert_called()
@@ -199,9 +190,8 @@ async def test_request(mock_aioresponse, deconz_session):
     await deconz_session.session.close()
 
 
-async def test_session_handler(deconz_session):
-    """Test session_handler works."""
-    deconz_session.connection_status_callback = Mock()
+async def test_session_handler_on_uninitialized_websocket(deconz_session):
+    """Test session_handler is not called when self.websocket is None."""
 
     # Event handler not called when self.websocket is None
 
@@ -211,11 +201,13 @@ async def test_session_handler(deconz_session):
         await deconz_session.session_handler(signal="data")
         event_handler.assert_not_called()
 
+
+async def test_session_handler(deconz_session):
+    """Test session_handler works."""
+
     # Mock websocket
 
     deconz_session.websocket = Mock()
-    deconz_session.websocket.data = {}
-    deconz_session.websocket.state = "running"
 
     # Event data
 
@@ -225,10 +217,16 @@ async def test_session_handler(deconz_session):
         await deconz_session.session_handler(signal="data")
         event_handler.assert_called()
 
-    # Connection status changed
 
-    await deconz_session.session_handler(signal="state")
-    deconz_session.connection_status_callback.assert_called_with(True)
+@pytest.mark.parametrize(
+    "state, value", [(STATE_RUNNING, True), (STATE_STOPPED, False)]
+)
+async def test_session_handler_state_change(
+    deconz_session, mock_websocket_state_change, state, value
+):
+    """Test session_handler works."""
+    await mock_websocket_state_change(state)
+    deconz_session.connection_status_callback.assert_called_with(value)
 
 
 async def test_unsupported_events(deconz_session):
@@ -237,17 +235,17 @@ async def test_unsupported_events(deconz_session):
     assert not deconz_session.event_handler({"e": "added", "r": "scenes"})
 
 
-async def test_alarmsystem_events(deconz_session):
+async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
     deconz_session.add_device_callback = Mock()
 
     # Add alarmsystem
 
-    deconz_session.event_handler(
-        {
-            "e": "added",
-            "id": "1",
-            "r": "alarmsystems",
+    await mock_websocket_event(
+        event="added",
+        resource="alarmsystems",
+        id="1",
+        data={
             "alarmsystem": {
                 "name": "default",
                 "config": {
@@ -270,8 +268,8 @@ async def test_alarmsystem_events(deconz_session):
                     "seconds_remaining": 0,
                 },
                 "devices": {},
-            },
-        }
+            }
+        },
     )
 
     assert "1" in deconz_session.alarmsystems
@@ -284,13 +282,10 @@ async def test_alarmsystem_events(deconz_session):
 
     mock_alarmsystem_callback = Mock()
     deconz_session.alarmsystems["1"].register_callback(mock_alarmsystem_callback)
-    deconz_session.event_handler(
-        {
-            "e": "changed",
-            "id": "1",
-            "r": "alarmsystems",
-            "state": {"armstate": "armed_away"},
-        }
+    await mock_websocket_event(
+        resource="alarmsystems",
+        id="1",
+        data={"state": {"armstate": "armed_away"}},
     )
 
     mock_alarmsystem_callback.assert_called()
@@ -300,21 +295,23 @@ async def test_alarmsystem_events(deconz_session):
         "e",
         "id",
         "r",
+        "t",
     }
     assert deconz_session.alarmsystems["1"].arm_state == "armed_away"
 
 
-async def test_light_events(deconz_session):
+async def test_light_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
     deconz_session.add_device_callback = Mock()
 
     # Add light
 
-    deconz_session.event_handler(
-        {
-            "e": "added",
-            "id": "1",
-            "r": "lights",
+    await mock_websocket_event(
+        event="added",
+        resource="lights",
+        id="1",
+        unique_id="1",
+        data={
             "light": {
                 "type": "light",
                 "state": {
@@ -322,7 +319,7 @@ async def test_light_events(deconz_session):
                     "reachable": True,
                 },
             },
-        }
+        },
     )
 
     assert "1" in deconz_session.lights
@@ -335,16 +332,27 @@ async def test_light_events(deconz_session):
 
     mock_light_callback = Mock()
     deconz_session.lights["1"].register_callback(mock_light_callback)
-    deconz_session.event_handler(
-        {"e": "changed", "id": "1", "r": "lights", "state": {"bri": 2}}
+    await mock_websocket_event(
+        resource="lights",
+        id="1",
+        unique_id="1",
+        data={"state": {"bri": 2}},
     )
 
     mock_light_callback.assert_called()
-    assert deconz_session.lights["1"].changed_keys == {"state", "bri", "e", "id", "r"}
+    assert deconz_session.lights["1"].changed_keys == {
+        "state",
+        "bri",
+        "e",
+        "id",
+        "r",
+        "uniqueid",
+        "t",
+    }
     assert deconz_session.lights["1"].brightness == 2
 
 
-async def test_group_events(deconz_session, deconz_refresh_state):
+async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket_event):
     """Test event_handler works."""
     deconz_session.add_device_callback = Mock()
     await deconz_refresh_state(
@@ -361,17 +369,17 @@ async def test_group_events(deconz_session, deconz_refresh_state):
 
     # Add group
 
-    deconz_session.event_handler(
-        {
-            "e": "added",
-            "id": "1",
-            "r": "groups",
+    await mock_websocket_event(
+        event="added",
+        resource="groups",
+        id="1",
+        data={
             "group": {
                 "action": {"bri": 1},
                 "lights": ["1"],
                 "scenes": [],
-            },
-        }
+            }
+        },
     )
 
     assert "1" in deconz_session.groups
@@ -384,33 +392,43 @@ async def test_group_events(deconz_session, deconz_refresh_state):
 
     mock_group_callback = Mock()
     deconz_session.groups["1"].register_callback(mock_group_callback)
-    deconz_session.event_handler(
-        {"e": "changed", "id": "1", "r": "groups", "action": {"bri": 2}}
+    await mock_websocket_event(
+        resource="groups",
+        id="1",
+        data={"action": {"bri": 2}},
     )
 
     mock_group_callback.assert_called()
-    assert deconz_session.groups["1"].changed_keys == {"action", "bri", "e", "id", "r"}
+    assert deconz_session.groups["1"].changed_keys == {
+        "action",
+        "bri",
+        "e",
+        "id",
+        "r",
+        "t",
+    }
     assert deconz_session.groups["1"].brightness == 2
 
 
-async def test_sensor_events(deconz_session):
+async def test_sensor_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
     deconz_session.add_device_callback = Mock()
 
     # Add sensor
 
-    deconz_session.event_handler(
-        {
-            "e": "added",
-            "id": "1",
-            "r": "sensors",
+    await mock_websocket_event(
+        event="added",
+        resource="sensors",
+        id="1",
+        unique_id="1",
+        data={
             "sensor": {
                 "type": "ZHAPresence",
                 "config": {
                     "reachable": True,
                 },
-            },
-        }
+            }
+        },
     )
 
     assert "1" in deconz_session.sensors
@@ -423,8 +441,13 @@ async def test_sensor_events(deconz_session):
 
     mock_sensor_callback = Mock()
     deconz_session.sensors["1"].register_callback(mock_sensor_callback)
-    deconz_session.event_handler(
-        {"e": "changed", "id": "1", "r": "sensors", "config": {"reachable": False}}
+    await mock_websocket_event(
+        resource="sensors",
+        id="1",
+        unique_id="1",
+        data={
+            "config": {"reachable": False},
+        },
     )
 
     mock_sensor_callback.assert_called()
@@ -434,6 +457,8 @@ async def test_sensor_events(deconz_session):
         "e",
         "id",
         "r",
+        "uniqueid",
+        "t",
     }
     assert not deconz_session.sensors["1"].reachable
 
