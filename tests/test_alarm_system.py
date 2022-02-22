@@ -2,9 +2,7 @@
 
 pytest --cov-report term-missing --cov=pydeconz.alarm_system tests/test_alarm_system.py
 """
-from unittest.mock import AsyncMock
 
-from pydeconz.interfaces.alarm_systems import AlarmSystems
 from pydeconz.models.alarm_system import (
     ARM_MODE_ARMED_AWAY,
     ARM_STATE_ARMED_AWAY,
@@ -13,10 +11,13 @@ from pydeconz.models.alarm_system import (
 )
 
 
-async def test_create_alarm_system():
+async def test_create_alarm_system(
+    mock_aioresponse, deconz_refresh_state, deconz_called_with
+):
     """Verify that alarm system works."""
-    alarm_systems = AlarmSystems(
-        {
+
+    deconz_session = await deconz_refresh_state(
+        alarm_systems={
             "0": {
                 "name": "default",
                 "config": {
@@ -43,16 +44,20 @@ async def test_create_alarm_system():
                     },
                 },
             }
-        },
-        AsyncMock(),
+        }
     )
 
+    alarm_systems = deconz_session.alarmsystems
+
+    mock_aioresponse.post("http://host:80/api/apikey/alarmsystems")
     await alarm_systems.create_alarm_system(name="not_default")
-    alarm_systems._request.assert_called_with(
+    assert deconz_called_with(
         "post",
         path="/alarmsystems",
         json={"name": "not_default"},
     )
+
+    assert len(alarm_systems.keys()) == 1
 
     alarm_system_0 = alarm_systems["0"]
 
@@ -81,26 +86,31 @@ async def test_create_alarm_system():
         },
     }
 
+    mock_aioresponse.put("http://host:80/api/apikey/alarmsystems/0/arm_away")
     await alarm_system_0.arm_away(pin_code="1234")
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/alarmsystems/0/arm_away", json={"code0": "1234"}
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/alarmsystems/0/arm_night")
     await alarm_system_0.arm_night(pin_code="23456")
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/alarmsystems/0/arm_night", json={"code0": "23456"}
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/alarmsystems/0/arm_stay")
     await alarm_system_0.arm_stay(pin_code="345678")
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/alarmsystems/0/arm_stay", json={"code0": "345678"}
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/alarmsystems/0/disarm")
     await alarm_system_0.disarm(pin_code="4567890")
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put", path="/alarmsystems/0/disarm", json={"code0": "4567890"}
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/alarmsystems/0/config")
     await alarm_system_0.set_alarm_system_configuration(
         code0="0000",
         armed_away_entry_delay=0,
@@ -115,7 +125,7 @@ async def test_create_alarm_system():
         disarmed_entry_delay=9,
         disarmed_exit_delay=10,
     )
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/alarmsystems/0/config",
         json={
@@ -134,15 +144,19 @@ async def test_create_alarm_system():
         },
     )
 
+    mock_aioresponse.put("http://host:80/api/apikey/alarmsystems/0/config")
     await alarm_system_0.set_alarm_system_configuration(
         code0="4444",
     )
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/alarmsystems/0/config",
         json={"code0": "4444"},
     )
 
+    mock_aioresponse.put(
+        "http://host:80/api/apikey/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101"
+    )
     await alarm_system_0.add_device(
         unique_id="00:00:00:00:00:00:00:01-01-0101",
         armed_away=True,
@@ -150,35 +164,45 @@ async def test_create_alarm_system():
         armed_stay=True,
         trigger=DEVICE_TRIGGER_ON,
     )
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101",
         json={"armmask": "ANS", "trigger": "state/on"},
     )
 
+    mock_aioresponse.put(
+        "http://host:80/api/apikey/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101"
+    )
     await alarm_system_0.add_device(
         unique_id="00:00:00:00:00:00:00:01-01-0101",
         armed_night=True,
     )
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101",
         json={"armmask": "N"},
     )
 
+    mock_aioresponse.put(
+        "http://host:80/api/apikey/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101"
+    )
     await alarm_system_0.add_device(
         unique_id="00:00:00:00:00:00:00:01-01-0101",
         armed_stay=True,
         is_keypad=True,
     )
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "put",
         path="/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101",
         json={},
     )
 
+    mock_aioresponse.delete(
+        "http://host:80/api/apikey/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101"
+    )
     await alarm_system_0.remove_device(unique_id="00:00:00:00:00:00:00:01-01-0101")
-    alarm_system_0._request.assert_called_with(
+    assert deconz_called_with(
         "delete",
         path="/alarmsystems/0/device/00:00:00:00:00:00:00:01-01-0101",
+        json=None,
     )
