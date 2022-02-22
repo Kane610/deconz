@@ -79,7 +79,6 @@ def deconz_refresh_state(mock_aioresponse, deconz_session) -> Iterator[DeconzSes
 
 
 @pytest.fixture()
-# @pytest.fixture(autouse=True)
 def mock_wsclient():
     """No real websocket allowed."""
     with patch("pydeconz.gateway.WSClient") as mock:

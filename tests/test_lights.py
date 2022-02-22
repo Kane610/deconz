@@ -5,6 +5,8 @@ pytest --cov-report term-missing --cov=pydeconz.light tests/test_lights.py
 
 from unittest.mock import Mock
 
+import pytest
+
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
 from pydeconz.models.light import (
     ALERT_KEY,
@@ -14,7 +16,6 @@ from pydeconz.models.light import (
     EFFECT_COLOR_LOOP,
     ON_TIME_KEY,
 )
-import pytest
 
 
 @pytest.fixture

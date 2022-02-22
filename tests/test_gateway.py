@@ -229,10 +229,10 @@ async def test_session_handler_state_change(
     deconz_session.connection_status_callback.assert_called_with(value)
 
 
-async def test_unsupported_events(deconz_session):
+@pytest.mark.parametrize("event", [{"e": "deleted"}, {"e": "added", "r": "scenes"}])
+async def test_unsupported_events(deconz_session, event):
     """Test event_handler handles unsupported events and resources."""
-    assert not deconz_session.event_handler({"e": "deleted"})
-    assert not deconz_session.event_handler({"e": "added", "r": "scenes"})
+    assert not deconz_session.event_handler(event)
 
 
 async def test_alarmsystem_events(deconz_session, mock_websocket_event):

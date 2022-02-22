@@ -2,12 +2,12 @@
 
 pytest --cov-report term-missing --cov=pydeconz.group tests/test_groups.py
 """
-from unittest.mock import AsyncMock, Mock
+
+from unittest.mock import Mock
 
 import pytest
 
 from pydeconz.models.light import ALERT_SHORT, EFFECT_COLOR_LOOP
-from pydeconz.models.light.light import Light
 
 
 async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh_state):

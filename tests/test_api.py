@@ -2,6 +2,7 @@
 
 pytest --cov-report term-missing --cov=pydeconz.api tests/test_api.py
 """
+
 from asyncio import gather
 from unittest.mock import AsyncMock, Mock, patch
 

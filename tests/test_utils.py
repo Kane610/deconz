@@ -6,7 +6,6 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-
 import aiohttp
 
 from pydeconz import errors, utils
