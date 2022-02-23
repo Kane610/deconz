@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 from typing import Any, Final, Union
 
 from ..models import ResourceTypes
@@ -44,13 +43,9 @@ class AirQualityHandler(APIItems[AirQuality]):
 
     resource_type = ResourceTypes.ZHA_AIR_QUALITY
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize air quality sensor handler."""
-        super().__init__(raw, request, URL, AirQuality)
+        super().__init__({}, gateway.request, URL, AirQuality)
 
 
 class AlarmHandler(APIItems[Alarm]):
@@ -58,13 +53,9 @@ class AlarmHandler(APIItems[Alarm]):
 
     resource_type = ResourceTypes.ZHA_ALARM
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize alarm sensor handler."""
-        super().__init__(raw, request, URL, Alarm)
+        super().__init__({}, gateway.request, URL, Alarm)
 
 
 class AncillaryControlHandler(APIItems[AncillaryControl]):
@@ -72,13 +63,9 @@ class AncillaryControlHandler(APIItems[AncillaryControl]):
 
     resource_type = ResourceTypes.ZHA_ANCILLARY_CONTROL
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize ancillary control sensor handler."""
-        super().__init__(raw, request, URL, AncillaryControl)
+        super().__init__({}, gateway.request, URL, AncillaryControl)
 
 
 class BatteryHandler(APIItems[Battery]):
@@ -86,13 +73,9 @@ class BatteryHandler(APIItems[Battery]):
 
     resource_type = ResourceTypes.ZHA_BATTERY
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize battery sensor handler."""
-        super().__init__(raw, request, URL, Battery)
+        super().__init__({}, gateway.request, URL, Battery)
 
 
 class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
@@ -100,13 +83,9 @@ class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
 
     resource_type = ResourceTypes.ZHA_CARBON_MONOXIDE
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize carbon monoxide sensor handler."""
-        super().__init__(raw, request, URL, CarbonMonoxide)
+        super().__init__({}, gateway.request, URL, CarbonMonoxide)
 
 
 class ConsumptionHandler(APIItems[Consumption]):
@@ -114,13 +93,9 @@ class ConsumptionHandler(APIItems[Consumption]):
 
     resource_type = ResourceTypes.ZHA_CONSUMPTION
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize consumption sensor handler."""
-        super().__init__(raw, request, URL, Consumption)
+        super().__init__({}, gateway.request, URL, Consumption)
 
 
 class DaylightHandler(APIItems[Daylight]):
@@ -128,13 +103,9 @@ class DaylightHandler(APIItems[Daylight]):
 
     resource_type = ResourceTypes.DAYLIGHT
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize daylight sensor handler."""
-        super().__init__(raw, request, URL, Daylight)
+        super().__init__({}, gateway.request, URL, Daylight)
 
 
 class DoorLockHandler(APIItems[DoorLock]):
@@ -142,13 +113,9 @@ class DoorLockHandler(APIItems[DoorLock]):
 
     resource_type = ResourceTypes.ZHA_DOOR_LOCK
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize door lock sensor handler."""
-        super().__init__(raw, request, URL, DoorLock)
+        super().__init__({}, gateway.request, URL, DoorLock)
 
 
 class FireHandler(APIItems[Fire]):
@@ -156,13 +123,9 @@ class FireHandler(APIItems[Fire]):
 
     resource_type = ResourceTypes.ZHA_FIRE
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize fire sensor handler."""
-        super().__init__(raw, request, URL, Fire)
+        super().__init__({}, gateway.request, URL, Fire)
 
 
 class GenericFlagHandler(APIItems[GenericFlag]):
@@ -170,13 +133,9 @@ class GenericFlagHandler(APIItems[GenericFlag]):
 
     resource_type = ResourceTypes.CLIP_GENERIC_FLAG
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize generic flag sensor handler."""
-        super().__init__(raw, request, URL, GenericFlag)
+        super().__init__({}, gateway.request, URL, GenericFlag)
 
 
 class GenericStatusHandler(APIItems[GenericStatus]):
@@ -184,13 +143,9 @@ class GenericStatusHandler(APIItems[GenericStatus]):
 
     resource_type = ResourceTypes.CLIP_GENERIC_STATUS
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize generic status sensor handler."""
-        super().__init__(raw, request, URL, GenericStatus)
+        super().__init__({}, gateway.request, URL, GenericStatus)
 
 
 class HumidityHandler(APIItems[Humidity]):
@@ -201,13 +156,9 @@ class HumidityHandler(APIItems[Humidity]):
         ResourceTypes.CLIP_HUMIDITY,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize humidity sensor handler."""
-        super().__init__(raw, request, URL, Humidity)
+        super().__init__({}, gateway.request, URL, Humidity)
 
 
 class LightLevelHandler(APIItems[LightLevel]):
@@ -218,13 +169,9 @@ class LightLevelHandler(APIItems[LightLevel]):
         ResourceTypes.CLIP_LIGHT_LEVEL,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize light level sensor handler."""
-        super().__init__(raw, request, URL, LightLevel)
+        super().__init__({}, gateway.request, URL, LightLevel)
 
 
 class OpenCloseHandler(APIItems[OpenClose]):
@@ -235,13 +182,9 @@ class OpenCloseHandler(APIItems[OpenClose]):
         ResourceTypes.CLIP_OPEN_CLOSE,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize open/close sensor handler."""
-        super().__init__(raw, request, URL, OpenClose)
+        super().__init__({}, gateway.request, URL, OpenClose)
 
 
 class PowerHandler(APIItems[Power]):
@@ -249,13 +192,9 @@ class PowerHandler(APIItems[Power]):
 
     resource_type = ResourceTypes.ZHA_POWER
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize power sensor handler."""
-        super().__init__(raw, request, URL, Power)
+        super().__init__({}, gateway.request, URL, Power)
 
 
 class PresenceHandler(APIItems[Presence]):
@@ -266,13 +205,9 @@ class PresenceHandler(APIItems[Presence]):
         ResourceTypes.CLIP_PRESENCE,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize presence sensor handler."""
-        super().__init__(raw, request, URL, Presence)
+        super().__init__({}, gateway.request, URL, Presence)
 
 
 class PressureHandler(APIItems[Pressure]):
@@ -283,13 +218,9 @@ class PressureHandler(APIItems[Pressure]):
         ResourceTypes.CLIP_PRESSURE,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize pressure sensor handler."""
-        super().__init__(raw, request, URL, Pressure)
+        super().__init__({}, gateway.request, URL, Pressure)
 
 
 class SwitchHandler(APIItems[Switch]):
@@ -301,13 +232,9 @@ class SwitchHandler(APIItems[Switch]):
         ResourceTypes.CLIP_SWITCH,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize switch sensor handler."""
-        super().__init__(raw, request, URL, Switch)
+        super().__init__({}, gateway.request, URL, Switch)
 
 
 class TemperatureHandler(APIItems[Temperature]):
@@ -318,13 +245,9 @@ class TemperatureHandler(APIItems[Temperature]):
         ResourceTypes.CLIP_TEMPERATURE,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize temperature sensor handler."""
-        super().__init__(raw, request, URL, Temperature)
+        super().__init__({}, gateway.request, URL, Temperature)
 
 
 class ThermostatHandler(APIItems[Thermostat]):
@@ -335,13 +258,9 @@ class ThermostatHandler(APIItems[Thermostat]):
         ResourceTypes.CLIP_THERMOSTAT,
     }
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize thermostat sensor handler."""
-        super().__init__(raw, request, URL, Thermostat)
+        super().__init__({}, gateway.request, URL, Thermostat)
 
 
 class TimeHandler(APIItems[Time]):
@@ -349,13 +268,9 @@ class TimeHandler(APIItems[Time]):
 
     resource_type = ResourceTypes.ZHA_TIME
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize time sensor handler."""
-        super().__init__(raw, request, URL, Time)
+        super().__init__({}, gateway.request, URL, Time)
 
 
 class VibrationHandler(APIItems[Vibration]):
@@ -363,13 +278,9 @@ class VibrationHandler(APIItems[Vibration]):
 
     resource_type = ResourceTypes.ZHA_VIBRATION
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize vibration sensor handler."""
-        super().__init__(raw, request, URL, Vibration)
+        super().__init__({}, gateway.request, URL, Vibration)
 
 
 class WaterHandler(APIItems[Water]):
@@ -377,13 +288,9 @@ class WaterHandler(APIItems[Water]):
 
     resource_type = ResourceTypes.ZHA_WATER
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize water sensor handler."""
-        super().__init__(raw, request, URL, Water)
+        super().__init__({}, gateway.request, URL, Water)
 
 
 SENSOR_RESOURCES = Union[
@@ -416,36 +323,32 @@ SENSOR_RESOURCES = Union[
 class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
     """Represent deCONZ sensors."""
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize sensor manager."""
 
-        self.air_quality = AirQualityHandler({}, request)
-        self.alarm = AlarmHandler({}, request)
-        self.ancillary_control = AncillaryControlHandler({}, request)
-        self.battery = BatteryHandler({}, request)
-        self.carbon_monoxide = CarbonMonoxideHandler({}, request)
-        self.consumption = ConsumptionHandler({}, request)
-        self.daylight = DaylightHandler({}, request)
-        self.door_lock = DoorLockHandler({}, request)
-        self.fire = FireHandler({}, request)
-        self.generic_flag = GenericFlagHandler({}, request)
-        self.generic_status = GenericStatusHandler({}, request)
-        self.humidity = HumidityHandler({}, request)
-        self.light_level = LightLevelHandler({}, request)
-        self.open_close = OpenCloseHandler({}, request)
-        self.power = PowerHandler({}, request)
-        self.presence = PresenceHandler({}, request)
-        self.pressure = PressureHandler({}, request)
-        self.switch = SwitchHandler({}, request)
-        self.temperature = TemperatureHandler({}, request)
-        self.thermostat = ThermostatHandler({}, request)
-        self.time = TimeHandler({}, request)
-        self.vibration = VibrationHandler({}, request)
-        self.water = WaterHandler({}, request)
+        self.air_quality = AirQualityHandler(gateway)
+        self.alarm = AlarmHandler(gateway)
+        self.ancillary_control = AncillaryControlHandler(gateway)
+        self.battery = BatteryHandler(gateway)
+        self.carbon_monoxide = CarbonMonoxideHandler(gateway)
+        self.consumption = ConsumptionHandler(gateway)
+        self.daylight = DaylightHandler(gateway)
+        self.door_lock = DoorLockHandler(gateway)
+        self.fire = FireHandler(gateway)
+        self.generic_flag = GenericFlagHandler(gateway)
+        self.generic_status = GenericStatusHandler(gateway)
+        self.humidity = HumidityHandler(gateway)
+        self.light_level = LightLevelHandler(gateway)
+        self.open_close = OpenCloseHandler(gateway)
+        self.power = PowerHandler(gateway)
+        self.presence = PresenceHandler(gateway)
+        self.pressure = PressureHandler(gateway)
+        self.switch = SwitchHandler(gateway)
+        self.temperature = TemperatureHandler(gateway)
+        self.thermostat = ThermostatHandler(gateway)
+        self.time = TimeHandler(gateway)
+        self.vibration = VibrationHandler(gateway)
+        self.water = WaterHandler(gateway)
 
         handlers: list[APIItems[Any]] = [
             self.air_quality,
@@ -473,4 +376,4 @@ class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
             self.water,
         ]
 
-        super().__init__(handlers, raw, request)
+        super().__init__(handlers)

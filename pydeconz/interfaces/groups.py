@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
-from typing import Any, Final
+from typing import Final
 
 from ..models import ResourceTypes
 from ..models.group import Group
@@ -17,10 +16,6 @@ class Groups(APIItems[Group]):
 
     resource_type = ResourceTypes.GROUP
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize group manager."""
-        super().__init__(raw, request, URL, Group)
+        super().__init__({}, gateway.request, URL, Group)

@@ -94,12 +94,7 @@ class APIItems(Generic[DataResource]):
 class GroupedAPIItems(Generic[DataResource]):
     """Represent a group of deCONZ API items."""
 
-    def __init__(
-        self,
-        api_items: list[APIItems[Any]],
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, api_items: list[APIItems[Any]]) -> None:
         """Initialize sensor manager."""
         self._items = api_items
         self._subscribers: list[SubscriptionType] = []
@@ -110,8 +105,6 @@ class GroupedAPIItems(Generic[DataResource]):
             if handler.resource_types is not None
             for resource_type in handler.resource_types
         }
-
-        self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, Any]) -> None:
         """Process data."""

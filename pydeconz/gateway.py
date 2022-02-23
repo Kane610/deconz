@@ -71,12 +71,12 @@ class DeconzSession:
         self.add_device_callback = add_device
         self.connection_status_callback = connection_status
 
-        self.alarmsystems = AlarmSystems({}, self.request)
+        self.alarmsystems = AlarmSystems(self)
         self.config: Config | None = None
-        self.groups = Groups({}, self.request)
-        self.lights = LightResourceManager({}, self.request)
+        self.groups = Groups(self)
+        self.lights = LightResourceManager(self)
         self.scenes: dict[str, Scene] = {}
-        self.sensors = SensorResourceManager({}, self.request)
+        self.sensors = SensorResourceManager(self)
         self.websocket: WSClient | None = None
 
     async def get_api_key(
