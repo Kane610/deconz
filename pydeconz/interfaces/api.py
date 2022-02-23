@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, ItemsView, ValuesView
+from collections.abc import Awaitable, Callable, ItemsView, Sequence, ValuesView
 import logging
-from typing import Any, Generic, Iterator, KeysView
+from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView
 
 from ..models import DataResource, ResourceTypes
 
+# if TYPE_CHECKING:
+#     from ..gateway import EventType
+
 LOGGER = logging.getLogger(__name__)
 
-SubscriptionType = Callable[[str, str], None]
+SubscriptionType = tuple[
+    Callable[[str, str], None],
+    "tuple[str] | None",
+    # "tuple[EventType] | None",
+]
 
 
 class APIItems(Generic[DataResource]):
@@ -50,23 +57,37 @@ class APIItems(Generic[DataResource]):
             if id in self._items:
                 obj = self._items[id]
                 obj.update(raw_item)
-                continue
+                event = "updated"
 
-            self._items[id] = self._item_cls(id, raw_item, self._request)
+            else:
+                self._items[id] = self._item_cls(id, raw_item, self._request)
+                event = "added"
 
-            for callback in self._subscribers:
-                callback("added", id)
+            for callback, event_filter in self._subscribers:
+                if event_filter is not None and event not in event_filter:
+                    continue
+                callback(event, id)
 
-    def subscribe(self, callback: SubscriptionType) -> Callable[..., Any]:
-        """Subscribe to added events.
+    def subscribe(
+        self,
+        callback: Callable[[str, str], None],
+        event_filter: tuple[str] | str | None = None,
+        # event_filter: tuple[EventType] | EventType | None = None,
+    ) -> Callable[..., Any]:
+        """Subscribe to events.
 
-        "callback" - callback function to call when an event emits.
+        "callback" - callback function to call when on event.
         Return function to unsubscribe.
         """
-        self._subscribers.append(callback)
+        if isinstance(event_filter, str):
+            # if isinstance(event_filter, EventType:
+            event_filter = (event_filter,)
+
+        subscription = (callback, event_filter)
+        self._subscribers.append(subscription)
 
         def unsubscribe() -> None:
-            self._subscribers.remove(callback)
+            self._subscribers.remove(subscription)
 
         return unsubscribe
 
@@ -118,7 +139,7 @@ class GroupedAPIItems(Generic[DataResource]):
             handler = self._type_to_handler[ResourceTypes(raw_item.get("type"))]
             handler.process_raw({id: raw_item})
 
-            for callback in self._subscribers:
+            for (callback, event_filter) in self._subscribers:
                 callback("added", id)
 
     def items(self) -> dict[str, DataResource]:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import enum
 import logging
 from pprint import pformat
 from typing import Any, Final, Literal
@@ -33,6 +34,16 @@ EVENT_TYPE_ADDED: Final = "added"
 EVENT_TYPE_CHANGED: Final = "changed"
 EVENT_TYPE_DELETED: Final = "deleted"
 EVENT_TYPE_SCENE_CALLED: Final = "scene-called"
+
+
+class EventType(enum.Enum):
+    """The event type of the message."""
+
+    ADDED = "added"
+    CHANGED = "changed"
+    DELETED = "deleted"
+    SCENE_CALLED = "scene-called"
+
 
 SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
 SUPPORTED_EVENT_RESOURCES: Final = (

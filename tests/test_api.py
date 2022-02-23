@@ -21,8 +21,14 @@ async def test_api_items():
     assert [*apiitems.keys()] == ["1", "2"]
     assert [*apiitems.values()] == [apiitems["1"], apiitems["2"]]
 
-    unsub_apiitems = apiitems.subscribe(apiitems_mock_subscribe := Mock())
-    assert len(apiitems._subscribers) == 1
+    unsub_apiitems_all = apiitems.subscribe(apiitems_mock_subscribe_all := Mock())
+    unsub_apiitems_add = apiitems.subscribe(
+        apiitems_mock_subscribe_add := Mock(), "added"
+    )
+    unsub_apiitems_update = apiitems.subscribe(
+        apiitems_mock_subscribe_update := Mock(), "updated"
+    )
+    assert len(apiitems._subscribers) == 3
 
     item_1 = apiitems["1"]
     item_1.register_callback(item_1_mock_callback := Mock())
@@ -30,19 +36,31 @@ async def test_api_items():
     apiitems._request.return_value = {"1": {"key1": ""}, "3": {}}
     await apiitems.update()
 
+    # Item 1 is updated
     apiitems._request.assert_called_with("get", "string_path")
-    assert "3" in apiitems
-    apiitems_mock_subscribe.assert_called_with("added", "3")
+    apiitems_mock_subscribe_all.assert_any_call("updated", "1")
+    apiitems_mock_subscribe_update.assert_called_with("updated", "1")
     item_1_mock_callback.assert_called()
     item_1_mock_subscribe.assert_called()
     item_1.changed_keys == ("key1")
+
+    # item 3 is created
+    assert "3" in apiitems
+    apiitems_mock_subscribe_all.assert_called_with("added", "3")
+    apiitems_mock_subscribe_add.assert_called_with("added", "3")
 
     await item_1.request("field", {"key2": "on"})
 
     unsub_item_1()
     assert len(item_1._subscribers) == 0
 
-    unsub_apiitems()
+    unsub_apiitems_all()
+    assert len(apiitems._subscribers) == 2
+
+    unsub_apiitems_add()
+    assert len(apiitems._subscribers) == 1
+
+    unsub_apiitems_update()
     assert len(apiitems._subscribers) == 0
 
 
