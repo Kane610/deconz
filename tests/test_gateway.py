@@ -43,7 +43,7 @@ async def test_websocket_config_provided_websocket_port(
     session.websocket.stop.assert_called()
 
 
-async def test_initial_state(mock_aioresponse, deconz_refresh_state):
+async def test_initial_state(deconz_refresh_state):
     """Test refresh_state creates devices as expected."""
     session = await deconz_refresh_state(
         alarm_systems={"0": {}},

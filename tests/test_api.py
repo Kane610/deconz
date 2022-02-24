@@ -8,14 +8,16 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from pydeconz.interfaces.api import APIItems
-from pydeconz.models.deconz_device import DeconzDevice
 from pydeconz.errors import BridgeBusy
 
 
-async def test_api_items():
+async def test_api_items(mock_aioresponse, deconz_refresh_state):
     """Verify that groups works."""
-    apiitems = APIItems({"1": {}, "2": {}}, AsyncMock(), "string_path", DeconzDevice)
+    session = await deconz_refresh_state(
+        lights={"1": {"type": "light"}, "2": {"type": "light"}}
+    )
+
+    apiitems = session.lights.lights
 
     assert [*apiitems.items()] == [("1", apiitems["1"]), ("2", apiitems["2"])]
     assert [*apiitems.keys()] == ["1", "2"]
@@ -33,11 +35,13 @@ async def test_api_items():
     item_1 = apiitems["1"]
     item_1.register_callback(item_1_mock_callback := Mock())
     unsub_item_1 = item_1.subscribe(item_1_mock_subscribe := Mock())
-    apiitems._request.return_value = {"1": {"key1": ""}, "3": {}}
+    mock_aioresponse.get(
+        "http://host:80/api/apikey/lights",
+        payload={"1": {"key1": ""}, "3": {"type": "light"}},
+    )
     await apiitems.update()
 
     # Item 1 is updated
-    apiitems._request.assert_called_with("get", "string_path")
     apiitems_mock_subscribe_all.assert_any_call("updated", "1")
     apiitems_mock_subscribe_update.assert_called_with("updated", "1")
     item_1_mock_callback.assert_called()
@@ -49,7 +53,8 @@ async def test_api_items():
     apiitems_mock_subscribe_all.assert_called_with("added", "3")
     apiitems_mock_subscribe_add.assert_called_with("added", "3")
 
-    await item_1.request("field", {"key2": "on"})
+    mock_aioresponse.put("http://host:80/api/apikey/field")
+    await item_1.request("/field", {"key2": "on"})
 
     unsub_item_1()
     assert len(item_1._subscribers) == 0
@@ -65,13 +70,14 @@ async def test_api_items():
 
 
 @patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
-async def test_retry_on_bridge_busy(_):
+async def test_retry_on_bridge_busy(_, deconz_refresh_state):
     """Verify a max count of 4 bridge busy messages."""
-    request_mock = AsyncMock(side_effect=BridgeBusy)
-    apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
+    session = await deconz_refresh_state(lights={"1": {"type": "light"}})
 
-    item_1 = apiitems["1"]
-    with pytest.raises(BridgeBusy):
+    item_1 = session.lights["1"]
+    request_mock = AsyncMock(side_effect=BridgeBusy)
+
+    with pytest.raises(BridgeBusy), patch.object(item_1, "_request", new=request_mock):
         await item_1.request("field", {"key1": "on"})
 
     assert request_mock.call_count == 3
@@ -79,29 +85,33 @@ async def test_retry_on_bridge_busy(_):
 
 
 @patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
-async def test_request_exception_bridge_busy_pass_on_retry(_):
+async def test_request_exception_bridge_busy_pass_on_retry(_, deconz_refresh_state):
     """Verify retry can return an expected response."""
-    request_mock = AsyncMock(side_effect=(BridgeBusy, {"response": "ok"}))
-    apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
+    session = await deconz_refresh_state(lights={"1": {"type": "light"}})
 
-    item_1 = apiitems["1"]
-    assert await item_1.request("field", {"key1": "on"}) == {"response": "ok"}
+    item_1 = session.lights["1"]
+    request_mock = AsyncMock(side_effect=(BridgeBusy, {"response": "ok"}))
+
+    with patch.object(item_1, "_request", new=request_mock):
+        assert await item_1.request("field", {"key1": "on"}) == {"response": "ok"}
 
     assert request_mock.call_count == 2
     assert not item_1._sleep_task
 
 
 @patch("pydeconz.models.api.sleep", new_callable=AsyncMock)
-async def test_reset_retry_with_a_second_request(_):
+async def test_reset_retry_with_a_second_request(_, deconz_refresh_state):
     """Verify an ongoing retry can be reset by a new request."""
-    request_mock = AsyncMock(side_effect=(BridgeBusy, BridgeBusy, {"response": "ok"}))
-    apiitems = APIItems({"1": {}, "2": {}}, request_mock, "string_path", DeconzDevice)
+    session = await deconz_refresh_state(lights={"1": {"type": "light"}})
 
-    item_1 = apiitems["1"]
-    collected_responses = await gather(
-        item_1.request("field", {"key1": "on"}),
-        item_1.request("field", {"key2": "on"}),
-    )
+    item_1 = session.lights["1"]
+    request_mock = AsyncMock(side_effect=(BridgeBusy, BridgeBusy, {"response": "ok"}))
+
+    with patch.object(item_1, "_request", new=request_mock):
+        collected_responses = await gather(
+            item_1.request("field", {"key1": "on"}),
+            item_1.request("field", {"key2": "on"}),
+        )
 
     assert request_mock.call_count == 3
     assert not item_1._sleep_task
