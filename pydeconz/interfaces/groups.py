@@ -15,7 +15,5 @@ class Groups(APIItems[Group]):
     """Represent deCONZ groups."""
 
     resource_type = ResourceTypes.GROUP
-
-    def __init__(self, gateway) -> None:
-        """Initialize group manager."""
-        super().__init__({}, gateway.request, URL, Group)
+    path = URL
+    item_cls = Group

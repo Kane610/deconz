@@ -42,110 +42,88 @@ class AirQualityHandler(APIItems[AirQuality]):
     """Handler for air quality sensor."""
 
     resource_type = ResourceTypes.ZHA_AIR_QUALITY
-
-    def __init__(self, gateway) -> None:
-        """Initialize air quality sensor handler."""
-        super().__init__({}, gateway.request, URL, AirQuality)
+    path = URL
+    item_cls = AirQuality
 
 
 class AlarmHandler(APIItems[Alarm]):
     """Handler for alarm sensor."""
 
     resource_type = ResourceTypes.ZHA_ALARM
-
-    def __init__(self, gateway) -> None:
-        """Initialize alarm sensor handler."""
-        super().__init__({}, gateway.request, URL, Alarm)
+    path = URL
+    item_cls = Alarm
 
 
 class AncillaryControlHandler(APIItems[AncillaryControl]):
     """Handler for ancillary control sensor."""
 
     resource_type = ResourceTypes.ZHA_ANCILLARY_CONTROL
-
-    def __init__(self, gateway) -> None:
-        """Initialize ancillary control sensor handler."""
-        super().__init__({}, gateway.request, URL, AncillaryControl)
+    path = URL
+    item_cls = AncillaryControl
 
 
 class BatteryHandler(APIItems[Battery]):
     """Handler for battery sensor."""
 
     resource_type = ResourceTypes.ZHA_BATTERY
-
-    def __init__(self, gateway) -> None:
-        """Initialize battery sensor handler."""
-        super().__init__({}, gateway.request, URL, Battery)
+    path = URL
+    item_cls = Battery
 
 
 class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
     """Handler for carbon monoxide sensor."""
 
     resource_type = ResourceTypes.ZHA_CARBON_MONOXIDE
-
-    def __init__(self, gateway) -> None:
-        """Initialize carbon monoxide sensor handler."""
-        super().__init__({}, gateway.request, URL, CarbonMonoxide)
+    path = URL
+    item_cls = CarbonMonoxide
 
 
 class ConsumptionHandler(APIItems[Consumption]):
     """Handler for consumption sensor."""
 
     resource_type = ResourceTypes.ZHA_CONSUMPTION
-
-    def __init__(self, gateway) -> None:
-        """Initialize consumption sensor handler."""
-        super().__init__({}, gateway.request, URL, Consumption)
+    path = URL
+    item_cls = Consumption
 
 
 class DaylightHandler(APIItems[Daylight]):
     """Handler for daylight sensor."""
 
     resource_type = ResourceTypes.DAYLIGHT
-
-    def __init__(self, gateway) -> None:
-        """Initialize daylight sensor handler."""
-        super().__init__({}, gateway.request, URL, Daylight)
+    path = URL
+    item_cls = Daylight
 
 
 class DoorLockHandler(APIItems[DoorLock]):
     """Handler for door lock sensor."""
 
     resource_type = ResourceTypes.ZHA_DOOR_LOCK
-
-    def __init__(self, gateway) -> None:
-        """Initialize door lock sensor handler."""
-        super().__init__({}, gateway.request, URL, DoorLock)
+    path = URL
+    item_cls = DoorLock
 
 
 class FireHandler(APIItems[Fire]):
     """Handler for fire sensor."""
 
     resource_type = ResourceTypes.ZHA_FIRE
-
-    def __init__(self, gateway) -> None:
-        """Initialize fire sensor handler."""
-        super().__init__({}, gateway.request, URL, Fire)
+    path = URL
+    item_cls = Fire
 
 
 class GenericFlagHandler(APIItems[GenericFlag]):
     """Handler for generic flag sensor."""
 
     resource_type = ResourceTypes.CLIP_GENERIC_FLAG
-
-    def __init__(self, gateway) -> None:
-        """Initialize generic flag sensor handler."""
-        super().__init__({}, gateway.request, URL, GenericFlag)
+    path = URL
+    item_cls = GenericFlag
 
 
 class GenericStatusHandler(APIItems[GenericStatus]):
     """Handler for generic status sensor."""
 
     resource_type = ResourceTypes.CLIP_GENERIC_STATUS
-
-    def __init__(self, gateway) -> None:
-        """Initialize generic status sensor handler."""
-        super().__init__({}, gateway.request, URL, GenericStatus)
+    path = URL
+    item_cls = GenericStatus
 
 
 class HumidityHandler(APIItems[Humidity]):
@@ -155,10 +133,8 @@ class HumidityHandler(APIItems[Humidity]):
         ResourceTypes.ZHA_HUMIDITY,
         ResourceTypes.CLIP_HUMIDITY,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize humidity sensor handler."""
-        super().__init__({}, gateway.request, URL, Humidity)
+    path = URL
+    item_cls = Humidity
 
 
 class LightLevelHandler(APIItems[LightLevel]):
@@ -168,10 +144,8 @@ class LightLevelHandler(APIItems[LightLevel]):
         ResourceTypes.ZHA_LIGHT_LEVEL,
         ResourceTypes.CLIP_LIGHT_LEVEL,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize light level sensor handler."""
-        super().__init__({}, gateway.request, URL, LightLevel)
+    path = URL
+    item_cls = LightLevel
 
 
 class OpenCloseHandler(APIItems[OpenClose]):
@@ -181,20 +155,16 @@ class OpenCloseHandler(APIItems[OpenClose]):
         ResourceTypes.ZHA_OPEN_CLOSE,
         ResourceTypes.CLIP_OPEN_CLOSE,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize open/close sensor handler."""
-        super().__init__({}, gateway.request, URL, OpenClose)
+    path = URL
+    item_cls = OpenClose
 
 
 class PowerHandler(APIItems[Power]):
     """Handler for power sensor."""
 
     resource_type = ResourceTypes.ZHA_POWER
-
-    def __init__(self, gateway) -> None:
-        """Initialize power sensor handler."""
-        super().__init__({}, gateway.request, URL, Power)
+    path = URL
+    item_cls = Power
 
 
 class PresenceHandler(APIItems[Presence]):
@@ -204,10 +174,8 @@ class PresenceHandler(APIItems[Presence]):
         ResourceTypes.ZHA_PRESENCE,
         ResourceTypes.CLIP_PRESENCE,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize presence sensor handler."""
-        super().__init__({}, gateway.request, URL, Presence)
+    path = URL
+    item_cls = Presence
 
 
 class PressureHandler(APIItems[Pressure]):
@@ -217,10 +185,8 @@ class PressureHandler(APIItems[Pressure]):
         ResourceTypes.ZHA_PRESSURE,
         ResourceTypes.CLIP_PRESSURE,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize pressure sensor handler."""
-        super().__init__({}, gateway.request, URL, Pressure)
+    path = URL
+    item_cls = Pressure
 
 
 class SwitchHandler(APIItems[Switch]):
@@ -231,10 +197,8 @@ class SwitchHandler(APIItems[Switch]):
         ResourceTypes.ZGP_SWITCH,
         ResourceTypes.CLIP_SWITCH,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize switch sensor handler."""
-        super().__init__({}, gateway.request, URL, Switch)
+    path = URL
+    item_cls = Switch
 
 
 class TemperatureHandler(APIItems[Temperature]):
@@ -244,10 +208,8 @@ class TemperatureHandler(APIItems[Temperature]):
         ResourceTypes.ZHA_TEMPERATURE,
         ResourceTypes.CLIP_TEMPERATURE,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize temperature sensor handler."""
-        super().__init__({}, gateway.request, URL, Temperature)
+    path = URL
+    item_cls = Temperature
 
 
 class ThermostatHandler(APIItems[Thermostat]):
@@ -257,40 +219,32 @@ class ThermostatHandler(APIItems[Thermostat]):
         ResourceTypes.ZHA_THERMOSTAT,
         ResourceTypes.CLIP_THERMOSTAT,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize thermostat sensor handler."""
-        super().__init__({}, gateway.request, URL, Thermostat)
+    path = URL
+    item_cls = Thermostat
 
 
 class TimeHandler(APIItems[Time]):
     """Handler for time sensor."""
 
     resource_type = ResourceTypes.ZHA_TIME
-
-    def __init__(self, gateway) -> None:
-        """Initialize time sensor handler."""
-        super().__init__({}, gateway.request, URL, Time)
+    path = URL
+    item_cls = Time
 
 
 class VibrationHandler(APIItems[Vibration]):
     """Handler for vibration sensor."""
 
     resource_type = ResourceTypes.ZHA_VIBRATION
-
-    def __init__(self, gateway) -> None:
-        """Initialize vibration sensor handler."""
-        super().__init__({}, gateway.request, URL, Vibration)
+    path = URL
+    item_cls = Vibration
 
 
 class WaterHandler(APIItems[Water]):
     """Handler for water sensor."""
 
     resource_type = ResourceTypes.ZHA_WATER
-
-    def __init__(self, gateway) -> None:
-        """Initialize water sensor handler."""
-        super().__init__({}, gateway.request, URL, Water)
+    path = URL
+    item_cls = Water
 
 
 SENSOR_RESOURCES = Union[

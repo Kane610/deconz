@@ -11,10 +11,11 @@ from .api import APIItems
 class Scenes(APIItems[Scene]):
     """Represent scenes of a deCONZ group."""
 
+    item_cls = Scene
+
     def __init__(self, gateway) -> None:
         """Initialize scene manager."""
-        self.gateway = gateway
-        super().__init__({}, gateway.request, "url", Scene)
+        super().__init__(gateway)
         gateway.groups.subscribe(self.group_data_callback)
 
     async def create_scene(self, group_id: str, name: str) -> dict[str, Any]:

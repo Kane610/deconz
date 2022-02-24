@@ -22,10 +22,8 @@ class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     """Handler for configuration tool."""
 
     resource_type = ResourceTypes.CONFIGURATION_TOOL
-
-    def __init__(self, gateway) -> None:
-        """Initialize configuration tool handler."""
-        super().__init__({}, gateway.request, URL, ConfigurationTool)
+    path = URL
+    item_cls = ConfigurationTool
 
 
 class CoverHandler(APIItems[Cover]):
@@ -36,20 +34,16 @@ class CoverHandler(APIItems[Cover]):
         ResourceTypes.WINDOW_COVERING_CONTROLLER,
         ResourceTypes.WINDOW_COVERING_DEVICE,
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize cover handler."""
-        super().__init__({}, gateway.request, URL, Cover)
+    path = URL
+    item_cls = Cover
 
 
 class FanHandler(APIItems[Fan]):
     """Handler for locks."""
 
     resource_type = ResourceTypes.FAN
-
-    def __init__(self, gateway) -> None:
-        """Initialize lock handler."""
-        super().__init__({}, gateway.request, URL, Fan)
+    path = URL
+    item_cls = Fan
 
 
 class LightHandler(APIItems[Light]):
@@ -68,30 +62,24 @@ class LightHandler(APIItems[Light]):
         ResourceTypes.SMART_PLUG,
         ResourceTypes.UNKNOWN,  # Legacy support
     }
-
-    def __init__(self, gateway) -> None:
-        """Initialize light handler."""
-        super().__init__({}, gateway.request, URL, Light)
+    path = URL
+    item_cls = Light
 
 
 class LockHandler(APIItems[Lock]):
     """Handler for fans."""
 
     resource_type = ResourceTypes.DOOR_LOCK
-
-    def __init__(self, gateway) -> None:
-        """Initialize fan handler."""
-        super().__init__({}, gateway.request, URL, Lock)
+    path = URL
+    item_cls = Lock
 
 
 class SirenHandler(APIItems[Siren]):
     """Handler for sirens."""
 
     resource_type = ResourceTypes.WARNING_DEVICE
-
-    def __init__(self, gateway) -> None:
-        """Initialize siren handler."""
-        super().__init__({}, gateway.request, URL, Siren)
+    path = URL
+    item_cls = Siren
 
 
 LIGHT_RESOURCES = Union[

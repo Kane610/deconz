@@ -25,29 +25,22 @@ class APIItems(Generic[DataResource]):
 
     resource_type = ResourceTypes.UNKNOWN
     resource_types: set[ResourceTypes] | None = None
+    path = ""
+    item_cls: Any
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-        path: str,
-        item_cls: Any,
-    ) -> None:
+    def __init__(self, gateway) -> None:
         """Initialize API items."""
-        self._request = request
-        self._path = path
-        self._item_cls = item_cls
+        self.gateway = gateway
+        self._request = gateway.request
         self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
 
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
 
-        self.process_raw(raw)
-
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self._path)
+        raw = await self._request("get", self.path)
         self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, Any]) -> None:
@@ -60,7 +53,7 @@ class APIItems(Generic[DataResource]):
                 event = "updated"
 
             else:
-                self._items[id] = self._item_cls(id, raw_item, self._request)
+                self._items[id] = self.item_cls(id, raw_item, self._request)
                 event = "added"
 
             for callback, event_filter in self._subscribers:
