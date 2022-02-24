@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, ItemsView, Sequence, ValuesView
+from collections.abc import Callable, ItemsView, ValuesView
 import logging
 from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView
 
 from ..models import DataResource, ResourceTypes
 
-# if TYPE_CHECKING:
+if TYPE_CHECKING:
+    from ..gateway import DeconzSession
 #     from ..gateway import EventType
 
 LOGGER = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class APIItems(Generic[DataResource]):
     path = ""
     item_cls: Any
 
-    def __init__(self, gateway) -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize API items."""
         self.gateway = gateway
         self._request = gateway.request

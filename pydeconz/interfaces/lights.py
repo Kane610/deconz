@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Union
+from typing import TYPE_CHECKING, Any, Final, Union
 
 from ..models import ResourceTypes
 from ..models.light import *  # noqa: F401, F403
@@ -14,6 +14,9 @@ from ..models.light.light import Light
 from ..models.light.lock import Lock
 from ..models.light.siren import Siren
 from .api import APIItems, GroupedAPIItems
+
+if TYPE_CHECKING:
+    from ..gateway import DeconzSession
 
 URL: Final = "/lights"
 
@@ -95,7 +98,7 @@ LIGHT_RESOURCES = Union[
 class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
     """Represent deCONZ lights."""
 
-    def __init__(self, gateway) -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize light manager."""
         self.configuration_tool = ConfigurationToolHandler(gateway)
         self.covers = CoverHandler(gateway)

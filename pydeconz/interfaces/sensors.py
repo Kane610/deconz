@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Union
+from typing import TYPE_CHECKING, Any, Final, Union
 
 from ..models import ResourceTypes
 from ..models.sensor import *  # noqa: F401, F403
@@ -34,6 +34,9 @@ from ..models.sensor.time import Time
 from ..models.sensor.vibration import Vibration
 from ..models.sensor.water import Water
 from .api import APIItems, GroupedAPIItems
+
+if TYPE_CHECKING:
+    from ..gateway import DeconzSession
 
 URL: Final = "/sensors"
 
@@ -277,7 +280,7 @@ SENSOR_RESOURCES = Union[
 class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
     """Represent deCONZ sensors."""
 
-    def __init__(self, gateway) -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize sensor manager."""
 
         self.air_quality = AirQualityHandler(gateway)
