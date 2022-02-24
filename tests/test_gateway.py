@@ -63,17 +63,15 @@ async def test_initial_state(mock_aioresponse, deconz_refresh_state):
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
-    assert "sc1" in session.groups["g1"].scenes
     assert "l1" in session.lights
+    assert "g1_sc1" in session.scenes
     assert "s1" in session.sensors
-    assert "gid_sc1" in session.scenes
 
     assert session.groups["g1"].id == "gid"
     assert session.groups["g1"].deconz_id == "/groups/g1"
-    assert session.groups["g1"].scenes["sc1"].id == "sc1"
     assert session.lights["l1"].deconz_id == "/lights/l1"
+    assert session.scenes["g1_sc1"].deconz_id == "/groups/g1/scenes/sc1"
     assert session.sensors["s1"].deconz_id == "/sensors/s1"
-    assert session.scenes == {"gid_sc1": session.groups["g1"].scenes["sc1"]}
 
 
 async def test_get_api_key(mock_aioresponse, deconz_session):
@@ -116,18 +114,16 @@ async def test_refresh_state(deconz_refresh_state):
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
-    assert "sc1" in session.groups["g1"].scenes
     assert "l1" in session.lights
+    assert "g1_sc1" in session.scenes
     assert "s1" in session.sensors
-    assert "gid_sc1" in session.scenes
 
     assert session.alarmsystems["0"].deconz_id == "/alarmsystems/0"
     assert session.groups["g1"].id == "gid"
     assert session.groups["g1"].deconz_id == "/groups/g1"
-    assert session.groups["g1"].scenes["sc1"].id == "sc1"
     assert session.lights["l1"].deconz_id == "/lights/l1"
+    assert session.scenes["g1_sc1"].deconz_id == "/groups/g1/scenes/sc1"
     assert session.sensors["s1"].deconz_id == "/sensors/s1"
-    assert session.scenes == {"gid_sc1": session.groups["g1"].scenes["sc1"]}
 
 
 async def test_request(mock_aioresponse, deconz_session):

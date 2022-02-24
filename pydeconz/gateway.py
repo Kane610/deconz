@@ -15,12 +15,12 @@ from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
+from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
 from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
 from .models.group import RESOURCE_TYPE as GROUP_RESOURCE
 from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
 from .models.light.light import Light
-from .models.scene import Scene
 from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
@@ -86,7 +86,7 @@ class DeconzSession:
         self.config: Config | None = None
         self.groups = Groups(self)
         self.lights = LightResourceManager(self)
-        self.scenes: dict[str, Scene] = {}
+        self.scenes = Scenes(self)
         self.sensors = SensorResourceManager(self)
         self.websocket: WSClient | None = None
 
@@ -149,7 +149,6 @@ class DeconzSession:
         self.sensors.process_raw(data[SENSOR_RESOURCE])
 
         self.update_group_color(list(self.lights.keys()))
-        self.update_scenes()
 
     async def request(
         self,
@@ -262,17 +261,6 @@ class DeconzSession:
                 if light.ZHATYPE == Light.ZHATYPE and light.reachable:
                     group.update_color_state(light, update_all_attributes=first)
                     first = False
-
-    def update_scenes(self) -> None:
-        """Update scenes to hold all known scenes from existing groups."""
-        self.scenes.update(
-            {
-                f"{group.id}_{scene.id}": scene
-                for group in self.groups.values()
-                for scene in group.scenes.values()
-                if f"{group.id}_{scene.id}" not in self.scenes
-            }
-        )
 
 
 def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:

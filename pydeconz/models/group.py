@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 from typing import Any, Final, Literal
 
-from ..interfaces.scenes import Scenes
 from .deconz_device import DeconzDevice
 from .light.light import Light
 from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene  # noqa: F401
@@ -29,29 +27,6 @@ class Group(DeconzDevice):
     Dresden Elektroniks documentation of light groups in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
-
-    def __init__(
-        self,
-        resource_id: str,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Set initial information about light group.
-
-        Create scenes related to light group.
-        """
-        super().__init__(resource_id, raw, request)
-
-        self.scenes = Scenes(raw, request, self.deconz_id, self.name)
-
-    def update(self, raw: dict[str, Any]) -> None:
-        """Update group and scenes with new data."""
-        super().update(raw)
-
-        if "scenes" in self.changed_keys:
-            self.scenes.process_raw(
-                self.scenes.pre_process_raw(raw, self.deconz_id, self.name)
-            )
 
     @property
     def resource_type(self) -> str:
