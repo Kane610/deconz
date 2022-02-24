@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from ..models.scene import Scene
 from .api import APIItems
-
-if TYPE_CHECKING:
-    from ..gateway import DeconzSession
 
 
 class Scenes(APIItems[Scene]):
@@ -16,10 +13,9 @@ class Scenes(APIItems[Scene]):
 
     item_cls = Scene
 
-    def __init__(self, gateway: DeconzSession) -> None:
-        """Initialize scene manager."""
-        super().__init__(gateway)
-        gateway.groups.subscribe(self.group_data_callback)
+    def post_init(self) -> None:
+        """Register for group data events."""
+        self.gateway.groups.subscribe(self.group_data_callback)
 
     async def create_scene(self, group_id: str, name: str) -> dict[str, Any]:
         """Create a new scene.

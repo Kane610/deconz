@@ -39,6 +39,11 @@ class APIItems(Generic[DataResource]):
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
 
+        self.post_init()
+
+    def post_init(self) -> None:
+        """Post initialization method."""
+
     async def update(self) -> None:
         """Refresh data."""
         raw = await self._request("get", self.path)
