@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
-from typing import Any, Final, Union
+from typing import TYPE_CHECKING, Any, Final, Union
 
 from ..models import ResourceTypes
 from ..models.light import *  # noqa: F401, F403
@@ -16,6 +15,9 @@ from ..models.light.lock import Lock
 from ..models.light.siren import Siren
 from .api import APIItems, GroupedAPIItems
 
+if TYPE_CHECKING:
+    from ..gateway import DeconzSession
+
 URL: Final = "/lights"
 
 
@@ -23,14 +25,8 @@ class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     """Handler for configuration tool."""
 
     resource_type = ResourceTypes.CONFIGURATION_TOOL
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Initialize configuration tool handler."""
-        super().__init__(raw, request, URL, ConfigurationTool)
+    path = URL
+    item_cls = ConfigurationTool
 
 
 class CoverHandler(APIItems[Cover]):
@@ -41,28 +37,16 @@ class CoverHandler(APIItems[Cover]):
         ResourceTypes.WINDOW_COVERING_CONTROLLER,
         ResourceTypes.WINDOW_COVERING_DEVICE,
     }
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Initialize cover handler."""
-        super().__init__(raw, request, URL, Cover)
+    path = URL
+    item_cls = Cover
 
 
 class FanHandler(APIItems[Fan]):
     """Handler for locks."""
 
     resource_type = ResourceTypes.FAN
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Initialize lock handler."""
-        super().__init__(raw, request, URL, Fan)
+    path = URL
+    item_cls = Fan
 
 
 class LightHandler(APIItems[Light]):
@@ -81,42 +65,24 @@ class LightHandler(APIItems[Light]):
         ResourceTypes.SMART_PLUG,
         ResourceTypes.UNKNOWN,  # Legacy support
     }
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Initialize light handler."""
-        super().__init__(raw, request, URL, Light)
+    path = URL
+    item_cls = Light
 
 
 class LockHandler(APIItems[Lock]):
     """Handler for fans."""
 
     resource_type = ResourceTypes.DOOR_LOCK
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Initialize fan handler."""
-        super().__init__(raw, request, URL, Lock)
+    path = URL
+    item_cls = Lock
 
 
 class SirenHandler(APIItems[Siren]):
     """Handler for sirens."""
 
     resource_type = ResourceTypes.WARNING_DEVICE
-
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Initialize siren handler."""
-        super().__init__(raw, request, URL, Siren)
+    path = URL
+    item_cls = Siren
 
 
 LIGHT_RESOURCES = Union[
@@ -132,18 +98,14 @@ LIGHT_RESOURCES = Union[
 class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
     """Represent deCONZ lights."""
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize light manager."""
-        self.configuration_tool = ConfigurationToolHandler({}, request)
-        self.covers = CoverHandler({}, request)
-        self.fans = FanHandler({}, request)
-        self.lights = LightHandler({}, request)
-        self.locks = LockHandler({}, request)
-        self.sirens = SirenHandler({}, request)
+        self.configuration_tool = ConfigurationToolHandler(gateway)
+        self.covers = CoverHandler(gateway)
+        self.fans = FanHandler(gateway)
+        self.lights = LightHandler(gateway)
+        self.locks = LockHandler(gateway)
+        self.sirens = SirenHandler(gateway)
 
         handlers: list[APIItems[Any]] = [
             self.configuration_tool,
@@ -154,4 +116,4 @@ class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
             self.sirens,
         ]
 
-        super().__init__(handlers, raw, request)
+        super().__init__(handlers)

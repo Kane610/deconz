@@ -2,41 +2,44 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 from typing import Any
 
-from ..models.scene import RESOURCE_TYPE, Scene
+from ..models.scene import Scene
 from .api import APIItems
 
 
 class Scenes(APIItems[Scene]):
     """Represent scenes of a deCONZ group."""
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-        group_id: str,
-        group_name: str,
-    ) -> None:
-        """Initialize scene manager."""
-        raw = self.pre_process_raw(raw, group_id, group_name)
-        url = f"{group_id}/{RESOURCE_TYPE}"
-        super().__init__(raw, request, url, Scene)
+    item_cls = Scene
 
-    async def create_scene(self, name: str) -> dict[str, Any]:
+    def post_init(self) -> None:
+        """Register for group data events."""
+        self.gateway.groups.subscribe(self.group_data_callback)
+
+    async def create_scene(self, group_id: str, name: str) -> dict[str, Any]:
         """Create a new scene.
 
         The actual state of each light will become the lights scene state.
         """
-        return await self._request("post", path=self._path, json={"name": name})
+        return await self._request(
+            "post",
+            path=f"/groups/{group_id}/scenes",
+            json={"name": name},
+        )
+        # return await self._request("post", path=self._path, json={"name": name})
 
-    @staticmethod
-    def pre_process_raw(
-        raw: dict[str, Any], group_id: str, group_name: str
-    ) -> dict[str, dict[str, Any]]:
-        """Transform scenes raw from list to dict."""
-        return {
-            scene["id"]: scene | {"group_deconz_id": group_id, "group_name": group_name}
-            for scene in raw["scenes"]
+    def group_data_callback(self, action: str, group_id: str) -> None:
+        """Subscribe callback for new group data."""
+        self.process_raw({group_id: self.gateway.groups[group_id].raw})
+
+    def process_raw(self, raw: dict[str, Any]) -> None:
+        """Pre-process scene data."""
+        raw = {
+            f'{group_id}_{scene["id"]}': scene
+            | {"group_deconz_id": group.deconz_id, "group_name": group.name}
+            for group_id in raw
+            if (group := self.gateway.groups[group_id])
+            for scene in group.raw["scenes"]
         }
+        super().process_raw(raw)

@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, ItemsView, ValuesView
+from collections.abc import Callable, ItemsView, ValuesView
 import logging
-from typing import Any, Generic, Iterator, KeysView
+from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView
 
 from ..models import DataResource, ResourceTypes
 
+if TYPE_CHECKING:
+    from ..gateway import DeconzSession
+#     from ..gateway import EventType
+
 LOGGER = logging.getLogger(__name__)
 
-SubscriptionType = Callable[[str, str], None]
+SubscriptionType = tuple[
+    Callable[[str, str], None],
+    "tuple[str] | None",
+    # "tuple[EventType] | None",
+]
 
 
 class APIItems(Generic[DataResource]):
@@ -18,29 +26,27 @@ class APIItems(Generic[DataResource]):
 
     resource_type = ResourceTypes.UNKNOWN
     resource_types: set[ResourceTypes] | None = None
+    path = ""
+    item_cls: Any
 
-    def __init__(
-        self,
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-        path: str,
-        item_cls: Any,
-    ) -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize API items."""
-        self._request = request
-        self._path = path
-        self._item_cls = item_cls
+        self.gateway = gateway
+        self._request = gateway.request
         self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
 
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
 
-        self.process_raw(raw)
+        self.post_init()
+
+    def post_init(self) -> None:
+        """Post initialization method."""
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self._path)
+        raw = await self._request("get", self.path)
         self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, Any]) -> None:
@@ -50,23 +56,37 @@ class APIItems(Generic[DataResource]):
             if id in self._items:
                 obj = self._items[id]
                 obj.update(raw_item)
-                continue
+                event = "updated"
 
-            self._items[id] = self._item_cls(id, raw_item, self._request)
+            else:
+                self._items[id] = self.item_cls(id, raw_item, self._request)
+                event = "added"
 
-            for callback in self._subscribers:
-                callback("added", id)
+            for callback, event_filter in self._subscribers:
+                if event_filter is not None and event not in event_filter:
+                    continue
+                callback(event, id)
 
-    def subscribe(self, callback: SubscriptionType) -> Callable[..., Any]:
-        """Subscribe to added events.
+    def subscribe(
+        self,
+        callback: Callable[[str, str], None],
+        event_filter: tuple[str] | str | None = None,
+        # event_filter: tuple[EventType] | EventType | None = None,
+    ) -> Callable[..., Any]:
+        """Subscribe to events.
 
-        "callback" - callback function to call when an event emits.
+        "callback" - callback function to call when on event.
         Return function to unsubscribe.
         """
-        self._subscribers.append(callback)
+        if isinstance(event_filter, str):
+            # if isinstance(event_filter, EventType:
+            event_filter = (event_filter,)
+
+        subscription = (callback, event_filter)
+        self._subscribers.append(subscription)
 
         def unsubscribe() -> None:
-            self._subscribers.remove(callback)
+            self._subscribers.remove(subscription)
 
         return unsubscribe
 
@@ -94,12 +114,7 @@ class APIItems(Generic[DataResource]):
 class GroupedAPIItems(Generic[DataResource]):
     """Represent a group of deCONZ API items."""
 
-    def __init__(
-        self,
-        api_items: list[APIItems[Any]],
-        raw: dict[str, Any],
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, api_items: list[APIItems[Any]]) -> None:
         """Initialize sensor manager."""
         self._items = api_items
         self._subscribers: list[SubscriptionType] = []
@@ -110,8 +125,6 @@ class GroupedAPIItems(Generic[DataResource]):
             if handler.resource_types is not None
             for resource_type in handler.resource_types
         }
-
-        self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, Any]) -> None:
         """Process data."""
@@ -125,7 +138,7 @@ class GroupedAPIItems(Generic[DataResource]):
             handler = self._type_to_handler[ResourceTypes(raw_item.get("type"))]
             handler.process_raw({id: raw_item})
 
-            for callback in self._subscribers:
+            for (callback, event_filter) in self._subscribers:
                 callback("added", id)
 
     def items(self) -> dict[str, DataResource]:

@@ -58,8 +58,6 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
     assert group.lights == ["14", "15", "12"]
     assert group.light_sequence is None
     assert group.multi_device_ids is None
-    assert group.scenes["1"].id == "1"
-    assert group.scenes["1"].name == "warmlight"
 
     assert group.brightness == 132
     assert group.hue == 0
@@ -177,10 +175,10 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
     # Scene
 
     mock_aioresponse.post("http://host:80/api/apikey/groups/0/scenes")
-    await group.scenes.create_scene(name="Garage")
+    await deconz_session.scenes.create_scene(group_id="0", name="Garage")
     assert deconz_called_with("post", path="/groups/0/scenes", json={"name": "Garage"})
 
-    scene = group.scenes["1"]
+    scene = deconz_session.scenes["0_1"]
     assert scene.deconz_id == "/groups/0/scenes/1"
     assert scene.id == "1"
     assert scene.light_count == 3
@@ -220,21 +218,46 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
         json={},
     )
 
-    group.update(
+    deconz_session.groups.process_raw(
         {
-            "scenes": [
-                {"id": "1", "name": "coldlight"},
-                {"id": "2", "name": "New scene"},
-            ]
+            "0": {
+                "action": {
+                    "bri": 132,
+                    "colormode": "hs",
+                    "ct": 0,
+                    "effect": "none",
+                    "hue": 0,
+                    "on": False,
+                    "sat": 127,
+                    "scene": None,
+                    "xy": [0, 0],
+                },
+                "devicemembership": [],
+                "etag": "e31c23b3bd9ece918f23ee17ef430304",
+                "id": "11",
+                "lights": ["14", "15", "12"],
+                "name": "Hall",
+                "scenes": [
+                    {
+                        "id": "1",
+                        "name": "coldlight",
+                        "lightcount": 3,
+                        "transitiontime": 10,
+                    },
+                    {"id": "2", "name": "New scene"},
+                ],
+                "state": {"all_on": False, "any_on": True},
+                "type": "LightGroup",
+            }
         }
     )
 
-    assert len(group.scenes.values()) == 2
+    assert len(deconz_session.scenes.values()) == 2
 
     assert scene.name == "coldlight"
     assert scene.full_name == "Hall coldlight"
 
-    scene2 = group.scenes["2"]
+    scene2 = deconz_session.scenes["0_2"]
     assert scene2.deconz_id == "/groups/0/scenes/2"
     assert scene2.id == "2"
     assert scene2.name == "New scene"
