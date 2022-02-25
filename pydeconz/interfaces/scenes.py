@@ -31,15 +31,14 @@ class Scenes(APIItems[Scene]):
 
     def group_data_callback(self, action: str, group_id: str) -> None:
         """Subscribe callback for new group data."""
-        self.process_raw({group_id: self.gateway.groups[group_id].raw})
+        self.process_raw(group_id, self.gateway.groups[group_id].raw)
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
+    def process_raw(self, id: str, raw: Any) -> None:
         """Pre-process scene data."""
-        raw = {
-            f'{group_id}_{scene["id"]}': scene
-            | {"group_deconz_id": group.deconz_id, "group_name": group.name}
-            for group_id in raw
-            if (group := self.gateway.groups[group_id])
-            for scene in group.raw["scenes"]
-        }
-        super().process_raw(raw)
+        group = self.gateway.groups[id]
+
+        for scene in group.raw["scenes"]:
+            super().process_raw(
+                f'{id}_{scene["id"]}',
+                scene | {"group_id": id, "group_name": group.name},
+            )

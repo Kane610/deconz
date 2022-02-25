@@ -143,10 +143,10 @@ class DeconzSession:
         if not self.config:
             self.config = Config(data[CONFIG_RESOURCE], self.request)
 
-        self.alarmsystems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
-        self.groups.process_raw(data[GROUP_RESOURCE])
-        self.lights.process_raw(data[LIGHT_RESOURCE])
-        self.sensors.process_raw(data[SENSOR_RESOURCE])
+        self.alarmsystems.process_full_data(data.get(ALARM_SYSTEM_RESOURCE, {}))
+        self.groups.process_full_data(data[GROUP_RESOURCE])
+        self.lights.process_full_data(data[LIGHT_RESOURCE])
+        self.sensors.process_full_data(data[SENSOR_RESOURCE])
 
         self.update_group_color(list(self.lights.keys()))
 
@@ -224,14 +224,14 @@ class DeconzSession:
         device_id = event[EVENT_ID]
 
         if event_type == EVENT_TYPE_CHANGED and device_id in device_class:
-            device_class.process_raw({device_id: event})
+            device_class.process_raw(device_id, event)
             if resource_type == LIGHT_RESOURCE and "attr" not in event:
                 self.update_group_color([device_id])
             return
 
         if event_type == EVENT_TYPE_ADDED and device_id not in device_class:
             device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
-            device_class.process_raw({device_id: event[device_type]})
+            device_class.process_raw(device_id, event[device_type])
             device = device_class[device_id]
             if self.add_device_callback:
                 self.add_device_callback(resource_type, device)

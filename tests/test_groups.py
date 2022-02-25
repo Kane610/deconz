@@ -218,8 +218,8 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
         json={},
     )
 
-    deconz_session.groups.process_raw(
-        {
+    deconz_session = await deconz_refresh_state(
+        groups={
             "0": {
                 "action": {
                     "bri": 132,

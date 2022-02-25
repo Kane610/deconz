@@ -47,25 +47,28 @@ class APIItems(Generic[DataResource]):
     async def update(self) -> None:
         """Refresh data."""
         raw = await self._request("get", self.path)
-        self.process_raw(raw)
+        self.process_full_data(raw)
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
-        """Process data."""
+    def process_full_data(self, raw: dict[str, Any]) -> None:
+        """Process full data."""
         for id, raw_item in raw.items():
+            self.process_raw(id, raw_item)
 
-            if id in self._items:
-                obj = self._items[id]
-                obj.update(raw_item)
-                event = "updated"
+    def process_raw(self, id: str, raw: Any) -> None:
+        """Process data."""
+        if id in self._items:
+            obj = self._items[id]
+            obj.update(raw)
+            event = "updated"
 
-            else:
-                self._items[id] = self.item_cls(id, raw_item, self._request)
-                event = "added"
+        else:
+            self._items[id] = self.item_cls(id, raw, self._request)
+            event = "added"
 
-            for callback, event_filter in self._subscribers:
-                if event_filter is not None and event not in event_filter:
-                    continue
-                callback(event, id)
+        for callback, event_filter in self._subscribers:
+            if event_filter is not None and event not in event_filter:
+                continue
+            callback(event, id)
 
     def subscribe(
         self,
@@ -126,20 +129,22 @@ class GroupedAPIItems(Generic[DataResource]):
             for resource_type in handler.resource_types
         }
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
-        """Process data."""
-
+    def process_full_data(self, raw: dict[str, Any]) -> None:
+        """Process full data."""
         for id, raw_item in raw.items():
+            self.process_raw(id, raw_item)
 
-            if obj := self.get(id):
-                obj.update(raw_item)
-                continue
+    def process_raw(self, id: str, raw: Any) -> None:
+        """Process data."""
+        if obj := self.get(id):
+            obj.update(raw)
+            return
 
-            handler = self._type_to_handler[ResourceTypes(raw_item.get("type"))]
-            handler.process_raw({id: raw_item})
+        handler = self._type_to_handler[ResourceTypes(raw.get("type"))]
+        handler.process_raw(id, raw)
 
-            for (callback, event_filter) in self._subscribers:
-                callback("added", id)
+        # for (callback, event_filter) in self._subscribers:
+        #     callback("added", id)
 
     def items(self) -> dict[str, DataResource]:
         """Return items."""
