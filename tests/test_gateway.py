@@ -192,7 +192,7 @@ async def test_session_handler_on_uninitialized_websocket(deconz_session):
     # Event handler not called when self.websocket is None
 
     with patch.object(
-        deconz_session, "event_handler", return_value=True
+        deconz_session.events, "handler", return_value=True
     ) as event_handler:
         await deconz_session.session_handler(signal="data")
         event_handler.assert_not_called()
@@ -208,7 +208,7 @@ async def test_session_handler(deconz_session):
     # Event data
 
     with patch.object(
-        deconz_session, "event_handler", return_value=True
+        deconz_session.events, "handler", return_value=True
     ) as event_handler:
         await deconz_session.session_handler(signal="data")
         event_handler.assert_called()
@@ -228,7 +228,7 @@ async def test_session_handler_state_change(
 @pytest.mark.parametrize("event", [{"e": "deleted"}, {"e": "added", "r": "scenes"}])
 async def test_unsupported_events(deconz_session, event):
     """Test event_handler handles unsupported events and resources."""
-    assert not deconz_session.event_handler(event)
+    assert not deconz_session.events.handler(event)
 
 
 async def test_alarmsystem_events(deconz_session, mock_websocket_event):

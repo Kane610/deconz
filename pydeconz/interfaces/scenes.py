@@ -6,6 +6,7 @@ from typing import Any
 
 from ..models.scene import Scene
 from .api import APIItems
+from .events import EventType
 
 
 class Scenes(APIItems[Scene]):
@@ -29,7 +30,7 @@ class Scenes(APIItems[Scene]):
         )
         # return await self._request("post", path=self._path, json={"name": name})
 
-    def group_data_callback(self, action: str, group_id: str) -> None:
+    def group_data_callback(self, action: EventType, group_id: str) -> None:
         """Subscribe callback for new group data."""
         self.process_raw(group_id, self.gateway.groups[group_id].raw)
 

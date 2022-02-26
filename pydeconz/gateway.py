@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-import enum
 import logging
 from pprint import pformat
-from typing import Any, Final, Literal
+from typing import Any, Literal
 
 import aiohttp
 
 from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
+from .interfaces.events import EventHandler
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
@@ -25,40 +25,6 @@ from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
-
-EVENT_ID: Final = "id"
-EVENT_RESOURCE: Final = "r"
-
-EVENT_TYPE: Final = "e"
-EVENT_TYPE_ADDED: Final = "added"
-EVENT_TYPE_CHANGED: Final = "changed"
-EVENT_TYPE_DELETED: Final = "deleted"
-EVENT_TYPE_SCENE_CALLED: Final = "scene-called"
-
-
-class EventType(enum.Enum):
-    """The event type of the message."""
-
-    ADDED = "added"
-    CHANGED = "changed"
-    DELETED = "deleted"
-    SCENE_CALLED = "scene-called"
-
-
-SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
-SUPPORTED_EVENT_RESOURCES: Final = (
-    ALARM_SYSTEM_RESOURCE,
-    GROUP_RESOURCE,
-    LIGHT_RESOURCE,
-    SENSOR_RESOURCE,
-)
-
-RESOURCE_TYPE_TO_DEVICE_TYPE: Final = {
-    ALARM_SYSTEM_RESOURCE: "alarmsystem",
-    GROUP_RESOURCE: "group",
-    LIGHT_RESOURCE: "light",
-    SENSOR_RESOURCE: "sensor",
-}
 
 
 class DeconzSession:
@@ -84,6 +50,7 @@ class DeconzSession:
 
         self.alarmsystems = AlarmSystems(self)
         self.config: Config | None = None
+        self.events = EventHandler(self)
         self.groups = Groups(self)
         self.lights = LightResourceManager(self)
         self.scenes = Scenes(self)
@@ -202,40 +169,10 @@ class DeconzSession:
             return
 
         if signal == SIGNAL_DATA:
-            self.event_handler(self.websocket.data)
+            self.events.handler(self.websocket.data)
 
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
-
-    def event_handler(self, event: dict[str, Any]) -> None:
-        """Receive event from websocket and identifies where the event belong.
-
-        Note that only one of config, name, or state will be present per changed event.
-        """
-        if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
-            LOGGER.debug("Unsupported event %s", event)
-            return
-
-        if (resource_type := event[EVENT_RESOURCE]) not in SUPPORTED_EVENT_RESOURCES:
-            LOGGER.debug("Unsupported resource %s", event)
-            return
-
-        device_class = getattr(self, resource_type)
-        device_id = event[EVENT_ID]
-
-        if event_type == EVENT_TYPE_CHANGED and device_id in device_class:
-            device_class.process_raw(device_id, event)
-            if resource_type == LIGHT_RESOURCE and "attr" not in event:
-                self.update_group_color([device_id])
-            return
-
-        if event_type == EVENT_TYPE_ADDED and device_id not in device_class:
-            device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
-            device_class.process_raw(device_id, event[device_type])
-            device = device_class[device_id]
-            if self.add_device_callback:
-                self.add_device_callback(resource_type, device)
-            return
 
     def update_group_color(self, lights: list[str]) -> None:
         """Update group colors based on light states.

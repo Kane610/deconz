@@ -4,20 +4,20 @@ from __future__ import annotations
 
 from collections.abc import Callable, ItemsView, ValuesView
 import logging
-from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView
+from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView, Optional
 
 from ..models import DataResource, ResourceTypes
+from .events import EventType
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
-#     from ..gateway import EventType
+
 
 LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = tuple[
-    Callable[[str, str], None],
-    "tuple[str] | None",
-    # "tuple[EventType] | None",
+    Callable[[EventType, str], None],
+    Optional[tuple[EventType]],
 ]
 
 
@@ -59,11 +59,11 @@ class APIItems(Generic[DataResource]):
         if id in self._items:
             obj = self._items[id]
             obj.update(raw)
-            event = "updated"
+            event = EventType.CHANGED
 
         else:
             self._items[id] = self.item_cls(id, raw, self._request)
-            event = "added"
+            event = EventType.ADDED
 
         for callback, event_filter in self._subscribers:
             if event_filter is not None and event not in event_filter:
@@ -72,17 +72,15 @@ class APIItems(Generic[DataResource]):
 
     def subscribe(
         self,
-        callback: Callable[[str, str], None],
-        event_filter: tuple[str] | str | None = None,
-        # event_filter: tuple[EventType] | EventType | None = None,
+        callback: Callable[[EventType, str], None],
+        event_filter: tuple[EventType] | EventType | None = None,
     ) -> Callable[..., Any]:
         """Subscribe to events.
 
         "callback" - callback function to call when on event.
         Return function to unsubscribe.
         """
-        if isinstance(event_filter, str):
-            # if isinstance(event_filter, EventType:
+        if isinstance(event_filter, EventType):
             event_filter = (event_filter,)
 
         subscription = (callback, event_filter)
@@ -120,7 +118,7 @@ class GroupedAPIItems(Generic[DataResource]):
     def __init__(self, api_items: list[APIItems[Any]]) -> None:
         """Initialize sensor manager."""
         self._items = api_items
-        self._subscribers: list[SubscriptionType] = []
+        # self._subscribers: list[SubscriptionType] = []
 
         self._type_to_handler: dict[ResourceTypes, APIItems[Any]] = {
             resource_type: handler
