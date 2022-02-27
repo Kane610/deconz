@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = tuple[
     Callable[[EventType, str], None],
-    Optional[tuple[EventType]],
+    Optional[tuple[EventType, ...]],
 ]
 
 
@@ -73,7 +73,7 @@ class APIItems(Generic[DataResource]):
     def subscribe(
         self,
         callback: Callable[[EventType, str], None],
-        event_filter: tuple[EventType] | EventType | None = None,
+        event_filter: tuple[EventType, ...] | EventType | None = None,
     ) -> Callable[..., Any]:
         """Subscribe to events.
 
@@ -118,7 +118,6 @@ class GroupedAPIItems(Generic[DataResource]):
     def __init__(self, api_items: list[APIItems[Any]]) -> None:
         """Initialize sensor manager."""
         self._items = api_items
-        # self._subscribers: list[SubscriptionType] = []
 
         self._type_to_handler: dict[ResourceTypes, APIItems[Any]] = {
             resource_type: handler
@@ -141,8 +140,19 @@ class GroupedAPIItems(Generic[DataResource]):
         handler = self._type_to_handler[ResourceTypes(raw.get("type"))]
         handler.process_raw(id, raw)
 
-        # for (callback, event_filter) in self._subscribers:
-        #     callback("added", id)
+    def subscribe(
+        self,
+        callback: Callable[[EventType, str], None],
+        event_filter: tuple[EventType, ...] | EventType | None = None,
+    ) -> Callable:
+        """Subscribe to state changes for all grouped resources."""
+        subscribers = [x.subscribe(callback, event_filter) for x in self._items]
+
+        def unsubscribe() -> None:
+            for subscriber in subscribers:
+                subscriber()
+
+        return unsubscribe
 
     def items(self) -> dict[str, DataResource]:
         """Return items."""

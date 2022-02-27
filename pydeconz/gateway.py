@@ -12,7 +12,7 @@ import aiohttp
 from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
-from .interfaces.events import EventHandler
+from .interfaces.events import EventHandler, EventResource, EventType
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
@@ -56,6 +56,37 @@ class DeconzSession:
         self.scenes = Scenes(self)
         self.sensors = SensorResourceManager(self)
         self.websocket: WSClient | None = None
+
+        self.legacy_add_device_callback()
+
+    def legacy_add_device_callback(self) -> None:
+        """Support legacy way to signal new device."""
+
+        def signal_new_device(resource: EventResource, device: Any) -> None:
+            """Emit signal new device has been added."""
+            if self.add_device_callback:
+                self.add_device_callback(resource.value, device)
+
+        def signal_new_alarm(event_type: EventType, alarm_id: str) -> None:
+            """Signal new alarm system."""
+            signal_new_device(EventResource.ALARM, self.alarmsystems[alarm_id])
+
+        def signal_new_group(event_type: EventType, group_id: str) -> None:
+            """Signal new group."""
+            signal_new_device(EventResource.GROUP, self.groups[group_id])
+
+        def signal_new_light(event_type: EventType, light_id: str) -> None:
+            """Signal new light."""
+            signal_new_device(EventResource.LIGHT, self.lights[light_id])
+
+        def signal_new_sensor(event_type: EventType, sensor_id: str) -> None:
+            """Signal new sensor."""
+            signal_new_device(EventResource.SENSOR, self.sensors[sensor_id])
+
+        self.alarmsystems.subscribe(signal_new_alarm, EventType.ADDED)
+        self.groups.subscribe(signal_new_group, EventType.ADDED)
+        self.lights.subscribe(signal_new_light, EventType.ADDED)
+        self.sensors.subscribe(signal_new_sensor, EventType.ADDED)
 
     async def get_api_key(
         self,

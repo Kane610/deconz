@@ -134,5 +134,5 @@ class ResourceTypes(Enum):
     @classmethod
     def _missing_(cls: object, value: object) -> "ResourceTypes":
         """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unsupported device type %s", type)
+        LOGGER.warning("Unsupported device type %s", value)
         return ResourceTypes.UNKNOWN

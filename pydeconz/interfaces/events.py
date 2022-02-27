@@ -118,7 +118,3 @@ class EventHandler:
         if event_type == EventType.ADDED and device_id not in device_class:
             device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
             device_class.process_raw(device_id, event[device_type])
-            device = device_class[device_id]
-            if self.gateway.add_device_callback:
-                self.gateway.add_device_callback(resource_type.value, device)
-            return
