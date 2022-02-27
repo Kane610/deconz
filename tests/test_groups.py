@@ -254,8 +254,12 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
 
     assert len(deconz_session.scenes.values()) == 2
 
+    # Update scene
+
     assert scene.name == "coldlight"
     assert scene.full_name == "Hall coldlight"
+
+    # Add scene
 
     scene2 = deconz_session.scenes["0_2"]
     assert scene2.deconz_id == "/groups/0/scenes/2"

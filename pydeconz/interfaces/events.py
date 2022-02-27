@@ -32,6 +32,7 @@ class EventKeys(enum.Enum):
     GROUP_ID = "gid"
     SCENE_ID = "scid"
 
+    ATTRIBUTE = "attr"
     CONFIG = "config"
     NAME = "name"
     STATE = "state"

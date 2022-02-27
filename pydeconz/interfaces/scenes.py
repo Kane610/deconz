@@ -16,7 +16,10 @@ class Scenes(APIItems[Scene]):
 
     def post_init(self) -> None:
         """Register for group data events."""
-        self.gateway.groups.subscribe(self.group_data_callback)
+        self.gateway.groups.subscribe(
+            self.group_data_callback,
+            event_filter={EventType.ADDED, EventType.CHANGED},
+        )
 
     async def create_scene(self, group_id: str, name: str) -> dict[str, Any]:
         """Create a new scene.
