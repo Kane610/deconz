@@ -31,7 +31,7 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     unsub_apiitems_update = apiitems.subscribe(
         apiitems_mock_subscribe_update := Mock(), EventType.CHANGED
     )
-    assert len(apiitems._subscribers) == 4
+    assert len(apiitems._subscribers) == 5
 
     item_1 = apiitems["1"]
     item_1.register_callback(item_1_mock_callback := Mock())
@@ -58,16 +58,16 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     await item_1.request("/field", {"key2": "on"})
 
     unsub_item_1()
-    assert len(item_1._subscribers) == 0
+    assert len(item_1._subscribers) == 1
 
     unsub_apiitems_all()
-    assert len(apiitems._subscribers) == 3
+    assert len(apiitems._subscribers) == 4
 
     unsub_apiitems_add()
-    assert len(apiitems._subscribers) == 2
+    assert len(apiitems._subscribers) == 3
 
     unsub_apiitems_update()
-    assert len(apiitems._subscribers) == 1
+    assert len(apiitems._subscribers) == 2
 
 
 @patch("pydeconz.models.api.sleep", new_callable=AsyncMock)

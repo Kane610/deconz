@@ -58,6 +58,7 @@ class DeconzSession:
         self.websocket: WSClient | None = None
 
         self.legacy_add_device_callback()
+        self.legacy_update_group_color()
 
     def legacy_add_device_callback(self) -> None:
         """Support legacy way to signal new device."""
@@ -87,6 +88,25 @@ class DeconzSession:
         self.groups.subscribe(signal_new_group, EventType.ADDED)
         self.lights.subscribe(signal_new_light, EventType.ADDED)
         self.sensors.subscribe(signal_new_sensor, EventType.ADDED)
+
+    def legacy_update_group_color(self) -> None:
+        """Support legacy way to update group colors."""
+
+        lights = self.lights.lights
+
+        def signal_new_light(event_type: EventType, light_id: str) -> None:
+            """Signal new light."""
+
+            light = lights[light_id]
+
+            def updated_light() -> None:
+                """Emit signal new device has been added."""
+                if "attr" not in light.changed_keys:
+                    self.update_group_color([light_id])
+
+            light.subscribe(updated_light)
+
+        lights.subscribe(signal_new_light, EventType.ADDED)
 
     async def get_api_key(
         self,

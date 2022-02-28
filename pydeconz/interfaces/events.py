@@ -111,8 +111,6 @@ class EventHandler:
 
         if event_type == EventType.CHANGED and device_id in device_class:
             device_class.process_raw(device_id, event)
-            if resource_type == EventResource.LIGHT and "attr" not in event:
-                self.gateway.update_group_color([device_id])
             return
 
         if event_type == EventType.ADDED and device_id not in device_class:
