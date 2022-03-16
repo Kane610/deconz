@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..models import ResourceGroup
 from ..models.scene import Scene
 from .api import APIItems
 from .events import EventType
@@ -13,6 +14,7 @@ class Scenes(APIItems[Scene]):
     """Represent scenes of a deCONZ group."""
 
     item_cls = Scene
+    resource_group = ResourceGroup.SCENE
 
     def post_init(self) -> None:
         """Register for group data events."""

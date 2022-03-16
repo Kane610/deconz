@@ -2,19 +2,18 @@
 
 from __future__ import annotations
 
-from typing import Any, Final
+from typing import Any
 
+from ..models import ResourceGroup
 from ..models.alarm_system import AlarmSystem
 from .api import APIItems
-
-URL: Final = "/alarmsystems"
 
 
 class AlarmSystems(APIItems[AlarmSystem]):
     """Manager of deCONZ alarm systems."""
 
     item_cls = AlarmSystem
-    path = URL
+    resource_group = ResourceGroup.ALARM
 
     async def create_alarm_system(self, name: str) -> dict[str, Any]:
         """Create a new alarm system.

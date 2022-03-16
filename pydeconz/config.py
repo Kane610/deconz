@@ -7,8 +7,6 @@ from typing import Any, Final, Literal
 
 from .utils import normalize_bridge_id
 
-RESOURCE_TYPE: Final = "config"
-
 UNINITIALIZED_BRIDGE_ID: Final = "0000000000000000"
 
 

@@ -2,18 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Final
-
-from ..models import ResourceTypes
+from ..models import ResourceGroup, ResourceType
 from ..models.group import Group
 from .api import APIItems
-
-URL: Final = "/groups"
 
 
 class Groups(APIItems[Group]):
     """Represent deCONZ groups."""
 
-    resource_type = ResourceTypes.GROUP
-    path = URL
+    resource_group = ResourceGroup.GROUP
+    resource_type = ResourceType.GROUP
     item_cls = Group

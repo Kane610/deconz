@@ -3,17 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable, ItemsView, ValuesView
-import logging
 from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView, Optional
 
-from ..models import DataResource, ResourceTypes
-from .events import EventType
+from ..models import DataResource, ResourceGroup, ResourceType
+from ..models.event import Event, EventType
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
-
-LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = tuple[
     Callable[[EventType, str], None],
@@ -24,9 +21,9 @@ SubscriptionType = tuple[
 class APIItems(Generic[DataResource]):
     """Base class for a map of API Items."""
 
-    resource_type = ResourceTypes.UNKNOWN
-    resource_types: set[ResourceTypes] | None = None
-    path = ""
+    resource_group: ResourceGroup
+    resource_type = ResourceType.UNKNOWN
+    resource_types: set[ResourceType] | None = None
     item_cls: Any
 
     def __init__(self, gateway: DeconzSession) -> None:
@@ -36,13 +33,18 @@ class APIItems(Generic[DataResource]):
         self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
 
+        self.path = f"/{self.resource_group.value}"
+
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
 
-        self.post_init()
-
     def post_init(self) -> None:
         """Post initialization method."""
+        self.gateway.events.subscribe(
+            self.process_event,
+            event_filter=(EventType.ADDED, EventType.CHANGED),
+            resource_filter=self.resource_group,
+        )
 
     async def update(self) -> None:
         """Refresh data."""
@@ -53,6 +55,15 @@ class APIItems(Generic[DataResource]):
         """Process full data."""
         for id, raw_item in raw.items():
             self.process_raw(id, raw_item)
+
+    def process_event(self, event: Event) -> None:
+        """Process event."""
+        if event.type == EventType.CHANGED and event.id in self:
+            self.process_raw(event.id, event.data)
+            return
+
+        if event.type == EventType.ADDED and event.id not in self:
+            self.process_raw(event.id, event.full_resource)
 
     def process_raw(self, id: str, raw: Any) -> None:
         """Process data."""
@@ -115,21 +126,41 @@ class APIItems(Generic[DataResource]):
 class GroupedAPIItems(Generic[DataResource]):
     """Represent a group of deCONZ API items."""
 
-    def __init__(self, api_items: list[APIItems[Any]]) -> None:
+    resource_group: ResourceGroup
+
+    def __init__(self, gateway: DeconzSession, api_items: list[APIItems[Any]]) -> None:
         """Initialize sensor manager."""
+        self.gateway = gateway
         self._items = api_items
 
-        self._type_to_handler: dict[ResourceTypes, APIItems[Any]] = {
+        self._type_to_handler: dict[ResourceType, APIItems[Any]] = {
             resource_type: handler
             for handler in api_items
             if handler.resource_types is not None
             for resource_type in handler.resource_types
         }
 
+    def post_init(self) -> None:
+        """Post initialization method."""
+        self.gateway.events.subscribe(
+            self.process_event,
+            event_filter=(EventType.ADDED, EventType.CHANGED),
+            resource_filter=self.resource_group,
+        )
+
     def process_full_data(self, raw: dict[str, Any]) -> None:
         """Process full data."""
         for id, raw_item in raw.items():
             self.process_raw(id, raw_item)
+
+    def process_event(self, event: Event) -> None:
+        """Process event."""
+        if event.type == EventType.CHANGED and event.id in self:
+            self.process_raw(event.id, event.data)
+            return
+
+        if event.type == EventType.ADDED and event.id not in self:
+            self.process_raw(event.id, event.full_resource)
 
     def process_raw(self, id: str, raw: Any) -> None:
         """Process data."""
@@ -137,7 +168,7 @@ class GroupedAPIItems(Generic[DataResource]):
             obj.update(raw)
             return
 
-        handler = self._type_to_handler[ResourceTypes(raw.get("type"))]
+        handler = self._type_to_handler[ResourceType(raw.get("type"))]
         handler.process_raw(id, raw)
 
     def subscribe(

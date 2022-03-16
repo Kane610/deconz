@@ -9,19 +9,16 @@ from typing import Any, Literal
 
 import aiohttp
 
-from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
+from .config import Config
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
-from .interfaces.events import EventHandler, EventResource, EventType
+from .interfaces.events import EventHandler, EventType
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
-from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
-from .models.group import RESOURCE_TYPE as GROUP_RESOURCE
-from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
+from .models import ResourceGroup
 from .models.light.light import Light
-from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
@@ -57,32 +54,38 @@ class DeconzSession:
         self.sensors = SensorResourceManager(self)
         self.websocket: WSClient | None = None
 
+        self.alarmsystems.post_init()
+        self.groups.post_init()
+        self.lights.post_init()
+        self.scenes.post_init()
+        self.sensors.post_init()
+
         self.legacy_add_device_callback()
         self.legacy_update_group_color()
 
     def legacy_add_device_callback(self) -> None:
         """Support legacy way to signal new device."""
 
-        def signal_new_device(resource: EventResource, device: Any) -> None:
+        def signal_new_device(resource: ResourceGroup, device: Any) -> None:
             """Emit signal new device has been added."""
             if self.add_device_callback:
                 self.add_device_callback(resource.value, device)
 
         def signal_new_alarm(event_type: EventType, alarm_id: str) -> None:
             """Signal new alarm system."""
-            signal_new_device(EventResource.ALARM, self.alarmsystems[alarm_id])
+            signal_new_device(ResourceGroup.ALARM, self.alarmsystems[alarm_id])
 
         def signal_new_group(event_type: EventType, group_id: str) -> None:
             """Signal new group."""
-            signal_new_device(EventResource.GROUP, self.groups[group_id])
+            signal_new_device(ResourceGroup.GROUP, self.groups[group_id])
 
         def signal_new_light(event_type: EventType, light_id: str) -> None:
             """Signal new light."""
-            signal_new_device(EventResource.LIGHT, self.lights[light_id])
+            signal_new_device(ResourceGroup.LIGHT, self.lights[light_id])
 
         def signal_new_sensor(event_type: EventType, sensor_id: str) -> None:
             """Signal new sensor."""
-            signal_new_device(EventResource.SENSOR, self.sensors[sensor_id])
+            signal_new_device(ResourceGroup.SENSOR, self.sensors[sensor_id])
 
         self.alarmsystems.subscribe(signal_new_alarm, EventType.ADDED)
         self.groups.subscribe(signal_new_group, EventType.ADDED)
@@ -159,12 +162,12 @@ class DeconzSession:
         data = await self.request("get", "")
 
         if not self.config:
-            self.config = Config(data[CONFIG_RESOURCE], self.request)
+            self.config = Config(data[ResourceGroup.CONFIG.value], self.request)
 
-        self.alarmsystems.process_full_data(data.get(ALARM_SYSTEM_RESOURCE, {}))
-        self.groups.process_full_data(data[GROUP_RESOURCE])
-        self.lights.process_full_data(data[LIGHT_RESOURCE])
-        self.sensors.process_full_data(data[SENSOR_RESOURCE])
+        self.alarmsystems.process_full_data(data.get(ResourceGroup.ALARM.value, {}))
+        self.groups.process_full_data(data[ResourceGroup.GROUP.value])
+        self.lights.process_full_data(data[ResourceGroup.LIGHT.value])
+        self.sensors.process_full_data(data[ResourceGroup.SENSOR.value])
 
         self.update_group_color(list(self.lights.keys()))
 
