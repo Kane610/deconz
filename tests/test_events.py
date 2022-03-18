@@ -71,6 +71,8 @@ async def test_event_added(resource, event_type, resource_key):
     event = Event.from_dict(data)
 
     assert event.id == "1"
+    assert event.gid == ""
+    assert event.scid == ""
     assert event.resource == resource
     assert event.type == event_type
     assert event.full_resource == {"k": "v"}
@@ -98,6 +100,8 @@ async def test_event_changed(resource, event_type, test_data):
     event = Event.from_dict(data)
 
     assert event.id == "1"
+    assert event.gid == ""
+    assert event.scid == ""
     assert event.resource == resource
     assert event.type == event_type
     assert event.changed_data == test_data
@@ -125,6 +129,8 @@ async def test_event_deleted(resource, event_type):
     event = Event.from_dict(data)
 
     assert event.id == "1"
+    assert event.gid == ""
+    assert event.scid == ""
     assert event.resource == resource
     assert event.type == event_type
     assert event.data == data
@@ -143,7 +149,9 @@ async def test_event_scene_called():
     }
     event = Event.from_dict(data)
 
-    assert event.id == "1"
+    assert event.id == ""
+    assert event.gid == "1"
+    assert event.scid == "2"
     assert event.resource == ResourceGroup.SCENE
     assert event.type == EventType.SCENE_CALLED
     assert event.data == data
