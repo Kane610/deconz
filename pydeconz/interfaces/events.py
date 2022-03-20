@@ -19,6 +19,7 @@ SubscriptionType = tuple[
     Optional[tuple[EventType, ...]],
     Optional[tuple[ResourceGroup, ...]],
 ]
+UnsubscribeType = Callable[[], None]
 
 
 class EventHandler:
@@ -34,7 +35,7 @@ class EventHandler:
         callback: Callable[[Event], None],
         event_filter: tuple[EventType, ...] | EventType | None = None,
         resource_filter: tuple[ResourceGroup, ...] | ResourceGroup | None = None,
-    ) -> Callable[..., Any]:
+    ) -> UnsubscribeType:
         """Subscribe to events.
 
         "callback" - callback function to call when on event.

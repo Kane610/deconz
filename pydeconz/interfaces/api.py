@@ -16,6 +16,7 @@ SubscriptionType = tuple[
     Callable[[EventType, str], None],
     Optional[tuple[EventType, ...]],
 ]
+UnsubscribeType = Callable[[], None]
 
 
 class APIItems(Generic[DataResource]):
@@ -85,7 +86,7 @@ class APIItems(Generic[DataResource]):
         self,
         callback: Callable[[EventType, str], None],
         event_filter: tuple[EventType, ...] | EventType | None = None,
-    ) -> Callable[..., Any]:
+    ) -> UnsubscribeType:
         """Subscribe to events.
 
         "callback" - callback function to call when on event.
@@ -175,7 +176,7 @@ class GroupedAPIItems(Generic[DataResource]):
         self,
         callback: Callable[[EventType, str], None],
         event_filter: tuple[EventType, ...] | EventType | None = None,
-    ) -> Callable:
+    ) -> UnsubscribeType:
         """Subscribe to state changes for all grouped resources."""
         subscribers = [x.subscribe(callback, event_filter) for x in self._items]
 
