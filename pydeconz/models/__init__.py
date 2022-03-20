@@ -11,7 +11,18 @@ LOGGER = logging.getLogger(__name__)
 DataResource = TypeVar("DataResource", bound=APIItem)
 
 
-class ResourceTypes(Enum):
+class ResourceGroup(Enum):
+    """Primary endpoints resources are exposed from."""
+
+    ALARM = "alarmsystems"
+    CONFIG = "config"
+    GROUP = "groups"
+    LIGHT = "lights"
+    SCENE = "scenes"
+    SENSOR = "sensors"
+
+
+class ResourceType(Enum):
     """Resource types."""
 
     # Group resources
@@ -132,7 +143,7 @@ class ResourceTypes(Enum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls: object, value: object) -> "ResourceTypes":
+    def _missing_(cls, value: object) -> "ResourceType":
         """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unsupported device type %s", type)
-        return ResourceTypes.UNKNOWN
+        LOGGER.warning("Unsupported device type %s", value)
+        return ResourceType.UNKNOWN

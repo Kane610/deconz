@@ -9,6 +9,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz.errors import BridgeBusy
+from pydeconz.interfaces.events import EventType
 
 
 async def test_api_items(mock_aioresponse, deconz_refresh_state):
@@ -25,12 +26,12 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
 
     unsub_apiitems_all = apiitems.subscribe(apiitems_mock_subscribe_all := Mock())
     unsub_apiitems_add = apiitems.subscribe(
-        apiitems_mock_subscribe_add := Mock(), "added"
+        apiitems_mock_subscribe_add := Mock(), EventType.ADDED
     )
     unsub_apiitems_update = apiitems.subscribe(
-        apiitems_mock_subscribe_update := Mock(), "updated"
+        apiitems_mock_subscribe_update := Mock(), EventType.CHANGED
     )
-    assert len(apiitems._subscribers) == 3
+    assert len(apiitems._subscribers) == 5
 
     item_1 = apiitems["1"]
     item_1.register_callback(item_1_mock_callback := Mock())
@@ -42,31 +43,31 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     await apiitems.update()
 
     # Item 1 is updated
-    apiitems_mock_subscribe_all.assert_any_call("updated", "1")
-    apiitems_mock_subscribe_update.assert_called_with("updated", "1")
+    apiitems_mock_subscribe_all.assert_any_call(EventType.CHANGED, "1")
+    apiitems_mock_subscribe_update.assert_called_with(EventType.CHANGED, "1")
     item_1_mock_callback.assert_called()
     item_1_mock_subscribe.assert_called()
     item_1.changed_keys == ("key1")
 
     # item 3 is created
     assert "3" in apiitems
-    apiitems_mock_subscribe_all.assert_called_with("added", "3")
-    apiitems_mock_subscribe_add.assert_called_with("added", "3")
+    apiitems_mock_subscribe_all.assert_called_with(EventType.ADDED, "3")
+    apiitems_mock_subscribe_add.assert_called_with(EventType.ADDED, "3")
 
     mock_aioresponse.put("http://host:80/api/apikey/field")
     await item_1.request("/field", {"key2": "on"})
 
     unsub_item_1()
-    assert len(item_1._subscribers) == 0
+    assert len(item_1._subscribers) == 1
 
     unsub_apiitems_all()
-    assert len(apiitems._subscribers) == 2
+    assert len(apiitems._subscribers) == 4
 
     unsub_apiitems_add()
-    assert len(apiitems._subscribers) == 1
+    assert len(apiitems._subscribers) == 3
 
     unsub_apiitems_update()
-    assert len(apiitems._subscribers) == 0
+    assert len(apiitems._subscribers) == 2
 
 
 @patch("pydeconz.models.api.sleep", new_callable=AsyncMock)

@@ -26,7 +26,7 @@ class DeconzLight(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
-    ZHATYPE: tuple = ()
+    ZHATYPE: tuple[str, ...] = ()
 
     @property
     def resource_type(self) -> str:

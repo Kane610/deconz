@@ -3,30 +3,28 @@
 from __future__ import annotations
 
 from collections.abc import Callable, ItemsView, ValuesView
-import logging
-from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView
+from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView, Optional
 
-from ..models import DataResource, ResourceTypes
+from ..models import DataResource, ResourceGroup, ResourceType
+from ..models.event import Event, EventType
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
-#     from ..gateway import EventType
 
-LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = tuple[
-    Callable[[str, str], None],
-    "tuple[str] | None",
-    # "tuple[EventType] | None",
+    Callable[[EventType, str], None],
+    Optional[tuple[EventType, ...]],
 ]
+UnsubscribeType = Callable[[], None]
 
 
 class APIItems(Generic[DataResource]):
     """Base class for a map of API Items."""
 
-    resource_type = ResourceTypes.UNKNOWN
-    resource_types: set[ResourceTypes] | None = None
-    path = ""
+    resource_group: ResourceGroup
+    resource_type = ResourceType.UNKNOWN
+    resource_types: set[ResourceType] | None = None
     item_cls: Any
 
     def __init__(self, gateway: DeconzSession) -> None:
@@ -36,50 +34,65 @@ class APIItems(Generic[DataResource]):
         self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
 
+        self.path = f"/{self.resource_group.value}"
+
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
 
-        self.post_init()
-
     def post_init(self) -> None:
         """Post initialization method."""
+        self.gateway.events.subscribe(
+            self.process_event,
+            event_filter=(EventType.ADDED, EventType.CHANGED),
+            resource_filter=self.resource_group,
+        )
 
     async def update(self) -> None:
         """Refresh data."""
         raw = await self._request("get", self.path)
         self.process_raw(raw)
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
-        """Process data."""
+    def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:
+        """Process full data."""
         for id, raw_item in raw.items():
+            self.process_item(id, raw_item)
 
-            if id in self._items:
-                obj = self._items[id]
-                obj.update(raw_item)
-                event = "updated"
+    def process_event(self, event: Event) -> None:
+        """Process event."""
+        if event.type == EventType.CHANGED and event.id in self:
+            self.process_item(event.id, event.changed_data)
+            return
 
-            else:
-                self._items[id] = self.item_cls(id, raw_item, self._request)
-                event = "added"
+        if event.type == EventType.ADDED and event.id not in self:
+            self.process_item(event.id, event.added_data)
 
-            for callback, event_filter in self._subscribers:
-                if event_filter is not None and event not in event_filter:
-                    continue
-                callback(event, id)
+    def process_item(self, id: str, raw: dict[str, Any]) -> None:
+        """Process data."""
+        if id in self._items:
+            obj = self._items[id]
+            obj.update(raw)
+            event = EventType.CHANGED
+
+        else:
+            self._items[id] = self.item_cls(id, raw, self._request)
+            event = EventType.ADDED
+
+        for callback, event_filter in self._subscribers:
+            if event_filter is not None and event not in event_filter:
+                continue
+            callback(event, id)
 
     def subscribe(
         self,
-        callback: Callable[[str, str], None],
-        event_filter: tuple[str] | str | None = None,
-        # event_filter: tuple[EventType] | EventType | None = None,
-    ) -> Callable[..., Any]:
+        callback: Callable[[EventType, str], None],
+        event_filter: tuple[EventType, ...] | EventType | None = None,
+    ) -> UnsubscribeType:
         """Subscribe to events.
 
         "callback" - callback function to call when on event.
         Return function to unsubscribe.
         """
-        if isinstance(event_filter, str):
-            # if isinstance(event_filter, EventType:
+        if isinstance(event_filter, EventType):
             event_filter = (event_filter,)
 
         subscription = (callback, event_filter)
@@ -114,32 +127,64 @@ class APIItems(Generic[DataResource]):
 class GroupedAPIItems(Generic[DataResource]):
     """Represent a group of deCONZ API items."""
 
-    def __init__(self, api_items: list[APIItems[Any]]) -> None:
-        """Initialize sensor manager."""
-        self._items = api_items
-        self._subscribers: list[SubscriptionType] = []
+    resource_group: ResourceGroup
 
-        self._type_to_handler: dict[ResourceTypes, APIItems[Any]] = {
+    def __init__(self, gateway: DeconzSession, api_items: list[APIItems[Any]]) -> None:
+        """Initialize sensor manager."""
+        self.gateway = gateway
+        self._items = api_items
+
+        self._type_to_handler: dict[ResourceType, APIItems[Any]] = {
             resource_type: handler
             for handler in api_items
             if handler.resource_types is not None
             for resource_type in handler.resource_types
         }
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
-        """Process data."""
+    def post_init(self) -> None:
+        """Post initialization method."""
+        self.gateway.events.subscribe(
+            self.process_event,
+            event_filter=(EventType.ADDED, EventType.CHANGED),
+            resource_filter=self.resource_group,
+        )
 
+    def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:
+        """Process full data."""
         for id, raw_item in raw.items():
+            self.process_item(id, raw_item)
 
-            if obj := self.get(id):
-                obj.update(raw_item)
-                continue
+    def process_event(self, event: Event) -> None:
+        """Process event."""
+        if event.type == EventType.CHANGED and event.id in self:
+            self.process_item(event.id, event.changed_data)
+            return
 
-            handler = self._type_to_handler[ResourceTypes(raw_item.get("type"))]
-            handler.process_raw({id: raw_item})
+        if event.type == EventType.ADDED and event.id not in self:
+            self.process_item(event.id, event.added_data)
 
-            for (callback, event_filter) in self._subscribers:
-                callback("added", id)
+    def process_item(self, id: str, raw: dict[str, Any]) -> None:
+        """Process item data."""
+        if obj := self.get(id):
+            obj.update(raw)
+            return
+
+        handler = self._type_to_handler[ResourceType(raw.get("type"))]
+        handler.process_item(id, raw)
+
+    def subscribe(
+        self,
+        callback: Callable[[EventType, str], None],
+        event_filter: tuple[EventType, ...] | EventType | None = None,
+    ) -> UnsubscribeType:
+        """Subscribe to state changes for all grouped resources."""
+        subscribers = [x.subscribe(callback, event_filter) for x in self._items]
+
+        def unsubscribe() -> None:
+            for subscriber in subscribers:
+                subscriber()
+
+        return unsubscribe
 
     def items(self) -> dict[str, DataResource]:
         """Return items."""

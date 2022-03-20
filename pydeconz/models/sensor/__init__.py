@@ -22,7 +22,7 @@ class DeconzSensor(DeconzDevice):
     """
 
     BINARY = False
-    ZHATYPE: tuple = ()
+    ZHATYPE: tuple[str, ...] = ()
 
     STATE_PROPERTY = "on"
 

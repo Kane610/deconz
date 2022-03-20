@@ -26,7 +26,8 @@ class Scene(APIItem):
         """Set initial information about scene."""
         super().__init__(resource_id, raw, request)
 
-        self.group_deconz_id = raw["group_deconz_id"]
+        self.group_id = raw["group_id"]
+        self.group_deconz_id = f"/groups/{self.group_id}"
         self.group_name = raw["group_name"]
 
     @property

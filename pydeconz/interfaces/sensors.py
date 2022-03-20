@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Union
+from typing import TYPE_CHECKING, Any, Union
 
-from ..models import ResourceTypes
+from ..models import ResourceGroup, ResourceType
 from ..models.sensor import *  # noqa: F401, F403
 from ..models.sensor.air_quality import AirQuality
 from ..models.sensor.alarm import Alarm
@@ -38,215 +38,213 @@ from .api import APIItems, GroupedAPIItems
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
-URL: Final = "/sensors"
-
 
 class AirQualityHandler(APIItems[AirQuality]):
     """Handler for air quality sensor."""
 
-    resource_type = ResourceTypes.ZHA_AIR_QUALITY
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_AIR_QUALITY
     item_cls = AirQuality
 
 
 class AlarmHandler(APIItems[Alarm]):
     """Handler for alarm sensor."""
 
-    resource_type = ResourceTypes.ZHA_ALARM
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_ALARM
     item_cls = Alarm
 
 
 class AncillaryControlHandler(APIItems[AncillaryControl]):
     """Handler for ancillary control sensor."""
 
-    resource_type = ResourceTypes.ZHA_ANCILLARY_CONTROL
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_ANCILLARY_CONTROL
     item_cls = AncillaryControl
 
 
 class BatteryHandler(APIItems[Battery]):
     """Handler for battery sensor."""
 
-    resource_type = ResourceTypes.ZHA_BATTERY
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_BATTERY
     item_cls = Battery
 
 
 class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
     """Handler for carbon monoxide sensor."""
 
-    resource_type = ResourceTypes.ZHA_CARBON_MONOXIDE
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_CARBON_MONOXIDE
     item_cls = CarbonMonoxide
 
 
 class ConsumptionHandler(APIItems[Consumption]):
     """Handler for consumption sensor."""
 
-    resource_type = ResourceTypes.ZHA_CONSUMPTION
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_CONSUMPTION
     item_cls = Consumption
 
 
 class DaylightHandler(APIItems[Daylight]):
     """Handler for daylight sensor."""
 
-    resource_type = ResourceTypes.DAYLIGHT
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.DAYLIGHT
     item_cls = Daylight
 
 
 class DoorLockHandler(APIItems[DoorLock]):
     """Handler for door lock sensor."""
 
-    resource_type = ResourceTypes.ZHA_DOOR_LOCK
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_DOOR_LOCK
     item_cls = DoorLock
 
 
 class FireHandler(APIItems[Fire]):
     """Handler for fire sensor."""
 
-    resource_type = ResourceTypes.ZHA_FIRE
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_FIRE
     item_cls = Fire
 
 
 class GenericFlagHandler(APIItems[GenericFlag]):
     """Handler for generic flag sensor."""
 
-    resource_type = ResourceTypes.CLIP_GENERIC_FLAG
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.CLIP_GENERIC_FLAG
     item_cls = GenericFlag
 
 
 class GenericStatusHandler(APIItems[GenericStatus]):
     """Handler for generic status sensor."""
 
-    resource_type = ResourceTypes.CLIP_GENERIC_STATUS
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.CLIP_GENERIC_STATUS
     item_cls = GenericStatus
 
 
 class HumidityHandler(APIItems[Humidity]):
     """Handler for humidity sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_HUMIDITY,
-        ResourceTypes.CLIP_HUMIDITY,
+        ResourceType.ZHA_HUMIDITY,
+        ResourceType.CLIP_HUMIDITY,
     }
-    path = URL
     item_cls = Humidity
 
 
 class LightLevelHandler(APIItems[LightLevel]):
     """Handler for light level sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_LIGHT_LEVEL,
-        ResourceTypes.CLIP_LIGHT_LEVEL,
+        ResourceType.ZHA_LIGHT_LEVEL,
+        ResourceType.CLIP_LIGHT_LEVEL,
     }
-    path = URL
     item_cls = LightLevel
 
 
 class OpenCloseHandler(APIItems[OpenClose]):
     """Handler for open/close sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_OPEN_CLOSE,
-        ResourceTypes.CLIP_OPEN_CLOSE,
+        ResourceType.ZHA_OPEN_CLOSE,
+        ResourceType.CLIP_OPEN_CLOSE,
     }
-    path = URL
     item_cls = OpenClose
 
 
 class PowerHandler(APIItems[Power]):
     """Handler for power sensor."""
 
-    resource_type = ResourceTypes.ZHA_POWER
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_POWER
     item_cls = Power
 
 
 class PresenceHandler(APIItems[Presence]):
     """Handler for presence sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_PRESENCE,
-        ResourceTypes.CLIP_PRESENCE,
+        ResourceType.ZHA_PRESENCE,
+        ResourceType.CLIP_PRESENCE,
     }
-    path = URL
     item_cls = Presence
 
 
 class PressureHandler(APIItems[Pressure]):
     """Handler for pressure sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_PRESSURE,
-        ResourceTypes.CLIP_PRESSURE,
+        ResourceType.ZHA_PRESSURE,
+        ResourceType.CLIP_PRESSURE,
     }
-    path = URL
     item_cls = Pressure
 
 
 class SwitchHandler(APIItems[Switch]):
     """Handler for switch sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_SWITCH,
-        ResourceTypes.ZGP_SWITCH,
-        ResourceTypes.CLIP_SWITCH,
+        ResourceType.ZHA_SWITCH,
+        ResourceType.ZGP_SWITCH,
+        ResourceType.CLIP_SWITCH,
     }
-    path = URL
     item_cls = Switch
 
 
 class TemperatureHandler(APIItems[Temperature]):
     """Handler for temperature sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_TEMPERATURE,
-        ResourceTypes.CLIP_TEMPERATURE,
+        ResourceType.ZHA_TEMPERATURE,
+        ResourceType.CLIP_TEMPERATURE,
     }
-    path = URL
     item_cls = Temperature
 
 
 class ThermostatHandler(APIItems[Thermostat]):
     """Handler for thermostat sensor."""
 
+    resource_group = ResourceGroup.SENSOR
     resource_types = {
-        ResourceTypes.ZHA_THERMOSTAT,
-        ResourceTypes.CLIP_THERMOSTAT,
+        ResourceType.ZHA_THERMOSTAT,
+        ResourceType.CLIP_THERMOSTAT,
     }
-    path = URL
     item_cls = Thermostat
 
 
 class TimeHandler(APIItems[Time]):
     """Handler for time sensor."""
 
-    resource_type = ResourceTypes.ZHA_TIME
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_TIME
     item_cls = Time
 
 
 class VibrationHandler(APIItems[Vibration]):
     """Handler for vibration sensor."""
 
-    resource_type = ResourceTypes.ZHA_VIBRATION
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_VIBRATION
     item_cls = Vibration
 
 
 class WaterHandler(APIItems[Water]):
     """Handler for water sensor."""
 
-    resource_type = ResourceTypes.ZHA_WATER
-    path = URL
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_WATER
     item_cls = Water
 
 
@@ -279,6 +277,8 @@ SENSOR_RESOURCES = Union[
 
 class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
     """Represent deCONZ sensors."""
+
+    resource_group = ResourceGroup.SENSOR
 
     def __init__(self, gateway: DeconzSession) -> None:
         """Initialize sensor manager."""
@@ -333,4 +333,4 @@ class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
             self.water,
         ]
 
-        super().__init__(handlers)
+        super().__init__(gateway, handlers)

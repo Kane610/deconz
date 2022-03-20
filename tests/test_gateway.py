@@ -192,7 +192,7 @@ async def test_session_handler_on_uninitialized_websocket(deconz_session):
     # Event handler not called when self.websocket is None
 
     with patch.object(
-        deconz_session, "event_handler", return_value=True
+        deconz_session.events, "handler", return_value=True
     ) as event_handler:
         await deconz_session.session_handler(signal="data")
         event_handler.assert_not_called()
@@ -208,7 +208,7 @@ async def test_session_handler(deconz_session):
     # Event data
 
     with patch.object(
-        deconz_session, "event_handler", return_value=True
+        deconz_session.events, "handler", return_value=True
     ) as event_handler:
         await deconz_session.session_handler(signal="data")
         event_handler.assert_called()
@@ -225,10 +225,23 @@ async def test_session_handler_state_change(
     deconz_session.connection_status_callback.assert_called_with(value)
 
 
-@pytest.mark.parametrize("event", [{"e": "deleted"}, {"e": "added", "r": "scenes"}])
+@pytest.mark.parametrize(
+    "event",
+    [
+        {"e": "added", "r": "scenes"},
+        {"e": "deleted", "r": "lights"},
+        {"e": "scene-called", "r": "scenes"},
+    ],
+)
 async def test_unsupported_events(deconz_session, event):
     """Test event_handler handles unsupported events and resources."""
-    assert not deconz_session.event_handler(event)
+    assert not deconz_session.events.handler(event)
+
+
+async def test_incomplete_event(deconz_session):
+    """Test event_handler handles unsupported events and resources."""
+    with pytest.raises(KeyError):
+        deconz_session.events.handler({"e": "deleted"})
 
 
 async def test_alarmsystem_events(deconz_session, mock_websocket_event):
@@ -285,14 +298,7 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     )
 
     mock_alarmsystem_callback.assert_called()
-    assert deconz_session.alarmsystems["1"].changed_keys == {
-        "state",
-        "armstate",
-        "e",
-        "id",
-        "r",
-        "t",
-    }
+    assert deconz_session.alarmsystems["1"].changed_keys == {"state", "armstate"}
     assert deconz_session.alarmsystems["1"].arm_state == "armed_away"
 
 
@@ -336,21 +342,14 @@ async def test_light_events(deconz_session, mock_websocket_event):
     )
 
     mock_light_callback.assert_called()
-    assert deconz_session.lights["1"].changed_keys == {
-        "state",
-        "bri",
-        "e",
-        "id",
-        "r",
-        "uniqueid",
-        "t",
-    }
+    assert deconz_session.lights["1"].changed_keys == {"state", "bri"}
     assert deconz_session.lights["1"].brightness == 2
 
 
 async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket_event):
     """Test event_handler works."""
     deconz_session.add_device_callback = Mock()
+
     await deconz_refresh_state(
         lights={
             "1": {
@@ -374,6 +373,7 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
                 "action": {"bri": 1},
                 "lights": ["1"],
                 "scenes": [],
+                "state": {"any_on": False},
             }
         },
     )
@@ -391,19 +391,12 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
     await mock_websocket_event(
         resource="groups",
         id="1",
-        data={"action": {"bri": 2}},
+        data={"state": {"any_on": True}},
     )
 
     mock_group_callback.assert_called()
-    assert deconz_session.groups["1"].changed_keys == {
-        "action",
-        "bri",
-        "e",
-        "id",
-        "r",
-        "t",
-    }
-    assert deconz_session.groups["1"].brightness == 2
+    assert deconz_session.groups["1"].changed_keys == {"state", "any_on"}
+    assert deconz_session.groups["1"].any_on
 
 
 async def test_sensor_events(deconz_session, mock_websocket_event):
@@ -447,15 +440,7 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
     )
 
     mock_sensor_callback.assert_called()
-    assert deconz_session.sensors["1"].changed_keys == {
-        "config",
-        "reachable",
-        "e",
-        "id",
-        "r",
-        "uniqueid",
-        "t",
-    }
+    assert deconz_session.sensors["1"].changed_keys == {"config", "reachable"}
     assert not deconz_session.sensors["1"].reachable
 
 

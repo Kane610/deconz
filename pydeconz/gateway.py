@@ -3,62 +3,26 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-import enum
 import logging
 from pprint import pformat
-from typing import Any, Final, Literal
+from typing import Any, Literal
 
 import aiohttp
 
-from .config import RESOURCE_TYPE as CONFIG_RESOURCE, Config
+from .config import Config
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
+from .interfaces.events import EventHandler
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
-from .models.alarm_system import RESOURCE_TYPE as ALARM_SYSTEM_RESOURCE
-from .models.group import RESOURCE_TYPE as GROUP_RESOURCE
-from .models.light import RESOURCE_TYPE as LIGHT_RESOURCE
+from .models import ResourceGroup
+from .models.event import EventType
 from .models.light.light import Light
-from .models.sensor import RESOURCE_TYPE as SENSOR_RESOURCE
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
-
-EVENT_ID: Final = "id"
-EVENT_RESOURCE: Final = "r"
-
-EVENT_TYPE: Final = "e"
-EVENT_TYPE_ADDED: Final = "added"
-EVENT_TYPE_CHANGED: Final = "changed"
-EVENT_TYPE_DELETED: Final = "deleted"
-EVENT_TYPE_SCENE_CALLED: Final = "scene-called"
-
-
-class EventType(enum.Enum):
-    """The event type of the message."""
-
-    ADDED = "added"
-    CHANGED = "changed"
-    DELETED = "deleted"
-    SCENE_CALLED = "scene-called"
-
-
-SUPPORTED_EVENT_TYPES: Final = (EVENT_TYPE_ADDED, EVENT_TYPE_CHANGED)
-SUPPORTED_EVENT_RESOURCES: Final = (
-    ALARM_SYSTEM_RESOURCE,
-    GROUP_RESOURCE,
-    LIGHT_RESOURCE,
-    SENSOR_RESOURCE,
-)
-
-RESOURCE_TYPE_TO_DEVICE_TYPE: Final = {
-    ALARM_SYSTEM_RESOURCE: "alarmsystem",
-    GROUP_RESOURCE: "group",
-    LIGHT_RESOURCE: "light",
-    SENSOR_RESOURCE: "sensor",
-}
 
 
 class DeconzSession:
@@ -72,6 +36,8 @@ class DeconzSession:
         api_key: str | None = None,
         add_device: Callable[[str, Any], None] | None = None,
         connection_status: Callable[[bool], None] | None = None,
+        legacy_add_device=True,
+        legacy_update_group_color=True,
     ):
         """Session setup."""
         self.session = session
@@ -84,11 +50,71 @@ class DeconzSession:
 
         self.alarmsystems = AlarmSystems(self)
         self.config: Config | None = None
+        self.events = EventHandler(self)
         self.groups = Groups(self)
         self.lights = LightResourceManager(self)
         self.scenes = Scenes(self)
         self.sensors = SensorResourceManager(self)
         self.websocket: WSClient | None = None
+
+        self.alarmsystems.post_init()
+        self.groups.post_init()
+        self.lights.post_init()
+        self.scenes.post_init()
+        self.sensors.post_init()
+
+        if legacy_add_device:
+            self.legacy_add_device_callback()
+        if legacy_update_group_color:
+            self.legacy_update_group_color()
+
+    def legacy_add_device_callback(self) -> None:
+        """Support legacy way to signal new device."""
+
+        def signal_new_device(resource: ResourceGroup, device: Any) -> None:
+            """Emit signal new device has been added."""
+            if self.add_device_callback:
+                self.add_device_callback(resource.value, device)
+
+        def signal_new_alarm(event_type: EventType, alarm_id: str) -> None:
+            """Signal new alarm system."""
+            signal_new_device(ResourceGroup.ALARM, self.alarmsystems[alarm_id])
+
+        def signal_new_group(event_type: EventType, group_id: str) -> None:
+            """Signal new group."""
+            signal_new_device(ResourceGroup.GROUP, self.groups[group_id])
+
+        def signal_new_light(event_type: EventType, light_id: str) -> None:
+            """Signal new light."""
+            signal_new_device(ResourceGroup.LIGHT, self.lights[light_id])
+
+        def signal_new_sensor(event_type: EventType, sensor_id: str) -> None:
+            """Signal new sensor."""
+            signal_new_device(ResourceGroup.SENSOR, self.sensors[sensor_id])
+
+        self.alarmsystems.subscribe(signal_new_alarm, EventType.ADDED)
+        self.groups.subscribe(signal_new_group, EventType.ADDED)
+        self.lights.subscribe(signal_new_light, EventType.ADDED)
+        self.sensors.subscribe(signal_new_sensor, EventType.ADDED)
+
+    def legacy_update_group_color(self) -> None:
+        """Support legacy way to update group colors."""
+
+        lights = self.lights.lights
+
+        def signal_new_light(event_type: EventType, light_id: str) -> None:
+            """Signal new light."""
+
+            light = lights[light_id]
+
+            def updated_light() -> None:
+                """Emit signal new device has been added."""
+                if "attr" not in light.changed_keys:
+                    self.update_group_color([light_id])
+
+            light.subscribe(updated_light)
+
+        lights.subscribe(signal_new_light, EventType.ADDED)
 
     async def get_api_key(
         self,
@@ -141,12 +167,12 @@ class DeconzSession:
         data = await self.request("get", "")
 
         if not self.config:
-            self.config = Config(data[CONFIG_RESOURCE], self.request)
+            self.config = Config(data[ResourceGroup.CONFIG.value], self.request)
 
-        self.alarmsystems.process_raw(data.get(ALARM_SYSTEM_RESOURCE, {}))
-        self.groups.process_raw(data[GROUP_RESOURCE])
-        self.lights.process_raw(data[LIGHT_RESOURCE])
-        self.sensors.process_raw(data[SENSOR_RESOURCE])
+        self.alarmsystems.process_raw(data.get(ResourceGroup.ALARM.value, {}))
+        self.groups.process_raw(data[ResourceGroup.GROUP.value])
+        self.lights.process_raw(data[ResourceGroup.LIGHT.value])
+        self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
 
         self.update_group_color(list(self.lights.keys()))
 
@@ -202,40 +228,10 @@ class DeconzSession:
             return
 
         if signal == SIGNAL_DATA:
-            self.event_handler(self.websocket.data)
+            self.events.handler(self.websocket.data)
 
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
-
-    def event_handler(self, event: dict[str, Any]) -> None:
-        """Receive event from websocket and identifies where the event belong.
-
-        Note that only one of config, name, or state will be present per changed event.
-        """
-        if (event_type := event[EVENT_TYPE]) not in SUPPORTED_EVENT_TYPES:
-            LOGGER.debug("Unsupported event %s", event)
-            return
-
-        if (resource_type := event[EVENT_RESOURCE]) not in SUPPORTED_EVENT_RESOURCES:
-            LOGGER.debug("Unsupported resource %s", event)
-            return
-
-        device_class = getattr(self, resource_type)
-        device_id = event[EVENT_ID]
-
-        if event_type == EVENT_TYPE_CHANGED and device_id in device_class:
-            device_class.process_raw({device_id: event})
-            if resource_type == LIGHT_RESOURCE and "attr" not in event:
-                self.update_group_color([device_id])
-            return
-
-        if event_type == EVENT_TYPE_ADDED and device_id not in device_class:
-            device_type = RESOURCE_TYPE_TO_DEVICE_TYPE[resource_type]
-            device_class.process_raw({device_id: event[device_type]})
-            device = device_class[device_id]
-            if self.add_device_callback:
-                self.add_device_callback(resource_type, device)
-            return
 
     def update_group_color(self, lights: list[str]) -> None:
         """Update group colors based on light states.

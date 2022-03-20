@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Union
+from typing import TYPE_CHECKING, Any, Union
 
-from ..models import ResourceTypes
+from ..models import ResourceGroup, ResourceType
 from ..models.light import *  # noqa: F401, F403
 from ..models.light.configuration_tool import ConfigurationTool
 from ..models.light.cover import Cover
@@ -18,70 +18,68 @@ from .api import APIItems, GroupedAPIItems
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
-URL: Final = "/lights"
-
 
 class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     """Handler for configuration tool."""
 
-    resource_type = ResourceTypes.CONFIGURATION_TOOL
-    path = URL
+    resource_group = ResourceGroup.LIGHT
+    resource_type = ResourceType.CONFIGURATION_TOOL
     item_cls = ConfigurationTool
 
 
 class CoverHandler(APIItems[Cover]):
     """Handler for covers."""
 
+    resource_group = ResourceGroup.LIGHT
     resource_types = {
-        ResourceTypes.LEVEL_CONTROLLABLE_OUTPUT,
-        ResourceTypes.WINDOW_COVERING_CONTROLLER,
-        ResourceTypes.WINDOW_COVERING_DEVICE,
+        ResourceType.LEVEL_CONTROLLABLE_OUTPUT,
+        ResourceType.WINDOW_COVERING_CONTROLLER,
+        ResourceType.WINDOW_COVERING_DEVICE,
     }
-    path = URL
     item_cls = Cover
 
 
 class FanHandler(APIItems[Fan]):
     """Handler for locks."""
 
-    resource_type = ResourceTypes.FAN
-    path = URL
+    resource_group = ResourceGroup.LIGHT
+    resource_type = ResourceType.FAN
     item_cls = Fan
 
 
 class LightHandler(APIItems[Light]):
     """Handler for lights."""
 
+    resource_group = ResourceGroup.LIGHT
     resource_types = {
-        ResourceTypes.COLOR_DIMMABLE_LIGHT,
-        ResourceTypes.COLOR_LIGHT,
-        ResourceTypes.COLOR_TEMPERATURE_LIGHT,
-        ResourceTypes.EXTENDED_COLOR_LIGHT,
-        ResourceTypes.DIMMABLE_LIGHT,
-        ResourceTypes.DIMMABLE_PLUGIN_UNIT,
-        ResourceTypes.ON_OFF_LIGHT,
-        ResourceTypes.ON_OFF_OUTPUT,
-        ResourceTypes.ON_OFF_PLUGIN_UNIT,
-        ResourceTypes.SMART_PLUG,
-        ResourceTypes.UNKNOWN,  # Legacy support
+        ResourceType.COLOR_DIMMABLE_LIGHT,
+        ResourceType.COLOR_LIGHT,
+        ResourceType.COLOR_TEMPERATURE_LIGHT,
+        ResourceType.EXTENDED_COLOR_LIGHT,
+        ResourceType.DIMMABLE_LIGHT,
+        ResourceType.DIMMABLE_PLUGIN_UNIT,
+        ResourceType.ON_OFF_LIGHT,
+        ResourceType.ON_OFF_OUTPUT,
+        ResourceType.ON_OFF_PLUGIN_UNIT,
+        ResourceType.SMART_PLUG,
+        ResourceType.UNKNOWN,  # Legacy support
     }
-    path = URL
     item_cls = Light
 
 
 class LockHandler(APIItems[Lock]):
     """Handler for fans."""
 
-    resource_type = ResourceTypes.DOOR_LOCK
-    path = URL
+    resource_group = ResourceGroup.LIGHT
+    resource_type = ResourceType.DOOR_LOCK
     item_cls = Lock
 
 
 class SirenHandler(APIItems[Siren]):
     """Handler for sirens."""
 
-    resource_type = ResourceTypes.WARNING_DEVICE
-    path = URL
+    resource_group = ResourceGroup.LIGHT
+    resource_type = ResourceType.WARNING_DEVICE
     item_cls = Siren
 
 
@@ -97,6 +95,8 @@ LIGHT_RESOURCES = Union[
 
 class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
     """Represent deCONZ lights."""
+
+    resource_group = ResourceGroup.LIGHT
 
     def __init__(self, gateway: DeconzSession) -> None:
         """Initialize light manager."""
@@ -116,4 +116,4 @@ class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
             self.sirens,
         ]
 
-        super().__init__(handlers)
+        super().__init__(gateway, handlers)
