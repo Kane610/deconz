@@ -1,15 +1,32 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzBinarySensor
+from typing import TypedDict, cast
+
+from . import DeconzSensor
 
 
-class Alarm(DeconzBinarySensor):
+class TypedAlarmState(TypedDict):
+    """Alarm state type definition."""
+
+    alarm: bool
+
+
+class TypedAlarm(TypedDict):
+    """Alarm type definition."""
+
+    state: TypedAlarmState
+
+
+class Alarm(DeconzSensor):
     """Alarm sensor."""
 
-    STATE_PROPERTY = "alarm"
     ZHATYPE = ("ZHAAlarm",)
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedAlarm, self.raw)
 
     @property
     def alarm(self) -> bool:
         """Alarm."""
-        return self.raw["state"]["alarm"]
+        return self._raw["state"]["alarm"]

@@ -2,9 +2,25 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict, cast
 
 from . import DeconzLight
+
+
+class TypedCoverState(TypedDict):
+    """Cover state type definition."""
+
+    bri: int
+    lift: int
+    open: bool
+    sat: int
+    tilt: int
+
+
+class TypedCover(TypedDict):
+    """Cover type definition."""
+
+    state: TypedCoverState
 
 
 class Cover(DeconzLight):
@@ -19,12 +35,16 @@ class Cover(DeconzLight):
         "Window covering device",
     )
 
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedCover, self.raw)
+
     @property
     def is_open(self) -> bool:
         """Is cover open."""
-        if "open" not in self.raw["state"]:  # Legacy support
+        if "open" not in self._raw["state"]:  # Legacy support
             return self.state is False
-        return self.raw["state"]["open"]
+        return self._raw["state"]["open"]
 
     @property
     def lift(self) -> int:
@@ -33,9 +53,9 @@ class Cover(DeconzLight):
         0 is fully open.
         100 is fully closed.
         """
-        if "lift" not in self.raw["state"]:  # Legacy support
-            return int(self.raw["state"].get("bri") / 2.54)
-        return self.raw["state"]["lift"]
+        if "lift" not in self._raw["state"]:  # Legacy support
+            return int(self._raw["state"]["bri"] / 2.54)
+        return self._raw["state"]["lift"]
 
     @property
     def tilt(self) -> int | None:
@@ -44,10 +64,10 @@ class Cover(DeconzLight):
         0 is fully open.
         100 is fully closed.
         """
-        if "tilt" in self.raw["state"]:
-            return self.raw["state"]["tilt"]
-        elif "sat" in self.raw["state"]:  # Legacy support
-            return int(self.raw["state"]["sat"] / 2.54)
+        if "tilt" in self._raw["state"]:
+            return self._raw["state"]["tilt"]
+        elif "sat" in self._raw["state"]:  # Legacy support
+            return int(self._raw["state"]["sat"] / 2.54)
         return None
 
     async def set_position(

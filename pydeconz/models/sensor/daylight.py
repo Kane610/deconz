@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Final
+from typing import Final, TypedDict, cast
 
 from . import DeconzSensor
 
@@ -22,26 +22,51 @@ DAYLIGHT_STATUS: Final = {
 }
 
 
+class TypedDaylightConfig(TypedDict):
+    """Daylight config type definition."""
+
+    configured: bool
+    sunriseoffset: int
+    sunsetoffset: int
+
+
+class TypedDaylightState(TypedDict):
+    """Daylight state type definition."""
+
+    daylight: bool
+    status: int
+
+
+class TypedDaylight(TypedDict):
+    """Daylight type definition."""
+
+    config: TypedDaylightConfig
+    state: TypedDaylightState
+
+
 class Daylight(DeconzSensor):
     """Daylight sensor built into deCONZ software."""
 
-    STATE_PROPERTY = "status"
     ZHATYPE = ("Daylight",)
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedDaylight, self.raw)
 
     @property
     def configured(self) -> bool:
         """Is daylight sensor configured."""
-        return self.raw["config"]["configured"]
+        return self._raw["config"]["configured"]
 
     @property
     def daylight(self) -> bool:
         """Is daylight."""
-        return self.raw["state"]["daylight"]
+        return self._raw["state"]["daylight"]
 
     @property
     def status(self) -> str:
         """Return the daylight status string."""
-        return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
+        return DAYLIGHT_STATUS.get(self._raw["state"]["status"], "unknown")
 
     @property
     def sunrise_offset(self) -> int:
@@ -49,7 +74,7 @@ class Daylight(DeconzSensor):
 
         -120 to 120.
         """
-        return self.raw["config"]["sunriseoffset"]
+        return self._raw["config"]["sunriseoffset"]
 
     @property
     def sunset_offset(self) -> int:
@@ -57,4 +82,4 @@ class Daylight(DeconzSensor):
 
         -120 to 120.
         """
-        return self.raw["config"]["sunsetoffset"]
+        return self._raw["config"]["sunsetoffset"]

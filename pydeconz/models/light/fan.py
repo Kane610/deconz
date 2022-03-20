@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, TypedDict, cast
 
 from .light import Light
 
@@ -13,6 +13,18 @@ FAN_SPEED_75_PERCENT: Final = 3
 FAN_SPEED_100_PERCENT: Final = 4
 FAN_SPEED_AUTO: Final = 5
 FAN_SPEED_COMFORT_BREEZE: Final = 6
+
+
+class TypedFanState(TypedDict):
+    """Fan state type definition."""
+
+    speed: Literal[0, 1, 2, 3, 4, 5, 6]
+
+
+class TypedFan(TypedDict):
+    """Fan type definition."""
+
+    state: TypedFanState
 
 
 class Fan(Light):
@@ -29,10 +41,15 @@ class Fan(Light):
 
     ZHATYPE = ("Fan",)
 
+    def post_init(self) -> None:
+        """Post init method."""
+        self.__raw = cast(TypedFan, self.raw)
+        super().post_init()
+
     @property
     def speed(self) -> Literal[0, 1, 2, 3, 4, 5, 6]:
         """Speed of the fan."""
-        return self.raw["state"]["speed"]
+        return self.__raw["state"]["speed"]
 
     async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict[str, Any]:
         """Set speed of fans/ventilators.

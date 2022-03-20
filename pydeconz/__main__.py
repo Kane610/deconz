@@ -11,7 +11,8 @@ from typing import Any
 import aiohttp
 import async_timeout
 
-from pydeconz import DeconzSession, errors
+from pydeconz import errors
+from pydeconz.gateway import DeconzSession
 
 LOGGER = logging.getLogger(__name__)
 

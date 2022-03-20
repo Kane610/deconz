@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Final
+from typing import Any, Final, TypedDict, cast
 
-from . import DeconzBinarySensor
+from . import DeconzSensor
 
 PRESENCE_DELAY: Final = "delay"
 PRESENCE_DURATION: Final = "duration"
@@ -14,31 +14,57 @@ PRESENCE_DARK: Final = "dark"
 PRESENCE_PRESENCE: Final = "presence"
 
 
-class Presence(DeconzBinarySensor):
+class TypedPresenceConfig(TypedDict):
+    """Presence config type definition."""
+
+    delay: int
+    duration: int
+    sensitivity: int
+    sensitivitymax: int
+
+
+class TypedPresenceState(TypedDict):
+    """Presence state type definition."""
+
+    dark: bool
+    presence: bool
+
+
+class TypedPresence(TypedDict):
+    """Presence type definition."""
+
+    config: TypedPresenceConfig
+    state: TypedPresenceState
+
+
+class Presence(DeconzSensor):
     """Presence detector."""
 
-    STATE_PROPERTY = "presence"
     ZHATYPE = ("ZHAPresence", "CLIPPresence")
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedPresence, self.raw)
 
     @property
     def dark(self) -> bool | None:
         """If the area near the sensor is light or not."""
-        return self.raw["state"].get(PRESENCE_DARK)
+        return self._raw["state"].get(PRESENCE_DARK)
 
     @property
     def delay(self) -> int | None:
         """Occupied to unoccupied delay in seconds."""
-        return self.raw["config"].get(PRESENCE_DELAY)
+        return self._raw["config"].get(PRESENCE_DELAY)
 
     @property
     def duration(self) -> int | None:
         """Minimum duration which presence will be true."""
-        return self.raw["config"].get(PRESENCE_DURATION)
+        return self._raw["config"].get(PRESENCE_DURATION)
 
     @property
     def presence(self) -> bool:
         """Motion detected."""
-        return self.raw["state"][PRESENCE_PRESENCE]
+        return self._raw["state"][PRESENCE_PRESENCE]
 
     @property
     def sensitivity(self) -> int | None:
@@ -47,12 +73,12 @@ class Presence(DeconzBinarySensor):
         Supported values:
         - 0-[sensitivitymax]
         """
-        return self.raw["config"].get(PRESENCE_SENSITIVITY)
+        return self._raw["config"].get(PRESENCE_SENSITIVITY)
 
     @property
     def max_sensitivity(self) -> int | None:
         """Maximum sensitivity value."""
-        return self.raw["config"].get(PRESENCE_SENSITIVITY_MAX)
+        return self._raw["config"].get(PRESENCE_SENSITIVITY_MAX)
 
     async def set_config(
         self,

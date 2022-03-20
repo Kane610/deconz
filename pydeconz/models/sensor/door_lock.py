@@ -1,15 +1,37 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict, cast
 
 from . import DeconzSensor
+
+
+class TypedDoorLockConfig(TypedDict):
+    """Door lock config type definition."""
+
+    lock: bool
+
+
+class TypedDoorLockState(TypedDict):
+    """Door lock state type definition."""
+
+    lockstate: Literal["locked", "unlocked", "undefined", "not fully locked"]
+
+
+class TypedDoorLock(TypedDict):
+    """Door lock type definition."""
+
+    config: TypedDoorLockConfig
+    state: TypedDoorLockState
 
 
 class DoorLock(DeconzSensor):
     """Door lock sensor."""
 
-    STATE_PROPERTY = "lock_state"
     ZHATYPE = ("ZHADoorLock",)
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedDoorLock, self.raw)
 
     @property
     def is_locked(self) -> bool:
@@ -28,12 +50,12 @@ class DoorLock(DeconzSensor):
         - "undefined"
         - "not fully locked"
         """
-        return self.raw["state"]["lockstate"]
+        return self._raw["state"]["lockstate"]
 
     @property
     def lock_configuration(self) -> bool:
         """Lock configuration."""
-        return self.raw["config"]["lock"]
+        return self._raw["config"]["lock"]
 
     async def lock(self) -> dict[str, Any]:
         """Lock the lock."""

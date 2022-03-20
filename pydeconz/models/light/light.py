@@ -2,9 +2,30 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict, cast
 
 from . import DeconzLight
+
+
+class TypedLightState(TypedDict):
+    """Light state type definition."""
+
+    alert: Literal["none", "select", "lselect"]
+    bri: int
+    colormode: Literal["ct", "hs", "xy"]
+    ct: int
+    effect: Literal["colorloop", "none"]
+    hue: int
+    sat: int
+    xy: tuple[float, float]
+
+
+class TypedLight(TypedDict):
+    """Light type definition."""
+
+    ctmax: int
+    ctmin: int
+    state: TypedLightState
 
 
 class Light(DeconzLight):
@@ -13,6 +34,10 @@ class Light(DeconzLight):
     Dresden Elektroniks documentation of lights in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedLight, self.raw)
 
     @property
     def alert(self) -> Literal["none", "select", "lselect"] | None:
@@ -23,7 +48,7 @@ class Light(DeconzLight):
         select - light is blinking a short time
         lselect - light is blinking a longer time
         """
-        return self.raw["state"].get("alert")
+        return self._raw["state"].get("alert")
 
     @property
     def brightness(self) -> int | None:
@@ -32,12 +57,12 @@ class Light(DeconzLight):
         Depending on the light type 0 might not mean visible "off"
         but minimum brightness.
         """
-        return self.raw["state"].get("bri")
+        return self._raw["state"].get("bri")
 
     @property
     def color_temp(self) -> int | None:
         """Mired color temperature of the light. (2000K - 6500K)."""
-        return self.raw["state"].get("ct")
+        return self._raw["state"].get("ct")
 
     @property
     def hue(self) -> int | None:
@@ -46,7 +71,7 @@ class Light(DeconzLight):
         The hue parameter in the HSV color model is between 0°-360°
         and is mapped to 0..65535 to get 16-bit resolution.
         """
-        return self.raw["state"].get("hue")
+        return self._raw["state"].get("hue")
 
     @property
     def saturation(self) -> int | None:
@@ -55,12 +80,12 @@ class Light(DeconzLight):
         There 0 means no color at all and 255 is the greatest saturation
         of the color.
         """
-        return self.raw["state"].get("sat")
+        return self._raw["state"].get("sat")
 
     @property
     def xy(self) -> tuple[float, float] | None:
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        x, y = self.raw["state"].get("xy", (None, None))
+        x, y = self._raw["state"].get("xy", (None, None))
 
         if x is None or y is None:
             return None
@@ -81,19 +106,19 @@ class Light(DeconzLight):
         hs - hue and saturation
         xy - CIE xy values
         """
-        return self.raw["state"].get("colormode")
+        return self._raw["state"].get("colormode")
 
     @property
     def max_color_temp(self) -> int | None:
         """Max value for color temperature."""
-        if (ctmax := self.raw.get("ctmax")) is not None and ctmax > 650:
+        if (ctmax := self._raw.get("ctmax")) is not None and ctmax > 650:
             ctmax = 650
         return ctmax
 
     @property
     def min_color_temp(self) -> int | None:
         """Min value for color temperature."""
-        if (ctmin := self.raw.get("ctmin")) is not None and ctmin < 140:
+        if (ctmin := self._raw.get("ctmin")) is not None and ctmin < 140:
             ctmin = 140
         return ctmin
 
@@ -105,7 +130,7 @@ class Light(DeconzLight):
                     with the speed specified by colorloopspeed.
         none — no effect.
         """
-        return self.raw["state"].get("effect")
+        return self._raw["state"].get("effect")
 
     async def set_attributes(self, name: str) -> dict[str, Any]:
         """Change attributes of a light.

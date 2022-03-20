@@ -3,11 +3,20 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final
+from typing import Any, Final, TypedDict, cast
 
 from .api import APIItem
 
 RESOURCE_TYPE: Final = "scenes"
+
+
+class TypedScene(TypedDict):
+    """Scene type definition."""
+
+    id: str
+    lightcount: int
+    transitiontime: int
+    name: str
 
 
 class Scene(APIItem):
@@ -16,6 +25,8 @@ class Scene(APIItem):
     Dresden Elektroniks documentation of scenes in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
     """
+
+    _raw: TypedScene
 
     def __init__(
         self,
@@ -29,6 +40,10 @@ class Scene(APIItem):
         self.group_id = raw["group_id"]
         self.group_deconz_id = f"/groups/{self.group_id}"
         self.group_name = raw["group_name"]
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedScene, self.raw)
 
     @property
     def resource_type(self) -> str:
@@ -72,22 +87,22 @@ class Scene(APIItem):
     @property
     def id(self) -> str:
         """Scene ID."""
-        return self.raw["id"]
+        return self._raw["id"]
 
     @property
     def light_count(self) -> int:
         """Lights in group."""
-        return self.raw["lightcount"]
+        return self._raw["lightcount"]
 
     @property
     def transition_time(self) -> int:
         """Transition time for scene."""
-        return self.raw["transitiontime"]
+        return self._raw["transitiontime"]
 
     @property
     def name(self) -> str:
         """Scene name."""
-        return self.raw["name"]
+        return self._raw["name"]
 
     @property
     def full_name(self) -> str:

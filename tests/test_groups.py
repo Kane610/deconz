@@ -49,7 +49,6 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
     group = deconz_session.groups["0"]
 
     assert group.state is True
-    assert group.group_class is None
     assert group.all_on is False
     assert group.any_on is True
     assert group.device_membership == []

@@ -2,9 +2,21 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, TypedDict, cast
 
 from . import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, DeconzLight
+
+
+class TypedSirenState(TypedDict):
+    """Siren state type definition."""
+
+    alert: Literal["lselect", "select", "none"]
+
+
+class TypedSiren(TypedDict):
+    """Siren type definition."""
+
+    state: TypedSirenState
 
 
 class Siren(DeconzLight):
@@ -12,10 +24,14 @@ class Siren(DeconzLight):
 
     ZHATYPE = ("Warning device",)
 
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedSiren, self.raw)
+
     @property
     def is_on(self) -> bool:
         """If device is sounding."""
-        return self.raw["state"][ALERT_KEY] == ALERT_LONG
+        return self._raw["state"][ALERT_KEY] == ALERT_LONG
 
     async def turn_on(self, duration: int | None = None) -> dict[str, Any]:
         """Turn on device.

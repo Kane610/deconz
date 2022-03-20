@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, TypedDict, cast
 
 from .deconz_device import DeconzDevice
 from .light.light import Light
-from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene  # noqa: F401
+from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene, TypedScene  # noqa: F401
 
 RESOURCE_TYPE: Final = "groups"
 
@@ -21,12 +21,54 @@ COLOR_STATE_ATTRIBUTES: Final = {
 }
 
 
+class TypedGroupAction(TypedDict):
+    """Group action type definition."""
+
+    bri: int
+    colormode: Literal["ct", "hs", "xy"]
+    ct: int
+    effect: Literal["colorloop", "none"]
+    hue: int
+    on: bool
+    sat: int
+    xy: tuple[float, float]
+
+
+class TypedGroupState(TypedDict):
+    """Group state type definition."""
+
+    all_on: bool
+    any_on: bool
+
+
+class TypedGroup(TypedDict):
+    """Group type definition."""
+
+    action: TypedGroupAction
+    devicemembership: list[str]
+    hidden: bool
+    id: str
+    lights: list[str]
+    lightsequence: list[str]
+    multideviceids: list[str]
+    name: str
+    scenes: list[TypedScene]
+    state: TypedGroupState
+    type: str
+
+
 class Group(DeconzDevice):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
+
+    _raw: TypedGroup
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedGroup, self.raw)
 
     @property
     def resource_type(self) -> str:
@@ -45,12 +87,12 @@ class Group(DeconzDevice):
         Depending on the light type 0 might not mean visible "off"
         but minimum brightness.
         """
-        return self.raw["action"].get("bri")
+        return self._raw["action"].get("bri")
 
     @property
     def color_temp(self) -> int | None:
         """Mired color temperature of the light. (2000K - 6500K)."""
-        return self.raw["action"].get("ct")
+        return self._raw["action"].get("ct")
 
     @property
     def hue(self) -> int | None:
@@ -59,7 +101,7 @@ class Group(DeconzDevice):
         The hue parameter in the HSV color model is between 0°-360°
         and is mapped to 0..65535 to get 16-bit resolution.
         """
-        return self.raw["action"].get("hue")
+        return self._raw["action"].get("hue")
 
     @property
     def saturation(self) -> int | None:
@@ -68,12 +110,12 @@ class Group(DeconzDevice):
         There 0 means no color at all and 255 is the greatest saturation
         of the color.
         """
-        return self.raw["action"].get("sat")
+        return self._raw["action"].get("sat")
 
     @property
     def xy(self) -> tuple[float, float] | None:
         """CIE xy color space coordinates as array [x, y] of real values (0..1)."""
-        x, y = self.raw["action"].get("xy", (None, None))
+        x, y = self._raw["action"].get("xy", (None, None))
 
         if x is None or y is None:
             return None
@@ -94,7 +136,7 @@ class Group(DeconzDevice):
         hs - hue and saturation
         xy - CIE xy values
         """
-        return self.raw["action"].get("colormode")
+        return self._raw["action"].get("colormode")
 
     @property
     def effect(self) -> Literal["colorloop", "none"] | None:
@@ -103,32 +145,27 @@ class Group(DeconzDevice):
         colorloop
         none - no effect
         """
-        return self.raw["action"].get("effect")
+        return self._raw["action"].get("effect")
 
     @property
-    def reachable(self) -> bool | None:
+    def reachable(self) -> bool:
         """Is group reachable."""
         return True
 
     @property
-    def group_class(self) -> str | None:
-        """Type of class."""
-        return self.raw.get("class")
-
-    @property
     def all_on(self) -> bool | None:
         """Is all lights in light group on."""
-        return self.raw["state"].get("all_on")
+        return self._raw["state"].get("all_on")
 
     @property
     def any_on(self) -> bool | None:
         """Is any lights in light group on."""
-        return self.raw["state"].get("any_on")
+        return self._raw["state"].get("any_on")
 
     @property
     def device_membership(self) -> list[str] | None:
         """List of device ids (sensors) when group was created by a device."""
-        return self.raw.get("devicemembership")
+        return self._raw.get("devicemembership")
 
     @property
     def hidden(self) -> bool | None:
@@ -136,12 +173,12 @@ class Group(DeconzDevice):
 
         Has no effect at the gateway but apps can uses this to hide groups.
         """
-        return self.raw.get("hidden")
+        return self._raw.get("hidden")
 
     @property
     def id(self) -> str | None:
         """Group ID."""
-        return self.raw.get("id")
+        return self._raw.get("id")
 
     @property
     def lights(self) -> list[str]:
@@ -149,7 +186,7 @@ class Group(DeconzDevice):
 
         Sequence is defined by the gateway.
         """
-        return self.raw.get("lights", [])
+        return self._raw.get("lights", [])
 
     @property
     def light_sequence(self) -> list[str] | None:
@@ -157,7 +194,7 @@ class Group(DeconzDevice):
 
         Need not to contain all light ids of this group.
         """
-        return self.raw.get("lightsequence")
+        return self._raw.get("lightsequence")
 
     @property
     def multi_device_ids(self) -> list[str] | None:
@@ -165,7 +202,7 @@ class Group(DeconzDevice):
 
         Subsequent ids from multidevices with multiple endpoints.
         """
-        return self.raw.get("multideviceids")
+        return self._raw.get("multideviceids")
 
     async def set_attributes(
         self,

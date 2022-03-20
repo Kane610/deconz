@@ -2,16 +2,42 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict, cast
 
 from . import DeconzSensor
+
+
+class TypedLightLevelConfig(TypedDict):
+    """Light level config type definition."""
+
+    tholddark: int
+    tholdoffset: int
+
+
+class TypedLightLevelState(TypedDict):
+    """Light level state type definition."""
+
+    dark: bool
+    daylight: bool
+    lightlevel: int
+    lux: int
+
+
+class TypedLightLevel(TypedDict):
+    """Light level type definition."""
+
+    config: TypedLightLevelConfig
+    state: TypedLightLevelState
 
 
 class LightLevel(DeconzSensor):
     """Light level sensor."""
 
-    STATE_PROPERTY = "scaled_light_level"
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedLightLevel, self.raw)
 
     @property
     def scaled_light_level(self) -> float | None:
@@ -24,32 +50,32 @@ class LightLevel(DeconzSensor):
     @property
     def dark(self) -> bool | None:
         """If the area near the sensor is light or not."""
-        return self.raw["state"].get("dark")
+        return self._raw["state"].get("dark")
 
     @property
     def daylight(self) -> bool | None:
         """Daylight."""
-        return self.raw["state"].get("daylight")
+        return self._raw["state"].get("daylight")
 
     @property
     def light_level(self) -> int | None:
         """Light level."""
-        return self.raw["state"].get("lightlevel")
+        return self._raw["state"].get("lightlevel")
 
     @property
     def lux(self) -> int | None:
         """Lux."""
-        return self.raw["state"].get("lux")
+        return self._raw["state"].get("lux")
 
     @property
     def threshold_dark(self) -> int | None:
         """Threshold to hold dark."""
-        return self.raw["config"].get("tholddark")
+        return self._raw["config"].get("tholddark")
 
     @property
     def threshold_offset(self) -> int | None:
         """Offset for threshold to hold dark."""
-        return self.raw["config"].get("tholdoffset")
+        return self._raw["config"].get("tholdoffset")
 
     async def set_config(
         self,

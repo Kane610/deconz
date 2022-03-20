@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Final, Literal, TypedDict, cast
 
 from . import DeconzSensor
 
@@ -28,11 +28,49 @@ ANCILLARY_CONTROL_IN_ALARM: Final = "in_alarm"
 ANCILLARY_CONTROL_NOT_READY: Final = "not_ready"
 
 
+class TypedAncillaryControlState(TypedDict):
+    """Ancillary control state type definition."""
+
+    action: Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "disarmed",
+        "emergency",
+        "fire",
+        "invalid_code",
+        "panic",
+    ]
+    panel: Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "arming_away",
+        "arming_night",
+        "arming_stay",
+        "disarmed",
+        "entry_delay",
+        "exit_delay",
+        "in_alarm",
+        "not_ready",
+    ]
+    seconds_remaining: int
+
+
+class TypedAncillaryControl(TypedDict):
+    """Ancillary control type definition."""
+
+    state: TypedAncillaryControlState
+
+
 class AncillaryControl(DeconzSensor):
     """Ancillary control sensor."""
 
-    STATE_PROPERTY = "panel"
     ZHATYPE = ("ZHAAncillaryControl",)
+
+    def post_init(self) -> None:
+        """Post init method."""
+        self._raw = cast(TypedAncillaryControl, self.raw)
 
     @property
     def action(
@@ -59,7 +97,7 @@ class AncillaryControl(DeconzSensor):
         - "invalid_code"
         - "panic"
         """
-        return self.raw["state"]["action"]
+        return self._raw["state"]["action"]
 
     @property
     def panel(
@@ -94,7 +132,7 @@ class AncillaryControl(DeconzSensor):
         - "in_alarm"
         - "not_ready"
         """
-        return self.raw["state"].get("panel")
+        return self._raw["state"].get("panel")
 
     @property
     def seconds_remaining(self) -> int:
@@ -102,4 +140,4 @@ class AncillaryControl(DeconzSensor):
 
         In all other states the value is 0.
         """
-        return self.raw["state"].get("seconds_remaining", 0)
+        return self._raw["state"].get("seconds_remaining", 0)

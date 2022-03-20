@@ -33,6 +33,11 @@ class APIItem:
         self._sleep_task: Task[Callable[..., Any]] | None = None
         self._changed_keys: set[str] = set()
 
+        self.post_init()
+
+    def post_init(self) -> None:
+        """Post init method used by subclasses."""
+
     @property
     def resource_id(self) -> str:
         """Read only resource ID."""
