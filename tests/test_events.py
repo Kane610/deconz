@@ -75,16 +75,16 @@ async def test_event_added(resource, event_type, resource_key):
     assert event.scene_id == ""
     assert event.resource == resource
     assert event.type == event_type
-    assert event.full_resource == {"k": "v"}
+    assert event.added_data == {"k": "v"}
     assert event.data == data
     assert event.changed_data == {}
 
 
 EVENT_CHANGED_DATA = [
-    (ResourceGroup.ALARM, EventType.CHANGED, {"name": "a", "state": {"k": "v"}}),
+    (ResourceGroup.ALARM, EventType.CHANGED, {"state": {"k": "v"}}),
     (ResourceGroup.GROUP, EventType.CHANGED, {"name": "g"}),
-    (ResourceGroup.LIGHT, EventType.CHANGED, {"name": "l", "state": {"k": "v"}}),
-    (ResourceGroup.SENSOR, EventType.CHANGED, {"name": "s", "config": {"k": "v"}}),
+    (ResourceGroup.LIGHT, EventType.CHANGED, {"state": {"k": "v"}}),
+    (ResourceGroup.SENSOR, EventType.CHANGED, {"config": {"k": "v"}}),
 ]
 
 
@@ -106,8 +106,7 @@ async def test_event_changed(resource, event_type, test_data):
     assert event.type == event_type
     assert event.changed_data == test_data
     assert event.data == data
-    with pytest.raises(KeyError):
-        assert event.full_resource
+    assert event.added_data == {}
 
 
 EVENT_DELETED_DATA = [
@@ -135,8 +134,7 @@ async def test_event_deleted(resource, event_type):
     assert event.type == event_type
     assert event.data == data
     assert event.changed_data == {}
-    with pytest.raises(KeyError):
-        assert event.full_resource
+    assert event.added_data == {}
 
 
 async def test_event_scene_called():
@@ -156,5 +154,4 @@ async def test_event_scene_called():
     assert event.type == EventType.SCENE_CALLED
     assert event.data == data
     assert event.changed_data == {}
-    with pytest.raises(KeyError):
-        assert event.full_resource
+    assert event.added_data == {}

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import enum
-from typing import Any, Final
+from typing import Any
 
 from . import ResourceGroup
 
@@ -41,14 +41,6 @@ class EventType(enum.Enum):
     SCENE_CALLED = "scene-called"
 
 
-RESOURCE_GROUP_TO_EVENT_RESOURCE_KEY: Final = {
-    ResourceGroup.ALARM: EventKey.ALARM.value,
-    ResourceGroup.GROUP: EventKey.GROUP.value,
-    ResourceGroup.LIGHT: EventKey.LIGHT.value,
-    ResourceGroup.SENSOR: EventKey.SENSOR.value,
-}
-
-
 @dataclass
 class Event:
     """Event data from deCONZ websocket."""
@@ -63,30 +55,42 @@ class Event:
     scene_id: str
 
     @property
-    def changed_data(self) -> dict[str, Any]:
-        """Altered device data.
+    def added_data(self) -> dict[str, Any]:
+        """Full device resource.
 
-        Available with event type changed.
+        Only for "added" events.
         """
         data: dict[str, Any] = {}
 
         for key in (
-            EventKey.NAME.value,
-            EventKey.CONFIG.value,
+            EventKey.SENSOR.value,
+            EventKey.LIGHT.value,
+            EventKey.ALARM.value,
+            EventKey.GROUP.value,
+        ):
+            if key in self.data:
+                data = self.data[key]
+                break
+
+        return data
+
+    @property
+    def changed_data(self) -> dict[str, Any]:
+        """Altered device data.
+
+        Only for "changed" events.
+        """
+        data: dict[str, Any] = {}
+
+        for key in (
             EventKey.STATE.value,
+            EventKey.CONFIG.value,
+            EventKey.NAME.value,
         ):
             if (value := self.data.get(key)) is not None:
                 data[key] = value
 
         return data
-
-    @property
-    def full_resource(self) -> dict[str, Any]:
-        """Full device resource.
-
-        Available with event type added.
-        """
-        return self.data[RESOURCE_GROUP_TO_EVENT_RESOURCE_KEY[self.resource]]
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Event":

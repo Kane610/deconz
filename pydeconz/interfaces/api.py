@@ -60,11 +60,11 @@ class APIItems(Generic[DataResource]):
     def process_event(self, event: Event) -> None:
         """Process event."""
         if event.type == EventType.CHANGED and event.id in self:
-            self.process_item(event.id, event.data)
+            self.process_item(event.id, event.changed_data)
             return
 
         if event.type == EventType.ADDED and event.id not in self:
-            self.process_item(event.id, event.full_resource)
+            self.process_item(event.id, event.added_data)
 
     def process_item(self, id: str, raw: dict[str, Any]) -> None:
         """Process data."""
@@ -157,11 +157,11 @@ class GroupedAPIItems(Generic[DataResource]):
     def process_event(self, event: Event) -> None:
         """Process event."""
         if event.type == EventType.CHANGED and event.id in self:
-            self.process_item(event.id, event.data)
+            self.process_item(event.id, event.changed_data)
             return
 
         if event.type == EventType.ADDED and event.id not in self:
-            self.process_item(event.id, event.full_resource)
+            self.process_item(event.id, event.added_data)
 
     def process_item(self, id: str, raw: dict[str, Any]) -> None:
         """Process item data."""
