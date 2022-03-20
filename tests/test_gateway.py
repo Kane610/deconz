@@ -364,6 +364,7 @@ async def test_light_events(deconz_session, mock_websocket_event):
 async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket_event):
     """Test event_handler works."""
     deconz_session.add_device_callback = Mock()
+
     await deconz_refresh_state(
         lights={
             "1": {

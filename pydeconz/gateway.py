@@ -36,6 +36,8 @@ class DeconzSession:
         api_key: str | None = None,
         add_device: Callable[[str, Any], None] | None = None,
         connection_status: Callable[[bool], None] | None = None,
+        legacy_add_device=True,
+        legacy_update_group_color=True,
     ):
         """Session setup."""
         self.session = session
@@ -61,8 +63,10 @@ class DeconzSession:
         self.scenes.post_init()
         self.sensors.post_init()
 
-        self.legacy_add_device_callback()
-        self.legacy_update_group_color()
+        if legacy_add_device:
+            self.legacy_add_device_callback()
+        if legacy_update_group_color:
+            self.legacy_update_group_color()
 
     def legacy_add_device_callback(self) -> None:
         """Support legacy way to signal new device."""
