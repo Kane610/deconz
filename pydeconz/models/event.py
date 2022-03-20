@@ -59,8 +59,8 @@ class Event:
     type: EventType
 
     # Only for "scene-called" events
-    gid: str
-    scid: str
+    group_id: str
+    scene_id: str
 
     @property
     def changed_data(self) -> dict[str, Any]:
@@ -93,8 +93,8 @@ class Event:
         """Create event instance from dict."""
         return cls(
             id=data.get(EventKey.ID.value, ""),
-            gid=data.get(EventKey.GROUP_ID.value, ""),
-            scid=data.get(EventKey.SCENE_ID.value, ""),
+            group_id=data.get(EventKey.GROUP_ID.value, ""),
+            scene_id=data.get(EventKey.SCENE_ID.value, ""),
             resource=ResourceGroup(data[EventKey.RESOURCE.value]),
             type=EventType(data[EventKey.EVENT.value]),
             data=data,
