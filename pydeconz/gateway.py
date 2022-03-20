@@ -12,12 +12,13 @@ import aiohttp
 from .config import Config
 from .errors import RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
-from .interfaces.events import EventHandler, EventType
+from .interfaces.events import EventHandler
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
 from .models import ResourceGroup
+from .models.event import EventType
 from .models.light.light import Light
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
@@ -164,10 +165,10 @@ class DeconzSession:
         if not self.config:
             self.config = Config(data[ResourceGroup.CONFIG.value], self.request)
 
-        self.alarmsystems.process_full_data(data.get(ResourceGroup.ALARM.value, {}))
-        self.groups.process_full_data(data[ResourceGroup.GROUP.value])
-        self.lights.process_full_data(data[ResourceGroup.LIGHT.value])
-        self.sensors.process_full_data(data[ResourceGroup.SENSOR.value])
+        self.alarmsystems.process_raw(data.get(ResourceGroup.ALARM.value, {}))
+        self.groups.process_raw(data[ResourceGroup.GROUP.value])
+        self.lights.process_raw(data[ResourceGroup.LIGHT.value])
+        self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
 
         self.update_group_color(list(self.lights.keys()))
 

@@ -63,7 +63,7 @@ class Event:
     scid: str
 
     @property
-    def changed_data(self):
+    def changed_data(self) -> dict[str, Any]:
         """Altered device data.
 
         Available with event type changed.

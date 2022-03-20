@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 from ..models import ResourceGroup
+from ..models.event import EventType
 from ..models.scene import Scene
 from .api import APIItems
-from .events import EventType
 
 
 class Scenes(APIItems[Scene]):
@@ -26,25 +26,24 @@ class Scenes(APIItems[Scene]):
     async def create_scene(self, group_id: str, name: str) -> dict[str, Any]:
         """Create a new scene.
 
-        The actual state of each light will become the lights scene state.
+        The current state of each light will become the lights scene state.
         """
         return await self._request(
             "post",
             path=f"/groups/{group_id}/scenes",
             json={"name": name},
         )
-        # return await self._request("post", path=self._path, json={"name": name})
 
     def group_data_callback(self, action: EventType, group_id: str) -> None:
         """Subscribe callback for new group data."""
-        self.process_raw(group_id, self.gateway.groups[group_id].raw)
+        self.process_item(group_id, self.gateway.groups[group_id].raw)
 
-    def process_raw(self, id: str, raw: Any) -> None:
+    def process_item(self, id: str, raw: dict[str, Any]) -> None:
         """Pre-process scene data."""
         group = self.gateway.groups[id]
 
         for scene in group.raw["scenes"]:
-            super().process_raw(
+            super().process_item(
                 f'{id}_{scene["id"]}',
                 scene | {"group_id": id, "group_name": group.name},
             )

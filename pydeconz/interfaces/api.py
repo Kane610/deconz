@@ -49,23 +49,23 @@ class APIItems(Generic[DataResource]):
     async def update(self) -> None:
         """Refresh data."""
         raw = await self._request("get", self.path)
-        self.process_full_data(raw)
+        self.process_raw(raw)
 
-    def process_full_data(self, raw: dict[str, Any]) -> None:
+    def process_raw(self, raw: dict[str, Any]) -> None:
         """Process full data."""
         for id, raw_item in raw.items():
-            self.process_raw(id, raw_item)
+            self.process_item(id, raw_item)
 
     def process_event(self, event: Event) -> None:
         """Process event."""
         if event.type == EventType.CHANGED and event.id in self:
-            self.process_raw(event.id, event.data)
+            self.process_item(event.id, event.data)
             return
 
         if event.type == EventType.ADDED and event.id not in self:
-            self.process_raw(event.id, event.full_resource)
+            self.process_item(event.id, event.full_resource)
 
-    def process_raw(self, id: str, raw: Any) -> None:
+    def process_item(self, id: str, raw: dict[str, Any]) -> None:
         """Process data."""
         if id in self._items:
             obj = self._items[id]
@@ -148,28 +148,28 @@ class GroupedAPIItems(Generic[DataResource]):
             resource_filter=self.resource_group,
         )
 
-    def process_full_data(self, raw: dict[str, Any]) -> None:
+    def process_raw(self, raw: dict[str, Any]) -> None:
         """Process full data."""
         for id, raw_item in raw.items():
-            self.process_raw(id, raw_item)
+            self.process_item(id, raw_item)
 
     def process_event(self, event: Event) -> None:
         """Process event."""
         if event.type == EventType.CHANGED and event.id in self:
-            self.process_raw(event.id, event.data)
+            self.process_item(event.id, event.data)
             return
 
         if event.type == EventType.ADDED and event.id not in self:
-            self.process_raw(event.id, event.full_resource)
+            self.process_item(event.id, event.full_resource)
 
-    def process_raw(self, id: str, raw: Any) -> None:
-        """Process data."""
+    def process_item(self, id: str, raw: dict[str, Any]) -> None:
+        """Process item data."""
         if obj := self.get(id):
             obj.update(raw)
             return
 
         handler = self._type_to_handler[ResourceType(raw.get("type"))]
-        handler.process_raw(id, raw)
+        handler.process_item(id, raw)
 
     def subscribe(
         self,
