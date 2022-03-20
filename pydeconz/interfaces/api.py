@@ -52,7 +52,7 @@ class APIItems(Generic[DataResource]):
         raw = await self._request("get", self.path)
         self.process_raw(raw)
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
+    def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:
         """Process full data."""
         for id, raw_item in raw.items():
             self.process_item(id, raw_item)
@@ -149,7 +149,7 @@ class GroupedAPIItems(Generic[DataResource]):
             resource_filter=self.resource_group,
         )
 
-    def process_raw(self, raw: dict[str, Any]) -> None:
+    def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:
         """Process full data."""
         for id, raw_item in raw.items():
             self.process_item(id, raw_item)
