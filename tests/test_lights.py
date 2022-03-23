@@ -536,7 +536,7 @@ async def test_create_siren(mock_aioresponse, deconz_light, deconz_called_with):
     assert siren.manufacturer == "Heiman"
     assert siren.model_id == "WarningDevice"
     assert siren.name == "alarm_tuin"
-    assert siren.software_version is None
+    assert not siren.software_version
     assert siren.type == "Warning device"
     assert siren.unique_id == "00:0d:6f:00:0f:ab:12:34-01"
 

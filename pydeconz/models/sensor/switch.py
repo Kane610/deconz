@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal, TypedDict, cast
+from typing import Any, Final, Literal, TypedDict
 
 from . import DeconzSensor
 
@@ -47,29 +47,27 @@ class Switch(DeconzSensor):
 
     ZHATYPE = ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedSwitch, self.raw)
+    raw: TypedSwitch
 
     @property
     def button_event(self) -> int | None:
         """Button press."""
-        return self._raw["state"].get("buttonevent")
+        return self.raw["state"].get("buttonevent")
 
     @property
     def gesture(self) -> int | None:
         """Gesture used for Xiaomi magic cube."""
-        return self._raw["state"].get("gesture")
+        return self.raw["state"].get("gesture")
 
     @property
     def angle(self) -> int | None:
         """Angle representing color on a tint remote color wheel."""
-        return self._raw["state"].get("angle")
+        return self.raw["state"].get("angle")
 
     @property
     def xy(self) -> tuple[float, float] | None:
         """X/Y color coordinates selected on a tint remote color wheel."""
-        return self._raw["state"].get("xy")
+        return self.raw["state"].get("xy")
 
     @property
     def event_duration(self) -> int | None:
@@ -77,7 +75,7 @@ class Switch(DeconzSensor):
 
         Increased with 8 for each x001, and they are issued pretty much every 800ms.
         """
-        return self._raw["state"].get("eventduration")
+        return self.raw["state"].get("eventduration")
 
     @property
     def device_mode(
@@ -103,7 +101,7 @@ class Switch(DeconzSensor):
         - "dualrocker"
         - "dualpushbutton"
         """
-        return self._raw["config"].get("devicemode")
+        return self.raw["config"].get("devicemode")
 
     @property
     def mode(self) -> Literal["momentary", "rocker"] | None:
@@ -113,7 +111,7 @@ class Switch(DeconzSensor):
         - "momentary"
         - "rocker"
         """
-        return self._raw["config"].get("mode")
+        return self.raw["config"].get("mode")
 
     @property
     def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None:
@@ -131,7 +129,7 @@ class Switch(DeconzSensor):
         - 8 = Tilt Blind lift & tilt
         - 9 = Projector Screen
         """
-        return self._raw["config"].get("windowcoveringtype")
+        return self.raw["config"].get("windowcoveringtype")
 
     async def set_config(
         self,

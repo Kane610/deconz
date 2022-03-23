@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TypedDict, cast
+from typing import Any, TypedDict
 
 from . import DeconzLight
 
@@ -35,16 +35,14 @@ class Cover(DeconzLight):
         "Window covering device",
     )
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedCover, self.raw)
+    raw: TypedCover
 
     @property
     def is_open(self) -> bool:
         """Is cover open."""
-        if "open" not in self._raw["state"]:  # Legacy support
+        if "open" not in self.raw["state"]:  # Legacy support
             return self.state is False
-        return self._raw["state"]["open"]
+        return self.raw["state"]["open"]
 
     @property
     def lift(self) -> int:
@@ -53,9 +51,9 @@ class Cover(DeconzLight):
         0 is fully open.
         100 is fully closed.
         """
-        if "lift" not in self._raw["state"]:  # Legacy support
-            return int(self._raw["state"]["bri"] / 2.54)
-        return self._raw["state"]["lift"]
+        if "lift" not in self.raw["state"]:  # Legacy support
+            return int(self.raw["state"]["bri"] / 2.54)
+        return self.raw["state"]["lift"]
 
     @property
     def tilt(self) -> int | None:
@@ -64,10 +62,10 @@ class Cover(DeconzLight):
         0 is fully open.
         100 is fully closed.
         """
-        if "tilt" in self._raw["state"]:
-            return self._raw["state"]["tilt"]
-        elif "sat" in self._raw["state"]:  # Legacy support
-            return int(self._raw["state"]["sat"] / 2.54)
+        if "tilt" in self.raw["state"]:
+            return self.raw["state"]["tilt"]
+        elif "sat" in self.raw["state"]:  # Legacy support
+            return int(self.raw["state"]["sat"] / 2.54)
         return None
 
     async def set_position(

@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
-from . import DeconzSensor, convert_temperature
+from . import DeconzSensor
 
 
 class TypedTemperatureState(TypedDict):
@@ -24,14 +24,14 @@ class Temperature(DeconzSensor):
 
     ZHATYPE = ("ZHATemperature", "CLIPTemperature")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedTemperature, self.raw)
+    raw: TypedTemperature
 
     @property
-    def temperature(self) -> float | None:
+    def temperature(self) -> int:
         """Temperature."""
-        if not isinstance(temperature := self._raw["state"].get("temperature"), int):
-            return None
+        return self.raw["state"]["temperature"]
 
-        return convert_temperature(temperature)
+    @property
+    def scaled_temperature(self) -> float:
+        """Scaled temperature."""
+        return round(self.temperature / 100, 1)

@@ -20,7 +20,7 @@ class APIItem:
     def __init__(
         self,
         resource_id: str,
-        raw: dict[str, Any],
+        raw: Any,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize API item."""

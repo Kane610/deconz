@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Final, TypedDict, cast
+from typing import Final, TypedDict
 
 from . import DeconzSensor
 
@@ -49,24 +49,22 @@ class Daylight(DeconzSensor):
 
     ZHATYPE = ("Daylight",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedDaylight, self.raw)
+    raw: TypedDaylight
 
     @property
     def configured(self) -> bool:
         """Is daylight sensor configured."""
-        return self._raw["config"]["configured"]
+        return self.raw["config"]["configured"]
 
     @property
     def daylight(self) -> bool:
         """Is daylight."""
-        return self._raw["state"]["daylight"]
+        return self.raw["state"]["daylight"]
 
     @property
     def status(self) -> str:
         """Return the daylight status string."""
-        return DAYLIGHT_STATUS.get(self._raw["state"]["status"], "unknown")
+        return DAYLIGHT_STATUS.get(self.raw["state"]["status"], "unknown")
 
     @property
     def sunrise_offset(self) -> int:
@@ -74,7 +72,7 @@ class Daylight(DeconzSensor):
 
         -120 to 120.
         """
-        return self._raw["config"]["sunriseoffset"]
+        return self.raw["config"]["sunriseoffset"]
 
     @property
     def sunset_offset(self) -> int:
@@ -82,4 +80,4 @@ class Daylight(DeconzSensor):
 
         -120 to 120.
         """
-        return self._raw["config"]["sunsetoffset"]
+        return self.raw["config"]["sunsetoffset"]

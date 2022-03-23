@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class GenericStatus(DeconzSensor):
 
     ZHATYPE = ("CLIPGenericStatus",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedGenericStatus, self.raw)
+    raw: TypedGenericStatus
 
     @property
     def status(self) -> str:
         """Status."""
-        return self._raw["state"]["status"]
+        return self.raw["state"]["status"]

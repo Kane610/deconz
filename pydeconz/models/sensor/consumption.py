@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -25,24 +25,19 @@ class Consumption(DeconzSensor):
 
     ZHATYPE = ("ZHAConsumption",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedConsumption, self.raw)
+    raw: TypedConsumption
 
     @property
-    def scaled_consumption(self) -> float | None:
-        """State of sensor."""
-        if self.consumption is None:
-            return None
-
-        return float(self.consumption / 1000)
-
-    @property
-    def consumption(self) -> int | None:
+    def consumption(self) -> int:
         """Consumption."""
-        return self._raw["state"].get("consumption")
+        return self.raw["state"]["consumption"]
+
+    @property
+    def scaled_consumption(self) -> float:
+        """State of sensor."""
+        return self.consumption / 1000
 
     @property
     def power(self) -> int | None:
         """Power."""
-        return self._raw["state"].get("power")
+        return self.raw["state"].get("power")

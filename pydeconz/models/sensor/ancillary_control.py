@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal, TypedDict, cast
+from typing import Final, Literal, TypedDict
 
 from . import DeconzSensor
 
@@ -68,9 +68,7 @@ class AncillaryControl(DeconzSensor):
 
     ZHATYPE = ("ZHAAncillaryControl",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedAncillaryControl, self.raw)
+    raw: TypedAncillaryControl
 
     @property
     def action(
@@ -97,7 +95,7 @@ class AncillaryControl(DeconzSensor):
         - "invalid_code"
         - "panic"
         """
-        return self._raw["state"]["action"]
+        return self.raw["state"]["action"]
 
     @property
     def panel(
@@ -132,7 +130,7 @@ class AncillaryControl(DeconzSensor):
         - "in_alarm"
         - "not_ready"
         """
-        return self._raw["state"].get("panel")
+        return self.raw["state"].get("panel")
 
     @property
     def seconds_remaining(self) -> int:
@@ -140,4 +138,4 @@ class AncillaryControl(DeconzSensor):
 
         In all other states the value is 0.
         """
-        return self._raw["state"].get("seconds_remaining", 0)
+        return self.raw["state"].get("seconds_remaining", 0)

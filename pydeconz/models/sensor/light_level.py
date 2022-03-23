@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TypedDict, cast
+from typing import Any, TypedDict
 
 from . import DeconzSensor
 
@@ -35,47 +35,42 @@ class LightLevel(DeconzSensor):
 
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedLightLevel, self.raw)
-
-    @property
-    def scaled_light_level(self) -> float | None:
-        """Scaled light level."""
-        if self.light_level is None:
-            return None
-
-        return round(10 ** (float(self.light_level - 1) / 10000), 1)
+    raw: TypedLightLevel
 
     @property
     def dark(self) -> bool | None:
         """If the area near the sensor is light or not."""
-        return self._raw["state"].get("dark")
+        return self.raw["state"].get("dark")
 
     @property
     def daylight(self) -> bool | None:
         """Daylight."""
-        return self._raw["state"].get("daylight")
+        return self.raw["state"].get("daylight")
 
     @property
-    def light_level(self) -> int | None:
+    def light_level(self) -> int:
         """Light level."""
-        return self._raw["state"].get("lightlevel")
+        return self.raw["state"]["lightlevel"]
+
+    @property
+    def scaled_light_level(self) -> float:
+        """Scaled light level."""
+        return round(10 ** ((self.light_level - 1) / 10000), 1)
 
     @property
     def lux(self) -> int | None:
         """Lux."""
-        return self._raw["state"].get("lux")
+        return self.raw["state"].get("lux")
 
     @property
     def threshold_dark(self) -> int | None:
         """Threshold to hold dark."""
-        return self._raw["config"].get("tholddark")
+        return self.raw["config"].get("tholddark")
 
     @property
     def threshold_offset(self) -> int | None:
         """Offset for threshold to hold dark."""
-        return self._raw["config"].get("tholdoffset")
+        return self.raw["config"].get("tholdoffset")
 
     async def set_config(
         self,

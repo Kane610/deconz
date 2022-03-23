@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class CarbonMonoxide(DeconzSensor):
 
     ZHATYPE = ("ZHACarbonMonoxide",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedCarbonMonoxide, self.raw)
+    raw: TypedCarbonMonoxide
 
     @property
     def carbon_monoxide(self) -> bool:
         """Carbon monoxide detected."""
-        return self._raw["state"]["carbonmonoxide"]
+        return self.raw["state"]["carbonmonoxide"]

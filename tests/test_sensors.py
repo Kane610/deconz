@@ -60,6 +60,7 @@ async def test_air_quality_sensor(deconz_sensor):
 
     # DeconzSensor
     assert sensor.battery is None
+    assert sensor.config_pending is None
     assert sensor.ep == 2
     assert sensor.low_battery is None
     assert sensor.on is True
@@ -300,6 +301,7 @@ async def test_consumption_sensor(deconz_sensor):
 
     assert sensor.consumption == 11342
     assert sensor.power == 123
+    assert sensor.scaled_consumption == 11.342
 
     # DeconzSensor
     assert sensor.battery is None
@@ -319,8 +321,6 @@ async def test_consumption_sensor(deconz_sensor):
     assert sensor.software_version == ""
     assert sensor.type == "ZHAConsumption"
     assert sensor.unique_id == "00:0d:6f:00:0b:7a:64:29-01-0702"
-
-    del sensor.raw["state"]["consumption"]
 
 
 async def test_daylight_sensor(deconz_sensor):
@@ -646,6 +646,7 @@ async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
 
     assert sensor.humidity == 3555
     assert sensor.offset == 0
+    assert sensor.scaled_humidity == 35.5
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -665,8 +666,6 @@ async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAHumidity"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0405"
-
-    del sensor.raw["state"]["humidity"]
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(offset=1)
@@ -712,6 +711,7 @@ async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_
     assert sensor.daylight is False
     assert sensor.light_level == 6955
     assert sensor.lux == 5
+    assert sensor.scaled_light_level == 5
     assert sensor.threshold_dark == 12000
     assert sensor.threshold_offset == 7000
 
@@ -733,8 +733,6 @@ async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_
     assert sensor.software_version == "6.1.0.18912"
     assert sensor.type == "ZHALightLevel"
     assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0400"
-
-    del sensor.raw["state"]["lightlevel"]
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(threshold_dark=10, threshold_offset=20)
@@ -1323,7 +1321,8 @@ async def test_temperature_sensor(deconz_sensor):
 
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
 
-    assert sensor.temperature == 21.8
+    assert sensor.temperature == 2182
+    assert sensor.scaled_temperature == 21.8
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -1343,8 +1342,6 @@ async def test_temperature_sensor(deconz_sensor):
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHATemperature"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0402"
-
-    del sensor.raw["state"]["temperature"]
 
 
 async def test_danfoss_thermostat(deconz_sensor):
@@ -1402,8 +1399,10 @@ async def test_danfoss_thermostat(deconz_sensor):
     assert sensor.mounting_mode_active is False
     assert sensor.offset == 0
     assert sensor.preset is None
+    assert sensor.state_on
     assert sensor.swing_mode is None
-    assert sensor.temperature == 21.0
+    assert sensor.temperature == 2102
+    assert sensor.scaled_temperature == 21.0
     assert sensor.temperature_measurement is None
     assert sensor.valve == 24
     assert sensor.window_open_detection is None
@@ -1473,8 +1472,10 @@ async def test_eurotronic_thermostat(deconz_sensor):
     assert sensor.mounting_mode_active is None
     assert sensor.offset == 0
     assert sensor.preset is None
+    assert not sensor.state_on
     assert sensor.swing_mode is None
-    assert sensor.temperature == 21.5
+    assert sensor.temperature == 2149
+    assert sensor.scaled_temperature == 21.5
     assert sensor.temperature_measurement is None
     assert sensor.valve == 0
     assert sensor.window_open_detection is None
@@ -1536,7 +1537,9 @@ async def test_tuya_thermostat(mock_aioresponse, deconz_sensor, deconz_called_wi
     assert sensor.mode is None
     assert sensor.offset == 0
     assert sensor.schedule_enabled is None
-    assert sensor.temperature == 22.9
+    assert not sensor.state_on
+    assert sensor.temperature == 2290
+    assert sensor.scaled_temperature == 22.9
     assert sensor.valve is None
 
     # DeconzSensor

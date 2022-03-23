@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class Pressure(DeconzSensor):
 
     ZHATYPE = ("ZHAPressure", "CLIPPressure")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedPressure, self.raw)
+    raw: TypedPressure
 
     @property
     def pressure(self) -> int:
         """Pressure."""
-        return self._raw["state"]["pressure"]
+        return self.raw["state"]["pressure"]

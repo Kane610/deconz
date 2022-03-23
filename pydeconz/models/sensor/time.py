@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class Time(DeconzSensor):
 
     ZHATYPE = ("ZHATime",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedTime, self.raw)
+    raw: TypedTime
 
     @property
     def last_set(self) -> str:
         """Last time time was set."""
-        return self._raw["state"]["lastset"]
+        return self.raw["state"]["lastset"]

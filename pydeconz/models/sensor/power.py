@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -26,21 +26,19 @@ class Power(DeconzSensor):
 
     ZHATYPE = ("ZHAPower",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedPower, self.raw)
+    raw: TypedPower
 
     @property
     def current(self) -> int | None:
         """Ampere load of device."""
-        return self._raw["state"].get("current")
+        return self.raw["state"].get("current")
 
     @property
     def power(self) -> int:
         """Power load of device."""
-        return self._raw["state"]["power"]
+        return self.raw["state"]["power"]
 
     @property
     def voltage(self) -> int | None:
         """Voltage draw of device."""
-        return self._raw["state"].get("voltage")
+        return self.raw["state"].get("voltage")

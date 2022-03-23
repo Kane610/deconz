@@ -9,11 +9,6 @@ from ..deconz_device import DeconzDevice
 RESOURCE_TYPE: Final = "sensors"
 
 
-def convert_temperature(temperature: int) -> float:
-    """Convert temperature to Celsius."""
-    return round(float(temperature) / 100, 1)
-
-
 class DeconzSensor(DeconzDevice):
     """deCONZ sensor representation.
 
@@ -31,9 +26,8 @@ class DeconzSensor(DeconzDevice):
     @property
     def battery(self) -> int | None:
         """Battery status of sensor."""
-        if not isinstance(battery := self.raw["config"].get("battery"), int):
-            return None
-        return battery
+        raw: dict[str, int] = self.raw["config"]
+        return raw.get("battery")
 
     @property
     def config_pending(self) -> list[str] | None:
@@ -41,47 +35,43 @@ class DeconzSensor(DeconzDevice):
 
         Only supported by Hue devices.
         """
-        if not isinstance(pending := self.raw["config"].get("pending"), list):
-            return None
-        return pending
+        raw: dict[str, list[str]] = self.raw["config"]
+        return raw.get("pending")
 
     @property
     def ep(self) -> int | None:
         """Endpoint of sensor."""
-        return self.raw.get("ep")
+        raw: dict[str, int] = self.raw
+        return raw.get("ep")
 
     @property
     def low_battery(self) -> bool | None:
         """Low battery."""
-        if not isinstance(lowbattery := self.raw["state"].get("lowbattery"), bool):
-            return None
-        return lowbattery
+        raw: dict[str, bool] = self.raw["state"]
+        return raw.get("lowbattery")
 
     @property
     def on(self) -> bool | None:
         """Declare if the sensor is on or off."""
-        if not isinstance(on := self.raw["config"].get("on"), bool):
-            return None
-        return on
+        raw: dict[str, bool] = self.raw["config"]
+        return raw.get("on")
 
     @property
     def reachable(self) -> bool:
         """Declare if the sensor is reachable."""
-        if not isinstance(reachable := self.raw["config"].get("reachable"), bool):
-            return True
-        return reachable
+        raw: dict[str, bool] = self.raw["config"]
+        return raw.get("reachable", True)
 
     @property
     def tampered(self) -> bool | None:
         """Tampered."""
-        if not isinstance(tampered := self.raw["state"].get("tampered"), bool):
-            return None
-        return tampered
+        raw: dict[str, bool] = self.raw["state"]
+        return raw.get("tampered")
 
     @property
     def secondary_temperature(self) -> float | None:
         """Extra temperature available on some Xiaomi devices."""
-        if not isinstance(temperature := self.raw["config"].get("temperature"), int):
-            return None
-
-        return convert_temperature(temperature)
+        raw: dict[str, int] = self.raw["config"]
+        if temperature := raw.get("temperature"):
+            return round(temperature / 100, 1)
+        return None

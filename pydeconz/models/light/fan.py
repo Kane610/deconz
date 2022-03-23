@@ -41,15 +41,16 @@ class Fan(Light):
 
     ZHATYPE = ("Fan",)
 
+    # raw: TypedFan
+
     def post_init(self) -> None:
         """Post init method."""
-        self.__raw = cast(TypedFan, self.raw)
-        super().post_init()
+        self._raw = cast(TypedFan, self.raw)
 
     @property
     def speed(self) -> Literal[0, 1, 2, 3, 4, 5, 6]:
         """Speed of the fan."""
-        return self.__raw["state"]["speed"]
+        return self._raw["state"]["speed"]
 
     async def set_speed(self, speed: Literal[0, 1, 2, 3, 4, 5, 6]) -> dict[str, Any]:
         """Set speed of fans/ventilators.

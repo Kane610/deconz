@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal, TypedDict, cast
+from typing import Any, Final, Literal, TypedDict
 
 from .api import APIItem
 
@@ -96,11 +96,7 @@ class AlarmSystem(APIItem):
     https://dresden-elektronik.github.io/deconz-rest-doc/endpoints/alarmsystems/
     """
 
-    _raw: TypedAlarmSystem
-
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedAlarmSystem, self.raw)
+    raw: TypedAlarmSystem
 
     @property
     def resource_type(self) -> str:
@@ -215,7 +211,7 @@ class AlarmSystem(APIItem):
         - "exit_delay"
         - "in_alarm"
         """
-        return self._raw["state"]["armstate"]
+        return self.raw["state"]["armstate"]
 
     @property
     def seconds_remaining(self) -> int:
@@ -226,12 +222,12 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["state"]["seconds_remaining"]
+        return self.raw["state"]["seconds_remaining"]
 
     @property
     def pin_configured(self) -> bool:
         """Is PIN code configured."""
-        return self._raw["config"]["configured"]
+        return self.raw["config"]["configured"]
 
     @property
     def arm_mode(
@@ -245,7 +241,7 @@ class AlarmSystem(APIItem):
         - "armed_stay"
         - "disarmed"
         """
-        return self._raw["config"]["armmode"]
+        return self.raw["config"]["armmode"]
 
     @property
     def armed_away_entry_delay(self) -> int:
@@ -254,7 +250,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_away_entry_delay"]
+        return self.raw["config"]["armed_away_entry_delay"]
 
     @property
     def armed_away_exit_delay(self) -> int:
@@ -263,7 +259,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_away_exit_delay"]
+        return self.raw["config"]["armed_away_exit_delay"]
 
     @property
     def armed_away_trigger_duration(self) -> int:
@@ -272,7 +268,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_away_trigger_duration"]
+        return self.raw["config"]["armed_away_trigger_duration"]
 
     @property
     def armed_night_entry_delay(self) -> int:
@@ -281,7 +277,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_night_entry_delay"]
+        return self.raw["config"]["armed_night_entry_delay"]
 
     @property
     def armed_night_exit_delay(self) -> int:
@@ -290,7 +286,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_night_exit_delay"]
+        return self.raw["config"]["armed_night_exit_delay"]
 
     @property
     def armed_night_trigger_duration(self) -> int:
@@ -299,7 +295,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_night_trigger_duration"]
+        return self.raw["config"]["armed_night_trigger_duration"]
 
     @property
     def armed_stay_entry_delay(self) -> int:
@@ -308,7 +304,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_stay_entry_delay"]
+        return self.raw["config"]["armed_stay_entry_delay"]
 
     @property
     def armed_stay_exit_delay(self) -> int:
@@ -317,7 +313,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_stay_exit_delay"]
+        return self.raw["config"]["armed_stay_exit_delay"]
 
     @property
     def armed_stay_trigger_duration(self) -> int:
@@ -326,7 +322,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["armed_stay_trigger_duration"]
+        return self.raw["config"]["armed_stay_trigger_duration"]
 
     @property
     def disarmed_entry_delay(self) -> int:
@@ -335,7 +331,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["disarmed_entry_delay"]
+        return self.raw["config"]["disarmed_entry_delay"]
 
     @property
     def disarmed_exit_delay(self) -> int:
@@ -344,7 +340,7 @@ class AlarmSystem(APIItem):
         Supported values:
           0-255.
         """
-        return self._raw["config"]["disarmed_exit_delay"]
+        return self.raw["config"]["disarmed_exit_delay"]
 
     @property
     def devices(self) -> dict[str, Any]:
@@ -364,7 +360,7 @@ class AlarmSystem(APIItem):
           "state/buttonevent"
           "state/on"
         """
-        return self._raw["devices"]
+        return self.raw["devices"]
 
     async def add_device(
         self,

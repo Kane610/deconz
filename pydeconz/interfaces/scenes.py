@@ -36,7 +36,7 @@ class Scenes(APIItems[Scene]):
 
     def group_data_callback(self, action: EventType, group_id: str) -> None:
         """Subscribe callback for new group data."""
-        self.process_item(group_id, self.gateway.groups[group_id].raw)
+        self.process_item(group_id, {})
 
     def process_item(self, id: str, raw: dict[str, Any]) -> None:
         """Pre-process scene data."""

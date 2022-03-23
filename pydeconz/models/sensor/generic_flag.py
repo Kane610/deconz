@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class GenericFlag(DeconzSensor):
 
     ZHATYPE = ("CLIPGenericFlag",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedGenericFlag, self.raw)
+    raw: TypedGenericFlag
 
     @property
     def flag(self) -> bool:
         """Flag status."""
-        return self._raw["state"]["flag"]
+        return self.raw["state"]["flag"]

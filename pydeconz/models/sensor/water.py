@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class Water(DeconzSensor):
 
     ZHATYPE = ("ZHAWater",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedWater, self.raw)
+    raw: TypedWater
 
     @property
     def water(self) -> bool:
         """Water detected."""
-        return self._raw["state"]["water"]
+        return self.raw["state"]["water"]

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TypedDict, cast
+from typing import Any, TypedDict
 
 from . import DeconzSensor
 
@@ -31,22 +31,17 @@ class Humidity(DeconzSensor):
 
     ZHATYPE = ("ZHAHumidity", "CLIPHumidity")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedHumidity, self.raw)
+    raw: TypedHumidity
 
     @property
-    def scaled_humidity(self) -> float | None:
-        """Scaled humidity level."""
-        if self.humidity is None:
-            return None
-
-        return round(float(self.humidity) / 100, 1)
-
-    @property
-    def humidity(self) -> int | None:
+    def humidity(self) -> int:
         """Humidity level."""
-        return self._raw["state"].get("humidity")
+        return self.raw["state"]["humidity"]
+
+    @property
+    def scaled_humidity(self) -> float:
+        """Scaled humidity level."""
+        return round(self.humidity / 100, 1)
 
     @property
     def offset(self) -> int | None:
@@ -54,7 +49,7 @@ class Humidity(DeconzSensor):
 
         Values send by the REST-API are already amended by the offset.
         """
-        return self._raw["config"].get("offset")
+        return self.raw["config"].get("offset")
 
     async def set_config(
         self,

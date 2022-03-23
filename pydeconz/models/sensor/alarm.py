@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -22,11 +22,9 @@ class Alarm(DeconzSensor):
 
     ZHATYPE = ("ZHAAlarm",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedAlarm, self.raw)
+    raw: TypedAlarm
 
     @property
     def alarm(self) -> bool:
         """Alarm."""
-        return self._raw["state"]["alarm"]
+        return self.raw["state"]["alarm"]

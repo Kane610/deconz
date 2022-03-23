@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from . import DeconzSensor
 
@@ -23,16 +23,14 @@ class Fire(DeconzSensor):
 
     ZHATYPE = ("ZHAFire",)
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedFire, self.raw)
+    raw: TypedFire
 
     @property
     def fire(self) -> bool:
         """Fire detected."""
-        return self._raw["state"]["fire"]
+        return self.raw["state"]["fire"]
 
     @property
     def in_test_mode(self) -> bool:
         """Sensor is in test mode."""
-        return self._raw["state"].get("test", False)
+        return self.raw["state"].get("test", False)

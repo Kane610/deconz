@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal, TypedDict, cast
+from typing import Any, Final, Literal, TypedDict
 
-from . import convert_temperature
-from .temperature import Temperature
+from . import DeconzSensor
 
 THERMOSTAT_MODE_AUTO: Final = "auto"
 THERMOSTAT_MODE_COOL: Final = "cool"
@@ -84,6 +83,7 @@ class TypedThermostatState(TypedDict):
     heating: bool
     mountingmodeactive: bool
     on: bool
+    temperature: int
     valve: int
 
 
@@ -94,15 +94,12 @@ class TypedThermostat(TypedDict):
     state: TypedThermostatState
 
 
-class Thermostat(Temperature):
+class Thermostat(DeconzSensor):
     """Thermostat "sensor"."""
 
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self.__raw = cast(TypedThermostat, self.raw)
-        super().post_init()
+    raw: TypedThermostat
 
     @property
     def cooling_setpoint(self) -> float | None:
@@ -110,20 +107,19 @@ class Thermostat(Temperature):
 
         700-3500.
         """
-        if not isinstance(temperature := self.__raw["config"].get("coolsetpoint"), int):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["config"].get("coolsetpoint"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def display_flipped(self) -> bool | None:
         """Tells if display for TRVs is flipped."""
-        return self.__raw["config"].get("displayflipped")
+        return self.raw["config"].get("displayflipped")
 
     @property
     def error_code(self) -> bool | None:
         """Error code."""
-        return self.__raw["state"].get("errorcode")
+        return self.raw["state"].get("errorcode")
 
     @property
     def external_sensor_temperature(self) -> float | None:
@@ -132,12 +128,9 @@ class Thermostat(Temperature):
         -32768–32767.
         Modes are device dependent and only exposed for devices supporting it.
         """
-        if not isinstance(
-            temperature := self.__raw["config"].get("externalsensortemp"), int
-        ):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["config"].get("externalsensortemp"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def external_window_open(self) -> bool | None:
@@ -145,7 +138,7 @@ class Thermostat(Temperature):
 
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.__raw["config"].get("externalwindowopen")
+        return self.raw["config"].get("externalwindowopen")
 
     @property
     def fan_mode(
@@ -163,22 +156,19 @@ class Thermostat(Temperature):
         - "smart"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.__raw["config"].get("fanmode")
+        return self.raw["config"].get("fanmode")
 
     @property
     def floor_temperature(self) -> float | None:
         """Floor temperature."""
-        if not isinstance(
-            temperature := self.__raw["state"].get("floortemperature"), int
-        ):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["state"].get("floortemperature"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def heating(self) -> bool | None:
         """Heating setpoint."""
-        return self.__raw["state"].get("heating")
+        return self.raw["state"].get("heating")
 
     @property
     def heating_setpoint(self) -> float | None:
@@ -186,15 +176,14 @@ class Thermostat(Temperature):
 
         500-3200.
         """
-        if not isinstance(temperature := self.__raw["config"].get("heatsetpoint"), int):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["config"].get("heatsetpoint"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def locked(self) -> bool | None:
         """Child lock active/inactive for thermostats/TRVs supporting it."""
-        return self.__raw["config"].get("locked")
+        return self.raw["config"].get("locked")
 
     @property
     def mode(
@@ -224,22 +213,22 @@ class Thermostat(Temperature):
         - "sleep"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.__raw["config"].get("mode")
+        return self.raw["config"].get("mode")
 
     @property
     def mounting_mode(self) -> bool | None:
         """Set a TRV into mounting mode if supported (valve fully open position)."""
-        return self.__raw["config"].get("mountingmode")
+        return self.raw["config"].get("mountingmode")
 
     @property
     def mounting_mode_active(self) -> bool | None:
         """If thermostat mounting mode is active."""
-        return self.__raw["state"].get("mountingmodeactive")
+        return self.raw["state"].get("mountingmodeactive")
 
     @property
     def offset(self) -> int | None:
         """Add a signed offset value to measured temperature and humidity state values. Values send by the REST-API are already amended by the offset."""
-        return self.__raw["config"].get("offset")
+        return self.raw["config"].get("offset")
 
     @property
     def preset(
@@ -259,17 +248,17 @@ class Thermostat(Temperature):
         - "complex"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.__raw["config"].get("preset")
+        return self.raw["config"].get("preset")
 
     @property
     def schedule_enabled(self) -> bool | None:
         """Tell when thermostat schedule is enabled."""
-        return self.__raw["config"].get("schedule_on")
+        return self.raw["config"].get("schedule_on")
 
     @property
     def state_on(self) -> bool | None:
         """Declare if the sensor is on or off."""
-        return self.__raw["state"].get("on")
+        return self.raw["state"].get("on")
 
     @property
     def swing_mode(
@@ -291,7 +280,17 @@ class Thermostat(Temperature):
         - "three quarters open"
         Modes are device dependent and only exposed for devices supporting it.
         """
-        return self.__raw["config"].get("swingmode")
+        return self.raw["config"].get("swingmode")
+
+    @property
+    def temperature(self) -> int:
+        """Temperature."""
+        return self.raw["state"]["temperature"]
+
+    @property
+    def scaled_temperature(self) -> float:
+        """Scaled temperature."""
+        return round(self.temperature / 100, 1)
 
     @property
     def temperature_measurement(
@@ -304,12 +303,12 @@ class Thermostat(Temperature):
         - "floor sensor"
         - "floor protection"
         """
-        return self.__raw["config"].get("temperaturemeasurement")
+        return self.raw["config"].get("temperaturemeasurement")
 
     @property
     def valve(self) -> int | None:
         """How open the valve is."""
-        return self.__raw["state"].get("valve")
+        return self.raw["state"].get("valve")
 
     @property
     def window_open_detection(self) -> bool | None:
@@ -317,7 +316,7 @@ class Thermostat(Temperature):
 
         (Support is device dependent).
         """
-        return self.__raw["config"].get("windowopen_set")
+        return self.raw["config"].get("windowopen_set")
 
     async def set_config(
         self,

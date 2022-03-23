@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, TypedDict, cast
+from typing import Any, Final, TypedDict
 
 from . import DeconzSensor
 
@@ -42,29 +42,27 @@ class Presence(DeconzSensor):
 
     ZHATYPE = ("ZHAPresence", "CLIPPresence")
 
-    def post_init(self) -> None:
-        """Post init method."""
-        self._raw = cast(TypedPresence, self.raw)
+    raw: TypedPresence
 
     @property
     def dark(self) -> bool | None:
         """If the area near the sensor is light or not."""
-        return self._raw["state"].get(PRESENCE_DARK)
+        return self.raw["state"].get(PRESENCE_DARK)
 
     @property
     def delay(self) -> int | None:
         """Occupied to unoccupied delay in seconds."""
-        return self._raw["config"].get(PRESENCE_DELAY)
+        return self.raw["config"].get(PRESENCE_DELAY)
 
     @property
     def duration(self) -> int | None:
         """Minimum duration which presence will be true."""
-        return self._raw["config"].get(PRESENCE_DURATION)
+        return self.raw["config"].get(PRESENCE_DURATION)
 
     @property
     def presence(self) -> bool:
         """Motion detected."""
-        return self._raw["state"][PRESENCE_PRESENCE]
+        return self.raw["state"][PRESENCE_PRESENCE]
 
     @property
     def sensitivity(self) -> int | None:
@@ -73,12 +71,12 @@ class Presence(DeconzSensor):
         Supported values:
         - 0-[sensitivitymax]
         """
-        return self._raw["config"].get(PRESENCE_SENSITIVITY)
+        return self.raw["config"].get(PRESENCE_SENSITIVITY)
 
     @property
     def max_sensitivity(self) -> int | None:
         """Maximum sensitivity value."""
-        return self._raw["config"].get(PRESENCE_SENSITIVITY_MAX)
+        return self.raw["config"].get(PRESENCE_SENSITIVITY_MAX)
 
     async def set_config(
         self,

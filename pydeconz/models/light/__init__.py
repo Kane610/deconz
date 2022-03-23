@@ -36,13 +36,11 @@ class DeconzLight(DeconzDevice):
     @property
     def state(self) -> bool | None:
         """Device state."""
-        if not isinstance(on := self.raw["state"].get("on"), bool):
-            return None
-        return on
+        raw: dict[str, bool] = self.raw["state"]
+        return raw.get("on")
 
     @property
     def reachable(self) -> bool:
         """Is light reachable."""
-        if not isinstance(reachable := self.raw["state"]["reachable"], bool):
-            return True
-        return reachable
+        raw: dict[str, bool] = self.raw["state"]
+        return raw["reachable"]
