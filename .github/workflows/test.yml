@@ -34,7 +34,7 @@ jobs:
           isort pydeconz --check-only
       - name: Check typing with mypy
         run: |
-          mypy pydeconz --strict
+          mypy pydeconz
       - name: Test with pytest
         run: |
           pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=pydeconz --cov-report=xml --cov-report=html
