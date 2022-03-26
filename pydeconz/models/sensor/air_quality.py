@@ -1,15 +1,36 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Literal
+from typing import Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
-class AirQuality(DeconzSensor):
+class TypedAirQualityState(TypedDict):
+    """Air quality state type definition."""
+
+    airquality: Literal[
+        "excellent",
+        "good",
+        "moderate",
+        "poor",
+        "unhealthy",
+        "out of scale",
+    ]
+    airqualityppb: int
+
+
+class TypedAirQuality(TypedDict):
+    """Air quality type definition."""
+
+    state: TypedAirQualityState
+
+
+class AirQuality(SensorBase):
     """Air quality sensor."""
 
-    STATE_PROPERTY = "air_quality"
     ZHATYPE = ("ZHAAirQuality",)
+
+    raw: TypedAirQuality
 
     @property
     def air_quality(

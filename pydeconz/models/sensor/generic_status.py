@@ -1,13 +1,28 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzSensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class GenericStatus(DeconzSensor):
+class TypedGenericStatusState(TypedDict):
+    """Generic status state type definition."""
+
+    status: str
+
+
+class TypedGenericStatus(TypedDict):
+    """Generic status type definition."""
+
+    state: TypedGenericStatusState
+
+
+class GenericStatus(SensorBase):
     """Generic status sensor."""
 
-    STATE_PROPERTY = "status"
     ZHATYPE = ("CLIPGenericStatus",)
+
+    raw: TypedGenericStatus
 
     @property
     def status(self) -> str:

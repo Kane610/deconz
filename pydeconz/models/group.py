@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, TypedDict
 
+from . import ResourceGroup
 from .deconz_device import DeconzDevice
 from .light.light import Light
-from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene  # noqa: F401
+from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene, TypedScene  # noqa: F401
 
-RESOURCE_TYPE: Final = "groups"
+RESOURCE_TYPE: Final = ResourceGroup.GROUP.value
 
 COLOR_STATE_ATTRIBUTES: Final = {
     "bri",
@@ -21,12 +22,50 @@ COLOR_STATE_ATTRIBUTES: Final = {
 }
 
 
+class TypedGroupAction(TypedDict):
+    """Group action type definition."""
+
+    bri: int
+    colormode: Literal["ct", "hs", "xy"]
+    ct: int
+    effect: Literal["colorloop", "none"]
+    hue: int
+    on: bool
+    sat: int
+    xy: tuple[float, float]
+
+
+class TypedGroupState(TypedDict):
+    """Group state type definition."""
+
+    all_on: bool
+    any_on: bool
+
+
+class TypedGroup(TypedDict):
+    """Group type definition."""
+
+    action: TypedGroupAction
+    devicemembership: list[str]
+    hidden: bool
+    id: str
+    lights: list[str]
+    lightsequence: list[str]
+    multideviceids: list[str]
+    name: str
+    scenes: list[TypedScene]
+    state: TypedGroupState
+    type: str
+
+
 class Group(DeconzDevice):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/groups/
     """
+
+    raw: TypedGroup
 
     @property
     def resource_type(self) -> str:
@@ -106,24 +145,19 @@ class Group(DeconzDevice):
         return self.raw["action"].get("effect")
 
     @property
-    def reachable(self) -> bool | None:
+    def reachable(self) -> bool:
         """Is group reachable."""
         return True
 
     @property
-    def group_class(self) -> str | None:
-        """Type of class."""
-        return self.raw.get("class")
-
-    @property
-    def all_on(self) -> bool | None:
+    def all_on(self) -> bool:
         """Is all lights in light group on."""
-        return self.raw["state"].get("all_on")
+        return self.raw["state"].get("all_on") is True
 
     @property
-    def any_on(self) -> bool | None:
+    def any_on(self) -> bool:
         """Is any lights in light group on."""
-        return self.raw["state"].get("any_on")
+        return self.raw["state"].get("any_on") is True
 
     @property
     def device_membership(self) -> list[str] | None:
@@ -199,11 +233,11 @@ class Group(DeconzDevice):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect"] | None = None,
+        alert: Literal["none", "select", "lselect"] | str | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none"] | None = None,
+        effect: Literal["colorloop", "none"] | str | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,
@@ -267,9 +301,7 @@ class Group(DeconzDevice):
         write light attributes with the value None to the group.
         This is used to not keep any bad values from the group.
         """
-        data: dict[
-            str, float | int | str | tuple[int, int] | tuple[None, None] | None
-        ] = {}
+        data = {}
 
         for attribute in COLOR_STATE_ATTRIBUTES:
 

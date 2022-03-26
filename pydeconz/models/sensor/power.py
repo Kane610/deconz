@@ -2,14 +2,31 @@
 
 from __future__ import annotations
 
-from . import DeconzSensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class Power(DeconzSensor):
+class TypedPowerState(TypedDict):
+    """Power state type definition."""
+
+    current: int
+    power: int
+    voltage: int
+
+
+class TypedPower(TypedDict):
+    """Power type definition."""
+
+    state: TypedPowerState
+
+
+class Power(SensorBase):
     """Power sensor."""
 
-    STATE_PROPERTY = "power"
     ZHATYPE = ("ZHAPower",)
+
+    raw: TypedPower
 
     @property
     def current(self) -> int | None:

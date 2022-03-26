@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Final
+from typing import Any, Final, TypedDict
 
-from . import DeconzBinarySensor
+from . import SensorBase
 
 PRESENCE_DELAY: Final = "delay"
 PRESENCE_DURATION: Final = "duration"
@@ -14,11 +14,35 @@ PRESENCE_DARK: Final = "dark"
 PRESENCE_PRESENCE: Final = "presence"
 
 
-class Presence(DeconzBinarySensor):
+class TypedPresenceConfig(TypedDict):
+    """Presence config type definition."""
+
+    delay: int
+    duration: int
+    sensitivity: int
+    sensitivitymax: int
+
+
+class TypedPresenceState(TypedDict):
+    """Presence state type definition."""
+
+    dark: bool
+    presence: bool
+
+
+class TypedPresence(TypedDict):
+    """Presence type definition."""
+
+    config: TypedPresenceConfig
+    state: TypedPresenceState
+
+
+class Presence(SensorBase):
     """Presence detector."""
 
-    STATE_PROPERTY = "presence"
     ZHATYPE = ("ZHAPresence", "CLIPPresence")
+
+    raw: TypedPresence
 
     @property
     def dark(self) -> bool | None:

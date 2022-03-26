@@ -2,14 +2,40 @@
 
 from __future__ import annotations
 
-from . import DeconzBinarySensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class Vibration(DeconzBinarySensor):
+class TypedVibrationConfig(TypedDict):
+    """Vibration config type definition."""
+
+    sensitivity: int
+    sensitivitymax: int
+
+
+class TypedVibrationState(TypedDict):
+    """Vibration state type definition."""
+
+    orientation: list[str]
+    tiltangle: int
+    vibration: bool
+    vibrationstrength: int
+
+
+class TypedVibration(TypedDict):
+    """Vibration type definition."""
+
+    config: TypedVibrationConfig
+    state: TypedVibrationState
+
+
+class Vibration(SensorBase):
     """Vibration sensor."""
 
-    STATE_PROPERTY = "vibration"
     ZHATYPE = ("ZHAVibration",)
+
+    raw: TypedVibration
 
     @property
     def orientation(self) -> list[str] | None:

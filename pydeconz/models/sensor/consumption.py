@@ -2,27 +2,40 @@
 
 from __future__ import annotations
 
-from . import DeconzSensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class Consumption(DeconzSensor):
+class TypedConsumptionState(TypedDict):
+    """Consumption state type definition."""
+
+    consumption: int
+    power: int
+
+
+class TypedConsumption(TypedDict):
+    """Consumption type definition."""
+
+    state: TypedConsumptionState
+
+
+class Consumption(SensorBase):
     """Power consumption sensor."""
 
-    STATE_PROPERTY = "scaled_consumption"
     ZHATYPE = ("ZHAConsumption",)
 
-    @property
-    def scaled_consumption(self) -> float | None:
-        """State of sensor."""
-        if self.consumption is None:
-            return None
-
-        return float(self.consumption / 1000)
+    raw: TypedConsumption
 
     @property
-    def consumption(self) -> int | None:
+    def consumption(self) -> int:
         """Consumption."""
-        return self.raw["state"].get("consumption")
+        return self.raw["state"]["consumption"]
+
+    @property
+    def scaled_consumption(self) -> float:
+        """State of sensor."""
+        return self.consumption / 1000
 
     @property
     def power(self) -> int | None:

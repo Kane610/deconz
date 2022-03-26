@@ -1,13 +1,28 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzSensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class Pressure(DeconzSensor):
+class TypedPressureState(TypedDict):
+    """Pressure state type definition."""
+
+    pressure: int
+
+
+class TypedPressure(TypedDict):
+    """Pressure type definition."""
+
+    state: TypedPressureState
+
+
+class Pressure(SensorBase):
     """Pressure sensor."""
 
-    STATE_PROPERTY = "pressure"
     ZHATYPE = ("ZHAPressure", "CLIPPressure")
+
+    raw: TypedPressure
 
     @property
     def pressure(self) -> int:

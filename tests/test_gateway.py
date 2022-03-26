@@ -401,6 +401,8 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
 
 async def test_sensor_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
+    sensor_subscription = Mock()
+    unsub_sensor_mock = deconz_session.sensors.subscribe(sensor_subscription)
     deconz_session.add_device_callback = Mock()
 
     # Add sensor
@@ -425,6 +427,8 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
     deconz_session.add_device_callback.assert_called_with(
         "sensors", deconz_session.sensors["1"]
     )
+    sensor_subscription.assert_called_once()
+    unsub_sensor_mock()
 
     # Update sensor
 
@@ -442,6 +446,7 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
     mock_sensor_callback.assert_called()
     assert deconz_session.sensors["1"].changed_keys == {"config", "reachable"}
     assert not deconz_session.sensors["1"].reachable
+    sensor_subscription.assert_called_once()
 
 
 @pytest.mark.parametrize(

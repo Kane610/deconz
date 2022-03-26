@@ -3,11 +3,21 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final
+from typing import Any, Final, TypedDict
 
+from . import ResourceGroup
 from .api import APIItem
 
-RESOURCE_TYPE: Final = "scenes"
+RESOURCE_TYPE: Final = ResourceGroup.SCENE.value
+
+
+class TypedScene(TypedDict):
+    """Scene type definition."""
+
+    id: str
+    lightcount: int
+    transitiontime: int
+    name: str
 
 
 class Scene(APIItem):
@@ -17,18 +27,20 @@ class Scene(APIItem):
     http://dresden-elektronik.github.io/deconz-rest-doc/scenes/
     """
 
+    raw: TypedScene
+
     def __init__(
         self,
         resource_id: str,
-        raw: dict[str, Any],
+        raw: Any,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Set initial information about scene."""
         super().__init__(resource_id, raw, request)
 
-        self.group_id = raw["group_id"]
-        self.group_deconz_id = f"/groups/{self.group_id}"
-        self.group_name = raw["group_name"]
+        self.group_id: str = raw["group_id"]
+        self.group_deconz_id: str = f"/groups/{self.group_id}"
+        self.group_name: str = raw["group_name"]
 
     @property
     def resource_type(self) -> str:

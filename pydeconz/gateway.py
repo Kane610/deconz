@@ -36,9 +36,9 @@ class DeconzSession:
         api_key: str | None = None,
         add_device: Callable[[str, Any], None] | None = None,
         connection_status: Callable[[bool], None] | None = None,
-        legacy_add_device=True,
-        legacy_update_group_color=True,
-    ):
+        legacy_add_device: bool = True,
+        legacy_update_group_color: bool = True,
+    ) -> None:
         """Session setup."""
         self.session = session
         self.host = host
@@ -135,13 +135,13 @@ class DeconzSession:
             }.items()
             if value is not None
         }
-        response = await self._request(
+        response: list[dict[str, dict[str, str]]] = await self._request(
             "post",
             url=f"http://{self.host}:{self.port}/api",
             json=data,
         )
 
-        return response[0]["success"]["username"]  # type: ignore[index]
+        return response[0]["success"]["username"]
 
     def start(self, websocketport: int | None = None) -> None:
         """Connect websocket to deCONZ."""
@@ -183,18 +183,19 @@ class DeconzSession:
         json: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Make a request to the API."""
-        return await self._request(
+        response: dict[str, Any] = await self._request(
             method,
             url=f"http://{self.host}:{self.port}/api/{self.api_key}{path}",
             json=json,
         )
+        return response
 
     async def _request(
         self,
         method: str,
         url: str,
         json: dict[str, Any] | None = None,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """Make a request."""
         LOGGER.debug('Sending "%s" "%s" to "%s"', method, json, url)
 
@@ -206,7 +207,7 @@ class DeconzSession:
                         "Invalid content type: {}".format(res.content_type)
                     )
 
-                response: dict[str, Any] = await res.json()
+                response = await res.json()
                 LOGGER.debug("HTTP request response: %s", pformat(response))
 
                 _raise_on_error(response)

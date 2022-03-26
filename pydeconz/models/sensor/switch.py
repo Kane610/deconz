@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 SWITCH_DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
 SWITCH_DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
@@ -15,11 +15,39 @@ SWITCH_MODE_MOMENTARY: Final = "momentary"
 SWITCH_MODE_ROCKER: Final = "rocker"
 
 
-class Switch(DeconzSensor):
+class TypedSwitchConfig(TypedDict):
+    """Switch config type definition."""
+
+    devicemode: Literal[
+        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
+    ]
+    mode: Literal["momentary", "rocker"]
+    windowcoveringtype: Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+class TypedSwitchState(TypedDict):
+    """Switch state type definition."""
+
+    angle: int
+    buttonevent: int
+    eventduration: int
+    gesture: int
+    xy: tuple[float, float]
+
+
+class TypedSwitch(TypedDict):
+    """Switch type definition."""
+
+    config: TypedSwitchConfig
+    state: TypedSwitchState
+
+
+class Switch(SensorBase):
     """Switch sensor."""
 
-    STATE_PROPERTY = "button_event"
     ZHATYPE = ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
+
+    raw: TypedSwitch
 
     @property
     def button_event(self) -> int | None:

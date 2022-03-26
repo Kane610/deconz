@@ -1,13 +1,28 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzSensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class Time(DeconzSensor):
+class TypedTimeState(TypedDict):
+    """Time state type definition."""
+
+    lastset: str
+
+
+class TypedTime(TypedDict):
+    """Time type definition."""
+
+    state: TypedTimeState
+
+
+class Time(SensorBase):
     """Time sensor."""
 
-    STATE_PROPERTY = "last_set"
     ZHATYPE = ("ZHATime",)
+
+    raw: TypedTime
 
     @property
     def last_set(self) -> str:

@@ -2,15 +2,29 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, TypedDict
 
-from . import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, DeconzLight
+from . import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, LightBase
 
 
-class Siren(DeconzLight):
+class TypedSirenState(TypedDict):
+    """Siren state type definition."""
+
+    alert: Literal["lselect", "select", "none"]
+
+
+class TypedSiren(TypedDict):
+    """Siren type definition."""
+
+    state: TypedSirenState
+
+
+class Siren(LightBase):
     """Siren class."""
 
     ZHATYPE = ("Warning device",)
+
+    raw: TypedSiren
 
     @property
     def is_on(self) -> bool:

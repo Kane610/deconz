@@ -4,27 +4,20 @@ from __future__ import annotations
 
 from typing import Final
 
+from .. import ResourceGroup
 from ..deconz_device import DeconzDevice
 
-RESOURCE_TYPE: Final = "sensors"
+RESOURCE_TYPE: Final = ResourceGroup.SENSOR.value
 
 
-def convert_temperature(temperature: int) -> float:
-    """Convert temperature to celsius."""
-    return round(float(temperature) / 100, 1)
-
-
-class DeconzSensor(DeconzDevice):
+class SensorBase(DeconzDevice):
     """deCONZ sensor representation.
 
     Dresden Elektroniks documentation of sensors in deCONZ
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
-    BINARY = False
     ZHATYPE: tuple[str, ...] = ()
-
-    STATE_PROPERTY = "on"
 
     @property
     def resource_type(self) -> str:
@@ -32,14 +25,10 @@ class DeconzSensor(DeconzDevice):
         return RESOURCE_TYPE
 
     @property
-    def state(self) -> bool | int | str | None:
-        """State of sensor."""
-        return getattr(self, self.STATE_PROPERTY)
-
-    @property
     def battery(self) -> int | None:
         """Battery status of sensor."""
-        return self.raw["config"].get("battery")
+        raw: dict[str, int] = self.raw["config"]
+        return raw.get("battery")
 
     @property
     def config_pending(self) -> list[str] | None:
@@ -47,46 +36,43 @@ class DeconzSensor(DeconzDevice):
 
         Only supported by Hue devices.
         """
-        return self.raw["config"].get("pending")
+        raw: dict[str, list[str]] = self.raw["config"]
+        return raw.get("pending")
 
     @property
     def ep(self) -> int | None:
         """Endpoint of sensor."""
-        return self.raw.get("ep")
+        raw: dict[str, int] = self.raw
+        return raw.get("ep")
 
     @property
     def low_battery(self) -> bool | None:
         """Low battery."""
-        return self.raw["state"].get("lowbattery")
+        raw: dict[str, bool] = self.raw["state"]
+        return raw.get("lowbattery")
 
     @property
     def on(self) -> bool | None:
         """Declare if the sensor is on or off."""
-        return self.raw["config"].get("on")
+        raw: dict[str, bool] = self.raw["config"]
+        return raw.get("on")
 
     @property
     def reachable(self) -> bool:
         """Declare if the sensor is reachable."""
-        return self.raw["config"].get("reachable", True)
+        raw: dict[str, bool] = self.raw["config"]
+        return raw.get("reachable", True)
 
     @property
     def tampered(self) -> bool | None:
         """Tampered."""
-        return self.raw["state"].get("tampered")
+        raw: dict[str, bool] = self.raw["state"]
+        return raw.get("tampered")
 
     @property
     def secondary_temperature(self) -> float | None:
         """Extra temperature available on some Xiaomi devices."""
-        if not isinstance(temperature := self.raw["config"].get("temperature"), int):
-            return None
-
-        return convert_temperature(temperature)
-
-
-class DeconzBinarySensor(DeconzSensor):
-    """Binary sensor base class.
-
-    Used to mark if sensor state is a boolean.
-    """
-
-    BINARY = True
+        raw: dict[str, int] = self.raw["config"]
+        if temperature := raw.get("temperature"):
+            return round(temperature / 100, 1)
+        return None

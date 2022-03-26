@@ -1,13 +1,28 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzBinarySensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class CarbonMonoxide(DeconzBinarySensor):
+class TypedCarbonMonoxideState(TypedDict):
+    """Carbon monoxide state type definition."""
+
+    carbonmonoxide: bool
+
+
+class TypedCarbonMonoxide(TypedDict):
+    """Carbon monoxide type definition."""
+
+    state: TypedCarbonMonoxideState
+
+
+class CarbonMonoxide(SensorBase):
     """Carbon monoxide sensor."""
 
-    STATE_PROPERTY = "carbon_monoxide"
     ZHATYPE = ("ZHACarbonMonoxide",)
+
+    raw: TypedCarbonMonoxide
 
     @property
     def carbon_monoxide(self) -> bool:

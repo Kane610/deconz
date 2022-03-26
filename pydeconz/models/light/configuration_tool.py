@@ -1,9 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzLight
+from . import LightBase
 
 
-class ConfigurationTool(DeconzLight):
+class ConfigurationTool(LightBase):
     """deCONZ hardware antenna."""
 
     ZHATYPE = ("Configuration tool",)

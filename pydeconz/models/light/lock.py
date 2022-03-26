@@ -2,20 +2,34 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
-from . import DeconzLight
+from . import LightBase
 
 
-class Lock(DeconzLight):
+class TypedLockState(TypedDict):
+    """Lock state type definition."""
+
+    on: bool
+
+
+class TypedLock(TypedDict):
+    """Lock type definition."""
+
+    state: TypedLockState
+
+
+class Lock(LightBase):
     """Lock class."""
 
     ZHATYPE = ("Door Lock",)
 
+    raw: TypedLock
+
     @property
     def is_locked(self) -> bool:
         """State of lock."""
-        return self.state is True
+        return self.raw["state"]["on"]
 
     async def lock(self) -> dict[str, Any]:
         """Lock the lock."""

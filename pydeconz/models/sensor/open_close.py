@@ -1,13 +1,28 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from . import DeconzBinarySensor
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class OpenClose(DeconzBinarySensor):
+class TypedOpenCloseState(TypedDict):
+    """Open close state type definition."""
+
+    open: bool
+
+
+class TypedOpenClose(TypedDict):
+    """Open close type definition."""
+
+    state: TypedOpenCloseState
+
+
+class OpenClose(SensorBase):
     """Door/Window sensor."""
 
-    STATE_PROPERTY = "open"
     ZHATYPE = ("ZHAOpenClose", "CLIPOpenClose")
+
+    raw: TypedOpenClose
 
     @property
     def open(self) -> bool:

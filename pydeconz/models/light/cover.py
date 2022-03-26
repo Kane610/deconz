@@ -2,12 +2,28 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
-from . import DeconzLight
+from . import LightBase
 
 
-class Cover(DeconzLight):
+class TypedCoverState(TypedDict):
+    """Cover state type definition."""
+
+    bri: int
+    lift: int
+    open: bool
+    sat: int
+    tilt: int
+
+
+class TypedCover(TypedDict):
+    """Cover type definition."""
+
+    state: TypedCoverState
+
+
+class Cover(LightBase):
     """Cover and Damper class.
 
     Position 0 means open and 100 means closed.
@@ -18,6 +34,8 @@ class Cover(DeconzLight):
         "Window covering controller",
         "Window covering device",
     )
+
+    raw: TypedCover
 
     @property
     def is_open(self) -> bool:
@@ -34,7 +52,7 @@ class Cover(DeconzLight):
         100 is fully closed.
         """
         if "lift" not in self.raw["state"]:  # Legacy support
-            return int(self.raw["state"].get("bri") / 2.54)
+            return int(self.raw["state"]["bri"] / 2.54)
         return self.raw["state"]["lift"]
 
     @property

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, TypedDict
 
+from . import ResourceGroup
 from .api import APIItem
 
-RESOURCE_TYPE: Final = "alarmsystems"
+RESOURCE_TYPE: Final = ResourceGroup.ALARM.value
 
 PATH_ARM_AWAY: Final = "arm_away"
 PATH_ARM_NIGHT: Final = "arm_night"
@@ -37,12 +38,66 @@ DEVICE_TRIGGER_PRESENCE: Final = "state/presence"
 DEVICE_TRIGGER_VIBRATION: Final = "state/vibration"
 
 
+class TypedAlarmSystemConfig(TypedDict):
+    """Alarm system config type definition."""
+
+    armmode: Literal["armed_away", "armed_night", "armed_stay", "disarmed"]
+    configured: bool
+    disarmed_entry_delay: int
+    disarmed_exit_delay: int
+    armed_away_entry_delay: int
+    armed_away_exit_delay: int
+    armed_away_trigger_duration: int
+    armed_stay_entry_delay: int
+    armed_stay_exit_delay: int
+    armed_stay_trigger_duration: int
+    armed_night_entry_delay: int
+    armed_night_exit_delay: int
+    armed_night_trigger_duration: int
+
+
+class TypedAlarmSystemState(TypedDict):
+    """Alarm system state type definition."""
+
+    armstate: Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "arming_away",
+        "arming_night",
+        "arming_stay",
+        "disarmed",
+        "entry_delay",
+        "exit_delay",
+        "in_alarm",
+    ]
+    seconds_remaining: int
+
+
+class TypedAlarmSystemDevices(TypedDict):
+    """Alarm system device type definition."""
+
+    armmask: str
+    trigger: str
+
+
+class TypedAlarmSystem(TypedDict):
+    """Alarm system type definition."""
+
+    name: str
+    config: TypedAlarmSystemConfig
+    state: TypedAlarmSystemState
+    devices: dict[str, TypedAlarmSystemDevices]
+
+
 class AlarmSystem(APIItem):
     """deCONZ alarm system representation.
 
     Dresden Elektroniks documentation of alarm systems in deCONZ
     https://dresden-elektronik.github.io/deconz-rest-doc/endpoints/alarmsystems/
     """
+
+    raw: TypedAlarmSystem
 
     @property
     def resource_type(self) -> str:

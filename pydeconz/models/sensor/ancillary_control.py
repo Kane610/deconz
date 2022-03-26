@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Final, Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 # Action and Panel
 ANCILLARY_CONTROL_ARMED_AWAY: Final = "armed_away"
@@ -28,11 +28,47 @@ ANCILLARY_CONTROL_IN_ALARM: Final = "in_alarm"
 ANCILLARY_CONTROL_NOT_READY: Final = "not_ready"
 
 
-class AncillaryControl(DeconzSensor):
+class TypedAncillaryControlState(TypedDict):
+    """Ancillary control state type definition."""
+
+    action: Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "disarmed",
+        "emergency",
+        "fire",
+        "invalid_code",
+        "panic",
+    ]
+    panel: Literal[
+        "armed_away",
+        "armed_night",
+        "armed_stay",
+        "arming_away",
+        "arming_night",
+        "arming_stay",
+        "disarmed",
+        "entry_delay",
+        "exit_delay",
+        "in_alarm",
+        "not_ready",
+    ]
+    seconds_remaining: int
+
+
+class TypedAncillaryControl(TypedDict):
+    """Ancillary control type definition."""
+
+    state: TypedAncillaryControlState
+
+
+class AncillaryControl(SensorBase):
     """Ancillary control sensor."""
 
-    STATE_PROPERTY = "panel"
     ZHATYPE = ("ZHAAncillaryControl",)
+
+    raw: TypedAncillaryControl
 
     @property
     def action(

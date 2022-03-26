@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import Final
 
+from .. import ResourceGroup
 from ..deconz_device import DeconzDevice
 
-RESOURCE_TYPE: Final = "lights"
+RESOURCE_TYPE: Final = ResourceGroup.LIGHT.value
 
 ALERT_KEY: Final = "alert"
 ALERT_LONG: Final = "lselect"
@@ -19,7 +20,7 @@ EFFECT_COLOR_LOOP: Final = "colorloop"
 ON_TIME_KEY: Final = "ontime"
 
 
-class DeconzLight(DeconzDevice):
+class LightBase(DeconzDevice):
     """deCONZ light representation.
 
     Dresden Elektroniks documentation of lights in deCONZ
@@ -36,9 +37,11 @@ class DeconzLight(DeconzDevice):
     @property
     def state(self) -> bool | None:
         """Device state."""
-        return self.raw["state"].get("on")
+        raw: dict[str, bool] = self.raw["state"]
+        return raw.get("on")
 
     @property
     def reachable(self) -> bool:
         """Is light reachable."""
-        return self.raw["state"]["reachable"]
+        raw: dict[str, bool] = self.raw["state"]
+        return raw["reachable"]

@@ -2,19 +2,36 @@
 
 from __future__ import annotations
 
-from . import DeconzSensor, convert_temperature
+from typing import TypedDict
+
+from . import SensorBase
 
 
-class Temperature(DeconzSensor):
+class TypedTemperatureState(TypedDict):
+    """Temperature state type definition."""
+
+    temperature: int
+
+
+class TypedTemperature(TypedDict):
+    """Temperature type definition."""
+
+    state: TypedTemperatureState
+
+
+class Temperature(SensorBase):
     """Temperature sensor."""
 
-    STATE_PROPERTY = "temperature"
     ZHATYPE = ("ZHATemperature", "CLIPTemperature")
 
-    @property
-    def temperature(self) -> float | None:
-        """Temperature."""
-        if not isinstance(temperature := self.raw["state"].get("temperature"), int):
-            return None
+    raw: TypedTemperature
 
-        return convert_temperature(temperature)
+    @property
+    def temperature(self) -> int:
+        """Temperature."""
+        return self.raw["state"]["temperature"]
+
+    @property
+    def scaled_temperature(self) -> float:
+        """Scaled temperature."""
+        return round(self.temperature / 100, 1)

@@ -83,7 +83,7 @@ class SirenHandler(APIItems[Siren]):
     item_cls = Siren
 
 
-LIGHT_RESOURCES = Union[
+LightResources = Union[
     ConfigurationTool,
     Cover,
     Fan,
@@ -93,7 +93,7 @@ LIGHT_RESOURCES = Union[
 ]
 
 
-class LightResourceManager(GroupedAPIItems[LIGHT_RESOURCES]):
+class LightResourceManager(GroupedAPIItems[LightResources]):
     """Represent deCONZ lights."""
 
     resource_group = ResourceGroup.LIGHT

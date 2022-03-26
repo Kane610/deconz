@@ -2,29 +2,46 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
-class Humidity(DeconzSensor):
+class TypedHumidityConfig(TypedDict):
+    """Humidity config type definition."""
+
+    offset: int
+
+
+class TypedHumidityState(TypedDict):
+    """Humidity state type definition."""
+
+    humidity: int
+
+
+class TypedHumidity(TypedDict):
+    """Humidity type definition."""
+
+    config: TypedHumidityConfig
+    state: TypedHumidityState
+
+
+class Humidity(SensorBase):
     """Humidity sensor."""
 
-    STATE_PROPERTY = "scaled_humidity"
     ZHATYPE = ("ZHAHumidity", "CLIPHumidity")
 
-    @property
-    def scaled_humidity(self) -> float | None:
-        """Scaled humidity level."""
-        if self.humidity is None:
-            return None
-
-        return round(float(self.humidity) / 100, 1)
+    raw: TypedHumidity
 
     @property
-    def humidity(self) -> int | None:
+    def humidity(self) -> int:
         """Humidity level."""
-        return self.raw["state"].get("humidity")
+        return self.raw["state"]["humidity"]
+
+    @property
+    def scaled_humidity(self) -> float:
+        """Scaled humidity level."""
+        return round(self.humidity / 100, 1)
 
     @property
     def offset(self) -> int | None:

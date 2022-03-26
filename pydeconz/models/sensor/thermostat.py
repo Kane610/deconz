@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal
+from typing import Any, Final, Literal, TypedDict
 
-from . import convert_temperature
-from .temperature import Temperature
+from . import SensorBase
 
 THERMOSTAT_MODE_AUTO: Final = "auto"
 THERMOSTAT_MODE_COOL: Final = "cool"
@@ -44,10 +43,63 @@ THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION: Final = "floor protect
 THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR: Final = "floor sensor"
 
 
-class Thermostat(Temperature):
+class TypedThermostatConfig(TypedDict):
+    """Thermostat config type definition."""
+
+    coolsetpoint: int
+    displayflipped: bool
+    externalsensortemp: int
+    externalwindowopen: bool
+    fanmode: Literal["off", "low", "medium", "high", "on", "auto", "smart"]
+    heatsetpoint: int
+    locked: bool
+    mode: Literal[
+        "off",
+        "auto",
+        "cool",
+        "heat",
+        "emergency heating",
+        "precooling",
+        "fan only",
+        "dry",
+        "sleep",
+    ]
+    mountingmode: bool
+    offset: int
+    preset: Literal["holiday", "auto", "manual", "comfort", "eco", "boost", "complex"]
+    schedule_on: bool
+    swingmode: Literal[
+        "fully closed", "fully open", "quarter open", "half open", "three quarters open"
+    ]
+    temperaturemeasurement: Literal["air sensor", "floor sensor", "floor protection"]
+    windowopen_set: bool
+
+
+class TypedThermostatState(TypedDict):
+    """Thermostat state type definition."""
+
+    errorcode: bool
+    floortemperature: int
+    heating: bool
+    mountingmodeactive: bool
+    on: bool
+    temperature: int
+    valve: int
+
+
+class TypedThermostat(TypedDict):
+    """Thermostat type definition."""
+
+    config: TypedThermostatConfig
+    state: TypedThermostatState
+
+
+class Thermostat(SensorBase):
     """Thermostat "sensor"."""
 
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
+
+    raw: TypedThermostat
 
     @property
     def cooling_setpoint(self) -> float | None:
@@ -55,10 +107,9 @@ class Thermostat(Temperature):
 
         700-3500.
         """
-        if not isinstance(temperature := self.raw["config"].get("coolsetpoint"), int):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["config"].get("coolsetpoint"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def display_flipped(self) -> bool | None:
@@ -77,12 +128,9 @@ class Thermostat(Temperature):
         -32768–32767.
         Modes are device dependent and only exposed for devices supporting it.
         """
-        if not isinstance(
-            temperature := self.raw["config"].get("externalsensortemp"), int
-        ):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["config"].get("externalsensortemp"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def external_window_open(self) -> bool | None:
@@ -113,12 +161,9 @@ class Thermostat(Temperature):
     @property
     def floor_temperature(self) -> float | None:
         """Floor temperature."""
-        if not isinstance(
-            temperature := self.raw["state"].get("floortemperature"), int
-        ):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["state"].get("floortemperature"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def heating(self) -> bool | None:
@@ -131,10 +176,9 @@ class Thermostat(Temperature):
 
         500-3200.
         """
-        if not isinstance(temperature := self.raw["config"].get("heatsetpoint"), int):
-            return None
-
-        return convert_temperature(temperature)
+        if temperature := self.raw["config"].get("heatsetpoint"):
+            return round(temperature / 100, 1)
+        return None
 
     @property
     def locked(self) -> bool | None:
@@ -154,8 +198,7 @@ class Thermostat(Temperature):
         "fan only",
         "dry",
         "sleep",
-        None,
-    ]:
+    ] | None:
         """Set the current operating mode of a thermostat.
 
         Supported values:
@@ -240,6 +283,16 @@ class Thermostat(Temperature):
         return self.raw["config"].get("swingmode")
 
     @property
+    def temperature(self) -> int:
+        """Temperature."""
+        return self.raw["state"]["temperature"]
+
+    @property
+    def scaled_temperature(self) -> float:
+        """Scaled temperature."""
+        return round(self.temperature / 100, 1)
+
+    @property
     def temperature_measurement(
         self,
     ) -> Literal["air sensor", "floor sensor", "floor protection"] | None:
@@ -272,6 +325,7 @@ class Thermostat(Temperature):
         external_sensor_temperature: int | None = None,
         external_window_open: bool | None = None,
         fan_mode: Literal["off", "low", "medium", "high", "on", "auto", "smart"]
+        | str
         | None = None,
         flip_display: bool | None = None,
         heating_setpoint: int | None = None,
@@ -287,12 +341,14 @@ class Thermostat(Temperature):
             "dry",
             "sleep",
         ]
+        | str
         | None = None,
         mounting_mode: bool | None = None,
         on: bool | None = None,
         preset: Literal[
             "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
         ]
+        | str
         | None = None,
         schedule: list[str] | None = None,
         set_valve: bool | None = None,
@@ -303,10 +359,12 @@ class Thermostat(Temperature):
             "half open",
             "three quarters open",
         ]
+        | str
         | None = None,
         temperature_measurement: Literal[
             "air sensor", "floor sensor", "floor protection"
         ]
+        | str
         | None = None,
         window_open_detection: bool | None = None,
     ) -> dict[str, Any]:

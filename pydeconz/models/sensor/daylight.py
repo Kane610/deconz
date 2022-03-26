@@ -1,8 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Final
+from typing import Final, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 DAYLIGHT_STATUS: Final = {
     100: "nadir",
@@ -22,11 +22,34 @@ DAYLIGHT_STATUS: Final = {
 }
 
 
-class Daylight(DeconzSensor):
+class TypedDaylightConfig(TypedDict):
+    """Daylight config type definition."""
+
+    configured: bool
+    sunriseoffset: int
+    sunsetoffset: int
+
+
+class TypedDaylightState(TypedDict):
+    """Daylight state type definition."""
+
+    daylight: bool
+    status: int
+
+
+class TypedDaylight(TypedDict):
+    """Daylight type definition."""
+
+    config: TypedDaylightConfig
+    state: TypedDaylightState
+
+
+class Daylight(SensorBase):
     """Daylight sensor built into deCONZ software."""
 
-    STATE_PROPERTY = "status"
     ZHATYPE = ("Daylight",)
+
+    raw: TypedDaylight
 
     @property
     def configured(self) -> bool:

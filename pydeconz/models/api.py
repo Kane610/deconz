@@ -20,28 +20,24 @@ class APIItem:
     def __init__(
         self,
         resource_id: str,
-        raw: dict[str, Any],
+        raw: Any,
         request: Callable[..., Awaitable[dict[str, Any]]],
     ) -> None:
         """Initialize API item."""
-        self._resource_id = resource_id
+        self.resource_id = resource_id
         self.raw = raw
         self._request = request
+
+        self.changed_keys: set[str] = set()
 
         self._callbacks: list[SubscriptionType] = []
         self._subscribers: list[SubscriptionType] = []
         self._sleep_task: Task[Callable[..., Any]] | None = None
-        self._changed_keys: set[str] = set()
 
-    @property
-    def resource_id(self) -> str:
-        """Read only resource ID."""
-        return self._resource_id
+        self.post_init()
 
-    @property
-    def changed_keys(self) -> set[str]:
-        """Read only changed keys data."""
-        return self._changed_keys
+    def post_init(self) -> None:
+        """Post init method used by subclasses."""
 
     def register_callback(self, callback: SubscriptionType) -> None:
         """Register callback for signalling."""
@@ -82,7 +78,7 @@ class APIItem:
             else:
                 self.raw[k] = v
 
-        self._changed_keys = changed_keys
+        self.changed_keys = changed_keys
 
         for callback in self._callbacks + self._subscribers:
             callback()

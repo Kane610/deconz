@@ -53,15 +53,14 @@ async def test_air_quality_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
-    assert sensor.state == "poor"
     assert sensor.air_quality == "poor"
     assert sensor.air_quality_ppb == 809
 
     # DeconzSensor
     assert sensor.battery is None
+    assert sensor.config_pending is None
     assert sensor.ep == 2
     assert sensor.low_battery is None
     assert sensor.on is True
@@ -107,10 +106,8 @@ async def test_alarm_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAAlarm",)
 
-    assert sensor.state is False
     assert sensor.alarm is False
 
     # DeconzSensor
@@ -164,10 +161,8 @@ async def test_ancillary_control_sensor(deconz_sensor):
         },
     )
 
-    assert not sensor.BINARY
     assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
 
-    assert sensor.state == "exit_delay"
     assert sensor.action == "armed_stay"
     assert sensor.panel == "exit_delay"
     assert sensor.seconds_remaining == 55
@@ -209,10 +204,7 @@ async def test_battery_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHABattery",)
-
-    assert sensor.state == 100
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -261,10 +253,8 @@ async def test_carbonmonoxide_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
 
-    assert sensor.state is False
     assert sensor.carbon_monoxide is False
 
     # DeconzSensor
@@ -307,12 +297,11 @@ async def test_consumption_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAConsumption",)
 
-    assert sensor.state == 11.342
     assert sensor.consumption == 11342
     assert sensor.power == 123
+    assert sensor.scaled_consumption == 11.342
 
     # DeconzSensor
     assert sensor.battery is None
@@ -332,9 +321,6 @@ async def test_consumption_sensor(deconz_sensor):
     assert sensor.software_version == ""
     assert sensor.type == "ZHAConsumption"
     assert sensor.unique_id == "00:0d:6f:00:0b:7a:64:29-01-0702"
-
-    del sensor.raw["state"]["consumption"]
-    assert sensor.state is None
 
 
 async def test_daylight_sensor(deconz_sensor):
@@ -361,10 +347,8 @@ async def test_daylight_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("Daylight",)
 
-    assert sensor.state == "solar_noon"
     assert sensor.configured is True
     assert sensor.daylight is True
     assert sensor.status == "solar_noon"
@@ -412,7 +396,6 @@ async def test_daylight_sensor(deconz_sensor):
         event = {"state": {"status": k}}
         sensor.update(event)
 
-        assert sensor.state == v
         assert sensor.changed_keys == {"state", "status"}
 
 
@@ -442,10 +425,8 @@ async def test_door_lock_sensor(mock_aioresponse, deconz_sensor, deconz_called_w
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHADoorLock",)
 
-    assert sensor.state == "unlocked"
     assert sensor.is_locked is False
     assert sensor.lock_state == "unlocked"
     assert sensor.lock_configuration is False
@@ -494,10 +475,8 @@ async def test_fire_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
 
-    assert sensor.state is False
     assert sensor.fire is False
 
     # DeconzSensor
@@ -543,10 +522,8 @@ async def test_fire_sensor_test_develco(deconz_sensor):
         }
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAFire",)
 
-    assert sensor.state is False
     assert sensor.fire is False
 
     # DeconzSensor
@@ -584,10 +561,8 @@ async def test_genericflag_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("CLIPGenericFlag",)
 
-    assert sensor.state is True
     assert sensor.flag is True
 
     # DeconzSensor
@@ -626,10 +601,8 @@ async def test_genericstatus_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("CLIPGenericStatus",)
 
-    assert sensor.state == 0
     assert sensor.status == 0
 
     # DeconzSensor
@@ -669,12 +642,11 @@ async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
 
-    assert sensor.state == 35.5
     assert sensor.humidity == 3555
     assert sensor.offset == 0
+    assert sensor.scaled_humidity == 35.5
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -694,9 +666,6 @@ async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAHumidity"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0405"
-
-    del sensor.raw["state"]["humidity"]
-    assert sensor.state is None
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(offset=1)
@@ -736,14 +705,13 @@ async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
 
-    assert sensor.state == 5
     assert sensor.dark is True
     assert sensor.daylight is False
     assert sensor.light_level == 6955
     assert sensor.lux == 5
+    assert sensor.scaled_light_level == 5
     assert sensor.threshold_dark == 12000
     assert sensor.threshold_offset == 7000
 
@@ -765,9 +733,6 @@ async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_
     assert sensor.software_version == "6.1.0.18912"
     assert sensor.type == "ZHALightLevel"
     assert sensor.unique_id == "00:17:88:01:03:28:8c:9b-02-0400"
-
-    del sensor.raw["state"]["lightlevel"]
-    assert sensor.state is None
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(threshold_dark=10, threshold_offset=20)
@@ -816,10 +781,8 @@ async def test_openclose_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
 
-    assert sensor.state is False
     assert sensor.open is False
 
     # DeconzSensor
@@ -863,7 +826,6 @@ async def test_openclose_sensor(deconz_sensor):
                 "uniqueid": "00:0d:6f:00:0b:7a:64:29-01-0b04",
             },
             {
-                "BINARY": False,
                 "ZHATYPE": ("ZHAPower",),
                 "battery": None,
                 "current": 34,
@@ -879,7 +841,6 @@ async def test_openclose_sensor(deconz_sensor):
                 "reachable": True,
                 "resource_type": "sensors",
                 "secondary_temperature": None,
-                "state": 64,
                 "software_version": "",
                 "tampered": None,
                 "type": "ZHAPower",
@@ -902,7 +863,6 @@ async def test_openclose_sensor(deconz_sensor):
                 "uniqueid": "00:15:8d:00:02:82:d3:56-02-000c",
             },
             {
-                "BINARY": False,
                 "ZHATYPE": ("ZHAPower",),
                 "battery": None,
                 "current": None,
@@ -917,7 +877,6 @@ async def test_openclose_sensor(deconz_sensor):
                 "power": 1,
                 "reachable": True,
                 "secondary_temperature": 34.0,
-                "state": 1,
                 "software_version": "05-02-2018",
                 "tampered": None,
                 "type": "ZHAPower",
@@ -963,10 +922,8 @@ async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
 
-    assert sensor.state is False
     assert sensor.presence is False
     assert sensor.dark is None
     assert sensor.delay == 0
@@ -1043,10 +1000,8 @@ async def test_pressure_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
 
-    assert sensor.state == 1010
     assert sensor.pressure == 1010
 
     # DeconzSensor
@@ -1092,10 +1047,8 @@ async def test_switch_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
-    assert sensor.state == 1002
     assert sensor.button_event == 1002
     assert sensor.gesture is None
     assert sensor.angle is None
@@ -1148,10 +1101,8 @@ async def test_switch_sensor_cube(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
-    assert sensor.state == 747
     assert sensor.button_event == 747
     assert sensor.gesture == 7
 
@@ -1206,10 +1157,8 @@ async def test_switch_sensor_hue_wall_switch_module(
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
-    assert sensor.state == 1002
     assert sensor.button_event == 1002
     assert sensor.event_duration == 1
     assert sensor.device_mode == SWITCH_DEVICE_MODE_DUAL_ROCKER
@@ -1271,10 +1220,8 @@ async def test_switch_sensor_tint_remote(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
-    assert sensor.state == 6002
     assert sensor.button_event == 6002
     assert sensor.angle == 10
     assert sensor.xy == [0.3381, 0.1627]
@@ -1321,10 +1268,8 @@ async def test_switch_ubisys_j1(mock_aioresponse, deconz_sensor, deconz_called_w
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
-    assert sensor.state is None
     assert sensor.button_event is None
     assert sensor.angle is None
     assert sensor.xy is None
@@ -1374,11 +1319,10 @@ async def test_temperature_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
 
-    assert sensor.state == 21.8
-    assert sensor.temperature == 21.8
+    assert sensor.temperature == 2182
+    assert sensor.scaled_temperature == 21.8
 
     # DeconzSensor
     assert sensor.battery == 100
@@ -1398,9 +1342,6 @@ async def test_temperature_sensor(deconz_sensor):
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHATemperature"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0402"
-
-    del sensor.raw["state"]["temperature"]
-    assert sensor.state is None
 
 
 async def test_danfoss_thermostat(deconz_sensor):
@@ -1441,10 +1382,8 @@ async def test_danfoss_thermostat(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
-    assert sensor.state == 21.0
     assert sensor.cooling_setpoint is None
     assert sensor.display_flipped is None
     assert sensor.error_code is None
@@ -1460,9 +1399,10 @@ async def test_danfoss_thermostat(deconz_sensor):
     assert sensor.mounting_mode_active is False
     assert sensor.offset == 0
     assert sensor.preset is None
-    assert sensor.state_on is True
+    assert sensor.state_on
     assert sensor.swing_mode is None
-    assert sensor.temperature == 21.0
+    assert sensor.temperature == 2102
+    assert sensor.scaled_temperature == 21.0
     assert sensor.temperature_measurement is None
     assert sensor.valve == 24
     assert sensor.window_open_detection is None
@@ -1518,10 +1458,8 @@ async def test_eurotronic_thermostat(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
-    assert sensor.state == 21.5
     assert sensor.cooling_setpoint is None
     assert sensor.error_code is None
     assert sensor.fan_mode is None
@@ -1534,9 +1472,10 @@ async def test_eurotronic_thermostat(deconz_sensor):
     assert sensor.mounting_mode_active is None
     assert sensor.offset == 0
     assert sensor.preset is None
-    assert sensor.state_on is False
+    assert not sensor.state_on
     assert sensor.swing_mode is None
-    assert sensor.temperature == 21.5
+    assert sensor.temperature == 2149
+    assert sensor.scaled_temperature == 21.5
     assert sensor.temperature_measurement is None
     assert sensor.valve == 0
     assert sensor.window_open_detection is None
@@ -1591,17 +1530,16 @@ async def test_tuya_thermostat(mock_aioresponse, deconz_sensor, deconz_called_wi
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == Thermostat.ZHATYPE
 
-    assert sensor.state == 22.9
     assert sensor.heating_setpoint == 15.50
     assert sensor.locked is None
     assert sensor.mode is None
     assert sensor.offset == 0
     assert sensor.schedule_enabled is None
-    assert sensor.state_on is None
-    assert sensor.temperature == 22.9
+    assert not sensor.state_on
+    assert sensor.temperature == 2290
+    assert sensor.scaled_temperature == 22.9
     assert sensor.valve is None
 
     # DeconzSensor
@@ -1717,10 +1655,8 @@ async def test_time_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is False
     assert sensor.ZHATYPE == ("ZHATime",)
 
-    assert sensor.state == "2020-11-19T08:07:08Z"
     assert sensor.last_set == "2020-11-19T08:07:08Z"
 
     # DeconzSensor
@@ -1774,10 +1710,8 @@ async def test_vibration_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAVibration",)
 
-    assert sensor.state is True
     assert sensor.orientation == [10, 1059, 0]
     assert sensor.sensitivity == 21
     assert sensor.max_sensitivity == 21
@@ -1845,10 +1779,8 @@ async def test_water_sensor(deconz_sensor):
         },
     )
 
-    assert sensor.BINARY is True
     assert sensor.ZHATYPE == ("ZHAWater",)
 
-    assert sensor.state is False
     assert sensor.water is False
 
     # DeconzSensor
