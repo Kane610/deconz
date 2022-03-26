@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Final
+from typing import Any, Callable, Final, TypedDict
 
 import aiohttp
 
@@ -12,6 +12,16 @@ from .errors import RequestError, ResponseError, raise_error
 LOGGER = logging.getLogger(__name__)
 
 URL_DISCOVER: Final = "https://phoscon.de/discover"
+
+
+class DiscoveredBridge(TypedDict):
+    """Discovered bridge type."""
+
+    id: str
+    host: str
+    mac: str
+    name: str
+    port: int
 
 
 async def delete_api_key(
@@ -56,17 +66,21 @@ async def get_bridge_id(
     return bridge_id
 
 
-async def discovery(session: aiohttp.ClientSession) -> list[dict[str, int | str]]:
+async def discovery(session: aiohttp.ClientSession) -> list[DiscoveredBridge]:
     """Find bridges allowing gateway discovery."""
     response: list[dict[str, Any]] = await request(session.get, URL_DISCOVER)
     LOGGER.info("Discovered the following bridges: %s.", response)
 
     return [
-        {
-            "bridgeid": normalize_bridge_id(bridge["id"]),
-            "host": bridge["internalipaddress"],
-            "port": bridge["internalport"],
-        }
+        DiscoveredBridge(
+            {
+                "id": normalize_bridge_id(bridge["id"]),
+                "host": bridge["internalipaddress"],
+                "port": bridge["internalport"],
+                "mac": bridge.get("macaddress", ""),
+                "name": bridge.get("name", ""),
+            }
+        )
         for bridge in response
     ]
 

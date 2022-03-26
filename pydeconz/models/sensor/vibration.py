@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedVibrationConfig(TypedDict):
@@ -30,7 +30,7 @@ class TypedVibration(TypedDict):
     state: TypedVibrationState
 
 
-class Vibration(DeconzSensor):
+class Vibration(SensorBase):
     """Vibration sensor."""
 
     ZHATYPE = ("ZHAVibration",)

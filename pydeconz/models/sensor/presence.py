@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Final, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 PRESENCE_DELAY: Final = "delay"
 PRESENCE_DURATION: Final = "duration"
@@ -37,7 +37,7 @@ class TypedPresence(TypedDict):
     state: TypedPresenceState
 
 
-class Presence(DeconzSensor):
+class Presence(SensorBase):
     """Presence detector."""
 
     ZHATYPE = ("ZHAPresence", "CLIPPresence")

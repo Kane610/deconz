@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedBatteryState(TypedDict):
@@ -17,7 +17,7 @@ class TypedBattery(TypedDict):
     state: TypedBatteryState
 
 
-class Battery(DeconzSensor):
+class Battery(SensorBase):
     """Battery sensor."""
 
     ZHATYPE = ("ZHABattery",)

@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedWaterState(TypedDict):
@@ -17,7 +17,7 @@ class TypedWater(TypedDict):
     state: TypedWaterState
 
 
-class Water(DeconzSensor):
+class Water(SensorBase):
     """Water sensor."""
 
     ZHATYPE = ("ZHAWater",)

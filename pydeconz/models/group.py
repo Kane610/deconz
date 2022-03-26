@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from typing import Any, Final, Literal, TypedDict
 
+from . import ResourceGroup
 from .deconz_device import DeconzDevice
 from .light.light import Light
 from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene, TypedScene  # noqa: F401
 
-RESOURCE_TYPE: Final = "groups"
+RESOURCE_TYPE: Final = ResourceGroup.GROUP.value
 
 COLOR_STATE_ATTRIBUTES: Final = {
     "bri",
@@ -149,14 +150,14 @@ class Group(DeconzDevice):
         return True
 
     @property
-    def all_on(self) -> bool | None:
+    def all_on(self) -> bool:
         """Is all lights in light group on."""
-        return self.raw["state"].get("all_on")
+        return self.raw["state"].get("all_on") is True
 
     @property
-    def any_on(self) -> bool | None:
+    def any_on(self) -> bool:
         """Is any lights in light group on."""
-        return self.raw["state"].get("any_on")
+        return self.raw["state"].get("any_on") is True
 
     @property
     def device_membership(self) -> list[str] | None:
@@ -232,11 +233,11 @@ class Group(DeconzDevice):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect"] | None = None,
+        alert: Literal["none", "select", "lselect"] | str | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none"] | None = None,
+        effect: Literal["colorloop", "none"] | str | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

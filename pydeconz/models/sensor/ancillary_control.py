@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Final, Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 # Action and Panel
 ANCILLARY_CONTROL_ARMED_AWAY: Final = "armed_away"
@@ -63,7 +63,7 @@ class TypedAncillaryControl(TypedDict):
     state: TypedAncillaryControlState
 
 
-class AncillaryControl(DeconzSensor):
+class AncillaryControl(SensorBase):
     """Ancillary control sensor."""
 
     ZHATYPE = ("ZHAAncillaryControl",)

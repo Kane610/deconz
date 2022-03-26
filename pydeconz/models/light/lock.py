@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from . import DeconzLight
+from . import LightBase
 
 
 class TypedLockState(TypedDict):
@@ -19,7 +19,7 @@ class TypedLock(TypedDict):
     state: TypedLockState
 
 
-class Lock(DeconzLight):
+class Lock(LightBase):
     """Lock class."""
 
     ZHATYPE = ("Door Lock",)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedHumidityConfig(TypedDict):
@@ -26,7 +26,7 @@ class TypedHumidity(TypedDict):
     state: TypedHumidityState
 
 
-class Humidity(DeconzSensor):
+class Humidity(SensorBase):
     """Humidity sensor."""
 
     ZHATYPE = ("ZHAHumidity", "CLIPHumidity")

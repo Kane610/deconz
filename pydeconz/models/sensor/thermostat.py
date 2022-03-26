@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Final, Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 THERMOSTAT_MODE_AUTO: Final = "auto"
 THERMOSTAT_MODE_COOL: Final = "cool"
@@ -94,7 +94,7 @@ class TypedThermostat(TypedDict):
     state: TypedThermostatState
 
 
-class Thermostat(DeconzSensor):
+class Thermostat(SensorBase):
     """Thermostat "sensor"."""
 
     ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
@@ -325,6 +325,7 @@ class Thermostat(DeconzSensor):
         external_sensor_temperature: int | None = None,
         external_window_open: bool | None = None,
         fan_mode: Literal["off", "low", "medium", "high", "on", "auto", "smart"]
+        | str
         | None = None,
         flip_display: bool | None = None,
         heating_setpoint: int | None = None,
@@ -340,12 +341,14 @@ class Thermostat(DeconzSensor):
             "dry",
             "sleep",
         ]
+        | str
         | None = None,
         mounting_mode: bool | None = None,
         on: bool | None = None,
         preset: Literal[
             "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
         ]
+        | str
         | None = None,
         schedule: list[str] | None = None,
         set_valve: bool | None = None,
@@ -356,10 +359,12 @@ class Thermostat(DeconzSensor):
             "half open",
             "three quarters open",
         ]
+        | str
         | None = None,
         temperature_measurement: Literal[
             "air sensor", "floor sensor", "floor protection"
         ]
+        | str
         | None = None,
         window_open_detection: bool | None = None,
     ) -> dict[str, Any]:

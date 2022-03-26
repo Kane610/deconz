@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from . import DeconzLight
+from . import LightBase
 
 
 class TypedCoverState(TypedDict):
@@ -23,7 +23,7 @@ class TypedCover(TypedDict):
     state: TypedCoverState
 
 
-class Cover(DeconzLight):
+class Cover(LightBase):
     """Cover and Damper class.
 
     Position 0 means open and 100 means closed.

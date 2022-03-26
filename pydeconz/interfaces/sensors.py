@@ -248,7 +248,7 @@ class WaterHandler(APIItems[Water]):
     item_cls = Water
 
 
-SENSOR_RESOURCES = Union[
+SensorResources = Union[
     AirQuality,
     Alarm,
     AncillaryControl,
@@ -275,7 +275,7 @@ SENSOR_RESOURCES = Union[
 ]
 
 
-class SensorResourceManager(GroupedAPIItems[SENSOR_RESOURCES]):
+class SensorResourceManager(GroupedAPIItems[SensorResources]):
     """Represent deCONZ sensors."""
 
     resource_group = ResourceGroup.SENSOR

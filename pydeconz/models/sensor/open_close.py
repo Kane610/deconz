@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedOpenCloseState(TypedDict):
@@ -17,7 +17,7 @@ class TypedOpenClose(TypedDict):
     state: TypedOpenCloseState
 
 
-class OpenClose(DeconzSensor):
+class OpenClose(SensorBase):
     """Door/Window sensor."""
 
     ZHATYPE = ("ZHAOpenClose", "CLIPOpenClose")

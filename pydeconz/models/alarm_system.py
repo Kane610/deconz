@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Final, Literal, TypedDict
 
+from . import ResourceGroup
 from .api import APIItem
 
-RESOURCE_TYPE: Final = "alarmsystems"
+RESOURCE_TYPE: Final = ResourceGroup.ALARM.value
 
 PATH_ARM_AWAY: Final = "arm_away"
 PATH_ARM_NIGHT: Final = "arm_night"

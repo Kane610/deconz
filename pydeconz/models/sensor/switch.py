@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Final, Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 SWITCH_DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
 SWITCH_DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
@@ -42,7 +42,7 @@ class TypedSwitch(TypedDict):
     state: TypedSwitchState
 
 
-class Switch(DeconzSensor):
+class Switch(SensorBase):
     """Switch sensor."""
 
     ZHATYPE = ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")

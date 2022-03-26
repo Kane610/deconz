@@ -2,7 +2,7 @@
 
 from typing import Final, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 DAYLIGHT_STATUS: Final = {
     100: "nadir",
@@ -44,7 +44,7 @@ class TypedDaylight(TypedDict):
     state: TypedDaylightState
 
 
-class Daylight(DeconzSensor):
+class Daylight(SensorBase):
     """Daylight sensor built into deCONZ software."""
 
     ZHATYPE = ("Daylight",)

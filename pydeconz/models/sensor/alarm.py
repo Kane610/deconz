@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedAlarmState(TypedDict):
@@ -17,7 +17,7 @@ class TypedAlarm(TypedDict):
     state: TypedAlarmState
 
 
-class Alarm(DeconzSensor):
+class Alarm(SensorBase):
     """Alarm sensor."""
 
     ZHATYPE = ("ZHAAlarm",)

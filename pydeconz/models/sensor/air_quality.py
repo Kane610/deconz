@@ -2,7 +2,7 @@
 
 from typing import Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedAirQualityState(TypedDict):
@@ -25,7 +25,7 @@ class TypedAirQuality(TypedDict):
     state: TypedAirQualityState
 
 
-class AirQuality(DeconzSensor):
+class AirQuality(SensorBase):
     """Air quality sensor."""
 
     ZHATYPE = ("ZHAAirQuality",)

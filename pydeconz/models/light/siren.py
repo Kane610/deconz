@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, TypedDict
 
-from . import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, DeconzLight
+from . import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY, LightBase
 
 
 class TypedSirenState(TypedDict):
@@ -19,7 +19,7 @@ class TypedSiren(TypedDict):
     state: TypedSirenState
 
 
-class Siren(DeconzLight):
+class Siren(LightBase):
     """Siren class."""
 
     ZHATYPE = ("Warning device",)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedLightLevelConfig(TypedDict):
@@ -30,7 +30,7 @@ class TypedLightLevel(TypedDict):
     state: TypedLightLevelState
 
 
-class LightLevel(DeconzSensor):
+class LightLevel(SensorBase):
     """Light level sensor."""
 
     ZHATYPE = ("ZHALightLevel", "CLIPLightLevel")

@@ -63,6 +63,8 @@ async def test_discovery() -> None:
                     "id": "123456FFFFABCDEF",
                     "internalipaddress": "host1",
                     "internalport": "port1",
+                    "macaddress": "a:b:c",
+                    "name": "gateway",
                 },
                 {
                     "id": "234567BCDEFG",
@@ -75,8 +77,20 @@ async def test_discovery() -> None:
         response = await utils.discovery(session)
 
     assert [
-        {"bridgeid": "123456ABCDEF", "host": "host1", "port": "port1"},
-        {"bridgeid": "234567BCDEFG", "host": "host2", "port": "port2"},
+        {
+            "id": "123456ABCDEF",
+            "host": "host1",
+            "port": "port1",
+            "mac": "a:b:c",
+            "name": "gateway",
+        },
+        {
+            "id": "234567BCDEFG",
+            "host": "host2",
+            "port": "port2",
+            "mac": "",
+            "name": "",
+        },
     ] == response
 
 

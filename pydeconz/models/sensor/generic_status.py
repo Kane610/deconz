@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedGenericStatusState(TypedDict):
@@ -17,7 +17,7 @@ class TypedGenericStatus(TypedDict):
     state: TypedGenericStatusState
 
 
-class GenericStatus(DeconzSensor):
+class GenericStatus(SensorBase):
     """Generic status sensor."""
 
     ZHATYPE = ("CLIPGenericStatus",)

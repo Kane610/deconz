@@ -2,7 +2,7 @@
 
 from typing import Any, Literal, TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedDoorLockConfig(TypedDict):
@@ -24,7 +24,7 @@ class TypedDoorLock(TypedDict):
     state: TypedDoorLockState
 
 
-class DoorLock(DeconzSensor):
+class DoorLock(SensorBase):
     """Door lock sensor."""
 
     ZHATYPE = ("ZHADoorLock",)

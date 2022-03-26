@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, TypedDict
 
-from . import DeconzLight
+from . import LightBase
 
 
 class TypedLightState(TypedDict):
@@ -16,6 +16,7 @@ class TypedLightState(TypedDict):
     ct: int
     effect: Literal["colorloop", "none"]
     hue: int
+    on: bool
     sat: int
     xy: tuple[float, float]
 
@@ -28,7 +29,7 @@ class TypedLight(TypedDict):
     state: TypedLightState
 
 
-class Light(DeconzLight):
+class Light(LightBase):
     """deCONZ light representation.
 
     Dresden Elektroniks documentation of lights in deCONZ
@@ -107,6 +108,11 @@ class Light(DeconzLight):
         return self.raw["state"].get("colormode")
 
     @property
+    def on(self) -> bool:
+        """Device state."""
+        return self.raw["state"]["on"]
+
+    @property
     def max_color_temp(self) -> int | None:
         """Max value for color temperature."""
         if (ctmax := self.raw.get("ctmax")) is not None and ctmax > 650:
@@ -141,11 +147,11 @@ class Light(DeconzLight):
 
     async def set_state(
         self,
-        alert: Literal["none", "select", "lselect"] | None = None,
+        alert: Literal["none", "select", "lselect"] | str | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Literal["colorloop", "none"] | None = None,
+        effect: Literal["colorloop", "none"] | str | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedFireState(TypedDict):
@@ -18,7 +18,7 @@ class TypedFire(TypedDict):
     state: TypedFireState
 
 
-class Fire(DeconzSensor):
+class Fire(SensorBase):
     """Fire sensor."""
 
     ZHATYPE = ("ZHAFire",)

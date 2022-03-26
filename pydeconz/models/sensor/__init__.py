@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from typing import Final
 
+from .. import ResourceGroup
 from ..deconz_device import DeconzDevice
 
-RESOURCE_TYPE: Final = "sensors"
+RESOURCE_TYPE: Final = ResourceGroup.SENSOR.value
 
 
-class DeconzSensor(DeconzDevice):
+class SensorBase(DeconzDevice):
     """deCONZ sensor representation.
 
     Dresden Elektroniks documentation of sensors in deCONZ

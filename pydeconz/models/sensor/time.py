@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedTimeState(TypedDict):
@@ -17,7 +17,7 @@ class TypedTime(TypedDict):
     state: TypedTimeState
 
 
-class Time(DeconzSensor):
+class Time(SensorBase):
     """Time sensor."""
 
     ZHATYPE = ("ZHATime",)

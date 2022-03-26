@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Any, Final, TypedDict
 
+from . import ResourceGroup
 from .api import APIItem
 
-RESOURCE_TYPE: Final = "scenes"
+RESOURCE_TYPE: Final = ResourceGroup.SCENE.value
 
 
 class TypedScene(TypedDict):

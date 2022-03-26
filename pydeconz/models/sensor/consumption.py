@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedConsumptionState(TypedDict):
@@ -20,7 +20,7 @@ class TypedConsumption(TypedDict):
     state: TypedConsumptionState
 
 
-class Consumption(DeconzSensor):
+class Consumption(SensorBase):
     """Power consumption sensor."""
 
     ZHATYPE = ("ZHAConsumption",)

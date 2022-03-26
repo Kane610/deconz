@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedPressureState(TypedDict):
@@ -17,7 +17,7 @@ class TypedPressure(TypedDict):
     state: TypedPressureState
 
 
-class Pressure(DeconzSensor):
+class Pressure(SensorBase):
     """Pressure sensor."""
 
     ZHATYPE = ("ZHAPressure", "CLIPPressure")

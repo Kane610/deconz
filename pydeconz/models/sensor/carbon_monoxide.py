@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from . import DeconzSensor
+from . import SensorBase
 
 
 class TypedCarbonMonoxideState(TypedDict):
@@ -17,7 +17,7 @@ class TypedCarbonMonoxide(TypedDict):
     state: TypedCarbonMonoxideState
 
 
-class CarbonMonoxide(DeconzSensor):
+class CarbonMonoxide(SensorBase):
     """Carbon monoxide sensor."""
 
     ZHATYPE = ("ZHACarbonMonoxide",)
