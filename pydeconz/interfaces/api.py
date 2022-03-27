@@ -129,12 +129,14 @@ class GroupedAPIItems(Generic[DataResource]):
 
     resource_group: ResourceGroup
 
-    def __init__(self, gateway: DeconzSession, api_items: list[APIItems[Any]]) -> None:
+    def __init__(
+        self, gateway: DeconzSession, api_items: list[APIItems[DataResource]]
+    ) -> None:
         """Initialize sensor manager."""
         self.gateway = gateway
         self._items = api_items
 
-        self._type_to_handler: dict[ResourceType, APIItems[Any]] = {
+        self._type_to_handler: dict[ResourceType, APIItems[DataResource]] = {
             resource_type: handler
             for handler in api_items
             if handler.resource_types is not None
@@ -188,19 +190,19 @@ class GroupedAPIItems(Generic[DataResource]):
 
     def items(self) -> dict[str, DataResource]:
         """Return items."""
-        return {y: x[y] for x in self._items for y in x}
+        return {k: v for i in self._items for k, v in i.items()}
 
     def keys(self) -> list[str]:
         """Return item keys."""
-        return [y for x in self._items for y in x]
+        return [k for i in self._items for k in i]
 
     def values(self) -> list[DataResource]:
         """Return item values."""
-        return [y for x in self._items for y in x.values()]
+        return [v for i in self._items for v in i.values()]
 
     def get(self, id: str, default: Any = None) -> DataResource | None:
         """Get item value based on key, if no match return default."""
-        return next((x[id] for x in self._items if id in x), default)
+        return next((i[id] for i in self._items if id in i), default)
 
     def __getitem__(self, obj_id: str) -> DataResource:
         """Get item value based on key."""
