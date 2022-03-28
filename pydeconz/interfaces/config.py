@@ -1,0 +1,100 @@
+"""Python library to connect deCONZ and Home Assistant to work together."""
+
+from __future__ import annotations
+
+from typing import Any, Literal
+
+from ..models import ResourceGroup
+from ..models.config import Config as ConfigModel
+from .api import APIItems
+
+
+class Config(APIItems[ConfigModel]):
+    """Manager of deCONZ gateway configuration."""
+
+    item_cls = ConfigModel
+    resource_group = ResourceGroup.CONFIG
+
+    async def set_config(
+        self,
+        discovery: bool | None = None,
+        group_delay: int | None = None,
+        light_last_seen_interval: int | None = None,
+        name: str | None = None,
+        network_open_duration: int | None = None,
+        otau_active: bool | None = None,
+        permit_join: int | None = None,
+        rf_connected: bool | None = None,
+        time_format: Literal["12h", "24h"] | None = None,
+        time_zone: str | None = None,
+        unlock: int | None = None,
+        update_channel: Literal["alpha", "beta", "stable"] | None = None,
+        utc: str | None = None,
+        zigbee_channel: Literal[11, 15, 20, 25] | None = None,
+        websocket_notify_all: bool | None = None,
+    ) -> dict[str, Any]:
+        """Modify configuration parameters.
+
+        Supported values:
+        - discovery [bool]
+            Set gateway discovery over the internet active or inactive.
+        - group_delay [int] 0-5000
+            Time between two group commands in milliseconds.
+        - light_last_seen_interval [int] 1-65535 default 60
+            Sets the number of seconds where the timestamp for "lastseen"
+            is updated at the earliest for light resources. For any such update,
+            a seperate websocket event will be triggered.
+        - name [str] 0-16 characters
+            Name of the gateway.
+        - network_open_duration [int] 1-65535
+            Sets the lights and sensors search duration in seconds.
+        - otau_active [bool]
+            Set OTAU active or inactive
+        - permit_join [int] 0-255
+            Open the network so that other zigbee devices can join.
+            0 = network closed
+            255 = network open
+            1–254 = time in seconds the network remains open
+            The value will decrement automatically.
+        - rf_connected [bool]
+            Set to true to bring the Zigbee network up and false to bring it down.
+            This has the same effect as using the Join and Leave buttons in deCONZ.
+        - time_format [str] 12h|24h
+            Can be used to store the timeformat permanently.
+        - time_zone [str]
+            Set the timezone of the gateway (only on Raspberry Pi).
+        - unlock [int] 0-600 (seconds)
+            Unlock the gateway so that apps can register themselves to the gateway.
+        - update_channel [str] stable|alpha|beta
+            Set update channel.
+        - utc [str]
+            Set the UTC time of the gateway (only on Raspbery Pi)
+            in ISO 8601 format (yyyy-MM-ddTHH:mm:ss).
+        - zigbee_channel [int] 11|15|20|25
+            Set the zigbeechannel of the gateway.
+            Notify other Zigbee devices also to change their channel.
+        - websocket_notify_all [bool] default True
+            When true all state changes will be signalled through the websocket connection.
+        """
+        data = {
+            key: value
+            for key, value in {
+                "discovery": discovery,
+                "groupdelay": group_delay,
+                "lightlastseeninterval": light_last_seen_interval,
+                "name": name,
+                "networkopenduration": network_open_duration,
+                "otauactive": otau_active,
+                "permitjoin": permit_join,
+                "rfconnected": rf_connected,
+                "timeformat": time_format,
+                "timezone": time_zone,
+                "unlock": unlock,
+                "updatechannel": update_channel,
+                "utc": utc,
+                "zigbeechannel": zigbee_channel,
+                "websocketnotifyall": websocket_notify_all,
+            }.items()
+            if value is not None
+        }
+        return await self.gateway.request("put", path="/config", json=data)
