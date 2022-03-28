@@ -20,7 +20,7 @@ class AlarmSystems(APIItems[AlarmSystem]):
 
         After creation the arm mode is set to disarmed.
         """
-        return await self._request(
+        return await self.gateway.request(
             "post",
             path=self.path,
             json={"name": name},

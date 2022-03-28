@@ -30,7 +30,6 @@ class APIItems(Generic[DataResource]):
     def __init__(self, gateway: DeconzSession) -> None:
         """Initialize API items."""
         self.gateway = gateway
-        self._request = gateway.request
         self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
 
@@ -49,7 +48,7 @@ class APIItems(Generic[DataResource]):
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self.path)
+        raw = await self.gateway.request("get", self.path)
         self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:
@@ -74,7 +73,7 @@ class APIItems(Generic[DataResource]):
             event = EventType.CHANGED
 
         else:
-            self._items[id] = self.item_cls(id, raw, self._request)
+            self._items[id] = self.item_cls(id, raw, self.gateway.request)
             event = EventType.ADDED
 
         for callback, event_filter in self._subscribers:
