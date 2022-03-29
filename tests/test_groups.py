@@ -8,6 +8,7 @@ from unittest.mock import Mock
 import pytest
 
 from pydeconz.models.light import ALERT_SHORT, EFFECT_COLOR_LOOP
+from pydeconz.interfaces.groups import Alert, Effect
 
 
 async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh_state):
@@ -45,6 +46,86 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
         }
     )
     assert len(deconz_session.groups.keys()) == 1
+
+    groups = deconz_session.groups
+
+    # Set attributes
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0")
+    await groups.set_attributes(
+        id="0",
+        hidden=False,
+        light_sequence=["1", "2"],
+        lights=["3", "4"],
+        multi_device_ids=["5", "6"],
+        name="Group",
+    )
+    assert deconz_called_with(
+        "put",
+        path="/groups/0",
+        json={
+            "hidden": False,
+            "lightsequence": ["1", "2"],
+            "lights": ["3", "4"],
+            "multideviceids": ["5", "6"],
+            "name": "Group",
+        },
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0")
+    await groups.set_attributes(id="0", name="Group")
+    assert deconz_called_with(
+        "put",
+        path="/groups/0",
+        json={"name": "Group"},
+    )
+
+    # Set state
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/action")
+    await groups.set_state(
+        id="0",
+        alert=Alert.SHORT,
+        brightness=200,
+        color_loop_speed=10,
+        color_temperature=400,
+        effect=Effect.COLORLOOP,
+        hue=1000,
+        on=True,
+        on_time=100,
+        saturation=150,
+        toggle=True,
+        transition_time=250,
+        xy=(0.1, 0.1),
+    )
+    assert deconz_called_with(
+        "put",
+        path="/groups/0/action",
+        json={
+            "alert": "select",
+            "bri": 200,
+            "colorloopspeed": 10,
+            "ct": 400,
+            "effect": "colorloop",
+            "hue": 1000,
+            "on": True,
+            "ontime": 100,
+            "sat": 150,
+            "toggle": True,
+            "transitiontime": 250,
+            "xy": (0.1, 0.1),
+        },
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/action")
+    await groups.set_state("0", on=True)
+    assert deconz_called_with(
+        "put",
+        path="/groups/0/action",
+        json={"on": True},
+    )
+
+    # Test model
 
     group = deconz_session.groups["0"]
 
