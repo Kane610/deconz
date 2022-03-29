@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
@@ -17,6 +18,14 @@ from .api import APIItems, GroupedAPIItems
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
+
+
+class CoverAction(enum.Enum):
+    """Possible cover actions."""
+
+    CLOSE = enum.auto()
+    OPEN = enum.auto()
+    STOP = enum.auto()
 
 
 class ConfigurationToolHandler(APIItems[ConfigurationTool]):
@@ -37,6 +46,40 @@ class CoverHandler(APIItems[Cover]):
         ResourceType.WINDOW_COVERING_DEVICE,
     }
     item_cls = Cover
+
+    async def set_state(
+        self,
+        id: str,
+        action: CoverAction | None = None,
+        lift: int | None = None,
+        tilt: int | None = None,
+    ) -> dict[str, Any]:
+        """Set state of cover.
+
+        Action [CoverAction] Open, Close, Stop
+        Lift [int] between 0-100.
+        Tilt [int] between 0-100.
+        """
+        data: dict[str, bool | int] = {}
+
+        if action is not None:
+            if action is CoverAction.OPEN:
+                data["open"] = True
+            elif action is CoverAction.CLOSE:
+                data["open"] = False
+            elif action is CoverAction.STOP:
+                data["stop"] = True
+        else:
+            if lift is not None:
+                data["lift"] = lift
+            if tilt is not None:
+                data["tilt"] = tilt
+
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/state",
+            json=data,
+        )
 
 
 class FanHandler(APIItems[Fan]):

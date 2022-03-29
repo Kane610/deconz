@@ -7,6 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from pydeconz.interfaces.lights import CoverAction
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
 from pydeconz.models.light import (
     ALERT_KEY,
@@ -199,6 +200,33 @@ async def test_configuration_tool(deconz_light):
     assert configuration_tool.software_version == "0x264a0700"
     assert configuration_tool.type == "Configuration tool"
     assert configuration_tool.unique_id == "00:21:2e:ff:ff:05:a7:a3-01"
+
+
+async def test_control_cover(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify that controlling covers work."""
+    covers = deconz_session.lights.covers
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.OPEN)
+    assert deconz_called_with("put", path="/lights/0/state", json={"open": True})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.CLOSE)
+    assert deconz_called_with("put", path="/lights/0/state", json={"open": False})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.STOP)
+    assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", lift=30, tilt=60)
+    assert deconz_called_with(
+        "put", path="/lights/0/state", json={"lift": 30, "tilt": 60}
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.STOP, lift=20)
+    assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
 
 
 async def test_create_cover(mock_aioresponse, deconz_light, deconz_called_with):
