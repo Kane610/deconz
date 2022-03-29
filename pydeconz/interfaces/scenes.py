@@ -28,7 +28,7 @@ class Scenes(APIItems[Scene]):
 
         The current state of each light will become the lights scene state.
         """
-        return await self._request(
+        return await self.gateway.request(
             "post",
             path=f"/groups/{group_id}/scenes",
             json={"name": name},

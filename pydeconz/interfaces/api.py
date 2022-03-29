@@ -30,7 +30,6 @@ class APIItems(Generic[DataResource]):
     def __init__(self, gateway: DeconzSession) -> None:
         """Initialize API items."""
         self.gateway = gateway
-        self._request = gateway.request
         self._items: dict[str, DataResource] = {}
         self._subscribers: list[SubscriptionType] = []
 
@@ -49,7 +48,7 @@ class APIItems(Generic[DataResource]):
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self._request("get", self.path)
+        raw = await self.gateway.request("get", self.path)
         self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:
@@ -74,7 +73,7 @@ class APIItems(Generic[DataResource]):
             event = EventType.CHANGED
 
         else:
-            self._items[id] = self.item_cls(id, raw, self._request)
+            self._items[id] = self.item_cls(id, raw, self.gateway.request)
             event = EventType.ADDED
 
         for callback, event_filter in self._subscribers:
@@ -129,12 +128,14 @@ class GroupedAPIItems(Generic[DataResource]):
 
     resource_group: ResourceGroup
 
-    def __init__(self, gateway: DeconzSession, api_items: list[APIItems[Any]]) -> None:
+    def __init__(
+        self, gateway: DeconzSession, api_items: list[APIItems[DataResource]]
+    ) -> None:
         """Initialize sensor manager."""
         self.gateway = gateway
         self._items = api_items
 
-        self._type_to_handler: dict[ResourceType, APIItems[Any]] = {
+        self._type_to_handler: dict[ResourceType, APIItems[DataResource]] = {
             resource_type: handler
             for handler in api_items
             if handler.resource_types is not None
@@ -188,19 +189,19 @@ class GroupedAPIItems(Generic[DataResource]):
 
     def items(self) -> dict[str, DataResource]:
         """Return items."""
-        return {y: x[y] for x in self._items for y in x}
+        return {k: v for i in self._items for k, v in i.items()}
 
     def keys(self) -> list[str]:
         """Return item keys."""
-        return [y for x in self._items for y in x]
+        return [k for i in self._items for k in i]
 
     def values(self) -> list[DataResource]:
         """Return item values."""
-        return [y for x in self._items for y in x.values()]
+        return [v for i in self._items for v in i.values()]
 
     def get(self, id: str, default: Any = None) -> DataResource | None:
         """Get item value based on key, if no match return default."""
-        return next((x[id] for x in self._items if id in x), default)
+        return next((i[id] for i in self._items if id in i), default)
 
     def __getitem__(self, obj_id: str) -> DataResource:
         """Get item value based on key."""

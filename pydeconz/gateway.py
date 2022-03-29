@@ -48,14 +48,15 @@ class DeconzSession:
         self.add_device_callback = add_device
         self.connection_status_callback = connection_status
 
-        self.alarmsystems = AlarmSystems(self)
-        self.config: Config | None = None
+        self.config = Config({}, self.request)
         self.events = EventHandler(self)
+        self.websocket: WSClient | None = None
+
+        self.alarmsystems = AlarmSystems(self)
         self.groups = Groups(self)
         self.lights = LightResourceManager(self)
         self.scenes = Scenes(self)
         self.sensors = SensorResourceManager(self)
-        self.websocket: WSClient | None = None
 
         self.alarmsystems.post_init()
         self.groups.post_init()
@@ -145,7 +146,7 @@ class DeconzSession:
 
     def start(self, websocketport: int | None = None) -> None:
         """Connect websocket to deCONZ."""
-        if self.config:
+        if self.config.websocket_port is not None:
             websocketport = self.config.websocket_port
 
         if not websocketport:
@@ -166,8 +167,7 @@ class DeconzSession:
         """Read deCONZ parameters."""
         data = await self.request("get", "")
 
-        if not self.config:
-            self.config = Config(data[ResourceGroup.CONFIG.value], self.request)
+        self.config.raw.update(data[ResourceGroup.CONFIG.value])
 
         self.alarmsystems.process_raw(data.get(ResourceGroup.ALARM.value, {}))
         self.groups.process_raw(data[ResourceGroup.GROUP.value])

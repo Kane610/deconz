@@ -62,6 +62,7 @@ async def test_create_light(mock_aioresponse, deconz_light, deconz_called_with):
     )
 
     assert light.state is False
+    assert light.on is False
     assert light.alert is None
 
     assert light.brightness == 111

@@ -110,7 +110,7 @@ async def test_refresh_state(deconz_refresh_state):
         sensors={"s1": {"type": "ZHAPresence"}},
     )
 
-    assert session.config.bridge_id == "0000000000000000"
+    assert session.config.bridge_id == "012345"
 
     assert "0" in session.alarmsystems
     assert "g1" in session.groups
