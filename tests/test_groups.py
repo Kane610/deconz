@@ -252,11 +252,47 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
         json={"on": True},
     )
 
-    # Scene
+    # Scenes
+
+    scenes = deconz_session.scenes
 
     mock_aioresponse.post("http://host:80/api/apikey/groups/0/scenes")
-    await deconz_session.scenes.create_scene(group_id="0", name="Garage")
+    await scenes.create_scene(group_id="0", name="Garage")
     assert deconz_called_with("post", path="/groups/0/scenes", json={"name": "Garage"})
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/recall")
+    await scenes.recall(group_id="0", scene_id="1")
+    assert deconz_called_with(
+        "put",
+        path="/groups/0/scenes/1/recall",
+        json={},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/store")
+    await scenes.store(group_id="0", scene_id="1")
+    assert deconz_called_with(
+        "put",
+        path="/groups/0/scenes/1/store",
+        json={},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1")
+    await scenes.set_attributes(group_id="0", scene_id="1", name="new name")
+    assert deconz_called_with(
+        "put",
+        path="/groups/0/scenes/1",
+        json={"name": "new name"},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1")
+    await scenes.set_attributes(group_id="0", scene_id="1")
+    assert deconz_called_with(
+        "put",
+        path="/groups/0/scenes/1",
+        json={},
+    )
+
+    # Scene model
 
     scene = deconz_session.scenes["0_1"]
     assert scene.deconz_id == "/groups/0/scenes/1"
