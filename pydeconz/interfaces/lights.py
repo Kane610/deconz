@@ -13,6 +13,7 @@ from ..models.light.fan import *  # noqa: F401, F403
 from ..models.light.fan import Fan
 from ..models.light.light import Light
 from ..models.light.lock import Lock
+from ..models.light.range_extender import RangeExtender
 from ..models.light.siren import Siren
 from .api import APIItems, GroupedAPIItems
 
@@ -240,6 +241,14 @@ class LockHandler(APIItems[Lock]):
         )
 
 
+class RangeExtenderHandler(APIItems[ConfigurationTool]):
+    """Handler for range extender."""
+
+    resource_group = ResourceGroup.LIGHT
+    resource_type = ResourceType.RANGE_EXTENDER
+    item_cls = RangeExtender
+
+
 class SirenHandler(APIItems[Siren]):
     """Handler for sirens."""
 
@@ -290,6 +299,7 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
         self.fans = FanHandler(gateway)
         self.lights = LightHandler(gateway)
         self.locks = LockHandler(gateway)
+        self.range_extender = RangeExtenderHandler(gateway)
         self.sirens = SirenHandler(gateway)
 
         handlers: list[APIItems[Any]] = [
@@ -298,6 +308,7 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
             self.fans,
             self.lights,
             self.locks,
+            self.range_extender,
             self.sirens,
         ]
 
