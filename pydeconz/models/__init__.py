@@ -57,6 +57,9 @@ class ResourceType(Enum):
     # Lock
     DOOR_LOCK = "Door Lock"
 
+    # Range extender
+    RANGE_EXTENDER = "Range extender"
+
     # Siren
     WARNING_DEVICE = "Warning device"
 
