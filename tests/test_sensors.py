@@ -399,6 +399,19 @@ async def test_daylight_sensor(deconz_sensor):
         assert sensor.changed_keys == {"state", "status"}
 
 
+async def test_control_door_lock(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify that door lock sensor works."""
+    locks = deconz_session.sensors.door_lock
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await locks.lock("0", True)
+    assert deconz_called_with("put", path="/sensors/0/config", json={"lock": True})
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await locks.lock("0", False)
+    assert deconz_called_with("put", path="/sensors/0/config", json={"lock": False})
+
+
 async def test_door_lock_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that door lock sensor works."""
     sensor = await deconz_sensor(

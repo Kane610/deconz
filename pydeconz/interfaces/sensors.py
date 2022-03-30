@@ -102,6 +102,17 @@ class DoorLockHandler(APIItems[DoorLock]):
     resource_type = ResourceType.ZHA_DOOR_LOCK
     item_cls = DoorLock
 
+    async def lock(self, id: str, lock: bool) -> dict[str, Any]:
+        """Set config of the lock.
+
+        Lock [bool] True/False.
+        """
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json={"lock": lock},
+        )
+
 
 class FireHandler(APIItems[Fire]):
     """Handler for fire sensor."""
