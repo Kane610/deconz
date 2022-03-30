@@ -28,6 +28,18 @@ class CoverAction(enum.Enum):
     STOP = enum.auto()
 
 
+class FanSpeed(enum.Enum):
+    """Possible fan speeds."""
+
+    OFF = 0
+    PERCENT_25 = 1
+    PERCENT_50 = 2
+    PERCENT_75 = 3
+    PERCENT_100 = 4
+    AUTO = 5
+    COMFORT_BREEZE = 6
+
+
 class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     """Handler for configuration tool."""
 
@@ -88,6 +100,17 @@ class FanHandler(APIItems[Fan]):
     resource_group = ResourceGroup.LIGHT
     resource_type = ResourceType.FAN
     item_cls = Fan
+
+    async def set_speed(self, id: str, speed: FanSpeed) -> dict[str, Any]:
+        """Set speed of fans/ventilators.
+
+        Speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze.
+        """
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/state",
+            json={"speed": speed.value},
+        )
 
 
 class LightHandler(APIItems[Light]):

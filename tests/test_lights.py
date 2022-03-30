@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.interfaces.lights import CoverAction
+from pydeconz.interfaces.lights import CoverAction, FanSpeed
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
 from pydeconz.models.light import (
     ALERT_KEY,
@@ -417,6 +417,39 @@ async def test_create_cover_without_lift(
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
+
+
+async def test_control_fan(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify light fixture with fan work."""
+    fans = deconz_session.lights.fans
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.OFF)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 0})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.PERCENT_25)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 1})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.PERCENT_50)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 2})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.PERCENT_75)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 3})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.PERCENT_100)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 4})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.AUTO)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 5})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await fans.set_speed("0", FanSpeed.COMFORT_BREEZE)
+    assert deconz_called_with("put", path="/lights/0/state", json={"speed": 6})
 
 
 async def test_create_fan(mock_aioresponse, deconz_light, deconz_called_with):
