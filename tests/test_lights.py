@@ -518,6 +518,19 @@ async def test_create_fan(mock_aioresponse, deconz_light, deconz_called_with):
     assert not fan._callbacks
 
 
+async def test_control_lock(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify that controlling locks work."""
+    locks = deconz_session.lights.locks
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await locks.set_state("0", lock=True)
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": True})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await locks.set_state("0", lock=False)
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": False})
+
+
 async def test_create_lock(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that locks work."""
     lock = await deconz_light(

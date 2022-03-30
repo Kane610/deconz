@@ -140,6 +140,17 @@ class LockHandler(APIItems[Lock]):
     resource_type = ResourceType.DOOR_LOCK
     item_cls = Lock
 
+    async def set_state(self, id: str, lock: bool) -> dict[str, Any]:
+        """Set state of lock.
+
+        Lock [bool] True/False.
+        """
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/state",
+            json={"on": lock},
+        )
+
 
 class SirenHandler(APIItems[Siren]):
     """Handler for sirens."""
