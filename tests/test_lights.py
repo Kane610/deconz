@@ -585,6 +585,35 @@ async def test_create_lock(mock_aioresponse, deconz_light, deconz_called_with):
     assert not lock._callbacks
 
 
+async def test_control_siren(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify that sirens work."""
+    sirens = deconz_session.lights.sirens
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await sirens.set_state("0", True)
+    assert deconz_called_with(
+        "put",
+        path="/lights/0/state",
+        json={ALERT_KEY: ALERT_LONG},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await sirens.set_state("0", True, duration=10)
+    assert deconz_called_with(
+        "put",
+        path="/lights/0/state",
+        json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await sirens.set_state("0", False, duration=10)
+    assert deconz_called_with(
+        "put",
+        path="/lights/0/state",
+        json={ALERT_KEY: ALERT_NONE},
+    )
+
+
 async def test_create_siren(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that sirens work."""
     siren = await deconz_light(

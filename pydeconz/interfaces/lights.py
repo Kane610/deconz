@@ -159,6 +159,26 @@ class SirenHandler(APIItems[Siren]):
     resource_type = ResourceType.WARNING_DEVICE
     item_cls = Siren
 
+    async def set_state(
+        self, id: str, on: bool, duration: int | None = None
+    ) -> dict[str, Any]:
+        """Turn on device.
+
+        Duration is counted as 1/10 of a second.
+        """
+        data: dict[str, int | str] = {}
+        if on:
+            data["alert"] = "lselect"
+            if duration is not None:
+                data["ontime"] = duration
+        else:
+            data["alert"] = "none"
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/state",
+            json=data,
+        )
+
 
 LightResources = Union[
     ConfigurationTool,
