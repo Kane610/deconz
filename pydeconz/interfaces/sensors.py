@@ -148,6 +148,18 @@ class HumidityHandler(APIItems[Humidity]):
     }
     item_cls = Humidity
 
+    async def set_config(self, id: str, offset: int) -> dict[str, Any]:
+        """Change config of humidity sensor.
+
+        Supported values:
+        - offset [int] -32768–32767
+        """
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json={"offset": offset},
+        )
+
 
 class LightLevelHandler(APIItems[LightLevel]):
     """Handler for light level sensor."""

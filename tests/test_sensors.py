@@ -638,6 +638,17 @@ async def test_genericstatus_sensor(deconz_sensor):
     assert sensor.unique_id == "fsm-state-1520195376277"
 
 
+async def test_control_humidity_offset(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that humidity sensor works."""
+    humidity = deconz_session.sensors.humidity
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await humidity.set_config("0", offset=1)
+    assert deconz_called_with("put", path="/sensors/0/config", json={"offset": 1})
+
+
 async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that humidity sensor works."""
     sensor = await deconz_sensor(
