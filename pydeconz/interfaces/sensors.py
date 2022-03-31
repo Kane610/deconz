@@ -171,6 +171,32 @@ class LightLevelHandler(APIItems[LightLevel]):
     }
     item_cls = LightLevel
 
+    async def set_config(
+        self,
+        id: str,
+        threshold_dark: int | None = None,
+        threshold_offset: int | None = None,
+    ) -> dict[str, Any]:
+        """Change config of presence sensor.
+
+        Supported values:
+        - threshold_dark [int] 0-65534
+        - threshold_offset [int] 1-65534
+        """
+        data = {
+            key: value
+            for key, value in {
+                "tholddark": threshold_dark,
+                "tholdoffset": threshold_offset,
+            }.items()
+            if value is not None
+        }
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json=data,
+        )
+
 
 class OpenCloseHandler(APIItems[OpenClose]):
     """Handler for open/close sensor."""

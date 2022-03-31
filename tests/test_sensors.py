@@ -638,7 +638,7 @@ async def test_genericstatus_sensor(deconz_sensor):
     assert sensor.unique_id == "fsm-state-1520195376277"
 
 
-async def test_control_humidity_offset(
+async def test_configure_humidity_offset(
     mock_aioresponse, deconz_session, deconz_called_with
 ):
     """Verify that humidity sensor works."""
@@ -694,6 +694,37 @@ async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(offset=1)
     assert deconz_called_with("put", path="/sensors/0/config", json={"offset": 1})
+
+
+async def test_configure_lightlevel_sensor(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring light level sensors works."""
+    light_level = deconz_session.sensors.light_level
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await light_level.set_config("0", threshold_dark=10, threshold_offset=20)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholddark": 10, "tholdoffset": 20},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await light_level.set_config("0", threshold_dark=1)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholddark": 1},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await light_level.set_config("0", threshold_offset=2)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholdoffset": 2},
+    )
 
 
 async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
