@@ -7,7 +7,16 @@ from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.interfaces.sensors import DeviceMode, Mode, WindowCoveringType
+from pydeconz.interfaces.sensors import (
+    DeviceMode,
+    Mode,
+    ThermostatFanMode,
+    ThermostatMode,
+    ThermostatPreset,
+    ThermostatSwingMode,
+    ThermostatTemperatureMeasurement,
+    WindowCoveringType,
+)
 from pydeconz.models.sensor.switch import SWITCH_DEVICE_MODE_DUAL_ROCKER
 from pydeconz.models.sensor.thermostat import (
     THERMOSTAT_FAN_MODE_AUTO,
@@ -1468,6 +1477,58 @@ async def test_temperature_sensor(deconz_sensor):
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHATemperature"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0402"
+
+
+async def test_configure_thermostat(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring presence sensor works."""
+    thermostat = deconz_session.sensors.thermostat
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await thermostat.set_config(
+        id="0",
+        cooling_setpoint=1000,
+        enable_schedule=True,
+        external_sensor_temperature=24,
+        external_window_open=True,
+        fan_mode=ThermostatFanMode.AUTO,
+        flip_display=False,
+        heating_setpoint=500,
+        locked=True,
+        mode=ThermostatMode.AUTO,
+        mounting_mode=False,
+        on=True,
+        preset=ThermostatPreset.AUTO,
+        schedule=[],
+        set_valve=True,
+        swing_mode=ThermostatSwingMode.HALFOPEN,
+        temperature_measurement=ThermostatTemperatureMeasurement.FLOORSENSOR,
+        window_open_detection=True,
+    )
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={
+            "coolsetpoint": 1000,
+            "schedule_on": True,
+            "externalsensortemp": 24,
+            "externalwindowopen": True,
+            "fanmode": "auto",
+            "displayflipped": False,
+            "heatsetpoint": 500,
+            "locked": True,
+            "mode": "auto",
+            "mountingmode": False,
+            "on": True,
+            "preset": "auto",
+            "schedule": [],
+            "setvalve": True,
+            "swingmode": "half open",
+            "temperaturemeasurement": "floor sensor",
+            "windowopen_set": True,
+        },
+    )
 
 
 async def test_danfoss_thermostat(deconz_sensor):

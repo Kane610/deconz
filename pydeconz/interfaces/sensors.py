@@ -96,6 +96,112 @@ class WindowCoveringType(enum.IntEnum):
     PROJECTORSCREEN = 9
 
 
+class ThermostatFanMode(enum.Enum):
+    """Fan mode.
+
+    Supported values:
+    - "off"
+    - "low"
+    - "medium"
+    - "high"
+    - "on"
+    - "auto"
+    - "smart"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    OFF = "off"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    ON = "on"
+    AUTO = "auto"
+    SMART = "smart"
+
+
+class ThermostatMode(enum.Enum):
+    """Set the current operating mode of a thermostat.
+
+    Supported values:
+    - "off"
+    - "auto"
+    - "cool"
+    - "heat"
+    - "emergency heating"
+    - "precooling"
+    - "fan only"
+    - "dry"
+    - "sleep"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    OFF = "off"
+    AUTO = "auto"
+    COOL = "cool"
+    HEAT = "heat"
+    EMERGENCYHEATING = "emergency heating"
+    PRECOOLING = "precooling"
+    FANONLY = "fan only"
+    DRY = "dry"
+    SLEEP = "sleep"
+
+
+class ThermostatSwingMode(enum.Enum):
+    """Set the AC louvers position.
+
+    Supported values:
+    - "fully closed"
+    - "fully open"
+    - "quarter open"
+    - "half open"
+    - "three quarters open"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    FULLYCLOSED = "fully closed"
+    FULLYOPEN = "fully open"
+    QUARTEROPEN = "quarter open"
+    HALFOPEN = "half open"
+    THREEQUARTERSOPEN = "three quarters open"
+
+
+class ThermostatPreset(enum.Enum):
+    """Set the current operating mode for Tuya thermostats.
+
+    Supported values:
+    - "holiday"
+    - "auto"
+    - "manual"
+    - "comfort"
+    - "eco"
+    - "boost"
+    - "complex"
+    Modes are device dependent and only exposed for devices supporting it.
+    """
+
+    HOLIDAY = "holiday"
+    AUTO = "auto"
+    MANUAL = "manual"
+    COMFORT = "comfort"
+    ECO = "eco"
+    BOOST = "boost"
+    COMPLEX = "complex"
+
+
+class ThermostatTemperatureMeasurement(enum.Enum):
+    """Set the mode of operation for Elko Super TR thermostat.
+
+    Supported values:
+    - "air sensor"
+    - "floor sensor"
+    - "floor protection"
+    """
+
+    AIRSENSOR = "air sensor"
+    FLOORSENSOR = "floor sensor"
+    FLOORPROTECTION = "floor protection"
+
+
 class AirQualityHandler(APIItems[AirQuality]):
     """Handler for air quality sensor."""
 
@@ -390,6 +496,113 @@ class ThermostatHandler(APIItems[Thermostat]):
         ResourceType.CLIP_THERMOSTAT,
     }
     item_cls = Thermostat
+
+    async def set_config(
+        self,
+        id: str,
+        cooling_setpoint: int | None = None,
+        enable_schedule: bool | None = None,
+        external_sensor_temperature: int | None = None,
+        external_window_open: bool | None = None,
+        fan_mode: ThermostatFanMode | None = None,
+        flip_display: bool | None = None,
+        heating_setpoint: int | None = None,
+        locked: bool | None = None,
+        mode: ThermostatMode | None = None,
+        mounting_mode: bool | None = None,
+        on: bool | None = None,
+        preset: ThermostatPreset | None = None,
+        schedule: list[str] | None = None,
+        set_valve: bool | None = None,
+        swing_mode: ThermostatSwingMode | None = None,
+        temperature_measurement: ThermostatTemperatureMeasurement | None = None,
+        window_open_detection: bool | None = None,
+    ) -> dict[str, Any]:
+        """Change config of thermostat.
+
+        Supported values:
+        - cooling_setpoint [int] 700-3500
+        - enable_schedule [bool] True/False
+        - external_sensor_temperature [int] -32768-32767
+        - external_window_open [bool] True/False
+        - fan_mode [str]
+          - "auto"
+          - "high"
+          - "low"
+          - "medium"
+          - "off"
+          - "on"
+          - "smart"
+        - flip_display [bool] True/False
+        - heating_setpoint [int] 500-3200
+        - locked [bool] True/False
+        - mode [str]
+          - "auto"
+          - "cool"
+          - "dry"
+          - "emergency heating"
+          - "fan only"
+          - "heat"
+          - "off"
+          - "precooling"
+          - "sleep"
+        - mounting_mode [bool] True/False
+        - on [bool] True/False
+        - preset [str]
+          - "auto"
+          - "boost"
+          - "comfort"
+          - "complex"
+          - "eco"
+          - "holiday"
+          - "manual"
+        - schedule [list]
+        - set_valve [bool] True/False
+        - swing_mode [str]
+          - "fully closed"
+          - "fully open"
+          - "half open"
+          - "quarter open"
+          - "three quarters open"
+        - temperature_measurement [str]
+          - "air sensor"
+          - "floor protection"
+          - "floor sensor"
+        - window_open_detection [bool] True/False
+        """
+        data: dict[str, Any] = {
+            key: value
+            for key, value in {
+                "coolsetpoint": cooling_setpoint,
+                "schedule_on": enable_schedule,
+                "externalsensortemp": external_sensor_temperature,
+                "externalwindowopen": external_window_open,
+                "displayflipped": flip_display,
+                "heatsetpoint": heating_setpoint,
+                "locked": locked,
+                "mountingmode": mounting_mode,
+                "on": on,
+                "schedule": schedule,
+                "setvalve": set_valve,
+                "windowopen_set": window_open_detection,
+            }.items()
+            if value is not None
+        }
+        if fan_mode is not None:
+            data["fanmode"] = fan_mode.value
+        if mode is not None:
+            data["mode"] = mode.value
+        if preset is not None:
+            data["preset"] = preset.value
+        if swing_mode is not None:
+            data["swingmode"] = swing_mode.value
+        if temperature_measurement is not None:
+            data["temperaturemeasurement"] = temperature_measurement.value
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json=data,
+        )
 
 
 class TimeHandler(APIItems[Time]):
