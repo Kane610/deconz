@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
@@ -37,6 +38,62 @@ from .api import APIItems, GroupedAPIItems
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
+
+
+class DeviceMode(enum.Enum):
+    """Different modes for the Hue wall switch module.
+
+    Supported values:
+    - "singlerocker"
+    - "singlepushbutton"
+    - "dualrocker"
+    - "dualpushbutton"
+    """
+
+    SINGLEROCKER = "singlerocker"
+    SINGLEPUSHBUTTON = "singlepushbutton"
+    DUALROCKER = "dualrocker"
+    DUALPUSHBUTTON = "dualpushbutton"
+
+
+class Mode(enum.Enum):
+    """For Ubisys S1/S2, operation mode of the switch.
+
+    Supported values:
+    - "momentary"
+    - "rocker"
+    """
+
+    MOMENTARY = "momentary"
+    ROCKER = "rocker"
+
+
+class WindowCoveringType(enum.IntEnum):
+    """Set the covering type and starts calibration for Ubisys J1.
+
+    Supported values:
+    - 0 = Roller Shade
+    - 1 = Roller Shade two motors
+    - 2 = Roller Shade exterior
+    - 3 = Roller Shade two motors ext
+    - 4 = Drapery
+    - 5 = Awning
+    - 6 = Shutter
+    - 7 = Tilt Blind Lift only
+    - 8 = Tilt Blind lift & tilt
+    - 9 = Projector Screen
+    """
+
+    ROLLERSHADE = 0
+    ROLLERSHADETWOMOTORS = 1
+    ROLLERSHADEEXTERIOR = 2
+    ROLLERSHADETWOMOTORSEXTERIOR = 3
+    DRAPERY = 4
+    AWNING = 5
+    SHUTTER = 6
+    TILTBLINDLIFTONLY = 7
+    TILTBLINDLIFTANDTILT = 8
+    PROJECTORSCREEN = 9
 
 
 class AirQualityHandler(APIItems[AirQuality]):
@@ -278,6 +335,39 @@ class SwitchHandler(APIItems[Switch]):
         ResourceType.CLIP_SWITCH,
     }
     item_cls = Switch
+
+    async def set_config(
+        self,
+        id: str,
+        device_mode: DeviceMode | None = None,
+        mode: Mode | None = None,
+        window_covering_type: WindowCoveringType | None = None,
+    ) -> dict[str, Any]:
+        """Change config of presence sensor.
+
+        Supported values:
+        - device_mode [str]
+          - "dualpushbutton"
+          - "dualrocker"
+          - "singlepushbutton"
+          - "singlerocker"
+        - mode [str]
+          - "momentary"
+          - "rocker"
+        - window_covering_type [int] 0-9
+        """
+        data: dict[str, int | str] = {}
+        if device_mode is not None:
+            data["devicemode"] = device_mode.value
+        if mode is not None:
+            data["mode"] = mode.value
+        if window_covering_type is not None:
+            data["windowcoveringtype"] = window_covering_type.value
+        return await self.gateway.request(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json=data,
+        )
 
 
 class TemperatureHandler(APIItems[Temperature]):

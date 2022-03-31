@@ -7,6 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from pydeconz.interfaces.sensors import DeviceMode, Mode, WindowCoveringType
 from pydeconz.models.sensor.switch import SWITCH_DEVICE_MODE_DUAL_ROCKER
 from pydeconz.models.sensor.thermostat import (
     THERMOSTAT_FAN_MODE_AUTO,
@@ -1116,6 +1117,37 @@ async def test_pressure_sensor(deconz_sensor):
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAPressure"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0403"
+
+
+async def test_configure_switch_sensor(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring presence sensor works."""
+    switch = deconz_session.sensors.switch
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await switch.set_config("0", device_mode=DeviceMode.DUALROCKER)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"devicemode": "dualrocker"},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await switch.set_config("0", mode=Mode.ROCKER)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"mode": "rocker"},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await switch.set_config("0", window_covering_type=WindowCoveringType.DRAPERY)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"windowcoveringtype": 4},
+    )
 
 
 async def test_switch_sensor(deconz_sensor):
