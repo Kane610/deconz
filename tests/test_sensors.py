@@ -949,6 +949,45 @@ async def test_power_sensor(input, expected, deconz_sensor):
         assert getattr(sensor, attr) == value
 
 
+async def test_configure_presence_sensor(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring presence sensor works."""
+    presence = deconz_session.sensors.presence
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", delay=10, duration=20, sensitivity=1)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"delay": 10, "duration": 20, "sensitivity": 1},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", delay=1)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"delay": 1},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", duration=2)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"duration": 2},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", sensitivity=3)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"sensitivity": 3},
+    )
+
+
 async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that presence sensor works."""
     sensor = await deconz_sensor(
