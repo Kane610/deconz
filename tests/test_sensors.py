@@ -414,11 +414,11 @@ async def test_control_door_lock(mock_aioresponse, deconz_session, deconz_called
     locks = deconz_session.sensors.door_lock
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await locks.lock("0", True)
+    await locks.set_config("0", True)
     assert deconz_called_with("put", path="/sensors/0/config", json={"lock": True})
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await locks.lock("0", False)
+    await locks.set_config("0", False)
     assert deconz_called_with("put", path="/sensors/0/config", json={"lock": False})
 
 

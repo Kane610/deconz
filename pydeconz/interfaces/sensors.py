@@ -265,7 +265,7 @@ class DoorLockHandler(APIItems[DoorLock]):
     resource_type = ResourceType.ZHA_DOOR_LOCK
     item_cls = DoorLock
 
-    async def lock(self, id: str, lock: bool) -> dict[str, Any]:
+    async def set_config(self, id: str, lock: bool) -> dict[str, Any]:
         """Set config of the lock.
 
         Lock [bool] True/False.
