@@ -7,6 +7,16 @@ from unittest.mock import Mock
 
 import pytest
 
+from pydeconz.interfaces.sensors import (
+    SwitchDeviceMode,
+    SwitchMode,
+    ThermostatFanMode,
+    ThermostatMode,
+    ThermostatPreset,
+    ThermostatSwingMode,
+    ThermostatTemperatureMeasurement,
+    SwitchWindowCoveringType,
+)
 from pydeconz.models.sensor.switch import SWITCH_DEVICE_MODE_DUAL_ROCKER
 from pydeconz.models.sensor.thermostat import (
     THERMOSTAT_FAN_MODE_AUTO,
@@ -399,6 +409,19 @@ async def test_daylight_sensor(deconz_sensor):
         assert sensor.changed_keys == {"state", "status"}
 
 
+async def test_control_door_lock(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify that door lock sensor works."""
+    locks = deconz_session.sensors.door_lock
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await locks.set_config("0", True)
+    assert deconz_called_with("put", path="/sensors/0/config", json={"lock": True})
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await locks.set_config("0", False)
+    assert deconz_called_with("put", path="/sensors/0/config", json={"lock": False})
+
+
 async def test_door_lock_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that door lock sensor works."""
     sensor = await deconz_sensor(
@@ -625,6 +648,17 @@ async def test_genericstatus_sensor(deconz_sensor):
     assert sensor.unique_id == "fsm-state-1520195376277"
 
 
+async def test_configure_humidity_offset(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that humidity sensor works."""
+    humidity = deconz_session.sensors.humidity
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await humidity.set_config("0", offset=1)
+    assert deconz_called_with("put", path="/sensors/0/config", json={"offset": 1})
+
+
 async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that humidity sensor works."""
     sensor = await deconz_sensor(
@@ -670,6 +704,37 @@ async def test_humidity_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
     await sensor.set_config(offset=1)
     assert deconz_called_with("put", path="/sensors/0/config", json={"offset": 1})
+
+
+async def test_configure_lightlevel_sensor(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring light level sensors works."""
+    light_level = deconz_session.sensors.light_level
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await light_level.set_config("0", threshold_dark=10, threshold_offset=20)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholddark": 10, "tholdoffset": 20},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await light_level.set_config("0", threshold_dark=1)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholddark": 1},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await light_level.set_config("0", threshold_offset=2)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"tholdoffset": 2},
+    )
 
 
 async def test_lightlevel_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
@@ -894,6 +959,45 @@ async def test_power_sensor(input, expected, deconz_sensor):
         assert getattr(sensor, attr) == value
 
 
+async def test_configure_presence_sensor(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring presence sensor works."""
+    presence = deconz_session.sensors.presence
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", delay=10, duration=20, sensitivity=1)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"delay": 10, "duration": 20, "sensitivity": 1},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", delay=1)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"delay": 1},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", duration=2)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"duration": 2},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await presence.set_config("0", sensitivity=3)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"sensitivity": 3},
+    )
+
+
 async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that presence sensor works."""
     sensor = await deconz_sensor(
@@ -1022,6 +1126,37 @@ async def test_pressure_sensor(deconz_sensor):
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAPressure"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0403"
+
+
+async def test_configure_switch_sensor(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring presence sensor works."""
+    switch = deconz_session.sensors.switch
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await switch.set_config("0", device_mode=SwitchDeviceMode.DUALROCKER)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"devicemode": "dualrocker"},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await switch.set_config("0", mode=SwitchMode.ROCKER)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"mode": "rocker"},
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await switch.set_config("0", window_covering_type=SwitchWindowCoveringType.DRAPERY)
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={"windowcoveringtype": 4},
+    )
 
 
 async def test_switch_sensor(deconz_sensor):
@@ -1342,6 +1477,58 @@ async def test_temperature_sensor(deconz_sensor):
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHATemperature"
     assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0402"
+
+
+async def test_configure_thermostat(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that configuring presence sensor works."""
+    thermostat = deconz_session.sensors.thermostat
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await thermostat.set_config(
+        id="0",
+        cooling_setpoint=1000,
+        enable_schedule=True,
+        external_sensor_temperature=24,
+        external_window_open=True,
+        fan_mode=ThermostatFanMode.AUTO,
+        flip_display=False,
+        heating_setpoint=500,
+        locked=True,
+        mode=ThermostatMode.AUTO,
+        mounting_mode=False,
+        on=True,
+        preset=ThermostatPreset.AUTO,
+        schedule=[],
+        set_valve=True,
+        swing_mode=ThermostatSwingMode.HALFOPEN,
+        temperature_measurement=ThermostatTemperatureMeasurement.FLOORSENSOR,
+        window_open_detection=True,
+    )
+    assert deconz_called_with(
+        "put",
+        path="/sensors/0/config",
+        json={
+            "coolsetpoint": 1000,
+            "schedule_on": True,
+            "externalsensortemp": 24,
+            "externalwindowopen": True,
+            "fanmode": "auto",
+            "displayflipped": False,
+            "heatsetpoint": 500,
+            "locked": True,
+            "mode": "auto",
+            "mountingmode": False,
+            "on": True,
+            "preset": "auto",
+            "schedule": [],
+            "setvalve": True,
+            "swingmode": "half open",
+            "temperaturemeasurement": "floor sensor",
+            "windowopen_set": True,
+        },
+    )
 
 
 async def test_danfoss_thermostat(deconz_sensor):
