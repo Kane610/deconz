@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
 
-class DeviceMode(enum.Enum):
+class SwitchDeviceMode(enum.Enum):
     """Different modes for the Hue wall switch module.
 
     Supported values:
@@ -56,7 +56,7 @@ class DeviceMode(enum.Enum):
     DUALPUSHBUTTON = "dualpushbutton"
 
 
-class Mode(enum.Enum):
+class SwitchMode(enum.Enum):
     """For Ubisys S1/S2, operation mode of the switch.
 
     Supported values:
@@ -68,7 +68,7 @@ class Mode(enum.Enum):
     ROCKER = "rocker"
 
 
-class WindowCoveringType(enum.IntEnum):
+class SwitchWindowCoveringType(enum.IntEnum):
     """Set the covering type and starts calibration for Ubisys J1.
 
     Supported values:
@@ -445,9 +445,9 @@ class SwitchHandler(APIItems[Switch]):
     async def set_config(
         self,
         id: str,
-        device_mode: DeviceMode | None = None,
-        mode: Mode | None = None,
-        window_covering_type: WindowCoveringType | None = None,
+        device_mode: SwitchDeviceMode | None = None,
+        mode: SwitchMode | None = None,
+        window_covering_type: SwitchWindowCoveringType | None = None,
     ) -> dict[str, Any]:
         """Change config of presence sensor.
 

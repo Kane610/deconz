@@ -8,14 +8,14 @@ from unittest.mock import Mock
 import pytest
 
 from pydeconz.interfaces.sensors import (
-    DeviceMode,
-    Mode,
+    SwitchDeviceMode,
+    SwitchMode,
     ThermostatFanMode,
     ThermostatMode,
     ThermostatPreset,
     ThermostatSwingMode,
     ThermostatTemperatureMeasurement,
-    WindowCoveringType,
+    SwitchWindowCoveringType,
 )
 from pydeconz.models.sensor.switch import SWITCH_DEVICE_MODE_DUAL_ROCKER
 from pydeconz.models.sensor.thermostat import (
@@ -1135,7 +1135,7 @@ async def test_configure_switch_sensor(
     switch = deconz_session.sensors.switch
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await switch.set_config("0", device_mode=DeviceMode.DUALROCKER)
+    await switch.set_config("0", device_mode=SwitchDeviceMode.DUALROCKER)
     assert deconz_called_with(
         "put",
         path="/sensors/0/config",
@@ -1143,7 +1143,7 @@ async def test_configure_switch_sensor(
     )
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await switch.set_config("0", mode=Mode.ROCKER)
+    await switch.set_config("0", mode=SwitchMode.ROCKER)
     assert deconz_called_with(
         "put",
         path="/sensors/0/config",
@@ -1151,7 +1151,7 @@ async def test_configure_switch_sensor(
     )
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await switch.set_config("0", window_covering_type=WindowCoveringType.DRAPERY)
+    await switch.set_config("0", window_covering_type=SwitchWindowCoveringType.DRAPERY)
     assert deconz_called_with(
         "put",
         path="/sensors/0/config",
