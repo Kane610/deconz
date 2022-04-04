@@ -48,7 +48,7 @@ class APIItems(Generic[DataResource]):
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self.gateway.request("get", self.path)
+        raw = await self.gateway.request("get", f"/{self.resource_group.value}")
         self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:

@@ -45,7 +45,7 @@ class CoverAction(enum.Enum):
 class Effect(enum.Enum):
     """Effect of the light.
 
-    "colorloop" — cycle through hue values 0–360.
+    "colorloop" — cycle through hue values 0-360.
     "none" — no effect.
     """
 
@@ -126,7 +126,7 @@ class FanHandler(APIItems[Fan]):
     resource_type = ResourceType.FAN
     item_cls = Fan
 
-    async def set_speed(self, id: str, speed: FanSpeed) -> dict[str, Any]:
+    async def set_state(self, id: str, speed: FanSpeed) -> dict[str, Any]:
         """Set speed of fans/ventilators.
 
         Speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze.
@@ -257,7 +257,10 @@ class SirenHandler(APIItems[Siren]):
     item_cls = Siren
 
     async def set_state(
-        self, id: str, on: bool, duration: int | None = None
+        self,
+        id: str,
+        on: bool,
+        duration: int | None = None,
     ) -> dict[str, Any]:
         """Turn on device.
 

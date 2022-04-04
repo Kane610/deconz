@@ -284,31 +284,31 @@ async def test_control_fan(mock_aioresponse, deconz_session, deconz_called_with)
     fans = deconz_session.lights.fans
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.OFF)
+    await fans.set_state("0", FanSpeed.OFF)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 0})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.PERCENT_25)
+    await fans.set_state("0", FanSpeed.PERCENT_25)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 1})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.PERCENT_50)
+    await fans.set_state("0", FanSpeed.PERCENT_50)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 2})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.PERCENT_75)
+    await fans.set_state("0", FanSpeed.PERCENT_75)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 3})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.PERCENT_100)
+    await fans.set_state("0", FanSpeed.PERCENT_100)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 4})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.AUTO)
+    await fans.set_state("0", FanSpeed.AUTO)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 5})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await fans.set_speed("0", FanSpeed.COMFORT_BREEZE)
+    await fans.set_state("0", FanSpeed.COMFORT_BREEZE)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 6})
 
 
