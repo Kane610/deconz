@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 MIN_PY_VERSION = "3.9"
 PACKAGES = find_packages(exclude=["tests", "tests.*"])
 REQUIREMENTS = list(val.strip() for val in open("requirements.txt"))
-VERSION = "87"
+VERSION = "88"
 
 setup(
     name="pydeconz",
@@ -16,7 +16,7 @@ setup(
     author_email="Kane610@users.noreply.github.com",
     license="MIT",
     url="https://github.com/Kane610/deconz",
-    download_url=f"https://github.com/Kane610/deconz/archive/{VERSION}.tar.gz",
+    download_url=f"https://github.com/Kane610/deconz/archive/v{VERSION}.tar.gz",
     install_requires=REQUIREMENTS,
     tests_require=["pytest-aiohttp", "pytest", "aioresponses"],
     keywords=["deconz", "zigbee", "homeassistant"],
