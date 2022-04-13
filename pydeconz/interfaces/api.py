@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Callable, ItemsView, ValuesView
-from typing import TYPE_CHECKING, Any, Generic, Iterator, KeysView, Optional
+import itertools
+from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView, Optional
 
 from ..models import DataResource, ResourceGroup, ResourceType
 from ..models.event import Event, EventType
@@ -187,9 +188,9 @@ class GroupedAPIItems(Generic[DataResource]):
 
         return unsubscribe
 
-    def items(self) -> dict[str, DataResource]:
+    def items(self) -> Iterable[tuple[str, DataResource]]:
         """Return items."""
-        return {k: v for i in self._items for k, v in i.items()}
+        return itertools.chain.from_iterable(i.items() for i in self._items)
 
     def keys(self) -> list[str]:
         """Return item keys."""
@@ -203,10 +204,12 @@ class GroupedAPIItems(Generic[DataResource]):
         """Get item value based on key, if no match return default."""
         return next((i[id] for i in self._items if id in i), default)
 
-    def __getitem__(self, obj_id: str) -> DataResource:
+    def __getitem__(self, id: str) -> DataResource:
         """Get item value based on key."""
-        return self.items()[obj_id]
+        if item := self.get(id):
+            return item
+        raise KeyError
 
     def __iter__(self) -> Iterator[str]:
         """Allow iterate over items."""
-        return iter(self.items())
+        return iter(self.keys())
