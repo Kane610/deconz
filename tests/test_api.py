@@ -18,11 +18,27 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
         lights={"1": {"type": "light"}, "2": {"type": "light"}}
     )
 
+    grouped_apiitems = session.lights
+
+    assert [*grouped_apiitems.items()] == [
+        ("1", grouped_apiitems["1"]),
+        ("2", grouped_apiitems["2"]),
+    ]
+    assert [*grouped_apiitems.keys()] == ["1", "2"]
+    assert [*grouped_apiitems.values()] == [
+        grouped_apiitems["1"],
+        grouped_apiitems["2"],
+    ]
+
     apiitems = session.lights.lights
 
     assert [*apiitems.items()] == [("1", apiitems["1"]), ("2", apiitems["2"])]
     assert [*apiitems.keys()] == ["1", "2"]
     assert [*apiitems.values()] == [apiitems["1"], apiitems["2"]]
+
+    assert grouped_apiitems["1"] == apiitems["1"]
+    with pytest.raises(KeyError):
+        grouped_apiitems["3"]
 
     unsub_apiitems_all = apiitems.subscribe(apiitems_mock_subscribe_all := Mock())
     unsub_apiitems_add = apiitems.subscribe(
