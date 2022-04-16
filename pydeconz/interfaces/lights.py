@@ -149,6 +149,7 @@ class LightHandler(APIItems[Light]):
         ResourceType.EXTENDED_COLOR_LIGHT,
         ResourceType.DIMMABLE_LIGHT,
         ResourceType.DIMMABLE_PLUGIN_UNIT,
+        ResourceType.DIMMER_SWITCH,
         ResourceType.ON_OFF_LIGHT,
         ResourceType.ON_OFF_OUTPUT,
         ResourceType.ON_OFF_PLUGIN_UNIT,
