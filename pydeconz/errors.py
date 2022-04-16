@@ -64,5 +64,11 @@ def raise_error(error: dict[str, Any]) -> None:
     """Raise error."""
     if error:
         if cls := ERRORS.get(error["type"]):
-            raise cls("{} {}".format(error["address"], error["description"]))
+            raise cls(
+                "{} {} {}".format(
+                    error["type"],
+                    error["address"],
+                    error["description"],
+                )
+            )
         raise pydeconzException(error)
