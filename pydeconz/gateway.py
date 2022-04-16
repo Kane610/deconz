@@ -204,7 +204,7 @@ class DeconzSession:
 
                 if res.content_type != "application/json":
                     raise ResponseError(
-                        "Invalid content type: {}".format(res.content_type)
+                        "Invalid content type: {} ({})".format(res.content_type, res)
                     )
 
                 response = await res.json()
