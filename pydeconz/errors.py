@@ -11,11 +11,31 @@ class pydeconzException(Exception):
     """
 
 
+class BadRequest(pydeconzException):
+    """The request was not formatted as expected or missing parameters."""
+
+
+class BridgeBusy(pydeconzException):
+    """The Bridge is busy, too many requests (more than 20)."""
+
+
+class Forbidden(pydeconzException):
+    """The caller has no rights to access the requested URI."""
+
+
+class LinkButtonNotPressed(pydeconzException):
+    """The Link button has not been pressed."""
+
+
 class RequestError(pydeconzException):
     """Unable to fulfill request.
 
     Raised when host or API cannot be reached.
     """
+
+
+class ResourceNotFound(pydeconzException):
+    """The requested resource (light, group, ...) was not found."""
 
 
 class ResponseError(pydeconzException):
@@ -24,26 +44,6 @@ class ResponseError(pydeconzException):
 
 class Unauthorized(pydeconzException):
     """Authorization failed."""
-
-
-class BadRequest(pydeconzException):
-    """The request was not formatted as expected or missing parameters."""
-
-
-class Forbidden(pydeconzException):
-    """The caller has no rights to access the requested URI."""
-
-
-class ResourceNotFound(pydeconzException):
-    """The requested resource (light, group, ...) was not found."""
-
-
-class BridgeBusy(pydeconzException):
-    """The Bridge is busy, too many requests (more than 20)."""
-
-
-class LinkButtonNotPressed(pydeconzException):
-    """The Link button has not been pressed."""
 
 
 ERRORS = {
