@@ -49,8 +49,9 @@ class ResourceType(Enum):
     EXTENDED_COLOR_LIGHT = "Extended color light"
     DIMMABLE_LIGHT = "Dimmable light"
     DIMMABLE_PLUGIN_UNIT = "Dimmable plug-in unit"
+    DIMMER_SWITCH = "Dimmer switch"
     ON_OFF_LIGHT = "On/Off light"
-    ON_OFF_OUTPUT = "On/Off output"  # ?
+    ON_OFF_OUTPUT = "On/Off output"
     ON_OFF_PLUGIN_UNIT = "On/Off plug-in unit"
     SMART_PLUG = "Smart plug"
 
