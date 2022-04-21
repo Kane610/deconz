@@ -27,6 +27,10 @@ class LinkButtonNotPressed(pydeconzException):
     """The Link button has not been pressed."""
 
 
+class NotConnected(pydeconzException):
+    """The Hardware is not connected."""
+
+
 class RequestError(pydeconzException):
     """Unable to fulfill request.
 
@@ -57,6 +61,8 @@ ERRORS = {
     8: RequestError,  # Parameter is not modifiable
     101: LinkButtonNotPressed,  # Link button not pressed
     901: BridgeBusy,  # May occur when sending too fast
+    950: NotConnected,  # Hardware is not connected
+    951: BridgeBusy,  # May occur when sending too fast
 }
 
 
