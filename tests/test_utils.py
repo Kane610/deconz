@@ -152,4 +152,4 @@ async def test_request_fails_raise_error() -> None:
     with pytest.raises(errors.Unauthorized) as e_info:
         await utils.request(session, "url")
 
-    assert str(e_info.value) == "address description"
+    assert str(e_info.value) == "1 address description"
