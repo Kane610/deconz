@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 MIN_PY_VERSION = "3.9"
 PACKAGES = find_packages(exclude=["tests", "tests.*"])
 REQUIREMENTS = list(val.strip() for val in open("requirements.txt"))
-VERSION = "88"
+VERSION = "89"
 
 setup(
     name="pydeconz",
