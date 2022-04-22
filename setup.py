@@ -5,11 +5,12 @@ from setuptools import find_packages, setup
 MIN_PY_VERSION = "3.9"
 PACKAGES = find_packages(exclude=["tests", "tests.*"])
 REQUIREMENTS = list(val.strip() for val in open("requirements.txt"))
-VERSION = "89"
+VERSION = "90"
 
 setup(
     name="pydeconz",
     packages=PACKAGES,
+    package_data={"pydeconz": ["py.typed"]},
     version=VERSION,
     description="A Python library for communicating with deCONZ REST-API from Dresden Elektronik",
     author="Robert Svensson",
