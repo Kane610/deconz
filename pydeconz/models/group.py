@@ -7,7 +7,7 @@ from typing import Any, Final, Literal, TypedDict
 from . import ResourceGroup
 from .deconz_device import DeconzDevice
 from .light.light import Light
-from .scene import RESOURCE_TYPE as RESOURCE_TYPE_SCENE, Scene, TypedScene  # noqa: F401
+from .scene import TypedScene
 
 RESOURCE_TYPE: Final = ResourceGroup.GROUP.value
 
