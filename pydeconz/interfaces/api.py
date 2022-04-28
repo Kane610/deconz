@@ -115,6 +115,10 @@ class APIItems(Generic[DataResource]):
         """Return item values."""
         return self._items.values()
 
+    def get(self, id: str, default: Any = None) -> DataResource | None:
+        """Get item value based on key, if no match return default."""
+        return self._items.get(id, default)
+
     def __getitem__(self, obj_id: str) -> DataResource:
         """Get item value based on key."""
         return self._items[obj_id]

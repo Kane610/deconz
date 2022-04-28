@@ -315,7 +315,7 @@ async def test_light_events(deconz_session, mock_websocket_event):
         unique_id="1",
         data={
             "light": {
-                "type": "light",
+                "type": "On/Off light",
                 "state": {
                     "bri": 1,
                     "reachable": True,
@@ -353,7 +353,7 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
     await deconz_refresh_state(
         lights={
             "1": {
-                "type": "light",
+                "type": "On/Off light",
                 "state": {
                     "bri": 1,
                     "reachable": True,
@@ -500,6 +500,18 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
                 "effect": None,
             },
         ),
+        (
+            ["l6"],
+            {
+                "brightness": 1,
+                "ct": 1,
+                "hue": 1,
+                "sat": 1,
+                "xy": (1, 1),
+                "colormode": "hs",
+                "effect": None,
+            },
+        ),
     ],
 )
 async def test_update_group_color(
@@ -524,7 +536,7 @@ async def test_update_group_color(
         },
         lights={
             "l1": {
-                "type": "light",
+                "type": "Color dimmable light",
                 "state": {
                     "bri": 1,
                     "hue": 1,
@@ -536,7 +548,7 @@ async def test_update_group_color(
                 },
             },
             "l2": {
-                "type": "light",
+                "type": "Color temperature light",
                 "state": {
                     "bri": 2,
                     "ct": 2,
@@ -545,14 +557,14 @@ async def test_update_group_color(
                 },
             },
             "l3": {
-                "type": "light",
+                "type": "On/Off light",
                 "state": {
                     "bri": 3,
                     "reachable": True,
                 },
             },
             "l4": {
-                "type": "light",
+                "type": "Color temperature light",
                 "state": {
                     "bri": 4,
                     "ct": 4,
@@ -561,11 +573,18 @@ async def test_update_group_color(
                 },
             },
             "l5": {
-                "type": "light",
+                "type": "Color temperature light",
                 "state": {
                     "bri": 5,
                     "ct": 5,
                     "colormode": "ct",
+                    "reachable": True,
+                },
+            },
+            "l6": {
+                "type": "Window covering device",
+                "state": {
+                    "lift": 100,
                     "reachable": True,
                 },
             },
