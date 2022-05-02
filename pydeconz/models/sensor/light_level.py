@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any, TypedDict
 
 from . import SensorBase
@@ -55,7 +56,7 @@ class LightLevel(SensorBase):
     @property
     def scaled_light_level(self) -> float:
         """Scaled light level."""
-        return round(10 ** ((self.light_level - 1) / 10000), 1)
+        return round(math.pow(10, (self.light_level - 1) / 10000), 1)
 
     @property
     def lux(self) -> int | None:
