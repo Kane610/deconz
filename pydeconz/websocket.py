@@ -2,7 +2,7 @@
 
 from asyncio import create_task, get_running_loop
 from collections import deque
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable, Coroutine
 import logging
 from typing import Any, Final, Literal
 
@@ -28,7 +28,7 @@ class WSClient:
         session: aiohttp.ClientSession,
         host: str,
         port: int,
-        callback: Callable[[Literal["data", "state"]], Awaitable[None]],
+        callback: Callable[[Literal["data", "state"]], Coroutine[Any, Any, None]],
     ) -> None:
         """Create resources for websocket communication."""
         self.session = session
