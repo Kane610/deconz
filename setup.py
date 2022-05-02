@@ -17,7 +17,7 @@ setup(
     license="MIT",
     url="https://github.com/Kane610/deconz",
     download_url=f"https://github.com/Kane610/deconz/archive/v{VERSION}.tar.gz",
-    install_requires=["aiohttp"],
+    install_requires=["aiohttp", "async_timeout"],
     tests_require=["pytest-aiohttp", "pytest", "aioresponses"],
     keywords=["deconz", "zigbee", "homeassistant"],
     classifiers=["Natural Language :: English", "Programming Language :: Python :: 3"],
