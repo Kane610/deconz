@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 def new_device_callback(resource: str, device: Any) -> None:
     """Signal new device is available."""
-    LOGGER.info(f"{resource}, {device._raw}")
+    LOGGER.info(f"{resource}, {device.raw}")
 
 
 async def deconz_gateway(
@@ -33,7 +33,7 @@ async def deconz_gateway(
     deconz = DeconzSession(session, host, port, api_key, add_device=callback)
 
     try:
-        with async_timeout.timeout(5):
+        async with async_timeout.timeout(5):
             await deconz.refresh_state()
         return deconz
 
@@ -71,7 +71,6 @@ async def main(host: str, port: int, api_key: str) -> None:
     try:
         while True:
             await asyncio.sleep(1)
-            # break
 
     except asyncio.CancelledError:
         pass
