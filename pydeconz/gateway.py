@@ -237,7 +237,7 @@ class DeconzSession:
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
 
-    def update_group_color(self, lights: list[str], first=True) -> None:
+    def update_group_color(self, lights: list[str], first: bool = True) -> None:
         """Update group colors based on light states.
 
         deCONZ group updates don't contain any information about the current
