@@ -109,9 +109,12 @@ class DeconzSession:
             light = lights[light_id]
 
             def updated_light() -> None:
-                """Emit signal new device has been added."""
-                if "attr" not in light.changed_keys:
-                    self.update_group_color([light_id])
+                """Update group state based on light state changes.
+
+                Only update changed keys.
+                """
+                if light.changed_keys and "attr" not in light.changed_keys:
+                    self.update_group_color([light_id], first=False)
 
             light.subscribe(updated_light)
 
@@ -234,7 +237,7 @@ class DeconzSession:
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
 
-    def update_group_color(self, lights: list[str]) -> None:
+    def update_group_color(self, lights: list[str], first: bool = True) -> None:
         """Update group colors based on light states.
 
         deCONZ group updates don't contain any information about the current
@@ -251,7 +254,6 @@ class DeconzSession:
             if len(light_ids := lights) > 1:
                 light_ids = group.lights
 
-            first = True
             for light_id in light_ids:
                 if (
                     (light := self.lights.lights.get(light_id))

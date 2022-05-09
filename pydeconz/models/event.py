@@ -79,6 +79,7 @@ class Event:
         """Altered device data.
 
         Only for "changed" events.
+        Ignores "attr" events.
         """
         data: dict[str, Any] = {}
 

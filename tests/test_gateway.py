@@ -599,4 +599,61 @@ async def test_update_group_color(
     assert session.groups["g1"].color_mode == expected_group_state["colormode"]
     assert session.groups["g1"].effect == expected_group_state["effect"]
 
-    await session.session.close()
+
+async def test_update_group_color_ignores_attr(
+    deconz_refresh_state, mock_websocket_event
+):
+    """Test update_group_color ignores attr messages on power plugs.
+
+    Bug caused group to reset all light attributes to None on power plugs.
+    """
+    session = await deconz_refresh_state(
+        groups={
+            "0": {
+                "action": {
+                    "bri": 0,
+                },
+                "id": "gid",
+                "lights": ["1", "2"],
+                "scenes": [],
+            }
+        },
+        lights={
+            "1": {
+                "type": "Color dimmable light",
+                "state": {
+                    "bri": 1,
+                    "reachable": True,
+                },
+            },
+            "2": {
+                "state": {
+                    "on": True,
+                    "reachable": True,
+                },
+            },
+        },
+    )
+
+    assert session.groups["0"].brightness == 1
+
+    await mock_websocket_event(
+        resource="lights",
+        unique_id="54:0f:57:ff:fe:91:ff:b6-01",
+        id="2",
+        data={
+            "attr": {
+                "id": "2",
+                "lastannounced": "2021-12-31T11:40:44Z",
+                "lastseen": "2022-05-07T07:18Z",
+                "manufacturername": "_TZ3000_u5u4cakc",
+                "modelid": "TS011F",
+                "name": "Kastlicht",
+                "swversion": "69",
+                "type": "On/Off plug-in unit",
+                "uniqueid": "54:0f:57:ff:fe:91:ff:b6-01",
+            },
+        },
+    )
+
+    assert session.groups["0"].brightness == 1
