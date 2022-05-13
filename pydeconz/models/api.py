@@ -12,6 +12,7 @@ from ..errors import BridgeBusy
 LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = Callable[..., None]
+UnsubscribeType = Callable[[], None]
 
 
 class APIItem:
@@ -48,7 +49,7 @@ class APIItem:
         if callback in self._callbacks:
             self._callbacks.remove(callback)
 
-    def subscribe(self, callback: SubscriptionType) -> Callable[[], None]:
+    def subscribe(self, callback: SubscriptionType) -> UnsubscribeType:
         """Subscribe to events.
 
         Return function to unsubscribe.
