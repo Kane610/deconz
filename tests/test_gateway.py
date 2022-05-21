@@ -3,10 +3,11 @@
 pytest --cov-report term-missing --cov=pydeconz.gateway tests/test_gateway.py
 """
 
-from unittest.mock import Mock, patch
+from asyncio import gather
+from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
-from pydeconz import RequestError, ResponseError, ERRORS, pydeconzException
+from pydeconz import BridgeBusy, RequestError, ResponseError, ERRORS, pydeconzException
 from pydeconz.websocket import STATE_RUNNING, STATE_STOPPED
 
 import aiohttp
@@ -657,3 +658,51 @@ async def test_update_group_color_ignores_attr(
     )
 
     assert session.groups["0"].brightness == 1
+
+
+@patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
+async def test_retry_on_bridge_busy(_, deconz_refresh_state):
+    """Verify a max count of 4 bridge busy messages."""
+    session = await deconz_refresh_state(lights={"1": {"type": "light"}})
+
+    request_mock = AsyncMock(side_effect=BridgeBusy)
+
+    with pytest.raises(BridgeBusy), patch.object(session, "_request", new=request_mock):
+        await session.request_with_retry("put", "field", {"key1": "on"})
+
+    assert request_mock.call_count == 3
+    assert not session._sleep_tasks
+
+
+@patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
+async def test_request_exception_bridge_busy_pass_on_retry(_, deconz_refresh_state):
+    """Verify retry can return an expected response."""
+    session = await deconz_refresh_state(lights={"1": {"type": "light"}})
+
+    request_mock = AsyncMock(side_effect=(BridgeBusy, {"response": "ok"}))
+
+    with patch.object(session, "_request", new=request_mock):
+        assert await session.request_with_retry("put", "field", {"key1": "on"}) == {
+            "response": "ok"
+        }
+
+    assert request_mock.call_count == 2
+    assert not session._sleep_tasks
+
+
+@patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
+async def test_reset_retry_with_a_second_request(_, deconz_refresh_state):
+    """Verify an ongoing retry can be reset by a new request."""
+    session = await deconz_refresh_state(lights={"1": {"type": "light"}})
+
+    request_mock = AsyncMock(side_effect=(BridgeBusy, BridgeBusy, {"response": "ok"}))
+
+    with patch.object(session, "_request", new=request_mock):
+        collected_responses = await gather(
+            session.request_with_retry("put", "field", {"key1": "on"}),
+            session.request_with_retry("put", "field", {"key2": "on"}),
+        )
+
+    assert request_mock.call_count == 3
+    assert not session._sleep_tasks
+    assert collected_responses == [{}, {"response": "ok"}]

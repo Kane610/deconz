@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from asyncio import CancelledError, Task, create_task, sleep
 from collections.abc import Callable
 import logging
 from pprint import pformat
@@ -10,7 +11,7 @@ from typing import Any, Literal
 import aiohttp
 
 from .config import Config
-from .errors import RequestError, ResponseError, raise_error
+from .errors import BridgeBusy, RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
 from .interfaces.events import EventHandler
 from .interfaces.groups import Groups
@@ -44,6 +45,8 @@ class DeconzSession:
         self.host = host
         self.port = port
         self.api_key = api_key
+
+        self._sleep_tasks: dict[str, Task[Callable[..., Any]]] = {}
 
         self.add_device_callback = add_device
         self.connection_status_callback = connection_status
@@ -178,6 +181,36 @@ class DeconzSession:
         self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
 
         self.update_group_color(list(self.lights.keys()))
+
+    async def request_with_retry(
+        self,
+        method: str,
+        path: str,
+        json: dict[str, Any] | None = None,
+        tries: int = 0,
+    ) -> dict[str, Any]:
+        """Make a request to the API, retry on BridgeBusy error."""
+        if sleep_task := self._sleep_tasks.pop(path, None):
+            sleep_task.cancel()
+
+        try:
+            return await self.request(method, path, json)
+
+        except BridgeBusy:
+            LOGGER.debug("Bridge is busy, schedule retry %s %s", path, str(json))
+
+            if (tries := tries + 1) < 3:
+                self._sleep_tasks[path] = sleep_task = create_task(sleep(2 ** (tries)))
+
+                try:
+                    await sleep_task
+                except CancelledError:
+                    return {}
+
+                return await self.request_with_retry(method, path, json, tries)
+
+            self._sleep_tasks.pop(path, None)
+            raise BridgeBusy
 
     async def request(
         self,
