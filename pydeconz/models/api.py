@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from asyncio import CancelledError, Task, create_task, sleep
 from collections.abc import Awaitable, Callable
 import logging
 from typing import Any
-
-from ..errors import BridgeBusy
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,7 +30,6 @@ class APIItem:
 
         self._callbacks: list[SubscriptionType] = []
         self._subscribers: list[SubscriptionType] = []
-        self._sleep_task: Task[Callable[..., Any]] | None = None
 
         self.post_init()
 
@@ -84,29 +80,6 @@ class APIItem:
         for callback in self._callbacks + self._subscribers:
             callback()
 
-    async def request(
-        self, field: str, data: dict[str, Any], tries: int = 0
-    ) -> dict[str, Any]:
+    async def request(self, field: str, data: dict[str, Any]) -> dict[str, Any]:
         """Set state of device."""
-        if self._sleep_task is not None:
-            self._sleep_task.cancel()
-            self._sleep_task = None
-
-        try:
-            return await self._request("put", path=field, json=data)
-
-        except BridgeBusy:
-            LOGGER.debug("Bridge is busy, schedule retry %s %s", field, str(data))
-
-            if (tries := tries + 1) < 3:
-                self._sleep_task = create_task(sleep(2 ** (tries)))
-
-                try:
-                    await self._sleep_task
-                except CancelledError:
-                    return {}
-
-                return await self.request(field, data, tries)
-
-            self._sleep_task = None
-            raise BridgeBusy
+        return await self._request("put", path=field, json=data)

@@ -74,7 +74,7 @@ class APIItems(Generic[DataResource]):
             event = EventType.CHANGED
 
         else:
-            self._items[id] = self.item_cls(id, raw, self.gateway.request)
+            self._items[id] = self.item_cls(id, raw, self.gateway.request_with_retry)
             event = EventType.ADDED
 
         for callback, event_filter in self._subscribers:
