@@ -112,7 +112,7 @@ class CoverHandler(APIItems[Cover]):
             if tilt is not None:
                 data["tilt"] = tilt
 
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
             json=data,
@@ -131,7 +131,7 @@ class FanHandler(APIItems[Fan]):
 
         Speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze.
         """
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
             json={"speed": speed.value},
@@ -216,7 +216,7 @@ class LightHandler(APIItems[Light]):
             data["alert"] = alert.value
         if effect is not None:
             data["effect"] = effect.value
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
             json=data,
@@ -235,7 +235,7 @@ class LockHandler(APIItems[Lock]):
 
         Lock [bool] True/False.
         """
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
             json={"on": lock},
@@ -274,7 +274,7 @@ class SirenHandler(APIItems[Siren]):
                 data["ontime"] = duration
         else:
             data["alert"] = "none"
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
             json=data,

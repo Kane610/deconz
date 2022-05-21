@@ -270,7 +270,7 @@ class DoorLockHandler(APIItems[DoorLock]):
 
         Lock [bool] True/False.
         """
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
             json={"lock": lock},
@@ -317,7 +317,7 @@ class HumidityHandler(APIItems[Humidity]):
         Supported values:
         - offset [int] -32768–32767
         """
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
             json={"offset": offset},
@@ -354,7 +354,7 @@ class LightLevelHandler(APIItems[LightLevel]):
             }.items()
             if value is not None
         }
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
             json=data,
@@ -413,7 +413,7 @@ class PresenceHandler(APIItems[Presence]):
             }.items()
             if value is not None
         }
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
             json=data,
@@ -469,7 +469,7 @@ class SwitchHandler(APIItems[Switch]):
             data["mode"] = mode.value
         if window_covering_type is not None:
             data["windowcoveringtype"] = window_covering_type.value
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
             json=data,
@@ -598,7 +598,7 @@ class ThermostatHandler(APIItems[Thermostat]):
             data["swingmode"] = swing_mode.value
         if temperature_measurement is not None:
             data["temperaturemeasurement"] = temperature_measurement.value
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
             json=data,
