@@ -138,7 +138,7 @@ class Groups(APIItems[Group]):
             data["alert"] = alert.value
         if effect is not None:
             data["effect"] = effect.value
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/action",
             json=data,

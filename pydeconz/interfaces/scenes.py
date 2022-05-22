@@ -36,7 +36,7 @@ class Scenes(APIItems[Scene]):
 
     async def recall(self, group_id: str, scene_id: str) -> dict[str, Any]:
         """Recall scene to group."""
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"/groups/{group_id}/scenes/{scene_id}/recall",
             json={},
@@ -47,7 +47,7 @@ class Scenes(APIItems[Scene]):
 
         The actual state of each light in the group will become the lights scene state.
         """
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"/groups/{group_id}/scenes/{scene_id}/store",
             json={},
@@ -68,7 +68,7 @@ class Scenes(APIItems[Scene]):
             }.items()
             if value is not None
         }
-        return await self.gateway.request(
+        return await self.gateway.request_with_retry(
             "put",
             path=f"/groups/{group_id}/scenes/{scene_id}",
             json=data,
