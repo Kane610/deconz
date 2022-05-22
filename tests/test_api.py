@@ -9,6 +9,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz.errors import BridgeBusy
+from pydeconz.interfaces.api import ID_FILTER_ALL
 from pydeconz.interfaces.events import EventType
 
 
@@ -40,6 +41,7 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     with pytest.raises(KeyError):
         grouped_apiitems["3"]
 
+    # Subscribe without ID filter
     unsub_apiitems_all = apiitems.subscribe(apiitems_mock_subscribe_all := Mock())
     unsub_apiitems_add = apiitems.subscribe(
         apiitems_mock_subscribe_add := Mock(), EventType.ADDED
@@ -47,7 +49,22 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     unsub_apiitems_update = apiitems.subscribe(
         apiitems_mock_subscribe_update := Mock(), EventType.CHANGED
     )
-    assert len(apiitems._subscribers) == 5
+    assert len(apiitems._subscribers) == 1
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 5
+
+    # Subscribe with ID filter
+    unsub_apiitems_1_all = apiitems.subscribe(
+        apiitems_1_mock_subscribe_all := Mock(), id_filter="1"
+    )
+    unsub_apiitems_1_add = apiitems.subscribe(
+        apiitems_1_mock_subscribe_add := Mock(), EventType.ADDED, id_filter="1"
+    )
+    unsub_apiitems_1_update = apiitems.subscribe(
+        apiitems_1_mock_subscribe_update := Mock(), EventType.CHANGED, id_filter="1"
+    )
+    assert len(apiitems._subscribers) == 2
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 5
+    assert len(apiitems._subscribers["1"]) == 3
 
     item_1 = apiitems["1"]
     item_1.register_callback(item_1_mock_callback := Mock())
@@ -61,6 +78,8 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     # Item 1 is updated
     apiitems_mock_subscribe_all.assert_any_call(EventType.CHANGED, "1")
     apiitems_mock_subscribe_update.assert_called_with(EventType.CHANGED, "1")
+    apiitems_1_mock_subscribe_all.assert_any_call(EventType.CHANGED, "1")
+    apiitems_1_mock_subscribe_update.assert_called_with(EventType.CHANGED, "1")
     item_1_mock_callback.assert_called()
     item_1_mock_subscribe.assert_called()
     item_1.changed_keys == ("key1")
@@ -69,6 +88,7 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     assert "3" in apiitems
     apiitems_mock_subscribe_all.assert_called_with(EventType.ADDED, "3")
     apiitems_mock_subscribe_add.assert_called_with(EventType.ADDED, "3")
+    apiitems_1_mock_subscribe_add.assert_not_called()
 
     mock_aioresponse.put("http://host:80/api/apikey/field")
     await item_1.request("/field", {"key2": "on"})
@@ -77,13 +97,28 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     assert len(item_1._subscribers) == 1
 
     unsub_apiitems_all()
-    assert len(apiitems._subscribers) == 4
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 4
 
     unsub_apiitems_add()
-    assert len(apiitems._subscribers) == 3
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 3
 
     unsub_apiitems_update()
-    assert len(apiitems._subscribers) == 2
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 2
+
+    unsub_apiitems_1_all()
+    assert len(apiitems._subscribers["1"]) == 2
+
+    unsub_apiitems_1_add()
+    assert len(apiitems._subscribers["1"]) == 1
+
+    unsub_apiitems_1_update()
+    assert len(apiitems._subscribers["1"]) == 0
+
+    # Unsubscribe without ID in subscribers
+    unsub_apiitems_4 = apiitems.subscribe(Mock(), id_filter="4")
+    assert len(apiitems._subscribers["4"]) == 1
+    del apiitems._subscribers["4"]
+    unsub_apiitems_4()
 
 
 @patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
