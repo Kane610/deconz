@@ -204,7 +204,8 @@ class GroupedAPIItems(Generic[DataResource]):
     ) -> UnsubscribeType:
         """Subscribe to state changes for all grouped resources."""
         subscribers = [
-            x.subscribe(callback, event_filter, id_filter) for x in self._items
+            x.subscribe(callback, event_filter=event_filter, id_filter=id_filter)
+            for x in self._items
         ]
 
         def unsubscribe() -> None:

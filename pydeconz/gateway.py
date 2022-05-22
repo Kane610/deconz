@@ -96,10 +96,10 @@ class DeconzSession:
             """Signal new sensor."""
             signal_new_device(ResourceGroup.SENSOR, self.sensors[sensor_id])
 
-        self.alarmsystems.subscribe(signal_new_alarm, EventType.ADDED)
-        self.groups.subscribe(signal_new_group, EventType.ADDED)
-        self.lights.subscribe(signal_new_light, EventType.ADDED)
-        self.sensors.subscribe(signal_new_sensor, EventType.ADDED)
+        self.alarmsystems.subscribe(signal_new_alarm, event_filter=EventType.ADDED)
+        self.groups.subscribe(signal_new_group, event_filter=EventType.ADDED)
+        self.lights.subscribe(signal_new_light, event_filter=EventType.ADDED)
+        self.sensors.subscribe(signal_new_sensor, event_filter=EventType.ADDED)
 
     def legacy_update_group_color(self) -> None:
         """Support legacy way to update group colors."""
@@ -121,7 +121,7 @@ class DeconzSession:
 
             light.subscribe(updated_light)
 
-        lights.subscribe(signal_new_light, EventType.ADDED)
+        lights.subscribe(signal_new_light, event_filter=EventType.ADDED)
 
     async def get_api_key(
         self,
