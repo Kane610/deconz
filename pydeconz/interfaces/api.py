@@ -34,7 +34,7 @@ class APIItems(Generic[DataResource]):
         """Initialize API items."""
         self.gateway = gateway
         self._items: dict[str, DataResource] = {}
-        self._subscribers: dict[str, SubscriptionType] = {ID_FILTER_ALL: []}
+        self._subscribers: dict[str, list[SubscriptionType]] = {ID_FILTER_ALL: []}
 
         self.path = f"/{self.resource_group.value}"
 
@@ -79,7 +79,9 @@ class APIItems(Generic[DataResource]):
             self._items[id] = self.item_cls(id, raw, self.gateway.request_with_retry)
             event = EventType.ADDED
 
-        subscribers = self._subscribers.get(id, []) + self._subscribers[ID_FILTER_ALL]
+        subscribers: list[SubscriptionType] = (
+            self._subscribers.get(id, []) + self._subscribers[ID_FILTER_ALL]
+        )
         for callback, event_filter in subscribers:
             if event_filter is not None and event not in event_filter:
                 continue
@@ -99,19 +101,20 @@ class APIItems(Generic[DataResource]):
         if isinstance(event_filter, EventType):
             event_filter = (event_filter,)
 
+        _id_filter: tuple[str]
         if id_filter is None:
-            id_filter = (ID_FILTER_ALL,)
+            _id_filter = (ID_FILTER_ALL,)
         elif isinstance(id_filter, str):
-            id_filter = (id_filter,)
+            _id_filter = (id_filter,)
 
         subscription = (callback, event_filter)
-        for id in id_filter:
+        for id in _id_filter:
             if id not in self._subscribers:
                 self._subscribers[id] = []
             self._subscribers[id].append(subscription)
 
         def unsubscribe() -> None:
-            for id in id_filter:
+            for id in _id_filter:
                 if id not in self._subscribers:
                     continue
                 self._subscribers[id].remove(subscription)
