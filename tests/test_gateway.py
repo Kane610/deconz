@@ -247,8 +247,6 @@ async def test_incomplete_event(deconz_session):
 
 async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
-    deconz_session.add_device_callback = Mock()
-
     # Add alarmsystem
 
     await mock_websocket_event(
@@ -284,9 +282,6 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
 
     assert "1" in deconz_session.alarmsystems
     assert deconz_session.alarmsystems["1"].arm_state == "disarmed"
-    deconz_session.add_device_callback.assert_called_with(
-        "alarmsystems", deconz_session.alarmsystems["1"]
-    )
 
     # Update alarmsystem
 
@@ -305,7 +300,6 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
 
 async def test_light_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
-    deconz_session.add_device_callback = Mock()
 
     # Add light
 
@@ -327,9 +321,6 @@ async def test_light_events(deconz_session, mock_websocket_event):
 
     assert "1" in deconz_session.lights
     assert deconz_session.lights["1"].brightness == 1
-    deconz_session.add_device_callback.assert_called_with(
-        "lights", deconz_session.lights["1"]
-    )
 
     # Update light
 
@@ -349,7 +340,6 @@ async def test_light_events(deconz_session, mock_websocket_event):
 
 async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket_event):
     """Test event_handler works."""
-    deconz_session.add_device_callback = Mock()
 
     await deconz_refresh_state(
         lights={
@@ -381,9 +371,6 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
 
     assert "1" in deconz_session.groups
     assert deconz_session.groups["1"].brightness == 1
-    deconz_session.add_device_callback.assert_called_with(
-        "groups", deconz_session.groups["1"]
-    )
 
     # Update group
 
@@ -404,7 +391,6 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
     sensor_subscription = Mock()
     unsub_sensor_mock = deconz_session.sensors.subscribe(sensor_subscription)
-    deconz_session.add_device_callback = Mock()
 
     # Add sensor
 
@@ -425,9 +411,6 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
 
     assert "1" in deconz_session.sensors
     assert deconz_session.sensors["1"].reachable
-    deconz_session.add_device_callback.assert_called_with(
-        "sensors", deconz_session.sensors["1"]
-    )
     sensor_subscription.assert_called_once()
     unsub_sensor_mock()
 

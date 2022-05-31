@@ -50,7 +50,7 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
         apiitems_mock_subscribe_update := Mock(), EventType.CHANGED
     )
     assert len(apiitems._subscribers) == 1
-    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 5
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 4
 
     # Subscribe with ID filter
     unsub_apiitems_1_all = apiitems.subscribe(
@@ -63,7 +63,7 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
         apiitems_1_mock_subscribe_update := Mock(), EventType.CHANGED, id_filter="1"
     )
     assert len(apiitems._subscribers) == 2
-    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 5
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 4
     assert len(apiitems._subscribers["1"]) == 3
 
     item_1 = apiitems["1"]
@@ -97,13 +97,13 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     assert len(item_1._subscribers) == 1
 
     unsub_apiitems_all()
-    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 4
-
-    unsub_apiitems_add()
     assert len(apiitems._subscribers[ID_FILTER_ALL]) == 3
 
-    unsub_apiitems_update()
+    unsub_apiitems_add()
     assert len(apiitems._subscribers[ID_FILTER_ALL]) == 2
+
+    unsub_apiitems_update()
+    assert len(apiitems._subscribers[ID_FILTER_ALL]) == 1
 
     unsub_apiitems_1_all()
     assert len(apiitems._subscribers["1"]) == 2

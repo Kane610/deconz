@@ -35,9 +35,7 @@ class DeconzSession:
         host: str,
         port: int,
         api_key: str | None = None,
-        add_device: Callable[[str, Any], None] | None = None,
         connection_status: Callable[[bool], None] | None = None,
-        legacy_add_device: bool = True,
         legacy_update_group_color: bool = True,
     ) -> None:
         """Session setup."""
@@ -48,7 +46,6 @@ class DeconzSession:
 
         self._sleep_tasks: dict[str, Task[Callable[..., Any]]] = {}
 
-        self.add_device_callback = add_device
         self.connection_status_callback = connection_status
 
         self.config = Config({}, self.request)
@@ -67,39 +64,8 @@ class DeconzSession:
         self.scenes.post_init()
         self.sensors.post_init()
 
-        if legacy_add_device:
-            self.legacy_add_device_callback()
         if legacy_update_group_color:
             self.legacy_update_group_color()
-
-    def legacy_add_device_callback(self) -> None:
-        """Support legacy way to signal new device."""
-
-        def signal_new_device(resource: ResourceGroup, device: Any) -> None:
-            """Emit signal new device has been added."""
-            if self.add_device_callback:
-                self.add_device_callback(resource.value, device)
-
-        def signal_new_alarm(event_type: EventType, alarm_id: str) -> None:
-            """Signal new alarm system."""
-            signal_new_device(ResourceGroup.ALARM, self.alarmsystems[alarm_id])
-
-        def signal_new_group(event_type: EventType, group_id: str) -> None:
-            """Signal new group."""
-            signal_new_device(ResourceGroup.GROUP, self.groups[group_id])
-
-        def signal_new_light(event_type: EventType, light_id: str) -> None:
-            """Signal new light."""
-            signal_new_device(ResourceGroup.LIGHT, self.lights[light_id])
-
-        def signal_new_sensor(event_type: EventType, sensor_id: str) -> None:
-            """Signal new sensor."""
-            signal_new_device(ResourceGroup.SENSOR, self.sensors[sensor_id])
-
-        self.alarmsystems.subscribe(signal_new_alarm, event_filter=EventType.ADDED)
-        self.groups.subscribe(signal_new_group, event_filter=EventType.ADDED)
-        self.lights.subscribe(signal_new_light, event_filter=EventType.ADDED)
-        self.sensors.subscribe(signal_new_sensor, event_filter=EventType.ADDED)
 
     def legacy_update_group_color(self) -> None:
         """Support legacy way to update group colors."""
