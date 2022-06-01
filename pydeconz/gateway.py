@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from asyncio import CancelledError, Task, create_task, sleep
-from collections.abc import Callable
 import logging
 from pprint import pformat
-from typing import Any, Literal
+from typing import Any, Callable, Literal
 
 import aiohttp
 
 from .config import Config
 from .errors import BridgeBusy, RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
+from .interfaces.api import CallbackType, UnsubscribeType
 from .interfaces.events import EventHandler
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager
@@ -36,6 +36,7 @@ class DeconzSession:
         port: int,
         api_key: str | None = None,
         connection_status: Callable[[bool], None] | None = None,
+        legacy_add_device: bool = False,
         legacy_update_group_color: bool = True,
     ) -> None:
         """Session setup."""
@@ -147,6 +148,21 @@ class DeconzSession:
         self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
 
         self.update_group_color(list(self.lights.keys()))
+
+    def subscribe(self, callback: CallbackType) -> UnsubscribeType:
+        """Subscribe to status changes for all resources."""
+        subscribers = [
+            self.alarmsystems.subscribe(callback),
+            self.groups.subscribe(callback),
+            self.lights.subscribe(callback),
+            self.sensors.subscribe(callback),
+        ]
+
+        def unsubscribe() -> None:
+            for subscriber in subscribers:
+                subscriber()
+
+        return unsubscribe
 
     async def request_with_retry(
         self,

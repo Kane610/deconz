@@ -4,22 +4,22 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from collections.abc import Callable
 import logging
-from typing import Any
 
 import aiohttp
 import async_timeout
 
 from pydeconz import errors
 from pydeconz.gateway import DeconzSession
+from pydeconz.interfaces.api import CallbackType
+from pydeconz.models.event import EventType
 
 LOGGER = logging.getLogger(__name__)
 
 
-def new_device_callback(resource: str, device: Any) -> None:
+def new_device_callback(event: EventType, id: str) -> None:
     """Signal new device is available."""
-    LOGGER.info(f"{resource}, {device.raw}")
+    LOGGER.info(f"{event}, {id}")
 
 
 async def deconz_gateway(
@@ -27,10 +27,11 @@ async def deconz_gateway(
     host: str,
     port: int,
     api_key: str,
-    callback: Callable[[str, Any], None],
+    callback: CallbackType,
 ) -> DeconzSession | None:
     """Create a gateway object and verify configuration."""
-    deconz = DeconzSession(session, host, port, api_key, add_device=callback)
+    deconz = DeconzSession(session, host, port, api_key)
+    deconz.subscribe(callback)
 
     try:
         async with async_timeout.timeout(5):
