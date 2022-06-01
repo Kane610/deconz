@@ -129,8 +129,7 @@ async def test_create_cover(mock_aioresponse, deconz_light, deconz_called_with):
     assert cover.type == "Window covering device"
     assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
 
-    mock_callback = Mock()
-    cover.register_callback(mock_callback)
+    cover.register_callback(mock_callback := Mock())
     assert cover._callbacks
 
     event = {"state": {"lift": 50, "open": True}}
@@ -213,8 +212,7 @@ async def test_create_cover_without_lift(
     assert cover.type == "Window covering device"
     assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
 
-    mock_callback = Mock()
-    cover.register_callback(mock_callback)
+    cover.register_callback(mock_callback := Mock())
     assert cover._callbacks
 
     event = {"state": {"bri": 50, "on": True}}
@@ -358,8 +356,7 @@ async def test_create_fan(mock_aioresponse, deconz_light, deconz_called_with):
     assert fan.type == "Fan"
     assert fan.unique_id == "00:22:a3:00:00:27:8b:81-01"
 
-    mock_callback = Mock()
-    fan.register_callback(mock_callback)
+    fan.register_callback(mock_callback := Mock())
     assert fan._callbacks
 
     event = {"state": {"speed": 1}}
@@ -479,8 +476,7 @@ async def test_create_light(mock_aioresponse, deconz_light, deconz_called_with):
     assert light.type == "Extended color light"
     assert light.unique_id == "00:21:2E:FF:FF:00:73:9F-0A"
 
-    mock_callback = Mock()
-    light.register_callback(mock_callback)
+    light.register_callback(mock_callback := Mock())
     assert light._callbacks
 
     event = {"state": {"xy": [0.1, 0.1]}}
@@ -609,8 +605,7 @@ async def test_create_lock(mock_aioresponse, deconz_light, deconz_called_with):
     assert lock.type == "Door Lock"
     assert lock.unique_id == "00:00:00:00:00:00:00:00-00"
 
-    mock_callback = Mock()
-    lock.register_callback(mock_callback)
+    lock.register_callback(mock_callback := Mock())
     assert lock._callbacks
 
     event = {"state": {"on": True}}
@@ -719,8 +714,7 @@ async def test_create_siren(mock_aioresponse, deconz_light, deconz_called_with):
     assert siren.type == "Warning device"
     assert siren.unique_id == "00:0d:6f:00:0f:ab:12:34-01"
 
-    mock_callback = Mock()
-    siren.register_callback(mock_callback)
+    siren.register_callback(mock_callback := Mock())
     assert siren._callbacks
 
     event = {"state": {ALERT_KEY: ALERT_LONG}}

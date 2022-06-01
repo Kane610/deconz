@@ -1925,8 +1925,7 @@ async def test_vibration_sensor(deconz_sensor):
     assert sensor.type == "ZHAVibration"
     assert sensor.unique_id == "00:15:8d:00:02:a5:21:24-01-0101"
 
-    mock_callback = Mock()
-    sensor.register_callback(mock_callback)
+    sensor.register_callback(mock_callback := Mock())
     assert sensor._callbacks
 
     event = {"state": {"lastupdated": "2019-03-15T10:15:17", "orientation": [0, 84, 6]}}

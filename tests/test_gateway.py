@@ -23,26 +23,21 @@ def count_subscribers(deconz_session) -> int:
         subscribers = 0
 
         def calc(subscriber_filters) -> int:
-            """"""
+            """Calculate subscriber per filter."""
             count = 0
             for filter in subscriber_filters.values():
                 count += len(filter)
             return count
 
         subscribers += calc(deconz_session.alarmsystems._subscribers)
-        print(subscribers)
         subscribers += calc(deconz_session.groups._subscribers)
-        print(subscribers)
         subscribers += calc(deconz_session.scenes._subscribers)
-        print(subscribers)
 
         for light in deconz_session.lights._handlers:
             subscribers += calc(light._subscribers)
-        print(subscribers)
 
         for sensor in deconz_session.sensors._handlers:
             subscribers += calc(sensor._subscribers)
-        print(subscribers)
 
         return subscribers
 
@@ -485,7 +480,6 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
 
     mock_sensor_callback.assert_called()
     assert deconz_session.sensors["1"].changed_keys == {"config", "reachable"}
-    print(session_subscription.call_args_list)
     session_subscription.assert_called_with(EventType.CHANGED, "1")
     assert not deconz_session.sensors["1"].reachable
     sensor_subscription.assert_called_once()
