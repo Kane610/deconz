@@ -21,18 +21,6 @@ def mock_aioresponse():
 
 
 @pytest.fixture
-async def deconz_session() -> Iterator[DeconzSession]:
-    """Return deCONZ gateway session.
-
-    Clean up sessions automatically at the end of each test.
-    """
-    session = aiohttp.ClientSession()
-    controller = DeconzSession(session, "host", 80, "apikey")
-    yield controller
-    await session.close()
-
-
-@pytest.fixture
 def deconz_called_with(mock_aioresponse):
     """Verify deCONZ call was made with the expected parameters."""
 
@@ -53,6 +41,18 @@ def deconz_called_with(mock_aioresponse):
         return False
 
     yield verify_call
+
+
+@pytest.fixture
+async def deconz_session() -> Iterator[DeconzSession]:
+    """Return deCONZ gateway session.
+
+    Clean up sessions automatically at the end of each test.
+    """
+    session = aiohttp.ClientSession()
+    controller = DeconzSession(session, "host", 80, "apikey")
+    yield controller
+    await session.close()
 
 
 @pytest.fixture

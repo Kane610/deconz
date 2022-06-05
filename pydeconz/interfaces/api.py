@@ -12,7 +12,7 @@ from ..models.event import Event, EventType
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
-
+CallbackType = Callable[[EventType, str], None]
 SubscriptionType = tuple[
     Callable[[EventType, str], None],
     Optional[tuple[EventType, ...]],
@@ -89,7 +89,7 @@ class APIItems(Generic[DataResource]):
 
     def subscribe(
         self,
-        callback: Callable[[EventType, str], None],
+        callback: CallbackType,
         event_filter: tuple[EventType, ...] | EventType | None = None,
         id_filter: tuple[str] | str | None = None,
     ) -> UnsubscribeType:
@@ -156,7 +156,7 @@ class GroupedAPIItems(Generic[DataResource]):
     ) -> None:
         """Initialize sensor manager."""
         self.gateway = gateway
-        self._items = api_items
+        self._handlers = api_items
 
         self._type_to_handler: dict[ResourceType, APIItems[DataResource]] = {
             resource_type: handler
@@ -182,30 +182,30 @@ class GroupedAPIItems(Generic[DataResource]):
         """Process event."""
         if event.type == EventType.CHANGED and event.id in self:
             self.process_item(event.id, event.changed_data)
-            return
 
-        if event.type == EventType.ADDED and event.id not in self:
+        elif event.type == EventType.ADDED and event.id not in self:
             self.process_item(event.id, event.added_data)
 
     def process_item(self, id: str, raw: dict[str, Any]) -> None:
         """Process item data."""
-        if obj := self.get(id):
-            obj.update(raw)
-            return
+        for handler in self._handlers:
+            if id in handler:
+                handler.process_item(id, raw)
+                return
 
         handler = self._type_to_handler[ResourceType(raw.get("type"))]
         handler.process_item(id, raw)
 
     def subscribe(
         self,
-        callback: Callable[[EventType, str], None],
+        callback: CallbackType,
         event_filter: tuple[EventType, ...] | EventType | None = None,
         id_filter: tuple[str] | str | None = None,
     ) -> UnsubscribeType:
         """Subscribe to state changes for all grouped resources."""
         subscribers = [
-            x.subscribe(callback, event_filter=event_filter, id_filter=id_filter)
-            for x in self._items
+            h.subscribe(callback, event_filter=event_filter, id_filter=id_filter)
+            for h in self._handlers
         ]
 
         def unsubscribe() -> None:
@@ -216,19 +216,19 @@ class GroupedAPIItems(Generic[DataResource]):
 
     def items(self) -> Iterable[tuple[str, DataResource]]:
         """Return items."""
-        return itertools.chain.from_iterable(i.items() for i in self._items)
+        return itertools.chain.from_iterable(h.items() for h in self._handlers)
 
     def keys(self) -> list[str]:
         """Return item keys."""
-        return [k for i in self._items for k in i]
+        return [id for h in self._handlers for id in h]
 
     def values(self) -> list[DataResource]:
         """Return item values."""
-        return [v for i in self._items for v in i.values()]
+        return [item for h in self._handlers for item in h.values()]
 
     def get(self, id: str, default: Any = None) -> DataResource | None:
         """Get item value based on key, if no match return default."""
-        return next((i[id] for i in self._items if id in i), default)
+        return next((h[id] for h in self._handlers if id in h), default)
 
     def __getitem__(self, id: str) -> DataResource:
         """Get item value based on key."""

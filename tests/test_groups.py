@@ -157,8 +157,7 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
     assert group.type == "LightGroup"
     assert group.unique_id == ""
 
-    mock_callback = Mock()
-    group.register_callback(mock_callback)
+    group.register_callback(mock_callback := Mock())
     assert group._callbacks
 
     event = {"state": {"all_on": False, "any_on": False}}

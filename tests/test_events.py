@@ -33,14 +33,13 @@ async def test_event_handler(event_filter, resource_filter, expected):
     event_handler = EventHandler(gateway=Mock())
     assert event_handler
 
-    mock_callback = Mock()
     filters = {}
     if event_filter:
         filters["event_filter"] = event_filter
     if resource_filter:
         filters["resource_filter"] = resource_filter
 
-    unsubscribe_callback = event_handler.subscribe(mock_callback, **filters)
+    unsubscribe_callback = event_handler.subscribe(mock_callback := Mock(), **filters)
     assert len(event_handler._subscribers) == 1
     assert unsubscribe_callback
 

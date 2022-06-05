@@ -8,9 +8,40 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz import BridgeBusy, RequestError, ResponseError, ERRORS, pydeconzException
+from pydeconz.models.event import EventType
 from pydeconz.websocket import STATE_RUNNING, STATE_STOPPED
 
 import aiohttp
+
+
+@pytest.fixture
+def count_subscribers(deconz_session) -> int:
+    """Count the amount of subscribers in all handlers."""
+
+    def calculate():
+        """Count subscribers."""
+        subscribers = 0
+
+        def calc(subscriber_filters) -> int:
+            """Calculate subscriber per filter."""
+            count = 0
+            for filter in subscriber_filters.values():
+                count += len(filter)
+            return count
+
+        subscribers += calc(deconz_session.alarmsystems._subscribers)
+        subscribers += calc(deconz_session.groups._subscribers)
+        subscribers += calc(deconz_session.scenes._subscribers)
+
+        for light in deconz_session.lights._handlers:
+            subscribers += calc(light._subscribers)
+
+        for sensor in deconz_session.sensors._handlers:
+            subscribers += calc(sensor._subscribers)
+
+        return subscribers
+
+    yield calculate
 
 
 async def test_websocket_not_setup(deconz_session, mock_wsclient):
@@ -44,9 +75,16 @@ async def test_websocket_config_provided_websocket_port(
     session.websocket.stop.assert_called()
 
 
-async def test_initial_state(deconz_refresh_state):
+async def test_initial_state(deconz_session, deconz_refresh_state, count_subscribers):
     """Test refresh_state creates devices as expected."""
-    session = await deconz_refresh_state(
+    assert (
+        count_subscribers() == 2
+    )  # Group subscribed to lights, scene subscribed to groups
+
+    unsub = deconz_session.subscribe(session_subscription := Mock())
+    assert count_subscribers() == 34
+
+    await deconz_refresh_state(
         alarm_systems={"0": {}},
         config={"bridgeid": "012345"},
         groups={
@@ -60,19 +98,24 @@ async def test_initial_state(deconz_refresh_state):
         sensors={"s1": {"type": "ZHAPresence"}},
     )
 
-    assert session.config.bridge_id == "012345"
+    assert session_subscription.call_count == 4
 
-    assert "0" in session.alarmsystems
-    assert "g1" in session.groups
-    assert "l1" in session.lights
-    assert "g1_sc1" in session.scenes
-    assert "s1" in session.sensors
+    assert deconz_session.config.bridge_id == "012345"
 
-    assert session.groups["g1"].id == "gid"
-    assert session.groups["g1"].deconz_id == "/groups/g1"
-    assert session.lights["l1"].deconz_id == "/lights/l1"
-    assert session.scenes["g1_sc1"].deconz_id == "/groups/g1/scenes/sc1"
-    assert session.sensors["s1"].deconz_id == "/sensors/s1"
+    assert "0" in deconz_session.alarmsystems
+    assert "g1" in deconz_session.groups
+    assert "l1" in deconz_session.lights
+    assert "g1_sc1" in deconz_session.scenes
+    assert "s1" in deconz_session.sensors
+
+    assert deconz_session.groups["g1"].id == "gid"
+    assert deconz_session.groups["g1"].deconz_id == "/groups/g1"
+    assert deconz_session.lights["l1"].deconz_id == "/lights/l1"
+    assert deconz_session.scenes["g1_sc1"].deconz_id == "/groups/g1/scenes/sc1"
+    assert deconz_session.sensors["s1"].deconz_id == "/sensors/s1"
+
+    unsub()
+    assert count_subscribers() == 2
 
 
 async def test_get_api_key(mock_aioresponse, deconz_session):
@@ -247,7 +290,7 @@ async def test_incomplete_event(deconz_session):
 
 async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
-    deconz_session.add_device_callback = Mock()
+    deconz_session.subscribe(session_subscription := Mock())
 
     # Add alarmsystem
 
@@ -284,14 +327,13 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
 
     assert "1" in deconz_session.alarmsystems
     assert deconz_session.alarmsystems["1"].arm_state == "disarmed"
-    deconz_session.add_device_callback.assert_called_with(
-        "alarmsystems", deconz_session.alarmsystems["1"]
-    )
+    session_subscription.assert_called_once_with(EventType.ADDED, "1")
 
     # Update alarmsystem
 
-    mock_alarmsystem_callback = Mock()
-    deconz_session.alarmsystems["1"].register_callback(mock_alarmsystem_callback)
+    deconz_session.alarmsystems["1"].register_callback(
+        mock_alarmsystem_callback := Mock()
+    )
     await mock_websocket_event(
         resource="alarmsystems",
         id="1",
@@ -305,7 +347,7 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
 
 async def test_light_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
-    deconz_session.add_device_callback = Mock()
+    deconz_session.subscribe(session_subscription := Mock())
 
     # Add light
 
@@ -327,14 +369,11 @@ async def test_light_events(deconz_session, mock_websocket_event):
 
     assert "1" in deconz_session.lights
     assert deconz_session.lights["1"].brightness == 1
-    deconz_session.add_device_callback.assert_called_with(
-        "lights", deconz_session.lights["1"]
-    )
+    session_subscription.assert_called_once_with(EventType.ADDED, "1")
 
     # Update light
 
-    mock_light_callback = Mock()
-    deconz_session.lights["1"].register_callback(mock_light_callback)
+    deconz_session.lights["1"].register_callback(mock_light_callback := Mock())
     await mock_websocket_event(
         resource="lights",
         id="1",
@@ -349,11 +388,11 @@ async def test_light_events(deconz_session, mock_websocket_event):
 
 async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket_event):
     """Test event_handler works."""
-    deconz_session.add_device_callback = Mock()
+    deconz_session.subscribe(session_subscription := Mock())
 
     await deconz_refresh_state(
         lights={
-            "1": {
+            "2": {
                 "type": "On/Off light",
                 "state": {
                     "bri": 1,
@@ -372,7 +411,7 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
         data={
             "group": {
                 "action": {"bri": 1},
-                "lights": ["1"],
+                "lights": ["2"],
                 "scenes": [],
                 "state": {"any_on": False},
             }
@@ -381,14 +420,13 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
 
     assert "1" in deconz_session.groups
     assert deconz_session.groups["1"].brightness == 1
-    deconz_session.add_device_callback.assert_called_with(
-        "groups", deconz_session.groups["1"]
-    )
+    assert session_subscription.call_count == 2
+    session_subscription.assert_any_call(EventType.ADDED, "1")
+    session_subscription.assert_any_call(EventType.ADDED, "2")
 
     # Update group
 
-    mock_group_callback = Mock()
-    deconz_session.groups["1"].register_callback(mock_group_callback)
+    deconz_session.groups["1"].register_callback(mock_group_callback := Mock())
     await mock_websocket_event(
         resource="groups",
         id="1",
@@ -402,9 +440,8 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
 
 async def test_sensor_events(deconz_session, mock_websocket_event):
     """Test event_handler works."""
-    sensor_subscription = Mock()
-    unsub_sensor_mock = deconz_session.sensors.subscribe(sensor_subscription)
-    deconz_session.add_device_callback = Mock()
+    unsub_sensor_mock = deconz_session.sensors.subscribe(sensor_subscription := Mock())
+    deconz_session.subscribe(session_subscription := Mock())
 
     # Add sensor
 
@@ -425,16 +462,13 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
 
     assert "1" in deconz_session.sensors
     assert deconz_session.sensors["1"].reachable
-    deconz_session.add_device_callback.assert_called_with(
-        "sensors", deconz_session.sensors["1"]
-    )
+    session_subscription.assert_called_once_with(EventType.ADDED, "1")
     sensor_subscription.assert_called_once()
     unsub_sensor_mock()
 
     # Update sensor
 
-    mock_sensor_callback = Mock()
-    deconz_session.sensors["1"].register_callback(mock_sensor_callback)
+    deconz_session.sensors["1"].register_callback(mock_sensor_callback := Mock())
     await mock_websocket_event(
         resource="sensors",
         id="1",
@@ -446,6 +480,7 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
 
     mock_sensor_callback.assert_called()
     assert deconz_session.sensors["1"].changed_keys == {"config", "reachable"}
+    session_subscription.assert_called_with(EventType.CHANGED, "1")
     assert not deconz_session.sensors["1"].reachable
     sensor_subscription.assert_called_once()
 
