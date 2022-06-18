@@ -6,10 +6,8 @@ import enum
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
-from ..models.sensor import *  # noqa: F401, F403
 from ..models.sensor.air_quality import AirQuality
 from ..models.sensor.alarm import Alarm
-from ..models.sensor.ancillary_control import *  # noqa: F401, F403
 from ..models.sensor.ancillary_control import AncillaryControl
 from ..models.sensor.battery import Battery
 from ..models.sensor.carbon_monoxide import CarbonMonoxide
@@ -23,14 +21,18 @@ from ..models.sensor.humidity import Humidity
 from ..models.sensor.light_level import LightLevel
 from ..models.sensor.open_close import OpenClose
 from ..models.sensor.power import Power
-from ..models.sensor.presence import *  # noqa: F401, F403
 from ..models.sensor.presence import Presence
 from ..models.sensor.pressure import Pressure
-from ..models.sensor.switch import *  # noqa: F401, F403
 from ..models.sensor.switch import Switch
 from ..models.sensor.temperature import Temperature
-from ..models.sensor.thermostat import *  # noqa: F401, F403
-from ..models.sensor.thermostat import Thermostat
+from ..models.sensor.thermostat import (
+    Thermostat,
+    ThermostatFanMode,
+    ThermostatMode,
+    ThermostatPreset,
+    ThermostatSwingMode,
+    ThermostatTemperatureMeasurement,
+)
 from ..models.sensor.time import Time
 from ..models.sensor.vibration import Vibration
 from ..models.sensor.water import Water
@@ -94,112 +96,6 @@ class SwitchWindowCoveringType(enum.IntEnum):
     TILTBLINDLIFTONLY = 7
     TILTBLINDLIFTANDTILT = 8
     PROJECTORSCREEN = 9
-
-
-class ThermostatFanMode(enum.Enum):
-    """Fan mode.
-
-    Supported values:
-    - "off"
-    - "low"
-    - "medium"
-    - "high"
-    - "on"
-    - "auto"
-    - "smart"
-    Modes are device dependent and only exposed for devices supporting it.
-    """
-
-    OFF = "off"
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    ON = "on"
-    AUTO = "auto"
-    SMART = "smart"
-
-
-class ThermostatMode(enum.Enum):
-    """Set the current operating mode of a thermostat.
-
-    Supported values:
-    - "off"
-    - "auto"
-    - "cool"
-    - "heat"
-    - "emergency heating"
-    - "precooling"
-    - "fan only"
-    - "dry"
-    - "sleep"
-    Modes are device dependent and only exposed for devices supporting it.
-    """
-
-    OFF = "off"
-    AUTO = "auto"
-    COOL = "cool"
-    HEAT = "heat"
-    EMERGENCYHEATING = "emergency heating"
-    PRECOOLING = "precooling"
-    FANONLY = "fan only"
-    DRY = "dry"
-    SLEEP = "sleep"
-
-
-class ThermostatSwingMode(enum.Enum):
-    """Set the AC louvers position.
-
-    Supported values:
-    - "fully closed"
-    - "fully open"
-    - "quarter open"
-    - "half open"
-    - "three quarters open"
-    Modes are device dependent and only exposed for devices supporting it.
-    """
-
-    FULLYCLOSED = "fully closed"
-    FULLYOPEN = "fully open"
-    QUARTEROPEN = "quarter open"
-    HALFOPEN = "half open"
-    THREEQUARTERSOPEN = "three quarters open"
-
-
-class ThermostatPreset(enum.Enum):
-    """Set the current operating mode for Tuya thermostats.
-
-    Supported values:
-    - "holiday"
-    - "auto"
-    - "manual"
-    - "comfort"
-    - "eco"
-    - "boost"
-    - "complex"
-    Modes are device dependent and only exposed for devices supporting it.
-    """
-
-    HOLIDAY = "holiday"
-    AUTO = "auto"
-    MANUAL = "manual"
-    COMFORT = "comfort"
-    ECO = "eco"
-    BOOST = "boost"
-    COMPLEX = "complex"
-
-
-class ThermostatTemperatureMeasurement(enum.Enum):
-    """Set the mode of operation for Elko Super TR thermostat.
-
-    Supported values:
-    - "air sensor"
-    - "floor sensor"
-    - "floor protection"
-    """
-
-    AIRSENSOR = "air sensor"
-    FLOORSENSOR = "floor sensor"
-    FLOORPROTECTION = "floor protection"
 
 
 class AirQualityHandler(APIItems[AirQuality]):

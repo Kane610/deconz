@@ -2,45 +2,155 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal, TypedDict
+import enum
+import logging
+from typing import Literal, TypedDict
 
 from . import SensorBase
 
-THERMOSTAT_MODE_AUTO: Final = "auto"
-THERMOSTAT_MODE_COOL: Final = "cool"
-THERMOSTAT_MODE_DRY: Final = "dry"
-THERMOSTAT_MODE_FAN_ONLY: Final = "fan only"
-THERMOSTAT_MODE_HEAT: Final = "heat"
-THERMOSTAT_MODE_EMERGENCY_HEATING: Final = "emergency heating"
-THERMOSTAT_MODE_OFF: Final = "off"
-THERMOSTAT_MODE_PRECOOLING: Final = "precooling"
-THERMOSTAT_MODE_SLEEP: Final = "sleep"
+LOGGER = logging.getLogger(__name__)
 
-THERMOSTAT_FAN_MODE_AUTO: Final = "auto"
-THERMOSTAT_FAN_MODE_HIGH: Final = "high"
-THERMOSTAT_FAN_MODE_LOW: Final = "low"
-THERMOSTAT_FAN_MODE_MEDIUM: Final = "medium"
-THERMOSTAT_FAN_MODE_OFF: Final = "off"
-THERMOSTAT_FAN_MODE_ON: Final = "on"
-THERMOSTAT_FAN_MODE_SMART: Final = "smart"
 
-THERMOSTAT_PRESET_AUTO: Final = "auto"
-THERMOSTAT_PRESET_BOOST: Final = "boost"
-THERMOSTAT_PRESET_COMFORT: Final = "comfort"
-THERMOSTAT_PRESET_COMPLEX: Final = "complex"
-THERMOSTAT_PRESET_ECO: Final = "eco"
-THERMOSTAT_PRESET_HOLIDAY: Final = "holiday"
-THERMOSTAT_PRESET_MANUAL: Final = "manual"
+class ThermostatFanMode(enum.Enum):
+    """Fan mode.
 
-THERMOSTAT_SWING_MODE_FULLY_CLOSED: Final = "fully closed"
-THERMOSTAT_SWING_MODE_FULLY_OPEN: Final = "fully open"
-THERMOSTAT_SWING_MODE_HALF_OPEN: Final = "half open"
-THERMOSTAT_SWING_MODE_QUARTER_OPEN: Final = "quarter open"
-THERMOSTAT_SWING_MODE_THREE_QUARTERS_OPEN: Final = "three quarters open"
+    Supported values:
+    - "off"
+    - "low"
+    - "medium"
+    - "high"
+    - "on"
+    - "auto"
+    - "smart"
+    """
 
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_AIR_SENSOR: Final = "air sensor"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_PROTECTION: Final = "floor protection"
-THERMOSTAT_TEMPERATURE_MEASUREMENT_MODE_FLOOR_SENSOR: Final = "floor sensor"
+    OFF = "off"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    ON = "on"
+    AUTO = "auto"
+    SMART = "smart"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ThermostatFanMode":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected thermostat fan mode %s", value)
+        return ThermostatFanMode.UNKNOWN
+
+
+class ThermostatMode(enum.Enum):
+    """Set the current operating mode of a thermostat.
+
+    Supported values:
+    - "off"
+    - "auto"
+    - "cool"
+    - "heat"
+    - "emergency heating"
+    - "precooling"
+    - "fan only"
+    - "dry"
+    - "sleep"
+    """
+
+    OFF = "off"
+    AUTO = "auto"
+    COOL = "cool"
+    HEAT = "heat"
+    EMERGENCYHEATING = "emergency heating"
+    PRECOOLING = "precooling"
+    FANONLY = "fan only"
+    DRY = "dry"
+    SLEEP = "sleep"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ThermostatMode":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected thermostat mode %s", value)
+        return ThermostatMode.UNKNOWN
+
+
+class ThermostatSwingMode(enum.Enum):
+    """Set the AC louvers position.
+
+    Supported values:
+    - "fully closed"
+    - "fully open"
+    - "quarter open"
+    - "half open"
+    - "three quarters open"
+    """
+
+    FULLYCLOSED = "fully closed"
+    FULLYOPEN = "fully open"
+    QUARTEROPEN = "quarter open"
+    HALFOPEN = "half open"
+    THREEQUARTERSOPEN = "three quarters open"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ThermostatSwingMode":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected thermostat swing mode %s", value)
+        return ThermostatSwingMode.UNKNOWN
+
+
+class ThermostatPreset(enum.Enum):
+    """Set the current operating mode for Tuya thermostats.
+
+    Supported values:
+    - "holiday"
+    - "auto"
+    - "manual"
+    - "comfort"
+    - "eco"
+    - "boost"
+    - "complex"
+    """
+
+    HOLIDAY = "holiday"
+    AUTO = "auto"
+    MANUAL = "manual"
+    COMFORT = "comfort"
+    ECO = "eco"
+    BOOST = "boost"
+    COMPLEX = "complex"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ThermostatPreset":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected thermostat preset %s", value)
+        return ThermostatPreset.UNKNOWN
+
+
+class ThermostatTemperatureMeasurement(enum.Enum):
+    """Set the mode of operation for Elko Super TR thermostat.
+
+    Supported values:
+    - "air sensor"
+    - "floor sensor"
+    - "floor protection"
+    """
+
+    AIRSENSOR = "air sensor"
+    FLOORSENSOR = "floor sensor"
+    FLOORPROTECTION = "floor protection"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ThermostatTemperatureMeasurement":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected thermostat temperature measurement %s", value)
+        return ThermostatTemperatureMeasurement.UNKNOWN
 
 
 class TypedThermostatConfig(TypedDict):
@@ -102,12 +212,20 @@ class Thermostat(SensorBase):
     raw: TypedThermostat
 
     @property
-    def cooling_setpoint(self) -> float | None:
+    def cooling_setpoint(self) -> int | None:
         """Cooling setpoint.
 
         700-3500.
         """
-        if temperature := self.raw["config"].get("coolsetpoint"):
+        return self.raw["config"].get("coolsetpoint")
+
+    @property
+    def scaled_cooling_setpoint(self) -> float | None:
+        """Cooling setpoint.
+
+        7-35.
+        """
+        if temperature := self.cooling_setpoint:
             return round(temperature / 100, 1)
         return None
 
@@ -122,13 +240,21 @@ class Thermostat(SensorBase):
         return self.raw["state"].get("errorcode")
 
     @property
-    def external_sensor_temperature(self) -> float | None:
+    def external_sensor_temperature(self) -> int | None:
         """Track temperature value provided by an external sensor.
 
         -32768–32767.
-        Modes are device dependent and only exposed for devices supporting it.
+        Device dependent and only exposed for devices supporting it.
         """
-        if temperature := self.raw["config"].get("externalsensortemp"):
+        return self.raw["config"].get("externalsensortemp")
+
+    @property
+    def scaled_external_sensor_temperature(self) -> float | None:
+        """Track temperature value provided by an external sensor.
+
+        -327–327.
+        """
+        if temperature := self.external_sensor_temperature:
             return round(temperature / 100, 1)
         return None
 
@@ -136,32 +262,26 @@ class Thermostat(SensorBase):
     def external_window_open(self) -> bool | None:
         """Track open/close state of an external sensor.
 
-        Modes are device dependent and only exposed for devices supporting it.
+        Device dependent and only exposed for devices supporting it.
         """
         return self.raw["config"].get("externalwindowopen")
 
     @property
-    def fan_mode(
-        self,
-    ) -> Literal["off", "low", "medium", "high", "on", "auto", "smart"] | None:
-        """Fan mode.
-
-        Supported values:
-        - "off"
-        - "low"
-        - "medium"
-        - "high"
-        - "on"
-        - "auto"
-        - "smart"
-        Modes are device dependent and only exposed for devices supporting it.
-        """
-        return self.raw["config"].get("fanmode")
+    def fan_mode(self) -> ThermostatFanMode | None:
+        """Fan mode."""
+        if "fanmode" in self.raw["config"]:
+            return ThermostatFanMode(self.raw["config"]["fanmode"])
+        return None
 
     @property
-    def floor_temperature(self) -> float | None:
+    def floor_temperature(self) -> int | None:
         """Floor temperature."""
-        if temperature := self.raw["state"].get("floortemperature"):
+        return self.raw["state"].get("floortemperature")
+
+    @property
+    def scaled_floor_temperature(self) -> float | None:
+        """Floor temperature."""
+        if temperature := self.floor_temperature:
             return round(temperature / 100, 1)
         return None
 
@@ -171,12 +291,20 @@ class Thermostat(SensorBase):
         return self.raw["state"].get("heating")
 
     @property
-    def heating_setpoint(self) -> float | None:
+    def heating_setpoint(self) -> int | None:
         """Heating setpoint.
 
         500-3200.
         """
-        if temperature := self.raw["config"].get("heatsetpoint"):
+        return self.raw["config"].get("heatsetpoint")
+
+    @property
+    def scaled_heating_setpoint(self) -> float | None:
+        """Heating setpoint.
+
+        5-32.
+        """
+        if temperature := self.heating_setpoint:
             return round(temperature / 100, 1)
         return None
 
@@ -186,34 +314,11 @@ class Thermostat(SensorBase):
         return self.raw["config"].get("locked")
 
     @property
-    def mode(
-        self,
-    ) -> Literal[
-        "off",
-        "auto",
-        "cool",
-        "heat",
-        "emergency heating",
-        "precooling",
-        "fan only",
-        "dry",
-        "sleep",
-    ] | None:
-        """Set the current operating mode of a thermostat.
-
-        Supported values:
-        - "off"
-        - "auto"
-        - "cool"
-        - "heat"
-        - "emergency heating"
-        - "precooling"
-        - "fan only"
-        - "dry"
-        - "sleep"
-        Modes are device dependent and only exposed for devices supporting it.
-        """
-        return self.raw["config"].get("mode")
+    def mode(self) -> ThermostatMode | None:
+        """Set the current operating mode of a thermostat."""
+        if "mode" in self.raw["config"]:
+            return ThermostatMode(self.raw["config"]["mode"])
+        return None
 
     @property
     def mounting_mode(self) -> bool | None:
@@ -227,28 +332,18 @@ class Thermostat(SensorBase):
 
     @property
     def offset(self) -> int | None:
-        """Add a signed offset value to measured temperature and humidity state values. Values send by the REST-API are already amended by the offset."""
+        """Add a signed offset value to measured temperature and humidity state values.
+
+        Values send by the REST-API are already amended by the offset.
+        """
         return self.raw["config"].get("offset")
 
     @property
-    def preset(
-        self,
-    ) -> Literal[
-        "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
-    ] | None:
-        """Set the current operating mode for Tuya thermostats.
-
-        Supported values:
-        - "holiday"
-        - "auto"
-        - "manual"
-        - "comfort"
-        - "eco"
-        - "boost"
-        - "complex"
-        Modes are device dependent and only exposed for devices supporting it.
-        """
-        return self.raw["config"].get("preset")
+    def preset(self) -> ThermostatPreset | None:
+        """Set the current operating mode for Tuya thermostats."""
+        if "preset" in self.raw["config"]:
+            return ThermostatPreset(self.raw["config"]["preset"])
+        return None
 
     @property
     def schedule_enabled(self) -> bool | None:
@@ -261,26 +356,11 @@ class Thermostat(SensorBase):
         return self.raw["state"].get("on")
 
     @property
-    def swing_mode(
-        self,
-    ) -> Literal[
-        "fully closed",
-        "fully open",
-        "quarter open",
-        "half open",
-        "three quarters open",
-    ] | None:
-        """Set the AC louvers position.
-
-        Supported values:
-        - "fully closed"
-        - "fully open"
-        - "quarter open"
-        - "half open"
-        - "three quarters open"
-        Modes are device dependent and only exposed for devices supporting it.
-        """
-        return self.raw["config"].get("swingmode")
+    def swing_mode(self) -> ThermostatSwingMode | None:
+        """Set the AC louvers position."""
+        if "swingmode" in self.raw["config"]:
+            return ThermostatSwingMode(self.raw["config"]["swingmode"])
+        return None
 
     @property
     def temperature(self) -> int:
@@ -293,17 +373,13 @@ class Thermostat(SensorBase):
         return round(self.temperature / 100, 1)
 
     @property
-    def temperature_measurement(
-        self,
-    ) -> Literal["air sensor", "floor sensor", "floor protection"] | None:
-        """Set the mode of operation for Elko Super TR thermostat.
-
-        Supported values:
-        - "air sensor"
-        - "floor sensor"
-        - "floor protection"
-        """
-        return self.raw["config"].get("temperaturemeasurement")
+    def temperature_measurement(self) -> ThermostatTemperatureMeasurement | None:
+        """Set the mode of operation for Elko Super TR thermostat."""
+        if "temperaturemeasurement" in self.raw["config"]:
+            return ThermostatTemperatureMeasurement(
+                self.raw["config"]["temperaturemeasurement"]
+            )
+        return None
 
     @property
     def valve(self) -> int | None:
@@ -314,133 +390,6 @@ class Thermostat(SensorBase):
     def window_open_detection(self) -> bool | None:
         """Set if window open detection shall be active or inactive for Tuya thermostats.
 
-        (Support is device dependent).
+        Device dependent and only exposed for devices supporting it.
         """
         return self.raw["config"].get("windowopen_set")
-
-    async def set_config(
-        self,
-        cooling_setpoint: int | None = None,
-        enable_schedule: bool | None = None,
-        external_sensor_temperature: int | None = None,
-        external_window_open: bool | None = None,
-        fan_mode: Literal["off", "low", "medium", "high", "on", "auto", "smart"]
-        | str
-        | None = None,
-        flip_display: bool | None = None,
-        heating_setpoint: int | None = None,
-        locked: bool | None = None,
-        mode: Literal[
-            "off",
-            "auto",
-            "cool",
-            "heat",
-            "emergency heating",
-            "precooling",
-            "fan only",
-            "dry",
-            "sleep",
-        ]
-        | str
-        | None = None,
-        mounting_mode: bool | None = None,
-        on: bool | None = None,
-        preset: Literal[
-            "holiday", "auto", "manual", "comfort", "eco", "boost", "complex"
-        ]
-        | str
-        | None = None,
-        schedule: list[str] | None = None,
-        set_valve: bool | None = None,
-        swing_mode: Literal[
-            "fully closed",
-            "fully open",
-            "quarter open",
-            "half open",
-            "three quarters open",
-        ]
-        | str
-        | None = None,
-        temperature_measurement: Literal[
-            "air sensor", "floor sensor", "floor protection"
-        ]
-        | str
-        | None = None,
-        window_open_detection: bool | None = None,
-    ) -> dict[str, Any]:
-        """Change config of thermostat.
-
-        Supported values:
-        - cooling_setpoint [int] 700-3500
-        - enable_schedule [bool] True/False
-        - external_sensor_temperature [int] -32768-32767
-        - external_window_open [bool] True/False
-        - fan_mode [str]
-          - "auto"
-          - "high"
-          - "low"
-          - "medium"
-          - "off"
-          - "on"
-          - "smart"
-        - flip_display [bool] True/False
-        - heating_setpoint [int] 500-3200
-        - locked [bool] True/False
-        - mode [str]
-          - "auto"
-          - "cool"
-          - "dry"
-          - "emergency heating"
-          - "fan only"
-          - "heat"
-          - "off"
-          - "precooling"
-          - "sleep"
-        - mounting_mode [bool] True/False
-        - on [bool] True/False
-        - preset [str]
-          - "auto"
-          - "boost"
-          - "comfort"
-          - "complex"
-          - "eco"
-          - "holiday"
-          - "manual"
-        - schedule [list]
-        - set_valve [bool] True/False
-        - swing_mode [str]
-          - "fully closed"
-          - "fully open"
-          - "half open"
-          - "quarter open"
-          - "three quarters open"
-        - temperature_measurement [str]
-          - "air sensor"
-          - "floor protection"
-          - "floor sensor"
-        - window_open_detection [bool] True/False
-        """
-        data = {
-            key: value
-            for key, value in {
-                "coolsetpoint": cooling_setpoint,
-                "schedule_on": enable_schedule,
-                "externalsensortemp": external_sensor_temperature,
-                "externalwindowopen": external_window_open,
-                "fanmode": fan_mode,
-                "displayflipped": flip_display,
-                "heatsetpoint": heating_setpoint,
-                "locked": locked,
-                "mode": mode,
-                "mountingmode": mounting_mode,
-                "on": on,
-                "preset": preset,
-                "schedule": schedule,
-                "setvalve": set_valve,
-                "swingmode": swing_mode,
-                "temperaturemeasurement": temperature_measurement,
-                "windowopen_set": window_open_detection,
-            }.items()
-            if value is not None
-        }
-        return await self.request(field=f"{self.deconz_id}/config", data=data)
