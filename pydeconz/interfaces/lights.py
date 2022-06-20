@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+import logging
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
@@ -18,6 +19,8 @@ from .api import APIItems, GroupedAPIItems
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
+LOGGER = logging.getLogger(__name__)
+
 
 class Alert(enum.Enum):
     """Temporary alert effect.
@@ -30,6 +33,23 @@ class Alert(enum.Enum):
     NONE = "none"
     LONG = "lselect"
     SHORT = "select"
+
+    # Specific to Hue color bulbs
+
+    BLINK = "blink"
+    BREATHE = "breathe"
+    CHANNEL_CHANGE = "channelchange"
+    FINISH = "finish"
+    OKAY = "okay"
+    STOP = "stop"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "Alert":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light alert type %s", value)
+        return Alert.UNKNOWN
 
 
 class CoverAction(enum.Enum):
@@ -49,6 +69,33 @@ class Effect(enum.Enum):
 
     COLORLOOP = "colorloop"
     NONE = "none"
+
+    # Specific to Lidl christmas light
+
+    CARNIVAL = "carnival"
+    COLLIDE = "collide"
+    FADING = "fading"
+    FIREWORKS = "fireworks"
+    FLAG = "flag"
+    GLOW = "glow"
+    RAINBOW = "rainbow"
+    SNAKE = "snake"
+    SNOW = "snow"
+    SPARKLES = "sparkles"
+    STEADY = "steady"
+    STROBE = "strobe"
+    TWINKLE = "twinkle"
+    UPDOWN = "updown"
+    VINTAGE = "vintage"
+    WAVES = "waves"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "Effect":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light effect type %s", value)
+        return Effect.UNKNOWN
 
 
 class FanSpeed(enum.Enum):
