@@ -2,9 +2,31 @@
 
 from __future__ import annotations
 
+import enum
+import logging
 from typing import Any, Literal, TypedDict
 
 from . import LightBase
+
+LOGGER = logging.getLogger(__name__)
+
+
+class ColorCapability(enum.IntFlag):
+    """Bit field of features supported by a light device."""
+
+    HUE_SATURATION = 0
+    ENHANCED_HUE = 1
+    COLOR_LOOP = 2
+    XY_ATTRIBUTES = 4
+    COLOR_TEMPERATURE = 8
+
+    UNKNOWN = 1111
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ColorCapability":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light color capability %s", value)
+        return ColorCapability.UNKNOWN
 
 
 class TypedLightState(TypedDict):
@@ -24,6 +46,7 @@ class TypedLightState(TypedDict):
 class TypedLight(TypedDict):
     """Light type definition."""
 
+    colorcapabilities: int
     ctmax: int
     ctmin: int
     state: TypedLightState
@@ -57,6 +80,13 @@ class Light(LightBase):
         but minimum brightness.
         """
         return self.raw["state"].get("bri")
+
+    @property
+    def color_capabilities(self) -> ColorCapability | None:
+        """Bit field to specify color capabilities of light."""
+        if "colorcapabilities" in self.raw:
+            return ColorCapability(self.raw["colorcapabilities"])
+        return None
 
     @property
     def color_temp(self) -> int | None:
