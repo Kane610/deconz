@@ -269,11 +269,11 @@ class SirenHandler(APIItems[Siren]):
         """
         data: dict[str, int | str] = {}
         if on:
-            data["alert"] = "lselect"
+            data["alert"] = Alert.LONG.value
             if duration is not None:
                 data["ontime"] = duration
         else:
-            data["alert"] = "none"
+            data["alert"] = Alert.NONE.value
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
