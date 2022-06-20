@@ -265,15 +265,14 @@ class SirenHandler(APIItems[Siren]):
     ) -> dict[str, Any]:
         """Turn on device.
 
-        Duration is counted as 1/10 of a second.
+        Duration is counted as 1/10th of a second.
         """
         data: dict[str, int | str] = {}
-        if on:
-            data["alert"] = "lselect"
-            if duration is not None:
-                data["ontime"] = duration
-        else:
-            data["alert"] = "none"
+
+        data["alert"] = (Alert.LONG if on else Alert.NONE).value
+        if on and duration is not None:
+            data["ontime"] = duration
+
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
