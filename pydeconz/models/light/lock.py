@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TypedDict
+from typing import TypedDict
 
 from . import LightBase
 
@@ -30,11 +30,3 @@ class Lock(LightBase):
     def is_locked(self) -> bool:
         """State of lock."""
         return self.raw["state"]["on"]
-
-    async def lock(self) -> dict[str, Any]:
-        """Lock the lock."""
-        return await self.request(field=f"{self.deconz_id}/state", data={"on": True})
-
-    async def unlock(self) -> dict[str, Any]:
-        """Unlock the lock."""
-        return await self.request(field=f"{self.deconz_id}/state", data={"on": False})

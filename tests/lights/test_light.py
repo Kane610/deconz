@@ -1,6 +1,6 @@
 """Test pydeCONZ light.
 
-pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz.models.light.light tests/sensors/test_light.py
+pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz.models.light.light tests/lights/test_light.py
 """
 
 from unittest.mock import Mock
