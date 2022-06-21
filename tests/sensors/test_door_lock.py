@@ -1,6 +1,6 @@
 """Test pydeCONZ door lock.
 
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.ancillary_control tests/sensors/test_ancillary_control.py
+pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.door_lock tests/sensors/test_door_lock.py
 """
 
 from pydeconz.models.sensor.door_lock import DoorLockLockState
@@ -19,7 +19,7 @@ async def test_control_door_lock(mock_aioresponse, deconz_session, deconz_called
     assert deconz_called_with("put", path="/sensors/0/config", json={"lock": False})
 
 
-async def test_door_lock_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
+async def test_door_lock_sensor(deconz_sensor):
     """Verify that door lock sensor works."""
     sensor = await deconz_sensor(
         {
