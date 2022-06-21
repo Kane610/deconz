@@ -2,32 +2,15 @@
 
 from __future__ import annotations
 
-import enum
 from typing import Any
 
 from ..models import ResourceGroup
-from ..models.alarm_system import AlarmSystem
+from ..models.alarm_system import (
+    AlarmSystem,
+    AlarmSystemArmAction,
+    AlarmSystemDeviceTrigger,
+)
 from .api import APIItems
-
-
-class ArmAction(enum.Enum):
-    """Explicit url path."""
-
-    AWAY = "arm_away"
-    NIGHT = "arm_night"
-    STAY = "arm_stay"
-    DISARM = "disarm"
-
-
-class DeviceTrigger(enum.Enum):
-    """Device trigger alternatives."""
-
-    ACTION = "state/action"
-    BUTTON_EVENT = "state/buttonevent"
-    ON = "state/on"
-    OPEN = "state/open"
-    PRESENCE = "state/presence"
-    VIBRATION = "state/vibration"
 
 
 class AlarmSystems(APIItems[AlarmSystem]):
@@ -88,7 +71,12 @@ class AlarmSystems(APIItems[AlarmSystem]):
             json=data,
         )
 
-    async def arm(self, id: str, action: ArmAction, pin_code: str) -> dict[str, Any]:
+    async def arm(
+        self,
+        id: str,
+        action: AlarmSystemArmAction,
+        pin_code: str,
+    ) -> dict[str, Any]:
         """Set the alarm to away."""
         return await self.gateway.request(
             "put",
@@ -103,7 +91,7 @@ class AlarmSystems(APIItems[AlarmSystem]):
         armed_away: bool = False,
         armed_night: bool = False,
         armed_stay: bool = False,
-        trigger: DeviceTrigger | None = None,
+        trigger: AlarmSystemDeviceTrigger | None = None,
         is_keypad: bool = False,
     ) -> dict[str, Any]:
         """Link device with alarm system.

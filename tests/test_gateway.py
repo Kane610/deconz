@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz import BridgeBusy, RequestError, ResponseError, ERRORS, pydeconzException
+from pydeconz.models.alarm_system import AlarmSystemArmState
 from pydeconz.models.event import EventType
 from pydeconz.websocket import STATE_RUNNING, STATE_STOPPED
 
@@ -326,7 +327,7 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     )
 
     assert "1" in deconz_session.alarmsystems
-    assert deconz_session.alarmsystems["1"].arm_state == "disarmed"
+    assert deconz_session.alarmsystems["1"].arm_state == AlarmSystemArmState.DISARMED
     session_subscription.assert_called_once_with(EventType.ADDED, "1")
 
     # Update alarmsystem
@@ -342,7 +343,7 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
 
     mock_alarmsystem_callback.assert_called()
     assert deconz_session.alarmsystems["1"].changed_keys == {"state", "armstate"}
-    assert deconz_session.alarmsystems["1"].arm_state == "armed_away"
+    assert deconz_session.alarmsystems["1"].arm_state == AlarmSystemArmState.ARMED_AWAY
 
 
 async def test_light_events(deconz_session, mock_websocket_event):
