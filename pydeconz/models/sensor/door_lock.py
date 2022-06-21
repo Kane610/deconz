@@ -1,8 +1,18 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, Literal, TypedDict
+import enum
+from typing import Literal, TypedDict
 
 from . import SensorBase
+
+
+class DoorLockLockState(enum.Enum):
+    """State the lock is in."""
+
+    LOCKED = "locked"
+    UNLOCKED = "unlocked"
+    UNDEFINED = "undefined"
+    NOT_FULLY_LOCKED = "not fully locked"
 
 
 class TypedDoorLockConfig(TypedDict):
@@ -34,37 +44,14 @@ class DoorLock(SensorBase):
     @property
     def is_locked(self) -> bool:
         """Return True if lock is locked."""
-        return self.lock_state == "locked"
+        return self.lock_state == DoorLockLockState.LOCKED
 
     @property
-    def lock_state(
-        self,
-    ) -> Literal["locked", "unlocked", "undefined", "not fully locked"]:
-        """State the lock is in.
-
-        Supported values:
-        - "locked"
-        - "unlocked"
-        - "undefined"
-        - "not fully locked"
-        """
-        return self.raw["state"]["lockstate"]
+    def lock_state(self) -> DoorLockLockState:
+        """State the lock is in."""
+        return DoorLockLockState(self.raw["state"]["lockstate"])
 
     @property
     def lock_configuration(self) -> bool:
         """Lock configuration."""
         return self.raw["config"]["lock"]
-
-    async def lock(self) -> dict[str, Any]:
-        """Lock the lock."""
-        return await self.request(
-            field=f"{self.deconz_id}/config",
-            data={"lock": True},
-        )
-
-    async def unlock(self) -> dict[str, Any]:
-        """Unlock the lock."""
-        return await self.request(
-            field=f"{self.deconz_id}/config",
-            data={"lock": False},
-        )
