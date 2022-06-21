@@ -2,17 +2,41 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Literal, TypedDict
+import enum
+from typing import Literal, TypedDict
 
 from . import SensorBase
 
-SWITCH_DEVICE_MODE_DUAL_PUSH_BUTTON: Final = "dualpushbutton"
-SWITCH_DEVICE_MODE_DUAL_ROCKER: Final = "dualrocker"
-SWITCH_DEVICE_MODE_SINGLE_PUSH_BUTTON: Final = "singlepushbutton"
-SWITCH_DEVICE_MODE_SINGLE_ROCKER: Final = "singlerocker"
 
-SWITCH_MODE_MOMENTARY: Final = "momentary"
-SWITCH_MODE_ROCKER: Final = "rocker"
+class SwitchDeviceMode(enum.Enum):
+    """Different modes for the Hue wall switch module."""
+
+    SINGLEROCKER = "singlerocker"
+    SINGLEPUSHBUTTON = "singlepushbutton"
+    DUALROCKER = "dualrocker"
+    DUALPUSHBUTTON = "dualpushbutton"
+
+
+class SwitchMode(enum.Enum):
+    """For Ubisys S1/S2, operation mode of the switch."""
+
+    MOMENTARY = "momentary"
+    ROCKER = "rocker"
+
+
+class SwitchWindowCoveringType(enum.IntEnum):
+    """Set the covering type and starts calibration for Ubisys J1."""
+
+    ROLLER_SHADE = 0
+    ROLLER_SHADE_TWO_MOTORS = 1
+    ROLLER_SHADE_EXTERIOR = 2
+    ROLLER_SHADE_TWO_MOTORS_EXTERIOR = 3
+    DRAPERY = 4
+    AWNING = 5
+    SHUTTER = 6
+    TILT_BLIND_LIFT_ONLY = 7
+    TILT_BLIND_LIFT_AND_TILT = 8
+    PROJECTOR_SCREEN = 9
 
 
 class TypedSwitchConfig(TypedDict):
@@ -78,11 +102,7 @@ class Switch(SensorBase):
         return self.raw["state"].get("eventduration")
 
     @property
-    def device_mode(
-        self,
-    ) -> Literal[
-        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
-    ] | None:
+    def device_mode(self) -> SwitchDeviceMode | None:
         """Different modes for the Hue wall switch module.
 
         Behavior as rocker:
@@ -94,72 +114,21 @@ class Switch(SensorBase):
           Issues a x000/x002 sequence on press/release.
           Issues a x000/x001/.../x001/x003 on press/hold/release.
           Similar to Hue remotes.
-
-        Supported values:
-        - "singlerocker"
-        - "singlepushbutton"
-        - "dualrocker"
-        - "dualpushbutton"
         """
-        return self.raw["config"].get("devicemode")
+        if "devicemode" in self.raw["config"]:
+            return SwitchDeviceMode(self.raw["config"]["devicemode"])
+        return None
 
     @property
-    def mode(self) -> Literal["momentary", "rocker"] | None:
-        """For Ubisys S1/S2, operation mode of the switch.
-
-        Supported values:
-        - "momentary"
-        - "rocker"
-        """
-        return self.raw["config"].get("mode")
+    def mode(self) -> SwitchMode | None:
+        """For Ubisys S1/S2, operation mode of the switch."""
+        if "mode" in self.raw["config"]:
+            return SwitchMode(self.raw["config"]["mode"])
+        return None
 
     @property
-    def window_covering_type(self) -> Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None:
-        """Set the covering type and starts calibration for Ubisys J1.
-
-        Supported values:
-        - 0 = Roller Shade
-        - 1 = Roller Shade two motors
-        - 2 = Roller Shade exterior
-        - 3 = Roller Shade two motors ext
-        - 4 = Drapery
-        - 5 = Awning
-        - 6 = Shutter
-        - 7 = Tilt Blind Lift only
-        - 8 = Tilt Blind lift & tilt
-        - 9 = Projector Screen
-        """
-        return self.raw["config"].get("windowcoveringtype")
-
-    async def set_config(
-        self,
-        device_mode: Literal[
-            "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
-        ]
-        | None = None,
-        mode: Literal["momentary", "rocker"] | None = None,
-        window_covering_type: Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None = None,
-    ) -> dict[str, Any]:
-        """Change config of presence sensor.
-
-        Supported values:
-        - device_mode [str]
-          - "dualpushbutton"
-          - "dualrocker"
-          - "singlepushbutton"
-          - "singlerocker"
-        - mode [str]
-          - "momentary"
-          - "rocker"
-        - window_covering_type [int] 0-9
-        """
-        data = {
-            key: value
-            for key, value in {
-                "devicemode": device_mode,
-                "mode": mode,
-                "windowcoveringtype": window_covering_type,
-            }.items()
-            if value is not None
-        }
-        return await self.request(field=f"{self.deconz_id}/config", data=data)
+    def window_covering_type(self) -> SwitchWindowCoveringType | None:
+        """Set the covering type and starts calibration for Ubisys J1."""
+        if "windowcoveringtype" in self.raw["config"]:
+            return SwitchWindowCoveringType(self.raw["config"]["windowcoveringtype"])
+        return None

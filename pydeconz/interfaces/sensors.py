@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import enum
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
@@ -23,7 +22,12 @@ from ..models.sensor.open_close import OpenClose
 from ..models.sensor.power import Power
 from ..models.sensor.presence import Presence
 from ..models.sensor.pressure import Pressure
-from ..models.sensor.switch import Switch
+from ..models.sensor.switch import (
+    Switch,
+    SwitchDeviceMode,
+    SwitchMode,
+    SwitchWindowCoveringType,
+)
 from ..models.sensor.temperature import Temperature
 from ..models.sensor.thermostat import (
     Thermostat,
@@ -40,62 +44,6 @@ from .api import APIItems, GroupedAPIItems
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
-
-
-class SwitchDeviceMode(enum.Enum):
-    """Different modes for the Hue wall switch module.
-
-    Supported values:
-    - "singlerocker"
-    - "singlepushbutton"
-    - "dualrocker"
-    - "dualpushbutton"
-    """
-
-    SINGLEROCKER = "singlerocker"
-    SINGLEPUSHBUTTON = "singlepushbutton"
-    DUALROCKER = "dualrocker"
-    DUALPUSHBUTTON = "dualpushbutton"
-
-
-class SwitchMode(enum.Enum):
-    """For Ubisys S1/S2, operation mode of the switch.
-
-    Supported values:
-    - "momentary"
-    - "rocker"
-    """
-
-    MOMENTARY = "momentary"
-    ROCKER = "rocker"
-
-
-class SwitchWindowCoveringType(enum.IntEnum):
-    """Set the covering type and starts calibration for Ubisys J1.
-
-    Supported values:
-    - 0 = Roller Shade
-    - 1 = Roller Shade two motors
-    - 2 = Roller Shade exterior
-    - 3 = Roller Shade two motors ext
-    - 4 = Drapery
-    - 5 = Awning
-    - 6 = Shutter
-    - 7 = Tilt Blind Lift only
-    - 8 = Tilt Blind lift & tilt
-    - 9 = Projector Screen
-    """
-
-    ROLLERSHADE = 0
-    ROLLERSHADETWOMOTORS = 1
-    ROLLERSHADEEXTERIOR = 2
-    ROLLERSHADETWOMOTORSEXTERIOR = 3
-    DRAPERY = 4
-    AWNING = 5
-    SHUTTER = 6
-    TILTBLINDLIFTONLY = 7
-    TILTBLINDLIFTANDTILT = 8
-    PROJECTORSCREEN = 9
 
 
 class AirQualityHandler(APIItems[AirQuality]):
