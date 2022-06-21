@@ -25,7 +25,7 @@ class AncillaryControlAction(enum.Enum):
 
 
 class AncillaryControlPanel(enum.Enum):
-    """Mirror of alarm system state.armstate attribute.."""
+    """Mirror of alarm system state.armstate attribute."""
 
     ARMED_AWAY = "armed_away"
     ARMED_NIGHT = "armed_night"
