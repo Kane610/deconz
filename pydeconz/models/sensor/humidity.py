@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TypedDict
+from typing import TypedDict
 
 from . import SensorBase
 
@@ -50,21 +50,3 @@ class Humidity(SensorBase):
         Values send by the REST-API are already amended by the offset.
         """
         return self.raw["config"].get("offset")
-
-    async def set_config(
-        self,
-        offset: int | None = None,
-    ) -> dict[str, Any]:
-        """Change config of humidity sensor.
-
-        Supported values:
-        - offset [int] -32768–32767
-        """
-        data = {
-            key: value
-            for key, value in {
-                "offset": offset,
-            }.items()
-            if value is not None
-        }
-        return await self.request(field=f"{self.deconz_id}/config", data=data)
