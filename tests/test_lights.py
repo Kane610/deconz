@@ -7,16 +7,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.interfaces.lights import Alert, CoverAction, Effect, FanSpeed
+from pydeconz.interfaces.lights import CoverAction, FanSpeed
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
-from pydeconz.models.light import (
-    ALERT_KEY,
-    ALERT_LONG,
-    ALERT_NONE,
-    ALERT_SHORT,
-    EFFECT_COLOR_LOOP,
-    ON_TIME_KEY,
-)
+from pydeconz.models.light import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY
 
 
 @pytest.fixture
@@ -468,102 +461,6 @@ async def test_range_extender(deconz_light):
     assert range_extender.software_version == "2.0.019"
     assert range_extender.type == "Range extender"
     assert range_extender.unique_id == "00:0d:6f:ff:fe:9f:7f:52-01"
-
-
-async def test_control_siren(mock_aioresponse, deconz_session, deconz_called_with):
-    """Verify that sirens work."""
-    sirens = deconz_session.lights.sirens
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await sirens.set_state("0", True)
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={ALERT_KEY: ALERT_LONG},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await sirens.set_state("0", True, duration=10)
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await sirens.set_state("0", False, duration=10)
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={ALERT_KEY: ALERT_NONE},
-    )
-
-
-async def test_create_siren(mock_aioresponse, deconz_light, deconz_called_with):
-    """Verify that sirens work."""
-    siren = await deconz_light(
-        {
-            "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
-            "hascolor": False,
-            "manufacturername": "Heiman",
-            "modelid": "WarningDevice",
-            "name": "alarm_tuin",
-            "state": {"alert": "none", "reachable": True},
-            "swversion": None,
-            "type": "Warning device",
-            "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
-        }
-    )
-
-    assert siren.state is None
-    assert siren.is_on is False
-
-    assert siren.reachable is True
-
-    assert siren.deconz_id == "/lights/0"
-    assert siren.etag == "0667cb8fff2adc1bf22be0e6eece2a18"
-    assert siren.manufacturer == "Heiman"
-    assert siren.model_id == "WarningDevice"
-    assert siren.name == "alarm_tuin"
-    assert not siren.software_version
-    assert siren.type == "Warning device"
-    assert siren.unique_id == "00:0d:6f:00:0f:ab:12:34-01"
-
-    siren.register_callback(mock_callback := Mock())
-    assert siren._callbacks
-
-    event = {"state": {ALERT_KEY: ALERT_LONG}}
-    siren.update(event)
-    assert siren.is_on is True
-    mock_callback.assert_called_once()
-    assert siren.changed_keys == {"state", ALERT_KEY}
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await siren.turn_on()
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={ALERT_KEY: ALERT_LONG},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await siren.turn_on(duration=10)
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await siren.turn_off()
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={ALERT_KEY: ALERT_NONE},
-    )
-
-    siren.remove_callback(mock_callback)
-    assert not siren._callbacks
 
 
 async def test_create_all_light_types(deconz_refresh_state):
