@@ -2,30 +2,50 @@
 
 from __future__ import annotations
 
-from typing import Final, Literal, TypedDict
+import enum
+import logging
+from typing import Literal, TypedDict
 
 from . import SensorBase
 
-# Action and Panel
-ANCILLARY_CONTROL_ARMED_AWAY: Final = "armed_away"
-ANCILLARY_CONTROL_ARMED_NIGHT: Final = "armed_night"
-ANCILLARY_CONTROL_ARMED_STAY: Final = "armed_stay"
-ANCILLARY_CONTROL_DISARMED: Final = "disarmed"
+LOGGER = logging.getLogger(__name__)
 
-# Action only
-ANCILLARY_CONTROL_EMERGENCY: Final = "emergency"
-ANCILLARY_CONTROL_FIRE: Final = "fire"
-ANCILLARY_CONTROL_INVALID_CODE: Final = "invalid_code"
-ANCILLARY_CONTROL_PANIC: Final = "panic"
 
-# Panel only
-ANCILLARY_CONTROL_ARMING_AWAY: Final = "arming_away"
-ANCILLARY_CONTROL_ARMING_NIGHT: Final = "arming_night"
-ANCILLARY_CONTROL_ARMING_STAY: Final = "arming_stay"
-ANCILLARY_CONTROL_ENTRY_DELAY: Final = "entry_delay"
-ANCILLARY_CONTROL_EXIT_DELAY: Final = "exit_delay"
-ANCILLARY_CONTROL_IN_ALARM: Final = "in_alarm"
-ANCILLARY_CONTROL_NOT_READY: Final = "not_ready"
+class AncillaryControlAction(enum.Enum):
+    """Last action a user invoked on the keypad."""
+
+    ARMED_AWAY = "armed_away"
+    ARMED_NIGHT = "armed_night"
+    ARMED_STAY = "armed_stay"
+    DISARMED = "disarmed"
+    EMERGENCY = "emergency"
+    FIRE = "fire"
+    INVALID_CODE = "invalid_code"
+    PANIC = "panic"
+
+
+class AncillaryControlPanel(enum.Enum):
+    """Mirror of alarm system state.armstate attribute."""
+
+    ARMED_AWAY = "armed_away"
+    ARMED_NIGHT = "armed_night"
+    ARMED_STAY = "armed_stay"
+    ARMING_AWAY = "arming_away"
+    ARMING_NIGHT = "arming_night"
+    ARMING_STAY = "arming_stay"
+    DISARMED = "disarmed"
+    ENTRY_DELAY = "entry_delay"
+    EXIT_DELAY = "exit_delay"
+    IN_ALARM = "in_alarm"
+    NOT_READY = "not_ready"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "AncillaryControlPanel":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected panel mode %s", value)
+        return AncillaryControlPanel.UNKNOWN
 
 
 class TypedAncillaryControlState(TypedDict):
@@ -71,66 +91,19 @@ class AncillaryControl(SensorBase):
     raw: TypedAncillaryControl
 
     @property
-    def action(
-        self,
-    ) -> Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "disarmed",
-        "emergency",
-        "fire",
-        "invalid_code",
-        "panic",
-    ]:
-        """Last action a user invoked on the keypad.
-
-        Supported values:
-        - "armed_away"
-        - "armed_night"
-        - "armed_stay"
-        - "disarmed"
-        - "emergency"
-        - "fire"
-        - "invalid_code"
-        - "panic"
-        """
-        return self.raw["state"]["action"]
+    def action(self) -> AncillaryControlAction:
+        """Last action a user invoked on the keypad."""
+        return AncillaryControlAction(self.raw["state"]["action"])
 
     @property
-    def panel(
-        self,
-    ) -> Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "arming_away",
-        "arming_night",
-        "arming_stay",
-        "disarmed",
-        "entry_delay",
-        "exit_delay",
-        "in_alarm",
-        "not_ready",
-    ] | None:
+    def panel(self) -> AncillaryControlPanel | None:
         """Mirror of alarm system state.armstate attribute.
 
         It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
-
-        Supported values:
-        - "armed_away"
-        - "armed_night"
-        - "armed_stay"
-        - "arming_away"
-        - "arming_night"
-        - "arming_stay"
-        - "disarmed"
-        - "entry_delay"
-        - "exit_delay"
-        - "in_alarm"
-        - "not_ready"
         """
-        return self.raw["state"].get("panel")
+        if "panel" in self.raw["state"]:
+            return AncillaryControlPanel(self.raw["state"]["panel"])
+        return None
 
     @property
     def seconds_remaining(self) -> int:

@@ -126,63 +126,6 @@ async def test_alarm_sensor(deconz_sensor):
     assert sensor.unique_id == "00:15:8d:00:02:b5:d1:80-01-0500"
 
 
-async def test_ancillary_control_sensor(deconz_sensor):
-    """Verify that ancillary control sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 95,
-                "enrolled": 1,
-                "on": True,
-                "pending": [],
-                "reachable": True,
-            },
-            "ep": 1,
-            "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
-            "lastseen": "2021-07-25T18:07Z",
-            "manufacturername": "lk",
-            "modelid": "ZB-KeypadGeneric-D0002",
-            "name": "Keypad",
-            "state": {
-                "action": "armed_stay",
-                "lastupdated": "2021-07-25T18:02:51.172",
-                "lowbattery": False,
-                "panel": "exit_delay",
-                "seconds_remaining": 55,
-                "tampered": False,
-            },
-            "swversion": "3.13",
-            "type": "ZHAAncillaryControl",
-            "uniqueid": "ec:1b:bd:ff:fe:6f:c3:4d-01-0501",
-        },
-    )
-
-    assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
-
-    assert sensor.action == "armed_stay"
-    assert sensor.panel == "exit_delay"
-    assert sensor.seconds_remaining == 55
-
-    # DeconzSensor
-    assert sensor.battery == 95
-    assert sensor.ep == 1
-    assert not sensor.low_battery
-    assert sensor.on
-    assert sensor.reachable
-    assert not sensor.tampered
-    assert not sensor.secondary_temperature
-
-    # DeconzDevice
-    assert sensor.deconz_id == "/sensors/0"
-    assert sensor.etag == "5aaa1c6bae8501f59929539c6e8f44d6"
-    assert sensor.manufacturer == "lk"
-    assert sensor.model_id == "ZB-KeypadGeneric-D0002"
-    assert sensor.name == "Keypad"
-    assert sensor.software_version == "3.13"
-    assert sensor.type == "ZHAAncillaryControl"
-    assert sensor.unique_id == "ec:1b:bd:ff:fe:6f:c3:4d-01-0501"
-
-
 async def test_battery_sensor(deconz_sensor):
     """Verify that alarm sensor works."""
     sensor = await deconz_sensor(
