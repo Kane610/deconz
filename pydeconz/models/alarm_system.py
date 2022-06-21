@@ -2,40 +2,69 @@
 
 from __future__ import annotations
 
+import enum
+import logging
 from typing import Any, Final, Literal, TypedDict
 
 from . import ResourceGroup
 from .api import APIItem
 
+LOGGER = logging.getLogger(__name__)
+
 RESOURCE_TYPE: Final = ResourceGroup.ALARM.value
 
-PATH_ARM_AWAY: Final = "arm_away"
-PATH_ARM_NIGHT: Final = "arm_night"
-PATH_ARM_STAY: Final = "arm_stay"
-PATH_DISARM: Final = "disarm"
 
-ARM_MODE_ARMED_AWAY: Final = "armed_away"
-ARM_MODE_ARMED_NIGHT: Final = "armed_night"
-ARM_MODE_ARMED_STAY: Final = "armed_stay"
-ARM_MODE_DISARMED: Final = "disarmed"
+class AlarmSystemArmAction(enum.Enum):
+    """Explicit url path to arm and disarm."""
 
-ARM_STATE_ARMED_AWAY: Final = "armed_away"
-ARM_STATE_ARMED_NIGHT: Final = "armed_night"
-ARM_STATE_ARMED_STAY: Final = "armed_stay"
-ARM_STATE_ARMING_AWAY: Final = "arming_away"
-ARM_STATE_ARMING_NIGHT: Final = "arming_night"
-ARM_STATE_ARMING_STAY: Final = "arming_stay"
-ARM_STATE_DISARMED: Final = "disarmed"
-ARM_STATE_ENTRY_DELAY: Final = "entry_delay"
-ARM_STATE_EXIT_DELAY: Final = "exit_delay"
-ARM_STATE_IN_ALARM: Final = "in_alarm"
+    AWAY = "arm_away"
+    NIGHT = "arm_night"
+    STAY = "arm_stay"
+    DISARM = "disarm"
 
-DEVICE_TRIGGER_ACTION: Final = "state/action"
-DEVICE_TRIGGER_BUTTON_EVENT: Final = "state/buttonevent"
-DEVICE_TRIGGER_ON: Final = "state/on"
-DEVICE_TRIGGER_OPEN: Final = "state/open"
-DEVICE_TRIGGER_PRESENCE: Final = "state/presence"
-DEVICE_TRIGGER_VIBRATION: Final = "state/vibration"
+
+class AlarmSystemArmMode(enum.Enum):
+    """The target arm mode."""
+
+    ARMED_AWAY = "armed_away"
+    ARMED_NIGHT = "armed_night"
+    ARMED_STAY = "armed_stay"
+    DISARMED = "disarmed"
+
+
+class AlarmSystemArmState(enum.Enum):
+    """The current alarm system state."""
+
+    ARMED_AWAY = "armed_away"
+    ARMED_NIGHT = "armed_night"
+    ARMED_STAY = "armed_stay"
+    ARMING_AWAY = "arming_away"
+    ARMING_NIGHT = "arming_night"
+    ARMING_STAY = "arming_stay"
+    DISARMED = "disarmed"
+    ENTRY_DELAY = "entry_delay"
+    EXIT_DELAY = "exit_delay"
+    IN_ALARM = "in_alarm"
+
+
+class AlarmSystemArmMask(enum.Flag):
+    """The target arm mode."""
+
+    ARMED_AWAY = "A"
+    ARMED_NIGHT = "N"
+    ARMED_STAY = "S"
+    NONE = "none"
+
+
+class AlarmSystemDeviceTrigger(enum.Enum):
+    """Specifies arm modes in which the device triggers alarms."""
+
+    ACTION = "state/action"
+    BUTTON_EVENT = "state/buttonevent"
+    ON = "state/on"
+    OPEN = "state/open"
+    PRESENCE = "state/presence"
+    VIBRATION = "state/vibration"
 
 
 class TypedAlarmSystemConfig(TypedDict):
@@ -109,110 +138,13 @@ class AlarmSystem(APIItem):
         """Id to call alarm system over API e.g. /alarmsystems/1."""
         return f"/{self.resource_type}/{self.resource_id}"
 
-    async def set_alarm_system_configuration(
-        self,
-        code0: str | None = None,
-        armed_away_entry_delay: int | None = None,
-        armed_away_exit_delay: int | None = None,
-        armed_away_trigger_duration: int | None = None,
-        armed_night_entry_delay: int | None = None,
-        armed_night_exit_delay: int | None = None,
-        armed_night_trigger_duration: int | None = None,
-        armed_stay_entry_delay: int | None = None,
-        armed_stay_exit_delay: int | None = None,
-        armed_stay_trigger_duration: int | None = None,
-        disarmed_entry_delay: int | None = None,
-        disarmed_exit_delay: int | None = None,
-    ) -> dict[str, Any]:
-        """Set config of alarm system."""
-        data = {
-            key: value
-            for key, value in {
-                "code0": code0,
-                "armed_away_entry_delay": armed_away_entry_delay,
-                "armed_away_exit_delay": armed_away_exit_delay,
-                "armed_away_trigger_duration": armed_away_trigger_duration,
-                "armed_night_entry_delay": armed_night_entry_delay,
-                "armed_night_exit_delay": armed_night_exit_delay,
-                "armed_night_trigger_duration": armed_night_trigger_duration,
-                "armed_stay_entry_delay": armed_stay_entry_delay,
-                "armed_stay_exit_delay": armed_stay_exit_delay,
-                "armed_stay_trigger_duration": armed_stay_trigger_duration,
-                "disarmed_entry_delay": disarmed_entry_delay,
-                "disarmed_exit_delay": disarmed_exit_delay,
-            }.items()
-            if value is not None
-        }
-        return await self._request(
-            "put",
-            path=f"{self.deconz_id}/config",
-            json=data,
-        )
-
-    async def arm_away(self, pin_code: str) -> dict[str, Any]:
-        """Set the alarm to away."""
-        return await self._request(
-            "put",
-            path=f"{self.deconz_id}/{PATH_ARM_AWAY}",
-            json={"code0": pin_code},
-        )
-
-    async def arm_night(self, pin_code: str) -> dict[str, Any]:
-        """Set the alarm to night."""
-        return await self._request(
-            "put",
-            path=f"{self.deconz_id}/{PATH_ARM_NIGHT}",
-            json={"code0": pin_code},
-        )
-
-    async def arm_stay(self, pin_code: str) -> dict[str, Any]:
-        """Set the alarm to stay."""
-        return await self._request(
-            "put",
-            path=f"{self.deconz_id}/{PATH_ARM_STAY}",
-            json={"code0": pin_code},
-        )
-
-    async def disarm(self, pin_code: str) -> dict[str, Any]:
-        """Disarm alarm."""
-        return await self._request(
-            "put",
-            path=f"{self.deconz_id}/{PATH_DISARM}",
-            json={"code0": pin_code},
-        )
-
     @property
-    def arm_state(
-        self,
-    ) -> Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "arming_away",
-        "arming_night",
-        "arming_stay",
-        "disarmed",
-        "entry_delay",
-        "exit_delay",
-        "in_alarm",
-    ]:
+    def arm_state(self) -> AlarmSystemArmState:
         """Alarm system state.
 
         Can be different from the config.armmode during state transitions.
-
-        Supported values:
-        - "armed_away"
-        - "armed_night"
-        - "armed_stay"
-        - "arming_away"
-        - "arming_night"
-        - "arming_stay"
-        - "disarmed"
-        - "entry_delay"
-        - "exit_delay"
-        - "in_alarm"
         """
-        return self.raw["state"]["armstate"]
+        return AlarmSystemArmState(self.raw["state"]["armstate"])
 
     @property
     def seconds_remaining(self) -> int:
@@ -231,18 +163,9 @@ class AlarmSystem(APIItem):
         return self.raw["config"]["configured"]
 
     @property
-    def arm_mode(
-        self,
-    ) -> Literal["armed_away", "armed_night", "armed_stay", "disarmed"]:
-        """Target arm mode.
-
-        Supported values:
-        - "armed_away"
-        - "armed_night"
-        - "armed_stay"
-        - "disarmed"
-        """
-        return self.raw["config"]["armmode"]
+    def arm_mode(self) -> AlarmSystemArmMode:
+        """Target arm mode."""
+        return AlarmSystemArmMode(self.raw["config"]["armmode"])
 
     @property
     def armed_away_entry_delay(self) -> int:
@@ -362,53 +285,3 @@ class AlarmSystem(APIItem):
           "state/on"
         """
         return self.raw["devices"]
-
-    async def add_device(
-        self,
-        unique_id: str,
-        armed_away: bool = False,
-        armed_night: bool = False,
-        armed_stay: bool = False,
-        trigger: Literal[
-            "state/presence",
-            "state/open",
-            "state/vibration",
-            "state/buttonevent",
-            "state/on",
-        ]
-        | None = None,
-        is_keypad: bool = False,
-    ) -> dict[str, Any]:
-        """Link device with alarm system.
-
-        A device can be linked to exactly one alarm system.
-          If it is added to another alarm system, it is automatically removed
-          from the prior one.
-        This request is used for adding and also for updating a device entry.
-        The uniqueid refers to sensors, lights or keypads.
-          Adding a light can be useful, e.g. when an alarm should be triggered,
-          after a light is powered or switched on in the basement.
-        """
-        data = {"armmask": ""}
-        data["armmask"] += "A" if armed_away else ""
-        data["armmask"] += "N" if armed_night else ""
-        data["armmask"] += "S" if armed_stay else ""
-
-        if trigger:
-            data["trigger"] = trigger
-
-        if is_keypad:
-            data = {}
-
-        return await self._request(
-            "put",
-            path=f"{self.deconz_id}/device/{unique_id}",
-            json=data,
-        )
-
-    async def remove_device(self, unique_id: str) -> dict[str, Any]:
-        """Unlink device with alarm system."""
-        return await self._request(
-            "delete",
-            path=f"{self.deconz_id}/device/{unique_id}",
-        )

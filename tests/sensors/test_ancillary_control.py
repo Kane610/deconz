@@ -1,6 +1,6 @@
 """Test pydeCONZ sensors.
 
-pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
+pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.ancillary_control tests/sensors/test_ancillary_control.py
 """
 
 import pytest
