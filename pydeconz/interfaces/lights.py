@@ -6,10 +6,8 @@ import enum
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
-from ..models.light import *  # noqa: F401, F403
 from ..models.light.configuration_tool import ConfigurationTool
 from ..models.light.cover import Cover
-from ..models.light.fan import *  # noqa: F401, F403
 from ..models.light.fan import Fan
 from ..models.light.light import Light
 from ..models.light.lock import Lock
