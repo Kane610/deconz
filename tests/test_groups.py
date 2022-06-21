@@ -301,35 +301,11 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
     assert scene.name == "warmlight"
     assert scene.full_name == "Hall warmlight"
 
-    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/recall")
-    await scene.recall()
-    assert deconz_called_with(
-        "put",
-        path="/groups/0/scenes/1/recall",
-        json={},
-    )
-
     mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/store")
     await scene.store()
     assert deconz_called_with(
         "put",
         path="/groups/0/scenes/1/store",
-        json={},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1")
-    await scene.set_attributes(name="new name")
-    assert deconz_called_with(
-        "put",
-        path="/groups/0/scenes/1",
-        json={"name": "new name"},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1")
-    await scene.set_attributes()
-    assert deconz_called_with(
-        "put",
-        path="/groups/0/scenes/1",
         json={},
     )
 
