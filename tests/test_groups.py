@@ -435,6 +435,8 @@ async def test_update_color_state(
     )
 
     group = deconz_session.groups["0"]
+    light = deconz_session.lights["14"]
+    group.update_color_state(light, update_all_attributes=True)
     assert group.brightness == expected_group_state["brightness"]
     assert group.color_temp == expected_group_state["ct"]
     assert group.hue == expected_group_state["hue"]
