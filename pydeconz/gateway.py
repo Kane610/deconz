@@ -118,8 +118,6 @@ class DeconzSession:
         self.lights.process_raw(data[ResourceGroup.LIGHT.value])
         self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
 
-        # self.update_group_color(list(self.lights.keys()))
-
     def subscribe(self, callback: CallbackType) -> UnsubscribeType:
         """Subscribe to status changes for all resources."""
         subscribers = [
