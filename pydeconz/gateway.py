@@ -19,8 +19,6 @@ from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
 from .models import ResourceGroup
-from .models.event import EventType
-from .models.light.light import Light
 from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
 
 LOGGER = logging.getLogger(__name__)
@@ -36,8 +34,6 @@ class DeconzSession:
         port: int,
         api_key: str | None = None,
         connection_status: Callable[[bool], None] | None = None,
-        legacy_add_device: bool = False,
-        legacy_update_group_color: bool = True,
     ) -> None:
         """Session setup."""
         self.session = session
@@ -64,31 +60,6 @@ class DeconzSession:
         self.lights.post_init()
         self.scenes.post_init()
         self.sensors.post_init()
-
-        if legacy_update_group_color:
-            self.legacy_update_group_color()
-
-    def legacy_update_group_color(self) -> None:
-        """Support legacy way to update group colors."""
-
-        lights = self.lights.lights
-
-        def signal_new_light(event_type: EventType, light_id: str) -> None:
-            """Signal new light."""
-
-            light = lights[light_id]
-
-            def updated_light() -> None:
-                """Update group state based on light state changes.
-
-                Only update changed keys.
-                """
-                if light.changed_keys and "attr" not in light.changed_keys:
-                    self.update_group_color([light_id], first=False)
-
-            light.subscribe(updated_light)
-
-        lights.subscribe(signal_new_light, event_filter=EventType.ADDED)
 
     async def get_api_key(
         self,
@@ -146,8 +117,6 @@ class DeconzSession:
         self.groups.process_raw(data[ResourceGroup.GROUP.value])
         self.lights.process_raw(data[ResourceGroup.LIGHT.value])
         self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
-
-        self.update_group_color(list(self.lights.keys()))
 
     def subscribe(self, callback: CallbackType) -> UnsubscribeType:
         """Subscribe to status changes for all resources."""
@@ -251,32 +220,6 @@ class DeconzSession:
 
         elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
             self.connection_status_callback(self.websocket.state == STATE_RUNNING)
-
-    def update_group_color(self, lights: list[str], first: bool = True) -> None:
-        """Update group colors based on light states.
-
-        deCONZ group updates don't contain any information about the current
-        state of the lights in the group. This method updates the color
-        properties of the group to the current color of the lights in the
-        group.
-        """
-        for group in self.groups.values():
-            # Skip group if there are no common light ids.
-            if not any({*lights} & {*group.lights}):
-                continue
-
-            # More than one light means self.initialize called this method.
-            if len(light_ids := lights) > 1:
-                light_ids = group.lights
-
-            for light_id in light_ids:
-                if (
-                    (light := self.lights.lights.get(light_id))
-                    and light.ZHATYPE == Light.ZHATYPE
-                    and light.reachable
-                ):
-                    group.update_color_state(light, update_all_attributes=first)
-                    first = False
 
 
 def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:

@@ -78,12 +78,10 @@ async def test_websocket_config_provided_websocket_port(
 
 async def test_initial_state(deconz_session, deconz_refresh_state, count_subscribers):
     """Test refresh_state creates devices as expected."""
-    assert (
-        count_subscribers() == 2
-    )  # Group subscribed to lights, scene subscribed to groups
+    assert count_subscribers() == 1  # Scene subscribed to groups
 
     unsub = deconz_session.subscribe(session_subscription := Mock())
-    assert count_subscribers() == 34
+    assert count_subscribers() == 33
 
     await deconz_refresh_state(
         alarm_systems={"0": {}},
@@ -116,7 +114,7 @@ async def test_initial_state(deconz_session, deconz_refresh_state, count_subscri
     assert deconz_session.sensors["s1"].deconz_id == "/sensors/s1"
 
     unsub()
-    assert count_subscribers() == 2
+    assert count_subscribers() == 1
 
 
 async def test_get_api_key(mock_aioresponse, deconz_session):
@@ -484,216 +482,6 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
     session_subscription.assert_called_with(EventType.CHANGED, "1")
     assert not deconz_session.sensors["1"].reachable
     sensor_subscription.assert_called_once()
-
-
-@pytest.mark.parametrize(
-    "light_ids,expected_group_state",
-    [
-        (
-            ["l1", "l2", "l3", "l4"],
-            {
-                "brightness": 3,
-                "ct": 2,
-                "hue": 1,
-                "sat": 1,
-                "xy": (0.1, 0.1),
-                "colormode": "ct",
-                "effect": None,
-            },
-        ),
-        (
-            ["l1"],
-            {
-                "brightness": 1,
-                "ct": 1,
-                "hue": 1,
-                "sat": 1,
-                "xy": (0.1, 0.1),
-                "colormode": "xy",
-                "effect": None,
-            },
-        ),
-        (
-            ["l2"],
-            {
-                "brightness": 2,
-                "ct": 2,
-                "hue": None,
-                "sat": None,
-                "xy": None,
-                "colormode": "ct",
-                "effect": None,
-            },
-        ),
-        (
-            ["l3"],
-            {
-                "brightness": 3,
-                "ct": None,
-                "hue": None,
-                "sat": None,
-                "xy": None,
-                "colormode": None,
-                "effect": None,
-            },
-        ),
-        (
-            ["l6"],
-            {
-                "brightness": 1,
-                "ct": 1,
-                "hue": 1,
-                "sat": 1,
-                "xy": (1, 1),
-                "colormode": "hs",
-                "effect": None,
-            },
-        ),
-    ],
-)
-async def test_update_group_color(
-    deconz_refresh_state, light_ids, expected_group_state
-):
-    """Test update_group_color works as expected."""
-    session = await deconz_refresh_state(
-        groups={
-            "g1": {
-                "action": {
-                    "bri": 1,
-                    "hue": 1,
-                    "sat": 1,
-                    "xy": (1, 1),
-                    "ct": 1,
-                    "colormode": "hs",
-                },
-                "id": "gid",
-                "lights": light_ids,
-                "scenes": [],
-            }
-        },
-        lights={
-            "l1": {
-                "type": "Color dimmable light",
-                "state": {
-                    "bri": 1,
-                    "hue": 1,
-                    "sat": 1,
-                    "xy": (0.1, 0.1),
-                    "ct": 1,
-                    "colormode": "xy",
-                    "reachable": True,
-                },
-            },
-            "l2": {
-                "type": "Color temperature light",
-                "state": {
-                    "bri": 2,
-                    "ct": 2,
-                    "colormode": "ct",
-                    "reachable": True,
-                },
-            },
-            "l3": {
-                "type": "On/Off light",
-                "state": {
-                    "bri": 3,
-                    "reachable": True,
-                },
-            },
-            "l4": {
-                "type": "Color temperature light",
-                "state": {
-                    "bri": 4,
-                    "ct": 4,
-                    "colormode": "ct",
-                    "reachable": False,
-                },
-            },
-            "l5": {
-                "type": "Color temperature light",
-                "state": {
-                    "bri": 5,
-                    "ct": 5,
-                    "colormode": "ct",
-                    "reachable": True,
-                },
-            },
-            "l6": {
-                "type": "Window covering device",
-                "state": {
-                    "lift": 100,
-                    "reachable": True,
-                },
-            },
-        },
-    )
-
-    assert session.groups["g1"].brightness == expected_group_state["brightness"]
-    assert session.groups["g1"].color_temp == expected_group_state["ct"]
-    assert session.groups["g1"].hue == expected_group_state["hue"]
-    assert session.groups["g1"].saturation == expected_group_state["sat"]
-    assert session.groups["g1"].xy == expected_group_state["xy"]
-    assert session.groups["g1"].color_mode == expected_group_state["colormode"]
-    assert session.groups["g1"].effect == expected_group_state["effect"]
-
-
-async def test_update_group_color_ignores_attr(
-    deconz_refresh_state, mock_websocket_event
-):
-    """Test update_group_color ignores attr messages on power plugs.
-
-    Bug caused group to reset all light attributes to None on power plugs.
-    """
-    session = await deconz_refresh_state(
-        groups={
-            "0": {
-                "action": {
-                    "bri": 0,
-                },
-                "id": "gid",
-                "lights": ["1", "2"],
-                "scenes": [],
-            }
-        },
-        lights={
-            "1": {
-                "type": "Color dimmable light",
-                "state": {
-                    "bri": 1,
-                    "reachable": True,
-                },
-            },
-            "2": {
-                "state": {
-                    "on": True,
-                    "reachable": True,
-                },
-            },
-        },
-    )
-
-    assert session.groups["0"].brightness == 1
-
-    await mock_websocket_event(
-        resource="lights",
-        unique_id="54:0f:57:ff:fe:91:ff:b6-01",
-        id="2",
-        data={
-            "attr": {
-                "id": "2",
-                "lastannounced": "2021-12-31T11:40:44Z",
-                "lastseen": "2022-05-07T07:18Z",
-                "manufacturername": "_TZ3000_u5u4cakc",
-                "modelid": "TS011F",
-                "name": "Kastlicht",
-                "swversion": "69",
-                "type": "On/Off plug-in unit",
-                "uniqueid": "54:0f:57:ff:fe:91:ff:b6-01",
-            },
-        },
-    )
-
-    assert session.groups["0"].brightness == 1
 
 
 @patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
