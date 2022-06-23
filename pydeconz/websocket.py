@@ -7,6 +7,7 @@ import logging
 from typing import Any, Final, Literal
 
 import aiohttp
+import orjson
 
 LOGGER = logging.getLogger(__name__)
 
@@ -89,7 +90,8 @@ class WSClient:
                         break
 
                     if msg.type == aiohttp.WSMsgType.TEXT:
-                        self._data.append(msg.json())
+                        self._data.append(orjson.loads(msg.data))
+                        # self._data.append(msg.json())
                         create_task(self.session_handler_callback(SIGNAL_DATA))
                         LOGGER.debug(msg.data)
                         continue
