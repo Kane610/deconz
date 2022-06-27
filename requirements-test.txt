@@ -6,7 +6,7 @@ flake8-docstrings==1.6.0
 flake8-noqa==1.2.5
 isort==5.10.1
 mypy==0.961
-orjson==3.6.2
+orjson==3.7.3
 types-orjson==3.6.2
 pytest==7.1.2
 pydocstyle==6.1.1
