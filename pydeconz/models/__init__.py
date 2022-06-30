@@ -66,6 +66,9 @@ class ResourceType(Enum):
 
     # Sensor resources
 
+    # Air purifier
+    ZHA_AIR_PURIFIER = "ZHAAirPurifier"
+
     # Air quality
     ZHA_AIR_QUALITY = "ZHAAirQuality"
 
