@@ -4,23 +4,13 @@ import enum
 from typing import Literal, TypedDict
 
 from . import SensorBase
-from .air_quality import AirQualityValue
 
 
 class TypedAirPurifierState(TypedDict):
     """Air purifier state type definition."""
 
-    airquality: Literal[
-        "excellent",
-        "good",
-        "moderate",
-        "poor",
-        "unhealthy",
-        "out of scale",
-    ]
     deviceruntime: int
     filterruntime: int
-    pm2_5: int
     replacefilter: bool
     speed: int
 
@@ -71,11 +61,6 @@ class AirPurifier(SensorBase):
     raw: TypedAirPurifier
 
     @property
-    def air_quality(self) -> AirQualityValue:
-        """Air quality."""
-        return AirQualityValue(self.raw["state"]["airquality"])
-
-    @property
     def device_run_time(self) -> int:
         """Device run time in minutes."""
         return self.raw["state"]["deviceruntime"]
@@ -109,11 +94,6 @@ class AirPurifier(SensorBase):
     def locked(self) -> bool:
         """Locked configuration."""
         return self.raw["config"]["locked"]
-
-    @property
-    def pm_2_5(self) -> int:
-        """Air quality PM2.5 (µg/m³)."""
-        return self.raw["state"]["pm2_5"]
 
     @property
     def replace_filter(self) -> bool:

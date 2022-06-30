@@ -31,7 +31,9 @@ async def test_air_quality_sensor(deconz_sensor):
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
     assert sensor.air_quality == AirQualityValue.POOR
+    assert sensor.supports_air_quality_ppb is True
     assert sensor.air_quality_ppb == 809
+    assert sensor.supports_pm_2_5 is False
 
     # DeconzSensor
     assert sensor.battery is None
@@ -52,3 +54,34 @@ async def test_air_quality_sensor(deconz_sensor):
     assert sensor.software_version == "20200402"
     assert sensor.type == "ZHAAirQuality"
     assert sensor.unique_id == "00:12:4b:00:14:4d:00:07-02-fdef"
+
+
+async def test_air_quality_sensor_with_pm2_5(deconz_sensor):
+    """Verify that air quality with PM 2.5 sensor works."""
+    sensor = await deconz_sensor(
+        {
+            "config": {"on": True, "reachable": True},
+            "ep": 1,
+            "etag": "74eb5d8558a3895a39a3884189701c99",
+            "lastannounced": None,
+            "lastseen": "2022-06-30T18:20Z",
+            "manufacturername": "IKEA of Sweden",
+            "modelid": "STARKVIND Air purifier",
+            "name": "Starkvind",
+            "state": {
+                "airquality": "excellent",
+                "lastupdated": "2022-06-30T18:18:26.205",
+                "pm2_5": 8,
+            },
+            "swversion": "1.0.033",
+            "type": "ZHAAirQuality",
+            "uniqueid": "cc:86:ec:ff:fe:6d:30:11-02-fc7d",
+        }
+    )
+
+    assert sensor.ZHATYPE == ("ZHAAirQuality",)
+
+    assert sensor.air_quality == AirQualityValue.EXCELLENT
+    assert sensor.supports_air_quality_ppb is False
+    assert sensor.supports_pm_2_5 is True
+    assert sensor.pm_2_5 == 8

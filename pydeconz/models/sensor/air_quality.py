@@ -6,6 +6,27 @@ from typing import Literal, TypedDict
 from . import SensorBase
 
 
+class TypedAirQualityState(TypedDict):
+    """Air quality state type definition."""
+
+    airquality: Literal[
+        "excellent",
+        "good",
+        "moderate",
+        "poor",
+        "unhealthy",
+        "out of scale",
+    ]
+    airqualityppb: int
+    pm2_5: int
+
+
+class TypedAirQuality(TypedDict):
+    """Air quality type definition."""
+
+    state: TypedAirQualityState
+
+
 class AirQualityValue(enum.Enum):
     """Air quality.
 
@@ -26,26 +47,6 @@ class AirQualityValue(enum.Enum):
     OUT_OF_SCALE = "out of scale"
 
 
-class TypedAirQualityState(TypedDict):
-    """Air quality state type definition."""
-
-    airquality: Literal[
-        "excellent",
-        "good",
-        "moderate",
-        "poor",
-        "unhealthy",
-        "out of scale",
-    ]
-    airqualityppb: int
-
-
-class TypedAirQuality(TypedDict):
-    """Air quality type definition."""
-
-    state: TypedAirQualityState
-
-
 class AirQuality(SensorBase):
     """Air quality sensor."""
 
@@ -62,3 +63,18 @@ class AirQuality(SensorBase):
     def air_quality_ppb(self) -> int:
         """Air quality PPB TVOC."""
         return self.raw["state"]["airqualityppb"]
+
+    @property
+    def pm_2_5(self) -> int:
+        """Air quality PM2.5 (µg/m³)."""
+        return self.raw["state"]["pm2_5"]
+
+    @property
+    def supports_air_quality_ppb(self) -> bool:
+        """Support Air quality PPB reporting."""
+        return "airqualityppb" in self.raw["state"]
+
+    @property
+    def supports_pm_2_5(self) -> bool:
+        """Support Air quality PM2.5 reporting."""
+        return "pm2_5" in self.raw["state"]
