@@ -195,6 +195,28 @@ class LightEffect(enum.Enum):
         return LightEffect.UNKNOWN
 
 
+class FanSpeed(enum.IntEnum):
+    """Possible fan speeds.
+
+    Supported values:
+    - 0 - fan is off
+    - 1 - 25%
+    - 2 - 50%
+    - 3 - 75%
+    - 4 - 100%
+    - 5 - Auto
+    - 6 - "comfort-breeze"
+    """
+
+    OFF = 0
+    PERCENT_25 = 1
+    PERCENT_50 = 2
+    PERCENT_75 = 3
+    PERCENT_100 = 4
+    AUTO = 5
+    COMFORT_BREEZE = 6
+
+
 class Light(LightBase):
     """deCONZ light representation.
 
@@ -341,6 +363,16 @@ class Light(LightBase):
         none — no effect.
         """
         return self.raw["state"].get("effect")
+
+    @property
+    def fan_speed(self) -> FanSpeed:
+        """Speed of the fan."""
+        return FanSpeed(self.raw["state"]["speed"])
+
+    @property
+    def supports_fan_speed(self) -> bool:
+        """Speed of the fan."""
+        return True if "speed" in self.raw["state"] else False
 
     async def set_attributes(self, name: str) -> dict[str, Any]:
         """Change attributes of a light.
