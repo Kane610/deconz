@@ -39,9 +39,6 @@ class ResourceType(Enum):
     WINDOW_COVERING_CONTROLLER = "Window covering controller"
     WINDOW_COVERING_DEVICE = "Window covering device"
 
-    # Fan
-    FAN = "Fan"
-
     # Light
     COLOR_DIMMABLE_LIGHT = "Color dimmable light"
     COLOR_LIGHT = "Color light"
@@ -50,6 +47,7 @@ class ResourceType(Enum):
     DIMMABLE_LIGHT = "Dimmable light"
     DIMMABLE_PLUGIN_UNIT = "Dimmable plug-in unit"
     DIMMER_SWITCH = "Dimmer switch"
+    FAN = "Fan"
     ON_OFF_LIGHT = "On/Off light"
     ON_OFF_OUTPUT = "On/Off output"
     ON_OFF_PLUGIN_UNIT = "On/Off plug-in unit"

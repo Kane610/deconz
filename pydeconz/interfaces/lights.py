@@ -20,18 +20,6 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
-# class FanSpeed(enum.Enum):
-#     """Possible fan speeds."""
-
-#     OFF = 0
-#     PERCENT_25 = 1
-#     PERCENT_50 = 2
-#     PERCENT_75 = 3
-#     PERCENT_100 = 4
-#     AUTO = 5
-#     COMFORT_BREEZE = 6
-
-
 class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     """Handler for configuration tool."""
 
@@ -85,25 +73,6 @@ class CoverHandler(APIItems[Cover]):
             path=f"{self.path}/{id}/state",
             json=data,
         )
-
-
-# class FanHandler(APIItems[Fan]):
-#     """Handler for locks."""
-
-#     resource_group = ResourceGroup.LIGHT
-#     resource_type = ResourceType.FAN
-#     item_cls = Fan
-
-#     async def set_state(self, id: str, speed: FanSpeed) -> dict[str, Any]:
-#         """Set speed of fans/ventilators.
-
-#         Speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze.
-#         """
-#         return await self.gateway.request_with_retry(
-#             "put",
-#             path=f"{self.path}/{id}/state",
-#             json={"speed": speed.value},
-#         )
 
 
 class LightHandler(APIItems[Light]):
@@ -160,7 +129,7 @@ class LightHandler(APIItems[Light]):
           - "none" no effect
           - "colorloop" the light will cycle continuously through all
                         colors with the speed specified by colorloopspeed
-        - fan_peed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze
+        - fan_speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze
         - hue [int] 0-65535
         - on [bool] True/False
         - on_time [int] 0-65535 1/10 seconds resolution
@@ -259,7 +228,6 @@ class SirenHandler(APIItems[Siren]):
 LightResources = Union[
     ConfigurationTool,
     Cover,
-    # Fan,
     Light,
     Lock,
     Siren,
@@ -275,7 +243,6 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
         """Initialize light manager."""
         self.configuration_tool = ConfigurationToolHandler(gateway, grouped=True)
         self.covers = CoverHandler(gateway, grouped=True)
-        # self.fans = FanHandler(gateway, grouped=True)
         self.lights = LightHandler(gateway, grouped=True)
         self.locks = LockHandler(gateway, grouped=True)
         self.range_extender = RangeExtenderHandler(gateway, grouped=True)
@@ -284,7 +251,6 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
         handlers: list[APIItems[Any]] = [
             self.configuration_tool,
             self.covers,
-            # self.fans,
             self.lights,
             self.locks,
             self.range_extender,

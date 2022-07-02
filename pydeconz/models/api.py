@@ -36,11 +36,6 @@ class APIItem:
         self._callbacks: list[SubscriptionType] = []
         self._subscribers: list[SubscriptionType] = []
 
-        self.post_init()
-
-    def post_init(self) -> None:
-        """Post init method used by subclasses."""
-
     @property
     def deconz_id(self) -> str:
         """Id to call device over API e.g. /sensors/1."""
