@@ -20,54 +20,6 @@ def deconz_sensor(deconz_refresh_state):
     yield data_to_deconz_session
 
 
-async def test_air_quality_sensor(deconz_sensor):
-    """Verify that air quality sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"on": True, "reachable": True},
-            "ep": 2,
-            "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
-            "lastseen": "2020-11-20T22:48Z",
-            "manufacturername": "BOSCH",
-            "modelid": "AIR",
-            "name": "BOSCH Air quality sensor",
-            "state": {
-                "airquality": "poor",
-                "airqualityppb": 809,
-                "lastupdated": "2020-11-20T22:48:00.209",
-            },
-            "swversion": "20200402",
-            "type": "ZHAAirQuality",
-            "uniqueid": "00:12:4b:00:14:4d:00:07-02-fdef",
-        },
-    )
-
-    assert sensor.ZHATYPE == ("ZHAAirQuality",)
-
-    assert sensor.air_quality == "poor"
-    assert sensor.air_quality_ppb == 809
-
-    # DeconzSensor
-    assert sensor.battery is None
-    assert sensor.config_pending is None
-    assert sensor.ep == 2
-    assert sensor.low_battery is None
-    assert sensor.on is True
-    assert sensor.reachable is True
-    assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
-
-    # DeconzDevice
-    assert sensor.deconz_id == "/sensors/0"
-    assert sensor.etag == "c2d2e42396f7c78e11e46c66e2ec0200"
-    assert sensor.manufacturer == "BOSCH"
-    assert sensor.model_id == "AIR"
-    assert sensor.name == "BOSCH Air quality sensor"
-    assert sensor.software_version == "20200402"
-    assert sensor.type == "ZHAAirQuality"
-    assert sensor.unique_id == "00:12:4b:00:14:4d:00:07-02-fdef"
-
-
 async def test_alarm_sensor(deconz_sensor):
     """Verify that alarm sensor works."""
     sensor = await deconz_sensor(

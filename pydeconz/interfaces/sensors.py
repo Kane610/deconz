@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
+from ..models.sensor.air_purifier import AirPurifier, AirPurifierFanMode
 from ..models.sensor.air_quality import AirQuality
 from ..models.sensor.alarm import Alarm
 from ..models.sensor.ancillary_control import AncillaryControl
@@ -44,6 +45,55 @@ from .api import APIItems, GroupedAPIItems
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
+
+
+class AirPurifierHandler(APIItems[AirPurifier]):
+    """Handler for air purifier sensor."""
+
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_AIR_PURIFIER
+    item_cls = AirPurifier
+
+    async def set_config(
+        self,
+        id: str,
+        fan_mode: AirPurifierFanMode | None = None,
+        filter_life_time: int | None = None,
+        led_indication: bool | None = None,
+        locked: bool | None = None,
+    ) -> dict[str, Any]:
+        """Set speed of fans/ventilators.
+
+        Supported values:
+        - fan_mode [AirPurifierFanMode]
+          - "off"
+          - "auto"
+          - "speed_1"
+          - "speed_2"
+          - "speed_3"
+          - "speed_4"
+          - "speed_5"
+        - filter_life_time [int] 0-65536
+        - led_indication [bool] True/False
+        - locked [bool] True/False
+        """
+        data: dict[str, int | str] = {
+            key: value
+            for key, value in {
+                "filterlifetime": filter_life_time,
+                "ledindication": led_indication,
+                "locked": locked,
+            }.items()
+            if value is not None
+        }
+        if fan_mode is not None:
+            data["mode"] = fan_mode.value
+
+        return await self.gateway.request_with_retry(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json=data,
+        )
 
 
 class AirQualityHandler(APIItems[AirQuality]):
@@ -296,15 +346,15 @@ class SwitchHandler(APIItems[Switch]):
         """Change config of presence sensor.
 
         Supported values:
-        - device_mode [str]
+        - device_mode [SwitchDeviceMode]
           - "dualpushbutton"
           - "dualrocker"
           - "singlepushbutton"
           - "singlerocker"
-        - mode [str]
+        - mode [SwitchMode]
           - "momentary"
           - "rocker"
-        - window_covering_type [int] 0-9
+        - window_covering_type [SwitchWindowCoveringType] 0-9
         """
         data: dict[str, int | str] = {}
         if device_mode is not None:
@@ -369,7 +419,7 @@ class ThermostatHandler(APIItems[Thermostat]):
         - enable_schedule [bool] True/False
         - external_sensor_temperature [int] -32768-32767
         - external_window_open [bool] True/False
-        - fan_mode [str]
+        - fan_mode [ThermostatFanMode]
           - "auto"
           - "high"
           - "low"
@@ -380,7 +430,7 @@ class ThermostatHandler(APIItems[Thermostat]):
         - flip_display [bool] True/False
         - heating_setpoint [int] 500-3200
         - locked [bool] True/False
-        - mode [str]
+        - mode [ThermostatMode]
           - "auto"
           - "cool"
           - "dry"
@@ -392,7 +442,7 @@ class ThermostatHandler(APIItems[Thermostat]):
           - "sleep"
         - mounting_mode [bool] True/False
         - on [bool] True/False
-        - preset [str]
+        - preset [ThermostatPreset]
           - "auto"
           - "boost"
           - "comfort"
@@ -402,13 +452,13 @@ class ThermostatHandler(APIItems[Thermostat]):
           - "manual"
         - schedule [list]
         - set_valve [bool] True/False
-        - swing_mode [str]
+        - swing_mode [ThermostatSwingMode]
           - "fully closed"
           - "fully open"
           - "half open"
           - "quarter open"
           - "three quarters open"
-        - temperature_measurement [str]
+        - temperature_measurement [ThermostatTemperatureMeasurement]
           - "air sensor"
           - "floor protection"
           - "floor sensor"
@@ -474,6 +524,7 @@ class WaterHandler(APIItems[Water]):
 
 
 SensorResources = Union[
+    AirPurifier,
     AirQuality,
     Alarm,
     AncillaryControl,
@@ -508,6 +559,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
     def __init__(self, gateway: DeconzSession) -> None:
         """Initialize sensor manager."""
 
+        self.air_purifier = AirPurifierHandler(gateway)
         self.air_quality = AirQualityHandler(gateway)
         self.alarm = AlarmHandler(gateway)
         self.ancillary_control = AncillaryControlHandler(gateway)
@@ -533,6 +585,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
         self.water = WaterHandler(gateway)
 
         handlers: list[APIItems[Any]] = [
+            self.air_purifier,
             self.air_quality,
             self.alarm,
             self.ancillary_control,

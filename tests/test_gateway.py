@@ -81,7 +81,7 @@ async def test_initial_state(deconz_session, deconz_refresh_state, count_subscri
     assert count_subscribers() == 1  # Scene subscribed to groups
 
     unsub = deconz_session.subscribe(session_subscription := Mock())
-    assert count_subscribers() == 33
+    assert count_subscribers() == 34
 
     await deconz_refresh_state(
         alarm_systems={"0": {}},
