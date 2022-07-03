@@ -11,6 +11,43 @@ from . import LightBase
 LOGGER = logging.getLogger(__name__)
 
 
+class Alert(enum.Enum):
+    """Temporary alert effect.
+
+    Supported values:
+    - "none" — light is not performing an alert.
+    - "lselect" — light is blinking a longer time.
+    - "select" — light is blinking a short time.
+    - "blink"
+    - "breathe"
+    - "channelchange"
+    - "finish"
+    - "okay"
+    - "stop"
+    """
+
+    NONE = "none"
+    LONG = "lselect"
+    SHORT = "select"
+
+    # Specific to Hue color bulbs
+
+    BLINK = "blink"
+    BREATHE = "breathe"
+    CHANNEL_CHANGE = "channelchange"
+    FINISH = "finish"
+    OKAY = "okay"
+    STOP = "stop"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "Alert":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light alert type %s", value)
+        return Alert.UNKNOWN
+
+
 class ColorCapability(enum.IntFlag):
     """Bit field of features supported by a light device."""
 
@@ -29,14 +66,98 @@ class ColorCapability(enum.IntFlag):
         return ColorCapability.UNKNOWN
 
 
+class Effect(enum.Enum):
+    """Effect of the light.
+
+    Supported values:
+    - "colorloop" — cycle through hue values 0-360
+    - "none" — no effect
+    - "carnival"
+    - "collide"
+    - "fading"
+    - "fireworks"
+    - "flag"
+    - "glow"
+    - "rainbow"
+    - "snake"
+    - "snow"
+    - "sparkles"
+    - "steady"
+    - "strobe"
+    - "twinkle"
+    - "updown"
+    - "vintage"
+    - "waves"
+    """
+
+    COLORLOOP = "colorloop"
+    NONE = "none"
+
+    # Specific to Lidl christmas light
+
+    CARNIVAL = "carnival"
+    COLLIDE = "collide"
+    FADING = "fading"
+    FIREWORKS = "fireworks"
+    FLAG = "flag"
+    GLOW = "glow"
+    RAINBOW = "rainbow"
+    SNAKE = "snake"
+    SNOW = "snow"
+    SPARKLES = "sparkles"
+    STEADY = "steady"
+    STROBE = "strobe"
+    TWINKLE = "twinkle"
+    UPDOWN = "updown"
+    VINTAGE = "vintage"
+    WAVES = "waves"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "Effect":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light effect type %s", value)
+        return Effect.UNKNOWN
+
+
 class TypedLightState(TypedDict):
     """Light state type definition."""
 
-    alert: Literal["none", "select", "lselect"]
+    alert: Literal[
+        "none",
+        "select",
+        "lselect",
+        "blink",
+        "breathe",
+        "channelchange",
+        "finish",
+        "okay",
+        "stop",
+    ]
     bri: int
     colormode: Literal["ct", "hs", "xy"]
     ct: int
-    effect: Literal["colorloop", "none"]
+    effect: Literal[
+        "colorloop",
+        "none",
+        "carnival",
+        "collide",
+        "fading",
+        "fireworks",
+        "flag",
+        "glow",
+        "rainbow",
+        "snake",
+        "snow",
+        "sparkles",
+        "steady",
+        "strobe",
+        "twinkle",
+        "updown",
+        "vintage",
+        "waves",
+    ]
     hue: int
     on: bool
     sat: int
@@ -62,7 +183,19 @@ class Light(LightBase):
     raw: TypedLight
 
     @property
-    def alert(self) -> Literal["none", "select", "lselect"] | None:
+    def alert(
+        self,
+    ) -> Literal[
+        "none",
+        "select",
+        "lselect",
+        "blink",
+        "breathe",
+        "channelchange",
+        "finish",
+        "okay",
+        "stop",
+    ] | None:
         """Temporary alert effect.
 
         Following values are possible:
@@ -157,7 +290,28 @@ class Light(LightBase):
         return ctmin
 
     @property
-    def effect(self) -> Literal["colorloop", "none"] | None:
+    def effect(
+        self,
+    ) -> Literal[
+        "colorloop",
+        "none",
+        "carnival",
+        "collide",
+        "fading",
+        "fireworks",
+        "flag",
+        "glow",
+        "rainbow",
+        "snake",
+        "snow",
+        "sparkles",
+        "steady",
+        "strobe",
+        "twinkle",
+        "updown",
+        "vintage",
+        "waves",
+    ] | None:
         """Effect of the light.
 
         colorloop — the light will cycle continuously through all colors
