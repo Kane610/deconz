@@ -186,7 +186,6 @@ async def test_switch_sensor_hue_wall_switch_module(deconz_sensor):
 
     # DeconzSensor
     assert sensor.battery == 100
-    assert not sensor.config_pending
     assert sensor.ep == 1
     assert not sensor.low_battery
     assert sensor.on

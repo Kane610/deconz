@@ -37,7 +37,6 @@ async def test_air_quality_sensor(deconz_sensor):
 
     # DeconzSensor
     assert sensor.battery is None
-    assert sensor.config_pending is None
     assert sensor.ep == 2
     assert sensor.low_battery is None
     assert sensor.on is True
