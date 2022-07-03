@@ -31,15 +31,6 @@ class SensorBase(DeconzDevice):
         return raw.get("battery")
 
     @property
-    def config_pending(self) -> list[str] | None:
-        """List of configurations pending device acceptance.
-
-        Only supported by Hue devices.
-        """
-        raw: dict[str, list[str]] = self.raw["config"]
-        return raw.get("pending")
-
-    @property
     def ep(self) -> int | None:
         """Endpoint of sensor."""
         raw: dict[str, int] = self.raw

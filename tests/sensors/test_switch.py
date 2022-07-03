@@ -3,11 +3,7 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.switch tests/sensors/test_switch.py
 """
 
-from pydeconz.models.sensor.switch import (
-    SwitchDeviceMode,
-    SwitchMode,
-    SwitchWindowCoveringType,
-)
+from pydeconz.models.sensor.switch import SwitchDeviceMode, SwitchWindowCoveringType
 
 
 async def test_configure_switch_sensor(
@@ -22,14 +18,6 @@ async def test_configure_switch_sensor(
         "put",
         path="/sensors/0/config",
         json={"devicemode": "dualrocker"},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await switch.set_config("0", mode=SwitchMode.ROCKER)
-    assert deconz_called_with(
-        "put",
-        path="/sensors/0/config",
-        json={"mode": "rocker"},
     )
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
@@ -180,13 +168,11 @@ async def test_switch_sensor_hue_wall_switch_module(deconz_sensor):
     assert sensor.device_mode == SwitchDeviceMode.DUALROCKER
     assert not sensor.angle
     assert not sensor.gesture
-    assert not sensor.mode
     assert not sensor.window_covering_type
     assert not sensor.xy
 
     # DeconzSensor
     assert sensor.battery == 100
-    assert not sensor.config_pending
     assert sensor.ep == 1
     assert not sensor.low_battery
     assert sensor.on
@@ -281,7 +267,6 @@ async def test_switch_ubisys_j1(deconz_sensor):
     assert sensor.button_event is None
     assert sensor.angle is None
     assert sensor.xy is None
-    assert sensor.mode == SwitchMode.MOMENTARY
     assert sensor.window_covering_type == SwitchWindowCoveringType.ROLLER_SHADE
 
     # DeconzSensor
