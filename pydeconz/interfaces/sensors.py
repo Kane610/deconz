@@ -24,7 +24,12 @@ from ..models.sensor.power import Power
 from ..models.sensor.presence import Presence
 from ..models.sensor.pressure import Pressure
 from ..models.sensor.relative_rotary import RelativeRotary
-from ..models.sensor.switch import Switch, SwitchDeviceMode, SwitchWindowCoveringType
+from ..models.sensor.switch import (
+    Switch,
+    SwitchDeviceMode,
+    SwitchMode,
+    SwitchWindowCoveringType,
+)
 from ..models.sensor.temperature import Temperature
 from ..models.sensor.thermostat import (
     Thermostat,
@@ -344,6 +349,7 @@ class SwitchHandler(APIItems[Switch]):
         self,
         id: str,
         device_mode: SwitchDeviceMode | None = None,
+        mode: SwitchMode | None = None,
         window_covering_type: SwitchWindowCoveringType | None = None,
     ) -> dict[str, Any]:
         """Change config of presence sensor.
@@ -354,11 +360,16 @@ class SwitchHandler(APIItems[Switch]):
           - "dualrocker"
           - "singlepushbutton"
           - "singlerocker"
+        - mode [SwitchMode]
+          - "momentary"
+          - "rocker"
         - window_covering_type [SwitchWindowCoveringType] 0-9
         """
         data: dict[str, int | str] = {}
         if device_mode is not None:
             data["devicemode"] = device_mode.value
+        if mode is not None:
+            data["mode"] = mode.value
         if window_covering_type is not None:
             data["windowcoveringtype"] = window_covering_type.value
         return await self.gateway.request_with_retry(

@@ -17,6 +17,13 @@ class SwitchDeviceMode(enum.Enum):
     DUALPUSHBUTTON = "dualpushbutton"
 
 
+class SwitchMode(enum.Enum):
+    """For Ubisys S1/S2, operation mode of the switch."""
+
+    MOMENTARY = "momentary"
+    ROCKER = "rocker"
+
+
 class SwitchWindowCoveringType(enum.IntEnum):
     """Set the covering type and starts calibration for Ubisys J1."""
 
@@ -38,6 +45,7 @@ class TypedSwitchConfig(TypedDict):
     devicemode: Literal[
         "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
     ]
+    mode: Literal["momentary", "rocker"]
     windowcoveringtype: Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
@@ -109,6 +117,13 @@ class Switch(SensorBase):
         """
         if "devicemode" in self.raw["config"]:
             return SwitchDeviceMode(self.raw["config"]["devicemode"])
+        return None
+
+    @property
+    def mode(self) -> SwitchMode | None:
+        """For Ubisys S1/S2, operation mode of the switch."""
+        if "mode" in self.raw["config"]:
+            return SwitchMode(self.raw["config"]["mode"])
         return None
 
     @property
