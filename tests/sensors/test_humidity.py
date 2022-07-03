@@ -1,4 +1,4 @@
-"""Test pydeCONZ door lock.
+"""Test pydeCONZ humidity.
 
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.humidity tests/sensors/test_humidity.py
 """
