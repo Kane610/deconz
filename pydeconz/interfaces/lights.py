@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import enum
+import logging
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
 from ..models.light.configuration_tool import ConfigurationTool
 from ..models.light.cover import Cover
 from ..models.light.fan import Fan
-from ..models.light.light import Light
+from ..models.light.light import Alert, Effect, Light
 from ..models.light.lock import Lock
 from ..models.light.range_extender import RangeExtender
 from ..models.light.siren import Siren
@@ -18,18 +19,7 @@ from .api import APIItems, GroupedAPIItems
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
-
-class Alert(enum.Enum):
-    """Temporary alert effect.
-
-    "none" — light is not performing an alert.
-    "lselect" — light is blinking a longer time.
-    "select" — light is blinking a short time.
-    """
-
-    NONE = "none"
-    LONG = "lselect"
-    SHORT = "select"
+LOGGER = logging.getLogger(__name__)
 
 
 class CoverAction(enum.Enum):
@@ -38,17 +28,6 @@ class CoverAction(enum.Enum):
     CLOSE = enum.auto()
     OPEN = enum.auto()
     STOP = enum.auto()
-
-
-class Effect(enum.Enum):
-    """Effect of the light.
-
-    "colorloop" — cycle through hue values 0-360.
-    "none" — no effect.
-    """
-
-    COLORLOOP = "colorloop"
-    NONE = "none"
 
 
 class FanSpeed(enum.Enum):
