@@ -125,6 +125,9 @@ class ResourceType(Enum):
     ZHA_PRESSURE = "ZHAPressure"
     CLIP_PRESSURE = "CLIPPressure"
 
+    # Relative rotary
+    ZHA_RELATIVE_ROTARY = "ZHARelativeRotary"
+
     # Switch
     ZHA_SWITCH = "ZHASwitch"
     ZGP_SWITCH = "ZGPSwitch"

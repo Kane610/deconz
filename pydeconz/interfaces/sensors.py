@@ -23,6 +23,7 @@ from ..models.sensor.open_close import OpenClose
 from ..models.sensor.power import Power
 from ..models.sensor.presence import Presence
 from ..models.sensor.pressure import Pressure
+from ..models.sensor.relative_rotary import RelativeRotary
 from ..models.sensor.switch import (
     Switch,
     SwitchDeviceMode,
@@ -325,6 +326,14 @@ class PressureHandler(APIItems[Pressure]):
     item_cls = Pressure
 
 
+class RelativeRotaryHandler(APIItems[RelativeRotary]):
+    """Handler for relative rotary sensor."""
+
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_RELATIVE_ROTARY
+    item_cls = RelativeRotary
+
+
 class SwitchHandler(APIItems[Switch]):
     """Handler for switch sensor."""
 
@@ -542,6 +551,7 @@ SensorResources = Union[
     Power,
     Presence,
     Pressure,
+    RelativeRotary,
     Switch,
     Temperature,
     Thermostat,
@@ -577,6 +587,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
         self.power = PowerHandler(gateway)
         self.presence = PresenceHandler(gateway)
         self.pressure = PressureHandler(gateway)
+        self.relative_rotary = RelativeRotaryHandler(gateway)
         self.switch = SwitchHandler(gateway)
         self.temperature = TemperatureHandler(gateway)
         self.thermostat = ThermostatHandler(gateway)
@@ -603,6 +614,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
             self.power,
             self.presence,
             self.pressure,
+            self.relative_rotary,
             self.switch,
             self.temperature,
             self.thermostat,
