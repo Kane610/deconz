@@ -30,7 +30,7 @@ async def test_air_quality_sensor(deconz_sensor):
 
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
-    assert sensor.air_quality == AirQualityValue.POOR
+    assert sensor.air_quality == AirQualityValue.POOR.value
     assert sensor.supports_air_quality_ppb is True
     assert sensor.air_quality_ppb == 809
     assert sensor.supports_pm_2_5 is False
@@ -81,7 +81,7 @@ async def test_air_quality_sensor_with_pm2_5(deconz_sensor):
 
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
-    assert sensor.air_quality == AirQualityValue.EXCELLENT
+    assert sensor.air_quality == AirQualityValue.EXCELLENT.value
     assert sensor.supports_air_quality_ppb is False
     assert sensor.supports_pm_2_5 is True
     assert sensor.pm_2_5 == 8

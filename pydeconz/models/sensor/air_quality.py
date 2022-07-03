@@ -55,9 +55,9 @@ class AirQuality(SensorBase):
     raw: TypedAirQuality
 
     @property
-    def air_quality(self) -> AirQualityValue:
+    def air_quality(self) -> str:  # AirQualityValue:
         """Air quality."""
-        return AirQualityValue(self.raw["state"]["airquality"])
+        return AirQualityValue(self.raw["state"]["airquality"]).value
 
     @property
     def air_quality_ppb(self) -> int:
