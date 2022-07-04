@@ -10,9 +10,7 @@ from pydeconz.models.sensor.presence import (
 )
 
 
-async def test_configure_presence_sensor(
-    mock_aioresponse, deconz_session, deconz_called_with
-):
+async def test_handler_presence(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that configuring presence sensor works."""
     presence = deconz_session.sensors.presence
 
@@ -73,7 +71,7 @@ async def test_configure_presence_sensor(
     )
 
 
-async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
+async def test_sensor_presence(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that presence sensor works."""
     sensor = await deconz_sensor(
         {

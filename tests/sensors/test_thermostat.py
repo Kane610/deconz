@@ -15,9 +15,7 @@ from pydeconz.models.sensor.thermostat import (
 )
 
 
-async def test_configure_thermostat(
-    mock_aioresponse, deconz_session, deconz_called_with
-):
+async def test_handler_thermostat(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that configuring thermostat sensor works."""
     thermostat = deconz_session.sensors.thermostat
 
@@ -67,7 +65,7 @@ async def test_configure_thermostat(
     )
 
 
-async def test_danfoss_thermostat(deconz_sensor):
+async def test_sensor_danfoss_thermostat(deconz_sensor):
     """Verify that Danfoss thermostat works.
 
     Danfoss thermostat is the simplest kind with only control over temperaturdeconz_sensore.
@@ -151,7 +149,7 @@ async def test_danfoss_thermostat(deconz_sensor):
     assert sensor.unique_id == "14:b4:57:ff:fe:d5:4e:77-01-0201"
 
 
-async def test_eurotronic_thermostat(deconz_sensor):
+async def test_sensor_eurotronic_thermostat(deconz_sensor):
     """Verify that thermostat sensor works."""
     sensor = await deconz_sensor(
         {
@@ -225,7 +223,7 @@ async def test_eurotronic_thermostat(deconz_sensor):
     assert sensor.unique_id == "00:15:8d:00:01:92:d2:51-01-0201"
 
 
-async def test_tuya_thermostat(mock_aioresponse, deconz_sensor, deconz_called_with):
+async def test_sensor_tuya_thermostat(deconz_sensor):
     """Verify that Tuya thermostat works."""
     sensor = await deconz_sensor(
         {

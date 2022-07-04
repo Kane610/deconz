@@ -6,7 +6,7 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 from pydeconz.models.sensor.door_lock import DoorLockLockState
 
 
-async def test_control_door_lock(mock_aioresponse, deconz_session, deconz_called_with):
+async def test_handler_door_lock(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that door lock sensor works."""
     locks = deconz_session.sensors.door_lock
 
@@ -19,7 +19,7 @@ async def test_control_door_lock(mock_aioresponse, deconz_session, deconz_called
     assert deconz_called_with("put", path="/sensors/0/config", json={"lock": False})
 
 
-async def test_door_lock_sensor(deconz_sensor):
+async def test_sensor_door_lock(deconz_sensor):
     """Verify that door lock sensor works."""
     sensor = await deconz_sensor(
         {

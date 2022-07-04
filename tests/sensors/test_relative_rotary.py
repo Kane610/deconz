@@ -6,7 +6,7 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 from pydeconz.models.sensor.relative_rotary import RelativeRotaryEvent
 
 
-async def test_relative_rotary_sensor(deconz_sensor):
+async def test_sensor_relative_rotary(deconz_sensor):
     """Verify that relative rotary sensor works."""
     sensor = await deconz_sensor(
         {

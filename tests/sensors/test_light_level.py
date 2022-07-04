@@ -4,7 +4,7 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 """
 
 
-async def test_configure_lightlevel_sensor(
+async def test_handler_light_level(
     mock_aioresponse, deconz_session, deconz_called_with
 ):
     """Verify that configuring light level sensors works."""
@@ -35,7 +35,7 @@ async def test_configure_lightlevel_sensor(
     )
 
 
-async def test_lightlevel_sensor(deconz_sensor):
+async def test_sensor_light_level(deconz_sensor):
     """Verify that light level sensor works."""
     sensor = await deconz_sensor(
         {

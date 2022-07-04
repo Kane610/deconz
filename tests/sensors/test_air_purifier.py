@@ -6,7 +6,7 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 from pydeconz.models.sensor.air_purifier import AirPurifierFanMode
 
 
-async def test_control_air_purifier(
+async def test_handler_air_purifier(
     mock_aioresponse, deconz_session, deconz_called_with
 ):
     """Verify that air purifier controls works."""
@@ -38,7 +38,7 @@ async def test_control_air_purifier(
     )
 
 
-async def test_air_purifier_sensor(deconz_sensor):
+async def test_sensor_air_purifier(deconz_sensor):
     """Verify that air purifier sensor works."""
     sensor = await deconz_sensor(
         {

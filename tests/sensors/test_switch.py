@@ -10,9 +10,7 @@ from pydeconz.models.sensor.switch import (
 )
 
 
-async def test_configure_switch_sensor(
-    mock_aioresponse, deconz_session, deconz_called_with
-):
+async def test_handler_switch(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that configuring presence sensor works."""
     switch = deconz_session.sensors.switch
 
@@ -41,7 +39,7 @@ async def test_configure_switch_sensor(
     )
 
 
-async def test_switch_sensor(deconz_sensor):
+async def test_sensor_switch(deconz_sensor):
     """Verify that switch sensor works."""
     sensor = await deconz_sensor(
         {
@@ -92,7 +90,7 @@ async def test_switch_sensor(deconz_sensor):
     assert sensor.unique_id == "00:17:88:01:02:0e:32:a3-02-fc00"
 
 
-async def test_switch_sensor_cube(deconz_sensor):
+async def test_sensor_switch_sensor_cube(deconz_sensor):
     """Verify that cube switch sensor works."""
     sensor = await deconz_sensor(
         {
@@ -144,7 +142,7 @@ async def test_switch_sensor_cube(deconz_sensor):
     assert sensor.unique_id == "00:15:8d:00:02:8b:3b:24-03-000c"
 
 
-async def test_switch_sensor_hue_wall_switch_module(deconz_sensor):
+async def test_sensor_switch_hue_wall_switch_module(deconz_sensor):
     """Verify that cube switch sensor works."""
     sensor = await deconz_sensor(
         {
@@ -204,7 +202,7 @@ async def test_switch_sensor_hue_wall_switch_module(deconz_sensor):
     assert sensor.unique_id == "00:17:88:01:0b:00:05:5d-01-fc00"
 
 
-async def test_switch_sensor_tint_remote(deconz_sensor):
+async def test_sensor_switch_tint_remote(deconz_sensor):
     """Verify that tint remote sensor works."""
     sensor = await deconz_sensor(
         {
@@ -251,7 +249,7 @@ async def test_switch_sensor_tint_remote(deconz_sensor):
     assert sensor.unique_id == "00:11:22:33:44:55:66:77-01-1000"
 
 
-async def test_switch_ubisys_j1(deconz_sensor):
+async def test_sensor_switch_ubisys_j1(deconz_sensor):
     """Verify that tint remote sensor works."""
     sensor = await deconz_sensor(
         {

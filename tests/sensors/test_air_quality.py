@@ -6,7 +6,7 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 from pydeconz.models.sensor.air_quality import AirQualityValue
 
 
-async def test_air_quality_sensor(deconz_sensor):
+async def test_sensor_air_quality(deconz_sensor):
     """Verify that air quality sensor works."""
     sensor = await deconz_sensor(
         {
@@ -55,7 +55,7 @@ async def test_air_quality_sensor(deconz_sensor):
     assert sensor.unique_id == "00:12:4b:00:14:4d:00:07-02-fdef"
 
 
-async def test_air_quality_sensor_with_pm2_5(deconz_sensor):
+async def test_sensor_air_quality_with_pm2_5(deconz_sensor):
     """Verify that air quality with PM 2.5 sensor works."""
     sensor = await deconz_sensor(
         {

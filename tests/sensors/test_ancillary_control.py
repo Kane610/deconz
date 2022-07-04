@@ -11,7 +11,7 @@ from pydeconz.models.sensor.ancillary_control import (
 )
 
 
-async def test_ancillary_control_sensor(deconz_sensor):
+async def test_sensor_ancillary_control(deconz_sensor):
     """Verify that ancillary control sensor works."""
     sensor = await deconz_sensor(
         {
