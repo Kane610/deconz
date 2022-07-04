@@ -5,6 +5,8 @@ pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 
 from tests import sensors as sensor_test_data
 
+from pydeconz.models import ResourceType
+
 
 async def test_create_all_sensors(deconz_refresh_state):
     """Verify that creating all sensors work."""
@@ -39,28 +41,28 @@ async def test_create_all_sensors(deconz_refresh_state):
     )
     sensors = deconz_session.sensors
     assert len(sensors._handlers) == 25
-    assert sensors["0"].type == "ZHAAirPurifier"
-    assert sensors["1"].type == "ZHAAirQuality"
-    assert sensors["2"].type == "ZHAAlarm"
-    assert sensors["3"].type == "ZHAAncillaryControl"
-    assert sensors["4"].type == "ZHABattery"
-    assert sensors["5"].type == "ZHACarbonMonoxide"
-    assert sensors["6"].type == "ZHAConsumption"
-    assert sensors["7"].type == "Daylight"
-    assert sensors["8"].type == "ZHADoorLock"
-    assert sensors["9"].type == "ZHAFire"
-    assert sensors["10"].type == "CLIPGenericFlag"
-    assert sensors["11"].type == "CLIPGenericStatus"
-    assert sensors["12"].type == "ZHAHumidity"
-    assert sensors["13"].type == "ZHALightLevel"
-    assert sensors["14"].type == "ZHAOpenClose"
-    assert sensors["15"].type == "ZHAPower"
-    assert sensors["16"].type == "ZHAPresence"
-    assert sensors["17"].type == "ZHAPressure"
-    assert sensors["18"].type == "ZHARelativeRotary"
-    assert sensors["19"].type == "ZHASwitch"
-    assert sensors["20"].type == "ZHATemperature"
-    assert sensors["21"].type == "ZHAThermostat"
-    assert sensors["22"].type == "ZHATime"
-    assert sensors["23"].type == "ZHAVibration"
-    assert sensors["24"].type == "ZHAWater"
+    assert sensors["0"].type == ResourceType.ZHA_AIR_PURIFIER.value
+    assert sensors["1"].type == ResourceType.ZHA_AIR_QUALITY.value
+    assert sensors["2"].type == ResourceType.ZHA_ALARM.value
+    assert sensors["3"].type == ResourceType.ZHA_ANCILLARY_CONTROL.value
+    assert sensors["4"].type == ResourceType.ZHA_BATTERY.value
+    assert sensors["5"].type == ResourceType.ZHA_CARBON_MONOXIDE.value
+    assert sensors["6"].type == ResourceType.ZHA_CONSUMPTION.value
+    assert sensors["7"].type == ResourceType.DAYLIGHT.value
+    assert sensors["8"].type == ResourceType.ZHA_DOOR_LOCK.value
+    assert sensors["9"].type == ResourceType.ZHA_FIRE.value
+    assert sensors["10"].type == ResourceType.CLIP_GENERIC_FLAG.value
+    assert sensors["11"].type == ResourceType.CLIP_GENERIC_STATUS.value
+    assert sensors["12"].type == ResourceType.ZHA_HUMIDITY.value
+    assert sensors["13"].type == ResourceType.ZHA_LIGHT_LEVEL.value
+    assert sensors["14"].type == ResourceType.ZHA_OPEN_CLOSE.value
+    assert sensors["15"].type == ResourceType.ZHA_POWER.value
+    assert sensors["16"].type == ResourceType.ZHA_PRESENCE.value
+    assert sensors["17"].type == ResourceType.ZHA_PRESSURE.value
+    assert sensors["18"].type == ResourceType.ZHA_RELATIVE_ROTARY.value
+    assert sensors["19"].type == ResourceType.ZHA_SWITCH.value
+    assert sensors["20"].type == ResourceType.ZHA_TEMPERATURE.value
+    assert sensors["21"].type == ResourceType.ZHA_THERMOSTAT.value
+    assert sensors["22"].type == ResourceType.ZHA_TIME.value
+    assert sensors["23"].type == ResourceType.ZHA_VIBRATION.value
+    assert sensors["24"].type == ResourceType.ZHA_WATER.value

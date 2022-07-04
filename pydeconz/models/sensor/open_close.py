@@ -2,6 +2,8 @@
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -20,7 +22,7 @@ class TypedOpenClose(TypedDict):
 class OpenClose(SensorBase):
     """Door/Window sensor."""
 
-    ZHATYPE = ("ZHAOpenClose", "CLIPOpenClose")
+    ZHATYPE = (ResourceType.ZHA_OPEN_CLOSE.value, ResourceType.CLIP_OPEN_CLOSE.value)
 
     raw: TypedOpenClose
 

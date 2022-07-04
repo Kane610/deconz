@@ -2,6 +2,8 @@
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -20,7 +22,7 @@ class TypedTime(TypedDict):
 class Time(SensorBase):
     """Time sensor."""
 
-    ZHATYPE = ("ZHATime",)
+    ZHATYPE = (ResourceType.ZHA_TIME.value,)
 
     raw: TypedTime
 
