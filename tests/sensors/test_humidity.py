@@ -4,7 +4,7 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 """
 
 
-async def test_configure_humidity(mock_aioresponse, deconz_session, deconz_called_with):
+async def test_handler_humidity(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that humidity sensor works."""
     humidity = deconz_session.sensors.humidity
 
@@ -13,7 +13,7 @@ async def test_configure_humidity(mock_aioresponse, deconz_session, deconz_calle
     assert deconz_called_with("put", path="/sensors/0/config", json={"offset": 1})
 
 
-async def test_humidity_sensor(deconz_sensor):
+async def test_sensor_humidity(deconz_sensor):
     """Verify that humidity sensor works."""
     sensor = await deconz_sensor(
         {
@@ -26,7 +26,7 @@ async def test_humidity_sensor(deconz_sensor):
             "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
             "swversion": "20161129",
             "type": "ZHAHumidity",
-            "uniqueid": "00:15:8d:00:02:45:dc:53-01-0405",
+            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0405",
         },
     )
 
@@ -53,4 +53,4 @@ async def test_humidity_sensor(deconz_sensor):
     assert sensor.name == "Mi temperature 1"
     assert sensor.software_version == "20161129"
     assert sensor.type == "ZHAHumidity"
-    assert sensor.unique_id == "00:15:8d:00:02:45:dc:53-01-0405"
+    assert sensor.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-01-0405"
