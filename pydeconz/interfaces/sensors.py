@@ -21,7 +21,11 @@ from ..models.sensor.humidity import Humidity
 from ..models.sensor.light_level import LightLevel
 from ..models.sensor.open_close import OpenClose
 from ..models.sensor.power import Power
-from ..models.sensor.presence import Presence
+from ..models.sensor.presence import (
+    Presence,
+    PresenceConfigDeviceMode,
+    PresenceConfigTriggerDistance,
+)
 from ..models.sensor.pressure import Pressure
 from ..models.sensor.relative_rotary import RelativeRotary
 from ..models.sensor.switch import (
@@ -289,25 +293,41 @@ class PresenceHandler(APIItems[Presence]):
         self,
         id: str,
         delay: int | None = None,
+        device_mode: PresenceConfigDeviceMode | None = None,
         duration: int | None = None,
+        reset_presence: bool | None = None,
         sensitivity: int | None = None,
+        trigger_distance: PresenceConfigTriggerDistance | None = None,
     ) -> dict[str, Any]:
         """Change config of presence sensor.
 
         Supported values:
         - delay [int] 0-65535 (in seconds)
+        - device_mode [str]
+          - leftright
+          - undirected
         - duration [int] 0-65535 (in seconds)
+        - reset_presence [bool] True/False
         - sensitivity [int] 0-[sensitivitymax]
+        - trigger_distance [str]
+          - far
+          - medium
+          - near
         """
-        data = {
+        data: dict[str, int | str] = {
             key: value
             for key, value in {
                 "delay": delay,
                 "duration": duration,
+                "resetpresence": reset_presence,
                 "sensitivity": sensitivity,
             }.items()
             if value is not None
         }
+        if device_mode is not None:
+            data["devicemode"] = device_mode.value
+        if trigger_distance is not None:
+            data["triggerdistance"] = trigger_distance.value
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
