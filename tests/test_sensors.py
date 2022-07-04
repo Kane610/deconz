@@ -3,462 +3,64 @@
 pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 """
 
+from tests import sensors as sensor_test_data
 
-async def test_create_all_sensor_types(deconz_refresh_state):
+
+async def test_create_all_sensors(deconz_refresh_state):
     """Verify that creating all sensors work."""
     deconz_session = await deconz_refresh_state(
         sensors={
-            "0": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 2500,
-                },
-                "ep": 1,
-                "etag": "fae893708dfe9b358df59107d944fa1c",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.sensor_wleak.aq1",
-                "name": "water2",
-                "state": {
-                    "lastupdated": "2019-01-29T07:13:20",
-                    "lowbattery": False,
-                    "tampered": False,
-                    "water": False,
-                },
-                "swversion": "20170721",
-                "type": "ZHAWater",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0500",
-            },
-            "1": {
-                "config": {
-                    "battery": 91,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                    "sensitivity": 21,
-                    "sensitivitymax": 21,
-                    "temperature": 3200,
-                },
-                "ep": 1,
-                "etag": "b7599df551944df97b2aa87d160b9c45",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.vibration.aq1",
-                "name": "Vibration 1",
-                "state": {
-                    "lastupdated": "2019-03-09T15:53:07",
-                    "orientation": [10, 1059, 0],
-                    "tiltangle": 83,
-                    "vibration": True,
-                    "vibrationstrength": 114,
-                },
-                "swversion": "20180130",
-                "type": "ZHAVibration",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0101",
-            },
-            "2": {
-                "config": {"battery": 40, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "28e796678d9a24712feef59294343bb6",
-                "lastseen": "2020-11-22T11:26Z",
-                "manufacturername": "Danfoss",
-                "modelid": "eTRV0100",
-                "name": "eTRV Séjour",
-                "state": {
-                    "lastset": "2020-11-19T08:07:08Z",
-                    "lastupdated": "2020-11-22T10:51:03.444",
-                    "localtime": "2020-11-22T10:51:01",
-                    "utc": "2020-11-22T10:51:01Z",
-                },
-                "swversion": "20200429",
-                "type": "ZHATime",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-000a",
-            },
-            "3": {
-                "config": {
-                    "battery": 59,
-                    "displayflipped": None,
-                    "heatsetpoint": 2100,
-                    "locked": None,
-                    "mountingmode": None,
-                    "offset": 0,
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "6130553ac247174809bae47144ee23f8",
-                "lastseen": "2020-11-29T19:31Z",
-                "manufacturername": "Danfoss",
-                "modelid": "eTRV0100",
-                "name": "Thermostat_stue_sofa",
-                "state": {
-                    "errorcode": None,
-                    "lastupdated": "2020-11-29T19:28:40.665",
-                    "mountingmodeactive": False,
-                    "on": True,
-                    "temperature": 2102,
-                    "valve": 24,
-                    "windowopen": "Closed",
-                },
-                "swversion": "01.02.0008 01.02",
-                "type": "ZHAThermostat",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0201",
-            },
-            "4": {
-                "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "1220e5d026493b6e86207993703a8a71",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.weather",
-                "name": "Mi temperature 1",
-                "state": {"lastupdated": "2019-05-05T14:39:00", "temperature": 2182},
-                "swversion": "20161129",
-                "type": "ZHATemperature",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0402",
-            },
-            "5": {
-                "config": {
-                    "battery": 100,
-                    "devicemode": "dualrocker",
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "01173dc5b19bb0a976006eee8d0d3718",
-                "lastseen": "2021-03-12T22:55Z",
-                "manufacturername": "Signify Netherlands B.V.",
-                "mode": 1,
-                "modelid": "RDM001",
-                "name": "RDM001 15",
-                "state": {
-                    "buttonevent": 1002,
-                    "eventduration": 1,
-                    "lastupdated": "2021-03-12T22:21:20.017",
-                },
-                "swversion": "20210115",
-                "type": "ZHASwitch",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-fc00",
-            },
-            "6": {
-                "config": {"battery": 100, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "1220e5d026493b6e86207993703a8a71",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.weather",
-                "name": "Mi temperature 1",
-                "state": {"lastupdated": "2019-05-05T14:39:00", "pressure": 1010},
-                "swversion": "20161129",
-                "type": "ZHAPressure",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0403",
-            },
-            "7": {
-                "config": {
-                    "alert": "none",
-                    "battery": 100,
-                    "delay": 0,
-                    "ledindication": False,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                    "sensitivity": 1,
-                    "sensitivitymax": 2,
-                    "usertest": False,
-                },
-                "ep": 2,
-                "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-                "manufacturername": "Philips",
-                "modelid": "SML001",
-                "name": "Motion sensor 4",
-                "state": {"lastupdated": "2019-05-05T14:37:06", "presence": False},
-                "swversion": "6.1.0.18912",
-                "type": "ZHAPresence",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-0406",
-            },
-            "8": {
-                "config": {"on": True, "reachable": True},
-                "ep": 1,
-                "etag": "96e71c7db4685b334d3d0decc3f11868",
-                "manufacturername": "Heiman",
-                "modelid": "SmartPlug",
-                "name": "Power 16",
-                "state": {
-                    "current": 34,
-                    "lastupdated": "2018-03-12T19:22:13",
-                    "power": 64,
-                    "voltage": 231,
-                },
-                "type": "ZHAPower",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0b04",
-            },
-            "9": {
-                "config": {
-                    "battery": 95,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 3300,
-                },
-                "ep": 1,
-                "etag": "66cc641d0368110da6882b50090174ac",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.sensor_magnet.aq2",
-                "name": "Back Door",
-                "state": {"lastupdated": "2019-05-05T14:54:32", "open": False},
-                "swversion": "20161128",
-                "type": "ZHAOpenClose",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0006",
-            },
-            "10": {
-                "config": {
-                    "alert": "none",
-                    "battery": 100,
-                    "ledindication": False,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                    "tholddark": 12000,
-                    "tholdoffset": 7000,
-                    "usertest": False,
-                },
-                "ep": 2,
-                "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-                "manufacturername": "Philips",
-                "modelid": "SML001",
-                "name": "Motion sensor 4",
-                "state": {
-                    "dark": True,
-                    "daylight": False,
-                    "lastupdated": "2019-05-05T14:37:06",
-                    "lightlevel": 6955,
-                    "lux": 5,
-                },
-                "swversion": "6.1.0.18912",
-                "type": "ZHALightLevel",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-0400",
-            },
-            "11": {
-                "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "1220e5d026493b6e86207993703a8a71",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.weather",
-                "name": "Mi temperature 1",
-                "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
-                "swversion": "20161129",
-                "type": "ZHAHumidity",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0405",
-            },
-            "12": {
-                "config": {"on": True, "reachable": True},
-                "etag": "aacc83bc7d6e4af7e44014e9f776b206",
-                "manufacturername": "Phoscon",
-                "modelid": "PHOSCON_FSM_STATE",
-                "name": "FSM_STATE Motion stair",
-                "state": {"lastupdated": "2019-04-24T00:00:25", "status": 0},
-                "swversion": "1.0",
-                "type": "CLIPGenericStatus",
-                "uniqueid": "fsm-state-1520195376277",
-            },
-            "13": {
-                "config": {"on": True, "reachable": True},
-                "modelid": "Switch",
-                "name": "Kitchen Switch",
-                "state": {"flag": True, "lastupdated": "2018-07-01T10:40:35"},
-                "swversion": "1.0.0",
-                "type": "CLIPGenericFlag",
-                "uniqueid": "kitchen-switch",
-            },
-            "14": {
-                "config": {"on": True, "battery": 90, "reachable": True},
-                "ep": 1,
-                "etag": "abcdef1234567890abcdef1234567890",
-                "manufacturername": "frient A/S",
-                "modelid": "SMSZB-120",
-                "name": "Fire alarm",
-                "state": {
-                    "fire": False,
-                    "lastupdated": "2021-11-25T08:00:02.003",
-                    "lowbattery": False,
-                    "test": True,
-                },
-                "swversion": "20210526 05:57",
-                "type": "ZHAFire",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-88-9900",
-            },
-            "15": {
-                "config": {
-                    "battery": 100,
-                    "lock": False,
-                    "on": True,
-                    "reachable": True,
-                },
-                "ep": 11,
-                "etag": "a43862f76b7fa48b0fbb9107df123b0e",
-                "lastseen": "2021-03-06T22:25Z",
-                "manufacturername": "Onesti Products AS",
-                "modelid": "easyCodeTouch_v1",
-                "name": "easyCodeTouch_v1",
-                "state": {
-                    "lastupdated": "2021-03-06T21:25:45.624",
-                    "lockstate": "unlocked",
-                },
-                "swversion": "20201211",
-                "type": "ZHADoorLock",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-xx-0101",
-            },
-            "16": {
-                "config": {
-                    "configured": True,
-                    "on": True,
-                    "sunriseoffset": 30,
-                    "sunsetoffset": -30,
-                },
-                "etag": "55047cf652a7e594d0ee7e6fae01dd38",
-                "manufacturername": "Philips",
-                "modelid": "PHDL00",
-                "name": "Daylight",
-                "state": {
-                    "daylight": True,
-                    "lastupdated": "2018-03-24T17:26:12",
-                    "status": 170,
-                },
-                "swversion": "1.0",
-                "type": "Daylight",
-            },
-            "17": {
-                "config": {"on": True, "reachable": True},
-                "ep": 1,
-                "etag": "a99e5bc463d15c23af7e89946e784cca",
-                "manufacturername": "Heiman",
-                "modelid": "SmartPlug",
-                "name": "Consumption 15",
-                "state": {
-                    "consumption": 11342,
-                    "lastupdated": "2018-03-12T19:19:08",
-                    "power": 123,
-                },
-                "type": "ZHAConsumption",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0702",
-            },
-            "18": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "b7599df551944df97b2aa87d160b9c45",
-                "manufacturername": "Heiman",
-                "modelid": "CO_V16",
-                "name": "Cave, CO",
-                "state": {
-                    "carbonmonoxide": False,
-                    "lastupdated": "none",
-                    "lowbattery": False,
-                    "tampered": False,
-                },
-                "swversion": "20150330",
-                "type": "ZHACarbonMonoxide",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0101",
-            },
-            "19": {
-                "config": {"alert": "none", "on": True, "reachable": True},
-                "ep": 1,
-                "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
-                "manufacturername": "IKEA of Sweden",
-                "modelid": "FYRTUR block-out roller blind",
-                "name": "FYRTUR block-out roller blind",
-                "state": {"battery": 100, "lastupdated": "none"},
-                "swversion": "2.2.007",
-                "type": "ZHABattery",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0001",
-            },
-            "20": {
-                "config": {
-                    "battery": 95,
-                    "enrolled": 1,
-                    "on": True,
-                    "pending": [],
-                    "reachable": True,
-                },
-                "ep": 1,
-                "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
-                "lastseen": "2021-07-25T18:07Z",
-                "manufacturername": "lk",
-                "modelid": "ZB-KeypadGeneric-D0002",
-                "name": "Keypad",
-                "state": {
-                    "action": "armed_stay",
-                    "lastupdated": "2021-07-25T18:02:51.172",
-                    "lowbattery": False,
-                    "panel": "exit_delay",
-                    "seconds_remaining": 55,
-                    "tampered": False,
-                },
-                "swversion": "3.13",
-                "type": "ZHAAncillaryControl",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0501",
-            },
-            "21": {
-                "config": {
-                    "battery": 100,
-                    "on": True,
-                    "reachable": True,
-                    "temperature": 2600,
-                },
-                "ep": 1,
-                "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
-                "manufacturername": "dresden elektronik",
-                "modelid": "lumi.sensor_motion.aq2",
-                "name": "Alarm 10",
-                "state": {
-                    "alarm": False,
-                    "lastupdated": "none",
-                    "lowbattery": None,
-                    "tampered": None,
-                },
-                "swversion": "20170627",
-                "type": "ZHAAlarm",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0500",
-            },
-            "22": {
-                "config": {"on": True, "reachable": True},
-                "ep": 2,
-                "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
-                "lastseen": "2020-11-20T22:48Z",
-                "manufacturername": "BOSCH",
-                "modelid": "AIR",
-                "name": "BOSCH Air quality sensor",
-                "state": {
-                    "airquality": "poor",
-                    "airqualityppb": 809,
-                    "lastupdated": "2020-11-20T22:48:00.209",
-                },
-                "swversion": "20200402",
-                "type": "ZHAAirQuality",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-fdef",
-            },
+            "0": sensor_test_data.test_air_purifier.DATA,
+            "1": sensor_test_data.test_air_quality.DATA,
+            "2": sensor_test_data.test_alarm.DATA,
+            "3": sensor_test_data.test_ancillary_control.DATA,
+            "4": sensor_test_data.test_battery.DATA,
+            "5": sensor_test_data.test_carbon_monoxide.DATA,
+            "6": sensor_test_data.test_consumption.DATA,
+            "7": sensor_test_data.test_daylight.DATA,
+            "8": sensor_test_data.test_door_lock.DATA,
+            "9": sensor_test_data.test_fire.DATA,
+            "10": sensor_test_data.test_generic_flag.DATA,
+            "11": sensor_test_data.test_generic_status.DATA,
+            "12": sensor_test_data.test_humidity.DATA,
+            "13": sensor_test_data.test_light_level.DATA,
+            "14": sensor_test_data.test_open_close.DATA,
+            "15": sensor_test_data.test_power.DATA,
+            "16": sensor_test_data.test_presence.DATA,
+            "17": sensor_test_data.test_pressure.DATA,
+            "18": sensor_test_data.test_relative_rotary.DATA,
+            "19": sensor_test_data.test_switch.DATA,
+            "20": sensor_test_data.test_temperature.DATA,
+            "21": sensor_test_data.test_thermostat.DATA,
+            "22": sensor_test_data.test_time.DATA,
+            "23": sensor_test_data.test_vibration.DATA,
+            "24": sensor_test_data.test_water.DATA,
         },
     )
     sensors = deconz_session.sensors
-    assert len(sensors.keys()) == 23
-    assert sensors["0"].type == "ZHAWater"
-    assert sensors["1"].type == "ZHAVibration"
-    assert sensors["2"].type == "ZHATime"
-    assert sensors["3"].type == "ZHAThermostat"
-    assert sensors["4"].type == "ZHATemperature"
-    assert sensors["5"].type == "ZHASwitch"
-    assert sensors["7"].type == "ZHAPresence"
-    assert sensors["8"].type == "ZHAPower"
-    assert sensors["9"].type == "ZHAOpenClose"
-    assert sensors["10"].type == "ZHALightLevel"
-    assert sensors["11"].type == "ZHAHumidity"
-    assert sensors["12"].type == "CLIPGenericStatus"
-    assert sensors["13"].type == "CLIPGenericFlag"
-    assert sensors["14"].type == "ZHAFire"
-    assert sensors["15"].type == "ZHADoorLock"
-    assert sensors["17"].type == "ZHAConsumption"
-    assert sensors["18"].type == "ZHACarbonMonoxide"
-    assert sensors["19"].type == "ZHABattery"
-    assert sensors["22"].type == "ZHAAirQuality"
+    assert len(sensors._handlers) == 25
+    assert sensors["0"].type == "ZHAAirPurifier"
+    assert sensors["1"].type == "ZHAAirQuality"
+    assert sensors["2"].type == "ZHAAlarm"
+    assert sensors["3"].type == "ZHAAncillaryControl"
+    assert sensors["4"].type == "ZHABattery"
+    assert sensors["5"].type == "ZHACarbonMonoxide"
+    assert sensors["6"].type == "ZHAConsumption"
+    assert sensors["7"].type == "Daylight"
+    assert sensors["8"].type == "ZHADoorLock"
+    assert sensors["9"].type == "ZHAFire"
+    assert sensors["10"].type == "CLIPGenericFlag"
+    assert sensors["11"].type == "CLIPGenericStatus"
+    assert sensors["12"].type == "ZHAHumidity"
+    assert sensors["13"].type == "ZHALightLevel"
+    assert sensors["14"].type == "ZHAOpenClose"
+    assert sensors["15"].type == "ZHAPower"
+    assert sensors["16"].type == "ZHAPresence"
+    assert sensors["17"].type == "ZHAPressure"
+    assert sensors["18"].type == "ZHARelativeRotary"
+    assert sensors["19"].type == "ZHASwitch"
+    assert sensors["20"].type == "ZHATemperature"
+    assert sensors["21"].type == "ZHAThermostat"
+    assert sensors["22"].type == "ZHATime"
+    assert sensors["23"].type == "ZHAVibration"
+    assert sensors["24"].type == "ZHAWater"

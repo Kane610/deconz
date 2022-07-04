@@ -5,6 +5,34 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 
 from pydeconz.models.sensor.air_purifier import AirPurifierFanMode
 
+DATA = {
+    "config": {
+        "filterlifetime": 256728,
+        "ledindication": True,
+        "locked": False,
+        "mode": "auto",
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "fea6623ea3909029409fed7a6224e60b",
+    "lastannounced": None,
+    "lastseen": "2022-06-30T18:19Z",
+    "manufacturername": "IKEA of Sweden",
+    "modelid": "STARKVIND Air purifier",
+    "name": "Starkvind",
+    "state": {
+        "deviceruntime": 185310,
+        "filterruntime": 182857,
+        "lastupdated": "2022-06-11T15:39:46.328",
+        "replacefilter": False,
+        "speed": 20,
+    },
+    "swversion": "1.0.033",
+    "type": "ZHAAirPurifier",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-fc7d",
+}
+
 
 async def test_handler_air_purifier(
     mock_aioresponse, deconz_session, deconz_called_with
@@ -40,35 +68,7 @@ async def test_handler_air_purifier(
 
 async def test_sensor_air_purifier(deconz_sensor):
     """Verify that air purifier sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "filterlifetime": 256728,
-                "ledindication": True,
-                "locked": False,
-                "mode": "auto",
-                "on": True,
-                "reachable": True,
-            },
-            "ep": 1,
-            "etag": "fea6623ea3909029409fed7a6224e60b",
-            "lastannounced": None,
-            "lastseen": "2022-06-30T18:19Z",
-            "manufacturername": "IKEA of Sweden",
-            "modelid": "STARKVIND Air purifier",
-            "name": "Starkvind",
-            "state": {
-                "deviceruntime": 185310,
-                "filterruntime": 182857,
-                "lastupdated": "2022-06-11T15:39:46.328",
-                "replacefilter": False,
-                "speed": 20,
-            },
-            "swversion": "1.0.033",
-            "type": "ZHAAirPurifier",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-fc7d",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAAirPurifier",)
 

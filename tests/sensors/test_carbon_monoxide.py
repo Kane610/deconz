@@ -3,33 +3,33 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.carbon_monoxide tests/sensors/test_carbon_monoxide.py
 """
 
+DATA = {
+    "config": {
+        "battery": 100,
+        "on": True,
+        "pending": [],
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "b7599df551944df97b2aa87d160b9c45",
+    "manufacturername": "Heiman",
+    "modelid": "CO_V16",
+    "name": "Cave, CO",
+    "state": {
+        "carbonmonoxide": False,
+        "lastupdated": "none",
+        "lowbattery": False,
+        "tampered": False,
+    },
+    "swversion": "20150330",
+    "type": "ZHACarbonMonoxide",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0101",
+}
+
 
 async def test_sensor_carbon_monoxide(deconz_sensor):
     """Verify that carbon monoxide sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 100,
-                "on": True,
-                "pending": [],
-                "reachable": True,
-            },
-            "ep": 1,
-            "etag": "b7599df551944df97b2aa87d160b9c45",
-            "manufacturername": "Heiman",
-            "modelid": "CO_V16",
-            "name": "Cave, CO",
-            "state": {
-                "carbonmonoxide": False,
-                "lastupdated": "none",
-                "lowbattery": False,
-                "tampered": False,
-            },
-            "swversion": "20150330",
-            "type": "ZHACarbonMonoxide",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0101",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
 

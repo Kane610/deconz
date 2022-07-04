@@ -3,6 +3,35 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.light_level tests/sensors/test_light_level.py
 """
 
+DATA = {
+    "config": {
+        "alert": "none",
+        "battery": 100,
+        "ledindication": False,
+        "on": True,
+        "pending": [],
+        "reachable": True,
+        "tholddark": 12000,
+        "tholdoffset": 7000,
+        "usertest": False,
+    },
+    "ep": 2,
+    "etag": "5cfb81765e86aa53ace427cfd52c6d52",
+    "manufacturername": "Philips",
+    "modelid": "SML001",
+    "name": "Motion sensor 4",
+    "state": {
+        "dark": True,
+        "daylight": False,
+        "lastupdated": "2019-05-05T14:37:06",
+        "lightlevel": 6955,
+        "lux": 5,
+    },
+    "swversion": "6.1.0.18912",
+    "type": "ZHALightLevel",
+    "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
+}
+
 
 async def test_handler_light_level(
     mock_aioresponse, deconz_session, deconz_called_with
@@ -37,36 +66,7 @@ async def test_handler_light_level(
 
 async def test_sensor_light_level(deconz_sensor):
     """Verify that light level sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "alert": "none",
-                "battery": 100,
-                "ledindication": False,
-                "on": True,
-                "pending": [],
-                "reachable": True,
-                "tholddark": 12000,
-                "tholdoffset": 7000,
-                "usertest": False,
-            },
-            "ep": 2,
-            "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-            "manufacturername": "Philips",
-            "modelid": "SML001",
-            "name": "Motion sensor 4",
-            "state": {
-                "dark": True,
-                "daylight": False,
-                "lastupdated": "2019-05-05T14:37:06",
-                "lightlevel": 6955,
-                "lux": 5,
-            },
-            "swversion": "6.1.0.18912",
-            "type": "ZHALightLevel",
-            "uniqueid": "00:17:88:01:03:28:8c:9b-02-0400",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
 

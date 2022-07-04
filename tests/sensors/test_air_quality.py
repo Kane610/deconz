@@ -5,28 +5,53 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 
 from pydeconz.models.sensor.air_quality import AirQualityValue
 
+DATA = {
+    "config": {
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 2,
+    "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
+    "lastseen": "2020-11-20T22:48Z",
+    "manufacturername": "BOSCH",
+    "modelid": "AIR",
+    "name": "BOSCH Air quality sensor",
+    "state": {
+        "airquality": "poor",
+        "airqualityppb": 809,
+        "lastupdated": "2020-11-20T22:48:00.209",
+    },
+    "swversion": "20200402",
+    "type": "ZHAAirQuality",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-fdef",
+}
+
+DATA_WITH_PM25 = {
+    "config": {
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "74eb5d8558a3895a39a3884189701c99",
+    "lastannounced": None,
+    "lastseen": "2022-06-30T18:20Z",
+    "manufacturername": "IKEA of Sweden",
+    "modelid": "STARKVIND Air purifier",
+    "name": "Starkvind",
+    "state": {
+        "airquality": "excellent",
+        "lastupdated": "2022-06-30T18:18:26.205",
+        "pm2_5": 8,
+    },
+    "swversion": "1.0.033",
+    "type": "ZHAAirQuality",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-fc7d",
+}
+
 
 async def test_sensor_air_quality(deconz_sensor):
     """Verify that air quality sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"on": True, "reachable": True},
-            "ep": 2,
-            "etag": "c2d2e42396f7c78e11e46c66e2ec0200",
-            "lastseen": "2020-11-20T22:48Z",
-            "manufacturername": "BOSCH",
-            "modelid": "AIR",
-            "name": "BOSCH Air quality sensor",
-            "state": {
-                "airquality": "poor",
-                "airqualityppb": 809,
-                "lastupdated": "2020-11-20T22:48:00.209",
-            },
-            "swversion": "20200402",
-            "type": "ZHAAirQuality",
-            "uniqueid": "00:12:4b:00:14:4d:00:07-02-fdef",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 
@@ -52,31 +77,12 @@ async def test_sensor_air_quality(deconz_sensor):
     assert sensor.name == "BOSCH Air quality sensor"
     assert sensor.software_version == "20200402"
     assert sensor.type == "ZHAAirQuality"
-    assert sensor.unique_id == "00:12:4b:00:14:4d:00:07-02-fdef"
+    assert sensor.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-02-fdef"
 
 
 async def test_sensor_air_quality_with_pm2_5(deconz_sensor):
     """Verify that air quality with PM 2.5 sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"on": True, "reachable": True},
-            "ep": 1,
-            "etag": "74eb5d8558a3895a39a3884189701c99",
-            "lastannounced": None,
-            "lastseen": "2022-06-30T18:20Z",
-            "manufacturername": "IKEA of Sweden",
-            "modelid": "STARKVIND Air purifier",
-            "name": "Starkvind",
-            "state": {
-                "airquality": "excellent",
-                "lastupdated": "2022-06-30T18:18:26.205",
-                "pm2_5": 8,
-            },
-            "swversion": "1.0.033",
-            "type": "ZHAAirQuality",
-            "uniqueid": "cc:86:ec:ff:fe:6d:30:11-02-fc7d",
-        }
-    )
+    sensor = await deconz_sensor(DATA_WITH_PM25)
 
     assert sensor.ZHATYPE == ("ZHAAirQuality",)
 

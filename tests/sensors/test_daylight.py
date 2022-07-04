@@ -3,30 +3,30 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.daylight tests/sensors/test_daylight.py
 """
 
+DATA = {
+    "config": {
+        "configured": True,
+        "on": True,
+        "sunriseoffset": 30,
+        "sunsetoffset": -30,
+    },
+    "etag": "55047cf652a7e594d0ee7e6fae01dd38",
+    "manufacturername": "Philips",
+    "modelid": "PHDL00",
+    "name": "Daylight",
+    "state": {
+        "daylight": True,
+        "lastupdated": "2018-03-24T17:26:12",
+        "status": 170,
+    },
+    "swversion": "1.0",
+    "type": "Daylight",
+}
+
 
 async def test_sensor_daylight(deconz_sensor):
     """Verify that daylight sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "configured": True,
-                "on": True,
-                "sunriseoffset": 30,
-                "sunsetoffset": -30,
-            },
-            "etag": "55047cf652a7e594d0ee7e6fae01dd38",
-            "manufacturername": "Philips",
-            "modelid": "PHDL00",
-            "name": "Daylight",
-            "state": {
-                "daylight": True,
-                "lastupdated": "2018-03-24T17:26:12",
-                "status": 170,
-            },
-            "swversion": "1.0",
-            "type": "Daylight",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("Daylight",)
 

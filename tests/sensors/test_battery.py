@@ -3,23 +3,30 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.battery tests/sensors/test_battery.py
 """
 
+DATA = {
+    "config": {
+        "alert": "none",
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
+    "manufacturername": "IKEA of Sweden",
+    "modelid": "FYRTUR block-out roller blind",
+    "name": "FYRTUR block-out roller blind",
+    "state": {
+        "battery": 100,
+        "lastupdated": "none",
+    },
+    "swversion": "2.2.007",
+    "type": "ZHABattery",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0001",
+}
+
 
 async def test_sensor_battery(deconz_sensor):
     """Verify that alarm sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"alert": "none", "on": True, "reachable": True},
-            "ep": 1,
-            "etag": "23a8659f1cb22df2f51bc2da0e241bb4",
-            "manufacturername": "IKEA of Sweden",
-            "modelid": "FYRTUR block-out roller blind",
-            "name": "FYRTUR block-out roller blind",
-            "state": {"battery": 100, "lastupdated": "none"},
-            "swversion": "2.2.007",
-            "type": "ZHABattery",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0001",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHABattery",)
 

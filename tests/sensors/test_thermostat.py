@@ -15,6 +15,94 @@ from pydeconz.models.sensor.thermostat import (
 )
 
 
+DATA = {
+    "config": {
+        "battery": 59,
+        "displayflipped": None,
+        "heatsetpoint": 2100,
+        "locked": None,
+        "mountingmode": None,
+        "offset": 0,
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "6130553ac247174809bae47144ee23f8",
+    "lastseen": "2020-11-29T19:31Z",
+    "manufacturername": "Danfoss",
+    "modelid": "eTRV0100",
+    "name": "Thermostat_stue_sofa",
+    "state": {
+        "errorcode": None,
+        "lastupdated": "2020-11-29T19:28:40.665",
+        "mountingmodeactive": False,
+        "on": True,
+        "temperature": 2102,
+        "valve": 24,
+        "windowopen": "Closed",
+    },
+    "swversion": "01.02.0008 01.02",
+    "type": "ZHAThermostat",
+    "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-0201",
+}
+
+DATA_EUROTRONIC = {
+    "config": {
+        "battery": 100,
+        "displayflipped": True,
+        "heatsetpoint": 2100,
+        "locked": False,
+        "mode": "auto",
+        "offset": 0,
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "25aac331bc3c4b465cfb2197f6243ea4",
+    "manufacturername": "Eurotronic",
+    "modelid": "SPZB0001",
+    "name": "Living Room Radiator",
+    "state": {
+        "lastupdated": "2019-02-10T22:41:32",
+        "on": False,
+        "temperature": 2149,
+        "valve": 0,
+    },
+    "swversion": "15181120",
+    "type": "ZHAThermostat",
+    "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201",
+}
+DATA_TUYA = {
+    "config": {
+        "battery": 100,
+        "heatsetpoint": 1550,
+        "locked": None,
+        "offset": 0,
+        "on": True,
+        "preset": "auto",
+        "reachable": True,
+        "schedule": {},
+        "schedule_on": None,
+        "setvalve": True,
+        "windowopen_set": True,
+    },
+    "ep": 1,
+    "etag": "36850fc8521f7c23606c9304b2e1f7bb",
+    "lastseen": "2020-11-11T21:23Z",
+    "manufacturername": "_TYST11_kfvq6avy",
+    "modelid": "fvq6avy",
+    "name": "fvq6avy",
+    "state": {
+        "lastupdated": "none",
+        "on": None,
+        "temperature": 2290,
+    },
+    "swversion": "20180727",
+    "type": "ZHAThermostat",
+    "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
+}
+
+
 async def test_handler_thermostat(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that configuring thermostat sensor works."""
     thermostat = deconz_session.sensors.thermostat
@@ -70,38 +158,7 @@ async def test_sensor_danfoss_thermostat(deconz_sensor):
 
     Danfoss thermostat is the simplest kind with only control over temperaturdeconz_sensore.
     """
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 59,
-                "displayflipped": None,
-                "heatsetpoint": 2100,
-                "locked": None,
-                "mountingmode": None,
-                "offset": 0,
-                "on": True,
-                "reachable": True,
-            },
-            "ep": 1,
-            "etag": "6130553ac247174809bae47144ee23f8",
-            "lastseen": "2020-11-29T19:31Z",
-            "manufacturername": "Danfoss",
-            "modelid": "eTRV0100",
-            "name": "Thermostat_stue_sofa",
-            "state": {
-                "errorcode": None,
-                "lastupdated": "2020-11-29T19:28:40.665",
-                "mountingmodeactive": False,
-                "on": True,
-                "temperature": 2102,
-                "valve": 24,
-                "windowopen": "Closed",
-            },
-            "swversion": "01.02.0008 01.02",
-            "type": "ZHAThermostat",
-            "uniqueid": "14:b4:57:ff:fe:d5:4e:77-01-0201",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
@@ -151,34 +208,7 @@ async def test_sensor_danfoss_thermostat(deconz_sensor):
 
 async def test_sensor_eurotronic_thermostat(deconz_sensor):
     """Verify that thermostat sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 100,
-                "displayflipped": True,
-                "heatsetpoint": 2100,
-                "locked": False,
-                "mode": "auto",
-                "offset": 0,
-                "on": True,
-                "reachable": True,
-            },
-            "ep": 1,
-            "etag": "25aac331bc3c4b465cfb2197f6243ea4",
-            "manufacturername": "Eurotronic",
-            "modelid": "SPZB0001",
-            "name": "Living Room Radiator",
-            "state": {
-                "lastupdated": "2019-02-10T22:41:32",
-                "on": False,
-                "temperature": 2149,
-                "valve": 0,
-            },
-            "swversion": "15181120",
-            "type": "ZHAThermostat",
-            "uniqueid": "00:15:8d:00:01:92:d2:51-01-0201",
-        },
-    )
+    sensor = await deconz_sensor(DATA_EUROTRONIC)
 
     assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
 
@@ -225,33 +255,7 @@ async def test_sensor_eurotronic_thermostat(deconz_sensor):
 
 async def test_sensor_tuya_thermostat(deconz_sensor):
     """Verify that Tuya thermostat works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 100,
-                "heatsetpoint": 1550,
-                "locked": None,
-                "offset": 0,
-                "on": True,
-                "preset": "auto",
-                "reachable": True,
-                "schedule": {},
-                "schedule_on": None,
-                "setvalve": True,
-                "windowopen_set": True,
-            },
-            "ep": 1,
-            "etag": "36850fc8521f7c23606c9304b2e1f7bb",
-            "lastseen": "2020-11-11T21:23Z",
-            "manufacturername": "_TYST11_kfvq6avy",
-            "modelid": "fvq6avy",
-            "name": "fvq6avy",
-            "state": {"lastupdated": "none", "on": None, "temperature": 2290},
-            "swversion": "20180727",
-            "type": "ZHAThermostat",
-            "uniqueid": "bc:33:ac:ff:fe:47:a1:95-01-0201",
-        },
-    )
+    sensor = await deconz_sensor(DATA_TUYA)
 
     assert sensor.ZHATYPE == Thermostat.ZHATYPE
 

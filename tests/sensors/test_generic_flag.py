@@ -3,20 +3,26 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.generic_flag tests/sensors/test_generic_flag.py
 """
 
+DATA = {
+    "config": {
+        "on": True,
+        "reachable": True,
+    },
+    "modelid": "Switch",
+    "name": "Kitchen Switch",
+    "state": {
+        "flag": True,
+        "lastupdated": "2018-07-01T10:40:35",
+    },
+    "swversion": "1.0.0",
+    "type": "CLIPGenericFlag",
+    "uniqueid": "kitchen-switch",
+}
+
 
 async def test_sensor_generic_flag(deconz_sensor):
     """Verify that generic flag sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"on": True, "reachable": True},
-            "modelid": "Switch",
-            "name": "Kitchen Switch",
-            "state": {"flag": True, "lastupdated": "2018-07-01T10:40:35"},
-            "swversion": "1.0.0",
-            "type": "CLIPGenericFlag",
-            "uniqueid": "kitchen-switch",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("CLIPGenericFlag",)
 

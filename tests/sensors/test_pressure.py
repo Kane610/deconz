@@ -3,23 +3,30 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.pressure tests/sensors/test_pressure.py
 """
 
+DATA = {
+    "config": {
+        "battery": 100,
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "1220e5d026493b6e86207993703a8a71",
+    "manufacturername": "LUMI",
+    "modelid": "lumi.weather",
+    "name": "Mi temperature 1",
+    "state": {
+        "lastupdated": "2019-05-05T14:39:00",
+        "pressure": 1010,
+    },
+    "swversion": "20161129",
+    "type": "ZHAPressure",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0403",
+}
+
 
 async def test_sensor_pressure(deconz_sensor):
     """Verify that pressure sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"battery": 100, "on": True, "reachable": True},
-            "ep": 1,
-            "etag": "1220e5d026493b6e86207993703a8a71",
-            "manufacturername": "LUMI",
-            "modelid": "lumi.weather",
-            "name": "Mi temperature 1",
-            "state": {"lastupdated": "2019-05-05T14:39:00", "pressure": 1010},
-            "swversion": "20161129",
-            "type": "ZHAPressure",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0403",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
 

@@ -3,33 +3,33 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.water tests/sensors/test_water.py
 """
 
+DATA = {
+    "config": {
+        "battery": 100,
+        "on": True,
+        "reachable": True,
+        "temperature": 2500,
+    },
+    "ep": 1,
+    "etag": "fae893708dfe9b358df59107d944fa1c",
+    "manufacturername": "LUMI",
+    "modelid": "lumi.sensor_wleak.aq1",
+    "name": "water2",
+    "state": {
+        "lastupdated": "2019-01-29T07:13:20",
+        "lowbattery": False,
+        "tampered": False,
+        "water": False,
+    },
+    "swversion": "20170721",
+    "type": "ZHAWater",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0500",
+}
+
 
 async def test_sensor_water(deconz_sensor):
     """Verify that water sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 100,
-                "on": True,
-                "reachable": True,
-                "temperature": 2500,
-            },
-            "ep": 1,
-            "etag": "fae893708dfe9b358df59107d944fa1c",
-            "manufacturername": "LUMI",
-            "modelid": "lumi.sensor_wleak.aq1",
-            "name": "water2",
-            "state": {
-                "lastupdated": "2019-01-29T07:13:20",
-                "lowbattery": False,
-                "tampered": False,
-                "water": False,
-            },
-            "swversion": "20170721",
-            "type": "ZHAWater",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0500",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAWater",)
 

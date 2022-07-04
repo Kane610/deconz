@@ -3,22 +3,28 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.generic_status tests/sensors/test_generic_status.py
 """
 
+DATA = {
+    "config": {
+        "on": True,
+        "reachable": True,
+    },
+    "etag": "aacc83bc7d6e4af7e44014e9f776b206",
+    "manufacturername": "Phoscon",
+    "modelid": "PHOSCON_FSM_STATE",
+    "name": "FSM_STATE Motion stair",
+    "state": {
+        "lastupdated": "2019-04-24T00:00:25",
+        "status": 0,
+    },
+    "swversion": "1.0",
+    "type": "CLIPGenericStatus",
+    "uniqueid": "fsm-state-1520195376277",
+}
+
 
 async def test_sensor_generic_status(deconz_sensor):
     """Verify that generic flag sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"on": True, "reachable": True},
-            "etag": "aacc83bc7d6e4af7e44014e9f776b206",
-            "manufacturername": "Phoscon",
-            "modelid": "PHOSCON_FSM_STATE",
-            "name": "FSM_STATE Motion stair",
-            "state": {"lastupdated": "2019-04-24T00:00:25", "status": 0},
-            "swversion": "1.0",
-            "type": "CLIPGenericStatus",
-            "uniqueid": "fsm-state-1520195376277",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("CLIPGenericStatus",)
 

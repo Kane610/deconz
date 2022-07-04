@@ -3,29 +3,33 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.time tests/sensors/test_time.py
 """
 
+DATA = {
+    "config": {
+        "battery": 40,
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "28e796678d9a24712feef59294343bb6",
+    "lastseen": "2020-11-22T11:26Z",
+    "manufacturername": "Danfoss",
+    "modelid": "eTRV0100",
+    "name": "eTRV Séjour",
+    "state": {
+        "lastset": "2020-11-19T08:07:08Z",
+        "lastupdated": "2020-11-22T10:51:03.444",
+        "localtime": "2020-11-22T10:51:01",
+        "utc": "2020-11-22T10:51:01Z",
+    },
+    "swversion": "20200429",
+    "type": "ZHATime",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-000a",
+}
+
 
 async def test_sensor_time(deconz_sensor):
     """Verify that time sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"battery": 40, "on": True, "reachable": True},
-            "ep": 1,
-            "etag": "28e796678d9a24712feef59294343bb6",
-            "lastseen": "2020-11-22T11:26Z",
-            "manufacturername": "Danfoss",
-            "modelid": "eTRV0100",
-            "name": "eTRV Séjour",
-            "state": {
-                "lastset": "2020-11-19T08:07:08Z",
-                "lastupdated": "2020-11-22T10:51:03.444",
-                "localtime": "2020-11-22T10:51:01",
-                "utc": "2020-11-22T10:51:01Z",
-            },
-            "swversion": "20200429",
-            "type": "ZHATime",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-000a",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHATime",)
 

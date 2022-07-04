@@ -3,23 +3,31 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.temperature tests/sensors/test_temperature.py
 """
 
+DATA = {
+    "config": {
+        "battery": 100,
+        "offset": 0,
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "1220e5d026493b6e86207993703a8a71",
+    "manufacturername": "LUMI",
+    "modelid": "lumi.weather",
+    "name": "Mi temperature 1",
+    "state": {
+        "lastupdated": "2019-05-05T14:39:00",
+        "temperature": 2182,
+    },
+    "swversion": "20161129",
+    "type": "ZHATemperature",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0402",
+}
+
 
 async def test_sensor_temperature(deconz_sensor):
     """Verify that temperature sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-            "ep": 1,
-            "etag": "1220e5d026493b6e86207993703a8a71",
-            "manufacturername": "LUMI",
-            "modelid": "lumi.weather",
-            "name": "Mi temperature 1",
-            "state": {"lastupdated": "2019-05-05T14:39:00", "temperature": 2182},
-            "swversion": "20161129",
-            "type": "ZHATemperature",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0402",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
 

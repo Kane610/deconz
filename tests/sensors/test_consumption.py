@@ -3,26 +3,29 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.consumption tests/sensors/test_consumption.py
 """
 
+DATA = {
+    "config": {
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "a99e5bc463d15c23af7e89946e784cca",
+    "manufacturername": "Heiman",
+    "modelid": "SmartPlug",
+    "name": "Consumption 15",
+    "state": {
+        "consumption": 11342,
+        "lastupdated": "2018-03-12T19:19:08",
+        "power": 123,
+    },
+    "type": "ZHAConsumption",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0702",
+}
+
 
 async def test_sensor_consumption(deconz_sensor):
     """Verify that consumption sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"on": True, "reachable": True},
-            "ep": 1,
-            "etag": "a99e5bc463d15c23af7e89946e784cca",
-            "manufacturername": "Heiman",
-            "modelid": "SmartPlug",
-            "name": "Consumption 15",
-            "state": {
-                "consumption": 11342,
-                "lastupdated": "2018-03-12T19:19:08",
-                "power": 123,
-            },
-            "type": "ZHAConsumption",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0702",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAConsumption",)
 

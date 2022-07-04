@@ -3,6 +3,27 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.humidity tests/sensors/test_humidity.py
 """
 
+DATA = {
+    "config": {
+        "battery": 100,
+        "offset": 0,
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "1220e5d026493b6e86207993703a8a71",
+    "manufacturername": "LUMI",
+    "modelid": "lumi.weather",
+    "name": "Mi temperature 1",
+    "state": {
+        "humidity": 3555,
+        "lastupdated": "2019-05-05T14:39:00",
+    },
+    "swversion": "20161129",
+    "type": "ZHAHumidity",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0405",
+}
+
 
 async def test_handler_humidity(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that humidity sensor works."""
@@ -15,20 +36,7 @@ async def test_handler_humidity(mock_aioresponse, deconz_session, deconz_called_
 
 async def test_sensor_humidity(deconz_sensor):
     """Verify that humidity sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {"battery": 100, "offset": 0, "on": True, "reachable": True},
-            "ep": 1,
-            "etag": "1220e5d026493b6e86207993703a8a71",
-            "manufacturername": "LUMI",
-            "modelid": "lumi.weather",
-            "name": "Mi temperature 1",
-            "state": {"humidity": 3555, "lastupdated": "2019-05-05T14:39:00"},
-            "swversion": "20161129",
-            "type": "ZHAHumidity",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0405",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
 

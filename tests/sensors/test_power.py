@@ -6,26 +6,53 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 import pytest
 
 
+DATA = {
+    "config": {
+        "on": True,
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "96e71c7db4685b334d3d0decc3f11868",
+    "manufacturername": "Heiman",
+    "modelid": "SmartPlug",
+    "name": "Power 16",
+    "state": {
+        "current": 34,
+        "lastupdated": "2018-03-12T19:22:13",
+        "power": 64,
+        "voltage": 231,
+    },
+    "type": "ZHAPower",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0b04",
+}
+
+DATA_ONLY_POWER = {
+    "config": {
+        "on": True,
+        "reachable": True,
+        "temperature": 3400,
+    },
+    "ep": 2,
+    "etag": "77ab6ddae6dd81469080ad62118d81b6",
+    "lastseen": "2021-07-07T19:30Z",
+    "manufacturername": "LUMI",
+    "modelid": "lumi.plug.maus01",
+    "name": "Power 27",
+    "state": {
+        "lastupdated": "2021-07-07T19:24:59.664",
+        "power": 1,
+    },
+    "swversion": "05-02-2018",
+    "type": "ZHAPower",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-000c",
+}
+
+
 @pytest.mark.parametrize(
     "input, expected",
     [
         (
-            {
-                "config": {"on": True, "reachable": True},
-                "ep": 1,
-                "etag": "96e71c7db4685b334d3d0decc3f11868",
-                "manufacturername": "Heiman",
-                "modelid": "SmartPlug",
-                "name": "Power 16",
-                "state": {
-                    "current": 34,
-                    "lastupdated": "2018-03-12T19:22:13",
-                    "power": 64,
-                    "voltage": 231,
-                },
-                "type": "ZHAPower",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0b04",
-            },
+            DATA,
             {
                 "ZHATYPE": ("ZHAPower",),
                 "battery": None,
@@ -50,19 +77,7 @@ import pytest
             },
         ),
         (
-            {
-                "config": {"on": True, "reachable": True, "temperature": 3400},
-                "ep": 2,
-                "etag": "77ab6ddae6dd81469080ad62118d81b6",
-                "lastseen": "2021-07-07T19:30Z",
-                "manufacturername": "LUMI",
-                "modelid": "lumi.plug.maus01",
-                "name": "Power 27",
-                "state": {"lastupdated": "2021-07-07T19:24:59.664", "power": 1},
-                "swversion": "05-02-2018",
-                "type": "ZHAPower",
-                "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-000c",
-            },
+            DATA_ONLY_POWER,
             {
                 "ZHATYPE": ("ZHAPower",),
                 "battery": None,

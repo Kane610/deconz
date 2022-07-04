@@ -5,37 +5,37 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 
 from unittest.mock import Mock
 
+DATA = {
+    "config": {
+        "battery": 91,
+        "on": True,
+        "pending": [],
+        "reachable": True,
+        "sensitivity": 21,
+        "sensitivitymax": 21,
+        "temperature": 3200,
+    },
+    "ep": 1,
+    "etag": "b7599df551944df97b2aa87d160b9c45",
+    "manufacturername": "LUMI",
+    "modelid": "lumi.vibration.aq1",
+    "name": "Vibration 1",
+    "state": {
+        "lastupdated": "2019-03-09T15:53:07",
+        "orientation": [10, 1059, 0],
+        "tiltangle": 83,
+        "vibration": True,
+        "vibrationstrength": 114,
+    },
+    "swversion": "20180130",
+    "type": "ZHAVibration",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0101",
+}
+
 
 async def test_sensor_vibration(deconz_sensor):
     """Verify that vibration sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 91,
-                "on": True,
-                "pending": [],
-                "reachable": True,
-                "sensitivity": 21,
-                "sensitivitymax": 21,
-                "temperature": 3200,
-            },
-            "ep": 1,
-            "etag": "b7599df551944df97b2aa87d160b9c45",
-            "manufacturername": "LUMI",
-            "modelid": "lumi.vibration.aq1",
-            "name": "Vibration 1",
-            "state": {
-                "lastupdated": "2019-03-09T15:53:07",
-                "orientation": [10, 1059, 0],
-                "tiltangle": 83,
-                "vibration": True,
-                "vibrationstrength": 114,
-            },
-            "swversion": "20180130",
-            "type": "ZHAVibration",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0101",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAVibration",)
 

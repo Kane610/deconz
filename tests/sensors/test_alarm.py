@@ -3,33 +3,33 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.alarm tests/sensors/test_alarm.py
 """
 
+DATA = {
+    "config": {
+        "battery": 100,
+        "on": True,
+        "reachable": True,
+        "temperature": 2600,
+    },
+    "ep": 1,
+    "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
+    "manufacturername": "dresden elektronik",
+    "modelid": "lumi.sensor_motion.aq2",
+    "name": "Alarm 10",
+    "state": {
+        "alarm": False,
+        "lastupdated": "none",
+        "lowbattery": None,
+        "tampered": None,
+    },
+    "swversion": "20170627",
+    "type": "ZHAAlarm",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0500",
+}
+
 
 async def test_sensor_alarm(deconz_sensor):
     """Verify that alarm sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 100,
-                "on": True,
-                "reachable": True,
-                "temperature": 2600,
-            },
-            "ep": 1,
-            "etag": "18c0f3c2100904e31a7f938db2ba9ba9",
-            "manufacturername": "dresden elektronik",
-            "modelid": "lumi.sensor_motion.aq2",
-            "name": "Alarm 10",
-            "state": {
-                "alarm": False,
-                "lastupdated": "none",
-                "lowbattery": None,
-                "tampered": None,
-            },
-            "swversion": "20170627",
-            "type": "ZHAAlarm",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0500",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAAlarm",)
 
