@@ -67,7 +67,6 @@ DATA_ONLY_POWER = {
                 "on": True,
                 "power": 64,
                 "reachable": True,
-                "resource_type": "sensors",
                 "secondary_temperature": None,
                 "software_version": "",
                 "tampered": None,

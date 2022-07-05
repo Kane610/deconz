@@ -9,8 +9,6 @@ from .deconz_device import DeconzDevice
 from .light.light import Light
 from .scene import TypedScene
 
-RESOURCE_TYPE: Final = ResourceGroup.GROUP.value
-
 COLOR_STATE_ATTRIBUTES: Final = {
     "bri",
     "ct",
@@ -66,11 +64,7 @@ class Group(DeconzDevice):
     """
 
     raw: TypedGroup
-
-    @property
-    def resource_type(self) -> str:
-        """Resource type."""
-        return RESOURCE_TYPE
+    resource_group = ResourceGroup.GROUP
 
     @property
     def state(self) -> bool | None:

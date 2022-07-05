@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import enum
 import logging
-from typing import Any, Final, Literal, TypedDict
+from typing import Any, Literal, TypedDict
 
 from . import ResourceGroup
 from .api import APIItem
 
 LOGGER = logging.getLogger(__name__)
-
-RESOURCE_TYPE: Final = ResourceGroup.ALARM.value
 
 
 class AlarmSystemArmAction(enum.Enum):
@@ -127,16 +125,7 @@ class AlarmSystem(APIItem):
     """
 
     raw: TypedAlarmSystem
-
-    @property
-    def resource_type(self) -> str:
-        """Resource type."""
-        return RESOURCE_TYPE
-
-    @property
-    def deconz_id(self) -> str:
-        """Id to call alarm system over API e.g. /alarmsystems/1."""
-        return f"/{self.resource_type}/{self.resource_id}"
+    resource_group = ResourceGroup.ALARM
 
     @property
     def arm_state(self) -> AlarmSystemArmState:
