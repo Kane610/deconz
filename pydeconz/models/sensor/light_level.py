@@ -5,8 +5,6 @@ from __future__ import annotations
 import math
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -35,8 +33,6 @@ class TypedLightLevel(TypedDict):
 
 class LightLevel(SensorBase):
     """Light level sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_LIGHT_LEVEL.value, ResourceType.CLIP_LIGHT_LEVEL.value)
 
     raw: TypedLightLevel
 

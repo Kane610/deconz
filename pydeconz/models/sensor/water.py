@@ -2,8 +2,6 @@
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -21,8 +19,6 @@ class TypedWater(TypedDict):
 
 class Water(SensorBase):
     """Water sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_WATER.value,)
 
     raw: TypedWater
 

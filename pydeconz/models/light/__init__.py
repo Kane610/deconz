@@ -26,7 +26,6 @@ class LightBase(DeconzDevice):
     """
 
     resource_group = ResourceGroup.LIGHT
-    ZHATYPE: tuple[str, ...] = ()
 
     @property
     def state(self) -> bool | None:

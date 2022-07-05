@@ -31,8 +31,6 @@ async def test_sensor_carbon_monoxide(deconz_sensor):
     """Verify that carbon monoxide sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHACarbonMonoxide",)
-
     assert sensor.carbon_monoxide is False
 
     # DeconzSensor

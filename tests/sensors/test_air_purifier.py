@@ -70,8 +70,6 @@ async def test_sensor_air_purifier(deconz_sensor):
     """Verify that air purifier sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAAirPurifier",)
-
     assert sensor.device_run_time == 185310
     assert sensor.fan_mode == AirPurifierFanMode.AUTO
     assert sensor.fan_speed == 20

@@ -38,8 +38,6 @@ async def test_sensor_humidity(deconz_sensor):
     """Verify that humidity sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAHumidity", "CLIPHumidity")
-
     assert sensor.humidity == 3555
     assert sensor.offset == 0
     assert sensor.scaled_humidity == 35.5

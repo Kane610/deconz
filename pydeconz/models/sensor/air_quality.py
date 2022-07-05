@@ -3,8 +3,6 @@
 import enum
 from typing import Literal, TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -51,8 +49,6 @@ class AirQualityValue(enum.Enum):
 
 class AirQuality(SensorBase):
     """Air quality sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_AIR_QUALITY.value,)
 
     raw: TypedAirQuality
 

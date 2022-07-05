@@ -29,8 +29,6 @@ async def test_sensor_temperature(deconz_sensor):
     """Verify that temperature sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHATemperature", "CLIPTemperature")
-
     assert sensor.temperature == 2182
     assert sensor.scaled_temperature == 21.8
 

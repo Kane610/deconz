@@ -4,8 +4,6 @@ import enum
 import logging
 from typing import Final, TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 LOGGER = logging.getLogger(__name__)
@@ -81,8 +79,6 @@ class TypedDaylight(TypedDict):
 
 class Daylight(SensorBase):
     """Daylight sensor built into deCONZ software."""
-
-    ZHATYPE = (ResourceType.DAYLIGHT.value,)
 
     raw: TypedDaylight
 

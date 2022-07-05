@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -30,8 +28,6 @@ class TypedHumidity(TypedDict):
 
 class Humidity(SensorBase):
     """Humidity sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_HUMIDITY.value, ResourceType.CLIP_HUMIDITY.value)
 
     raw: TypedHumidity
 

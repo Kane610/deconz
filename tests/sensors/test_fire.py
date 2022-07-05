@@ -48,8 +48,6 @@ async def test_sensor_fire(deconz_sensor):
     """Verify that fire sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAFire",)
-
     assert sensor.fire is False
 
     # DeconzSensor
@@ -76,8 +74,6 @@ async def test_sensor_fire(deconz_sensor):
 async def test_sensor_fire_develco(deconz_sensor):
     """Verify that develco/frient fire sensor works."""
     sensor = await deconz_sensor(DATA_DEVELCO)
-
-    assert sensor.ZHATYPE == ("ZHAFire",)
 
     assert sensor.fire is False
 

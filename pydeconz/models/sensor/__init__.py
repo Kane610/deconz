@@ -14,7 +14,6 @@ class SensorBase(DeconzDevice):
     """
 
     resource_group = ResourceGroup.SENSOR
-    ZHATYPE: tuple[str, ...] = ()
 
     @property
     def battery(self) -> int | None:

@@ -28,8 +28,6 @@ async def test_sensor_pressure(deconz_sensor):
     """Verify that pressure sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAPressure", "CLIPPressure")
-
     assert sensor.pressure == 1010
 
     # DeconzSensor

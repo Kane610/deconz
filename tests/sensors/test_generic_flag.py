@@ -24,8 +24,6 @@ async def test_sensor_generic_flag(deconz_sensor):
     """Verify that generic flag sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("CLIPGenericFlag",)
-
     assert sensor.flag is True
 
     # DeconzSensor

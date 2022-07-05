@@ -31,8 +31,6 @@ async def test_sensor_alarm(deconz_sensor):
     """Verify that alarm sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAAlarm",)
-
     assert sensor.alarm is False
 
     # DeconzSensor

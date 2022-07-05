@@ -6,8 +6,6 @@ import enum
 import logging
 from typing import Literal, TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 LOGGER = logging.getLogger(__name__)
@@ -87,8 +85,6 @@ class TypedAncillaryControl(TypedDict):
 
 class AncillaryControl(SensorBase):
     """Ancillary control sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_ANCILLARY_CONTROL.value,)
 
     raw: TypedAncillaryControl
 

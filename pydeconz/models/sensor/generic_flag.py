@@ -2,8 +2,6 @@
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -21,8 +19,6 @@ class TypedGenericFlag(TypedDict):
 
 class GenericFlag(SensorBase):
     """Generic flag sensor."""
-
-    ZHATYPE = (ResourceType.CLIP_GENERIC_FLAG.value,)
 
     raw: TypedGenericFlag
 
