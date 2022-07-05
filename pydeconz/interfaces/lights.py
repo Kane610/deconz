@@ -278,13 +278,13 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
 
     def __init__(self, gateway: DeconzSession) -> None:
         """Initialize light manager."""
-        self.configuration_tool = ConfigurationToolHandler(gateway)
-        self.covers = CoverHandler(gateway)
-        self.fans = FanHandler(gateway)
-        self.lights = LightHandler(gateway)
-        self.locks = LockHandler(gateway)
-        self.range_extender = RangeExtenderHandler(gateway)
-        self.sirens = SirenHandler(gateway)
+        self.configuration_tool = ConfigurationToolHandler(gateway, grouped=True)
+        self.covers = CoverHandler(gateway, grouped=True)
+        self.fans = FanHandler(gateway, grouped=True)
+        self.lights = LightHandler(gateway, grouped=True)
+        self.locks = LockHandler(gateway, grouped=True)
+        self.range_extender = RangeExtenderHandler(gateway, grouped=True)
+        self.sirens = SirenHandler(gateway, grouped=True)
 
         handlers: list[APIItems[Any]] = [
             self.configuration_tool,

@@ -55,12 +55,6 @@ class DeconzSession:
         self.scenes = Scenes(self)
         self.sensors = SensorResourceManager(self)
 
-        self.alarmsystems.post_init()
-        self.groups.post_init()
-        self.lights.post_init()
-        self.scenes.post_init()
-        self.sensors.post_init()
-
     async def get_api_key(
         self,
         api_key: str | None = None,
