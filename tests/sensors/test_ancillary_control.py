@@ -42,8 +42,6 @@ async def test_sensor_ancillary_control(deconz_sensor):
     """Verify that ancillary control sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
-
     assert sensor.action == AncillaryControlAction.ARMED_STAY
     assert sensor.panel == AncillaryControlPanel.EXIT_DELAY
     assert sensor.seconds_remaining == 55

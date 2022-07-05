@@ -31,8 +31,6 @@ async def test_sensor_water(deconz_sensor):
     """Verify that water sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAWater",)
-
     assert sensor.water is False
 
     # DeconzSensor

@@ -37,8 +37,6 @@ async def test_sensor_vibration(deconz_sensor):
     """Verify that vibration sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAVibration",)
-
     assert sensor.orientation == [10, 1059, 0]
     assert sensor.sensitivity == 21
     assert sensor.max_sensitivity == 21

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -23,8 +21,6 @@ class TypedTemperature(TypedDict):
 
 class Temperature(SensorBase):
     """Temperature sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_TEMPERATURE.value, ResourceType.CLIP_TEMPERATURE.value)
 
     raw: TypedTemperature
 

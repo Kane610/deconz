@@ -68,8 +68,6 @@ async def test_sensor_light_level(deconz_sensor):
     """Verify that light level sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHALightLevel", "CLIPLightLevel")
-
     assert sensor.dark is True
     assert sensor.daylight is False
     assert sensor.light_level == 6955

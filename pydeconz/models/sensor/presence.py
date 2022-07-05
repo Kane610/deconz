@@ -5,8 +5,6 @@ from __future__ import annotations
 import enum
 from typing import Any, Final, Literal, TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 PRESENCE_DELAY: Final = "delay"
@@ -126,8 +124,6 @@ class PresenceStatePresenceEvent(enum.Enum):
 
 class Presence(SensorBase):
     """Presence detector."""
-
-    ZHATYPE = (ResourceType.ZHA_PRESENCE.value, ResourceType.CLIP_PRESENCE.value)
 
     raw: TypedPresence
 

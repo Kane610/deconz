@@ -54,7 +54,6 @@ DATA_ONLY_POWER = {
         (
             DATA,
             {
-                "ZHATYPE": ("ZHAPower",),
                 "battery": None,
                 "current": 34,
                 "deconz_id": "/sensors/0",
@@ -78,7 +77,6 @@ DATA_ONLY_POWER = {
         (
             DATA_ONLY_POWER,
             {
-                "ZHATYPE": ("ZHAPower",),
                 "battery": None,
                 "current": None,
                 "deconz_id": "/sensors/0",

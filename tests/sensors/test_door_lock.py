@@ -45,8 +45,6 @@ async def test_sensor_door_lock(deconz_sensor):
     """Verify that door lock sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHADoorLock",)
-
     assert sensor.is_locked is False
     assert sensor.lock_state == DoorLockLockState.UNLOCKED
     assert sensor.lock_configuration is False

@@ -2,8 +2,6 @@
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -21,8 +19,6 @@ class TypedCarbonMonoxide(TypedDict):
 
 class CarbonMonoxide(SensorBase):
     """Carbon monoxide sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_CARBON_MONOXIDE.value,)
 
     raw: TypedCarbonMonoxide
 

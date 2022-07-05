@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -25,8 +23,6 @@ class TypedPower(TypedDict):
 
 class Power(SensorBase):
     """Power sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_POWER.value,)
 
     raw: TypedPower
 

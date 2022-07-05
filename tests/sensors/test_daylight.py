@@ -45,8 +45,6 @@ async def test_sensor_daylight(deconz_sensor):
     """Verify that daylight sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("Daylight",)
-
     assert sensor.configured is True
     assert sensor.daylight is True
     assert sensor.status == "solar_noon"

@@ -31,8 +31,6 @@ async def test_sensor_time(deconz_sensor):
     """Verify that time sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHATime",)
-
     assert sensor.last_set == "2020-11-19T08:07:08Z"
 
     # DeconzSensor

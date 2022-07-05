@@ -2,8 +2,6 @@
 
 from typing import TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import SensorBase
 
 
@@ -21,8 +19,6 @@ class TypedAlarm(TypedDict):
 
 class Alarm(SensorBase):
     """Alarm sensor."""
-
-    ZHATYPE = (ResourceType.ZHA_ALARM.value,)
 
     raw: TypedAlarm
 

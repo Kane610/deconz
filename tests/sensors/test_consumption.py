@@ -27,8 +27,6 @@ async def test_sensor_consumption(deconz_sensor):
     """Verify that consumption sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAConsumption",)
-
     assert sensor.consumption == 11342
     assert sensor.power == 123
     assert sensor.scaled_consumption == 11.342

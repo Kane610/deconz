@@ -26,8 +26,6 @@ async def test_sensor_open_close(deconz_sensor):
     """Verify that open/close sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAOpenClose", "CLIPOpenClose")
-
     assert sensor.open is False
 
     # DeconzSensor

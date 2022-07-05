@@ -6,7 +6,6 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 import pytest
 
 from pydeconz.models.sensor.thermostat import (
-    Thermostat,
     ThermostatFanMode,
     ThermostatMode,
     ThermostatPreset,
@@ -160,8 +159,6 @@ async def test_sensor_danfoss_thermostat(deconz_sensor):
     """
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
-
     assert sensor.cooling_setpoint is None
     assert sensor.display_flipped is None
     assert sensor.error_code is None
@@ -210,8 +207,6 @@ async def test_sensor_eurotronic_thermostat(deconz_sensor):
     """Verify that thermostat sensor works."""
     sensor = await deconz_sensor(DATA_EUROTRONIC)
 
-    assert sensor.ZHATYPE == ("ZHAThermostat", "CLIPThermostat")
-
     assert sensor.cooling_setpoint is None
     assert sensor.error_code is None
     assert sensor.fan_mode is None
@@ -256,8 +251,6 @@ async def test_sensor_eurotronic_thermostat(deconz_sensor):
 async def test_sensor_tuya_thermostat(deconz_sensor):
     """Verify that Tuya thermostat works."""
     sensor = await deconz_sensor(DATA_TUYA)
-
-    assert sensor.ZHATYPE == Thermostat.ZHATYPE
 
     assert sensor.heating_setpoint == 1550
     assert sensor.scaled_heating_setpoint == 15.50

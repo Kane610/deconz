@@ -33,8 +33,6 @@ async def test_sensor_relative_rotary(deconz_sensor):
     """Verify that relative rotary sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHARelativeRotary",)
-
     assert sensor.expected_event_duration == 400
     assert sensor.expected_rotation == 75
     assert sensor.rotary_event == RelativeRotaryEvent.REPEAT

@@ -158,8 +158,6 @@ async def test_sensor_switch(deconz_sensor):
     """Verify that switch sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
-
     assert sensor.button_event == 1002
     assert sensor.gesture is None
     assert sensor.angle is None
@@ -190,8 +188,6 @@ async def test_sensor_switch_sensor_cube(deconz_sensor):
     """Verify that cube switch sensor works."""
     sensor = await deconz_sensor(DATA_CUBE)
 
-    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
-
     assert sensor.button_event == 747
     assert sensor.gesture == 7
 
@@ -218,8 +214,6 @@ async def test_sensor_switch_sensor_cube(deconz_sensor):
 async def test_sensor_switch_hue_wall_switch_module(deconz_sensor):
     """Verify that cube switch sensor works."""
     sensor = await deconz_sensor(DATA_HUE_WALL_SWITCH)
-
-    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.button_event == 1002
     assert sensor.event_duration == 1
@@ -254,8 +248,6 @@ async def test_sensor_switch_tint_remote(deconz_sensor):
     """Verify that tint remote sensor works."""
     sensor = await deconz_sensor(DATA_TINT_REMOTE)
 
-    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
-
     assert sensor.button_event == 6002
     assert sensor.angle == 10
     assert sensor.xy == [0.3381, 0.1627]
@@ -281,8 +273,6 @@ async def test_sensor_switch_tint_remote(deconz_sensor):
 async def test_sensor_switch_ubisys_j1(deconz_sensor):
     """Verify that tint remote sensor works."""
     sensor = await deconz_sensor(DATA_UBISYS_J1)
-
-    assert sensor.ZHATYPE == ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
 
     assert sensor.button_event is None
     assert sensor.angle is None

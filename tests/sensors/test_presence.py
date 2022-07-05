@@ -126,8 +126,6 @@ async def test_sensor_presence(mock_aioresponse, deconz_sensor, deconz_called_wi
     """Verify that presence sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
-
     assert sensor.dark is None
     assert sensor.delay == 0
     assert sensor.device_mode is None
@@ -193,8 +191,6 @@ async def test_sensor_presence(mock_aioresponse, deconz_sensor, deconz_called_wi
 async def test_presence_event_sensor(deconz_sensor):
     """Verify that presence event sensor works."""
     sensor = await deconz_sensor(DATA_PRESENCE_EVENT)
-
-    assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
 
     assert sensor.dark is None
     assert sensor.delay is None
