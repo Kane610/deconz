@@ -24,6 +24,23 @@ DATA = {
 }
 
 
+async def test_handler_daylight(mock_aioresponse, deconz_session, deconz_called_with):
+    """Verify that door lock sensor works."""
+    daylight = deconz_session.sensors.daylight
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await daylight.set_config("0", sunrise_offset=100)
+    assert deconz_called_with(
+        "put", path="/sensors/0/config", json={"sunriseoffset": 100}
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
+    await daylight.set_config("0", sunset_offset=-100)
+    assert deconz_called_with(
+        "put", path="/sensors/0/config", json={"sunsetoffset": -100}
+    )
+
+
 async def test_sensor_daylight(deconz_sensor):
     """Verify that daylight sensor works."""
     sensor = await deconz_sensor(DATA)
@@ -78,3 +95,4 @@ async def test_sensor_daylight(deconz_sensor):
         sensor.update(event)
 
         assert sensor.changed_keys == {"state", "status"}
+        assert sensor.status == v
