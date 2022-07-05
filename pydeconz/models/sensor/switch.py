@@ -5,6 +5,8 @@ from __future__ import annotations
 import enum
 from typing import Literal, TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -69,7 +71,11 @@ class TypedSwitch(TypedDict):
 class Switch(SensorBase):
     """Switch sensor."""
 
-    ZHATYPE = ("ZHASwitch", "ZGPSwitch", "CLIPSwitch")
+    ZHATYPE = (
+        ResourceType.ZHA_SWITCH.value,
+        ResourceType.ZGP_SWITCH.value,
+        ResourceType.CLIP_SWITCH.value,
+    )
 
     raw: TypedSwitch
 

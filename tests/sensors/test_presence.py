@@ -9,10 +9,59 @@ from pydeconz.models.sensor.presence import (
     PresenceStatePresenceEvent,
 )
 
+DATA = {
+    "config": {
+        "alert": "none",
+        "battery": 100,
+        "delay": 0,
+        "ledindication": False,
+        "on": True,
+        "pending": [],
+        "reachable": True,
+        "sensitivity": 1,
+        "sensitivitymax": 2,
+        "usertest": False,
+    },
+    "ep": 2,
+    "etag": "5cfb81765e86aa53ace427cfd52c6d52",
+    "manufacturername": "Philips",
+    "modelid": "SML001",
+    "name": "Motion sensor 4",
+    "state": {
+        "lastupdated": "2019-05-05T14:37:06",
+        "presence": False,
+    },
+    "swversion": "6.1.0.18912",
+    "type": "ZHAPresence",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-0406",
+}
 
-async def test_configure_presence_sensor(
-    mock_aioresponse, deconz_session, deconz_called_with
-):
+DATA_PRESENCE_EVENT = {
+    "config": {
+        "devicemode": "undirected",
+        "on": True,
+        "reachable": True,
+        "sensitivity": 3,
+        "triggerdistance": "medium",
+    },
+    "etag": "13ff209f9401b317987d42506dd4cd79",
+    "lastannounced": None,
+    "lastseen": "2022-06-28T23:13Z",
+    "manufacturername": "aqara",
+    "modelid": "lumi.motion.ac01",
+    "name": "Aqara FP1",
+    "state": {
+        "lastupdated": "2022-06-28T23:13:38.577",
+        "presence": True,
+        "presenceevent": "leave",
+    },
+    "swversion": "20210121",
+    "type": "ZHAPresence",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0406",
+}
+
+
+async def test_handler_presence(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that configuring presence sensor works."""
     presence = deconz_session.sensors.presence
 
@@ -73,33 +122,9 @@ async def test_configure_presence_sensor(
     )
 
 
-async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_with):
+async def test_sensor_presence(mock_aioresponse, deconz_sensor, deconz_called_with):
     """Verify that presence sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "alert": "none",
-                "battery": 100,
-                "delay": 0,
-                "ledindication": False,
-                "on": True,
-                "pending": [],
-                "reachable": True,
-                "sensitivity": 1,
-                "sensitivitymax": 2,
-                "usertest": False,
-            },
-            "ep": 2,
-            "etag": "5cfb81765e86aa53ace427cfd52c6d52",
-            "manufacturername": "Philips",
-            "modelid": "SML001",
-            "name": "Motion sensor 4",
-            "state": {"lastupdated": "2019-05-05T14:37:06", "presence": False},
-            "swversion": "6.1.0.18912",
-            "type": "ZHAPresence",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-02-0406",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
 
@@ -167,31 +192,7 @@ async def test_presence_sensor(mock_aioresponse, deconz_sensor, deconz_called_wi
 
 async def test_presence_event_sensor(deconz_sensor):
     """Verify that presence event sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "devicemode": "undirected",
-                "on": True,
-                "reachable": True,
-                "sensitivity": 3,
-                "triggerdistance": "medium",
-            },
-            "etag": "13ff209f9401b317987d42506dd4cd79",
-            "lastannounced": None,
-            "lastseen": "2022-06-28T23:13Z",
-            "manufacturername": "aqara",
-            "modelid": "lumi.motion.ac01",
-            "name": "Aqara FP1",
-            "state": {
-                "lastupdated": "2022-06-28T23:13:38.577",
-                "presence": True,
-                "presenceevent": "leave",
-            },
-            "swversion": "20210121",
-            "type": "ZHAPresence",
-            "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0406",
-        },
-    )
+    sensor = await deconz_sensor(DATA_PRESENCE_EVENT)
 
     assert sensor.ZHATYPE == ("ZHAPresence", "CLIPPresence")
 

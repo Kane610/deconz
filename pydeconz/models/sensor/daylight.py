@@ -2,6 +2,8 @@
 
 from typing import Final, TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 DAYLIGHT_STATUS: Final = {
@@ -47,7 +49,7 @@ class TypedDaylight(TypedDict):
 class Daylight(SensorBase):
     """Daylight sensor built into deCONZ software."""
 
-    ZHATYPE = ("Daylight",)
+    ZHATYPE = (ResourceType.DAYLIGHT.value,)
 
     raw: TypedDaylight
 

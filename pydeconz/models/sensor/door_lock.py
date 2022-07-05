@@ -3,6 +3,8 @@
 import enum
 from typing import Literal, TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -37,7 +39,7 @@ class TypedDoorLock(TypedDict):
 class DoorLock(SensorBase):
     """Door lock sensor."""
 
-    ZHATYPE = ("ZHADoorLock",)
+    ZHATYPE = (ResourceType.ZHA_DOOR_LOCK.value,)
 
     raw: TypedDoorLock
 

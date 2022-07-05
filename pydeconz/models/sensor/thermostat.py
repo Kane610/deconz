@@ -6,6 +6,8 @@ import enum
 import logging
 from typing import Literal, TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 LOGGER = logging.getLogger(__name__)
@@ -207,7 +209,7 @@ class TypedThermostat(TypedDict):
 class Thermostat(SensorBase):
     """Thermostat "sensor"."""
 
-    ZHATYPE = ("ZHAThermostat", "CLIPThermostat")
+    ZHATYPE = (ResourceType.ZHA_THERMOSTAT.value, ResourceType.CLIP_THERMOSTAT.value)
 
     raw: TypedThermostat
 

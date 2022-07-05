@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -33,7 +35,7 @@ class TypedVibration(TypedDict):
 class Vibration(SensorBase):
     """Vibration sensor."""
 
-    ZHATYPE = ("ZHAVibration",)
+    ZHATYPE = (ResourceType.ZHA_VIBRATION.value,)
 
     raw: TypedVibration
 

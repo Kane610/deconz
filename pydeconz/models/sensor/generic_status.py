@@ -2,6 +2,8 @@
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -20,7 +22,7 @@ class TypedGenericStatus(TypedDict):
 class GenericStatus(SensorBase):
     """Generic status sensor."""
 
-    ZHATYPE = ("CLIPGenericStatus",)
+    ZHATYPE = (ResourceType.CLIP_GENERIC_STATUS.value,)
 
     raw: TypedGenericStatus
 

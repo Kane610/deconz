@@ -5,6 +5,8 @@ from __future__ import annotations
 import enum
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -37,7 +39,7 @@ class RelativeRotaryEvent(enum.IntEnum):
 class RelativeRotary(SensorBase):
     """Relative rotary sensor."""
 
-    ZHATYPE = ("ZHARelativeRotary",)
+    ZHATYPE = (ResourceType.ZHA_RELATIVE_ROTARY.value,)
 
     raw: TypedRelativeRotary
 

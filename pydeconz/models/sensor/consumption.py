@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -23,7 +25,7 @@ class TypedConsumption(TypedDict):
 class Consumption(SensorBase):
     """Power consumption sensor."""
 
-    ZHATYPE = ("ZHAConsumption",)
+    ZHATYPE = (ResourceType.ZHA_CONSUMPTION.value,)
 
     raw: TypedConsumption
 

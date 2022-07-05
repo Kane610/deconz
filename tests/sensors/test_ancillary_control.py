@@ -10,37 +10,37 @@ from pydeconz.models.sensor.ancillary_control import (
     AncillaryControlPanel,
 )
 
+DATA = {
+    "config": {
+        "battery": 95,
+        "enrolled": 1,
+        "on": True,
+        "pending": [],
+        "reachable": True,
+    },
+    "ep": 1,
+    "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
+    "lastseen": "2021-07-25T18:07Z",
+    "manufacturername": "lk",
+    "modelid": "ZB-KeypadGeneric-D0002",
+    "name": "Keypad",
+    "state": {
+        "action": "armed_stay",
+        "lastupdated": "2021-07-25T18:02:51.172",
+        "lowbattery": False,
+        "panel": "exit_delay",
+        "seconds_remaining": 55,
+        "tampered": False,
+    },
+    "swversion": "3.13",
+    "type": "ZHAAncillaryControl",
+    "uniqueid": "ec:1b:bd:ff:fe:6f:c3:4d-01-0501",
+}
 
-async def test_ancillary_control_sensor(deconz_sensor):
+
+async def test_sensor_ancillary_control(deconz_sensor):
     """Verify that ancillary control sensor works."""
-    sensor = await deconz_sensor(
-        {
-            "config": {
-                "battery": 95,
-                "enrolled": 1,
-                "on": True,
-                "pending": [],
-                "reachable": True,
-            },
-            "ep": 1,
-            "etag": "5aaa1c6bae8501f59929539c6e8f44d6",
-            "lastseen": "2021-07-25T18:07Z",
-            "manufacturername": "lk",
-            "modelid": "ZB-KeypadGeneric-D0002",
-            "name": "Keypad",
-            "state": {
-                "action": "armed_stay",
-                "lastupdated": "2021-07-25T18:02:51.172",
-                "lowbattery": False,
-                "panel": "exit_delay",
-                "seconds_remaining": 55,
-                "tampered": False,
-            },
-            "swversion": "3.13",
-            "type": "ZHAAncillaryControl",
-            "uniqueid": "ec:1b:bd:ff:fe:6f:c3:4d-01-0501",
-        },
-    )
+    sensor = await deconz_sensor(DATA)
 
     assert sensor.ZHATYPE == ("ZHAAncillaryControl",)
 

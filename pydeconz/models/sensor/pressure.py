@@ -2,6 +2,8 @@
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import SensorBase
 
 
@@ -20,7 +22,7 @@ class TypedPressure(TypedDict):
 class Pressure(SensorBase):
     """Pressure sensor."""
 
-    ZHATYPE = ("ZHAPressure", "CLIPPressure")
+    ZHATYPE = (ResourceType.ZHA_PRESSURE.value, ResourceType.CLIP_PRESSURE.value)
 
     raw: TypedPressure
 
