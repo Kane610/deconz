@@ -6,7 +6,26 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz
 from unittest.mock import Mock
 
 
-async def test_control_lock(mock_aioresponse, deconz_session, deconz_called_with):
+DATA = {
+    "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
+    "hascolor": False,
+    "lastannounced": None,
+    "lastseen": "2020-08-22T15:29:03Z",
+    "manufacturername": "Danalock",
+    "modelid": "V3-BTZB",
+    "name": "Door lock",
+    "state": {
+        "alert": "none",
+        "on": False,
+        "reachable": True,
+    },
+    "swversion": "19042019",
+    "type": "Door Lock",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-00",
+}
+
+
+async def test_handler_lock(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that controlling locks work."""
     locks = deconz_session.lights.locks
 
@@ -19,23 +38,9 @@ async def test_control_lock(mock_aioresponse, deconz_session, deconz_called_with
     assert deconz_called_with("put", path="/lights/0/state", json={"on": False})
 
 
-async def test_create_lock(mock_aioresponse, deconz_light, deconz_called_with):
+async def test_light_lock(deconz_light):
     """Verify that locks work."""
-    lock = await deconz_light(
-        {
-            "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
-            "hascolor": False,
-            "lastannounced": None,
-            "lastseen": "2020-08-22T15:29:03Z",
-            "manufacturername": "Danalock",
-            "modelid": "V3-BTZB",
-            "name": "Door lock",
-            "state": {"alert": "none", "on": False, "reachable": True},
-            "swversion": "19042019",
-            "type": "Door Lock",
-            "uniqueid": "00:00:00:00:00:00:00:00-00",
-        }
-    )
+    lock = await deconz_light(DATA)
 
     assert lock.state is False
     assert lock.is_locked is False
@@ -49,7 +54,7 @@ async def test_create_lock(mock_aioresponse, deconz_light, deconz_called_with):
     assert lock.name == "Door lock"
     assert lock.software_version == "19042019"
     assert lock.type == "Door Lock"
-    assert lock.unique_id == "00:00:00:00:00:00:00:00-00"
+    assert lock.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-00"
 
     lock.register_callback(mock_callback := Mock())
     assert lock._callbacks

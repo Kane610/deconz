@@ -7,8 +7,23 @@ from unittest.mock import Mock
 
 from pydeconz.models.light import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY
 
+DATA = {
+    "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
+    "hascolor": False,
+    "manufacturername": "Heiman",
+    "modelid": "WarningDevice",
+    "name": "alarm_tuin",
+    "state": {
+        "alert": "none",
+        "reachable": True,
+    },
+    "swversion": None,
+    "type": "Warning device",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01",
+}
 
-async def test_control_siren(mock_aioresponse, deconz_session, deconz_called_with):
+
+async def test_handler_siren(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that sirens work."""
     sirens = deconz_session.lights.sirens
 
@@ -37,21 +52,9 @@ async def test_control_siren(mock_aioresponse, deconz_session, deconz_called_wit
     )
 
 
-async def test_create_siren(deconz_light):
+async def test_light_siren(deconz_light):
     """Verify that sirens work."""
-    siren = await deconz_light(
-        {
-            "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
-            "hascolor": False,
-            "manufacturername": "Heiman",
-            "modelid": "WarningDevice",
-            "name": "alarm_tuin",
-            "state": {"alert": "none", "reachable": True},
-            "swversion": None,
-            "type": "Warning device",
-            "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
-        }
-    )
+    siren = await deconz_light(DATA)
 
     assert siren.state is None
     assert siren.is_on is False
@@ -65,7 +68,7 @@ async def test_create_siren(deconz_light):
     assert siren.name == "alarm_tuin"
     assert not siren.software_version
     assert siren.type == "Warning device"
-    assert siren.unique_id == "00:0d:6f:00:0f:ab:12:34-01"
+    assert siren.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-01"
 
     siren.register_callback(mock_callback := Mock())
     assert siren._callbacks
