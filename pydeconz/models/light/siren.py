@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import ALERT_KEY, ALERT_LONG, LightBase
 
 
@@ -22,7 +24,7 @@ class TypedSiren(TypedDict):
 class Siren(LightBase):
     """Siren class."""
 
-    ZHATYPE = ("Warning device",)
+    ZHATYPE = (ResourceType.WARNING_DEVICE.value,)
 
     raw: TypedSiren
 

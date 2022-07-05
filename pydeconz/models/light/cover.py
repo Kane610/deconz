@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import LightBase
 
 
@@ -30,9 +32,9 @@ class Cover(LightBase):
     """
 
     ZHATYPE = (
-        "Level controllable output",
-        "Window covering controller",
-        "Window covering device",
+        ResourceType.LEVEL_CONTROLLABLE_OUTPUT.value,
+        ResourceType.WINDOW_COVERING_CONTROLLER.value,
+        ResourceType.WINDOW_COVERING_DEVICE.value,
     )
 
     raw: TypedCover

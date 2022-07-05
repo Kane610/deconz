@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from pydeconz.models import ResourceType
+
 from . import LightBase
 
 
@@ -22,7 +24,7 @@ class TypedLock(TypedDict):
 class Lock(LightBase):
     """Lock class."""
 
-    ZHATYPE = ("Door Lock",)
+    ZHATYPE = (ResourceType.DOOR_LOCK.value,)
 
     raw: TypedLock
 
