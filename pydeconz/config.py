@@ -4,30 +4,49 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 import enum
-from typing import Any, Final, Literal
+import logging
+from typing import Any, Final
 
 from .utils import normalize_bridge_id
+
+LOGGER = logging.getLogger(__name__)
+
 
 UNINITIALIZED_BRIDGE_ID: Final = "0000000000000000"
 
 
-class DeviceName(enum.Enum):
+class ConfigDeviceName(enum.Enum):
     """Valid product names of the gateway."""
 
     CONBEE = "ConBee"
     RASPBEE = "RaspBee"
-    CONBEE2 = "ConBee II"
-    RASPBEE2 = "RaspBee II"
+    CONBEE_2 = "ConBee II"
+    RASPBEE_2 = "RaspBee II"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ConfigDeviceName":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected config device name %s", value)
+        return ConfigDeviceName.UNKNOWN
 
 
-class TimeFormat(enum.Enum):
+class ConfigNTP(enum.Enum):
     """Timeformat that can be used by other applications."""
 
-    TWELVE = "12h"
-    TWENTYFOUR = "24h"
+    SYNCED = "synced"
+    UNSYNCED = "unsynced"
 
 
-class UpdateChannel(enum.Enum):
+class ConfigTimeFormat(enum.Enum):
+    """Tells if the NTP time is "synced" or "unsynced"."""
+
+    FORMAT_12H = "12h"
+    FORMAT_24H = "24h"
+
+
+class ConfigUpdateChannel(enum.Enum):
     """Available update channels to use with the Gateway."""
 
     ALPHA = "alpha"
@@ -35,7 +54,7 @@ class UpdateChannel(enum.Enum):
     STABLE = "stable"
 
 
-class ZigbeeChannel(enum.IntEnum):
+class ConfigZigbeeChannel(enum.IntEnum):
     """Available wireless frequency channels to use with the Gateway."""
 
     CHANNEL_11 = 11
@@ -71,12 +90,12 @@ class Config:
         return normalize_bridge_id(self.raw.get("bridgeid", UNINITIALIZED_BRIDGE_ID))
 
     @property
-    def device_name(self) -> str | None:
+    def device_name(self) -> ConfigDeviceName:
         """Product name of the gateway.
 
         Valid values are "ConBee", "RaspBee", "ConBee II" and "RaspBee II".
         """
-        return self.raw.get("devicename")
+        return ConfigDeviceName(self.raw.get("devicename"))
 
     @property
     def dhcp(self) -> bool | None:
@@ -104,7 +123,7 @@ class Config:
         return self.raw.get("linkbutton")
 
     @property
-    def local_time(self) -> bool | None:
+    def local_time(self) -> str | None:
         """Localtime of the gateway."""
         return self.raw.get("localtime")
 
@@ -115,7 +134,10 @@ class Config:
 
     @property
     def model_id(self) -> str | None:
-        """Model describing either conbee or raspbee."""
+        """Model identifyer.
+
+        Fixed string "deCONZ".
+        """
         return self.raw.get("modelid")
 
     @property
@@ -134,12 +156,14 @@ class Config:
         return self.raw.get("networkopenduration")
 
     @property
-    def ntp(self) -> Literal["synced", "unsynced"] | None:
+    def ntp(self) -> ConfigNTP | None:
         """Tells if the NTP time is "synced" or "unsynced".
 
         Only for gateways running on Linux.
         """
-        return self.raw.get("ntp")
+        if "ntp" in self.raw:
+            return ConfigNTP(self.raw["ntp"])
+        return None
 
     @property
     def pan_id(self) -> int | None:
@@ -170,13 +194,13 @@ class Config:
         return self.raw.get("swversion")
 
     @property
-    def time_format(self) -> Literal["12h", "24h"] | None:
+    def time_format(self) -> ConfigTimeFormat:
         """Timeformat used by gateway.
 
         Supported values:
         "12h" or "24h"
         """
-        return self.raw.get("timeformat")
+        return ConfigTimeFormat(self.raw["timeformat"])
 
     @property
     def time_zone(self) -> str | None:
@@ -211,17 +235,14 @@ class Config:
         return self.raw.get("websocketport")
 
     @property
-    def whitelist(self) -> dict[str, Any] | None:
+    def whitelist(self) -> dict[str, Any]:
         """Array of whitelisted API keys."""
-        return self.raw.get("whitelist")
+        return self.raw.get("whitelist", {})
 
     @property
-    def zigbee_channel(self) -> Literal[11, 15, 20, 25] | None:
-        """Wireless frequency channel.
-
-        Supported channels: 11, 15, 20, 25.
-        """
-        return self.raw.get("zigbeechannel")
+    def zigbee_channel(self) -> ConfigZigbeeChannel:
+        """Wireless frequency channel."""
+        return ConfigZigbeeChannel(self.raw["zigbeechannel"])
 
     async def set_config(
         self,
@@ -233,12 +254,12 @@ class Config:
         otau_active: bool | None = None,
         permit_join: int | None = None,
         rf_connected: bool | None = None,
-        time_format: Literal["12h", "24h"] | None = None,
+        time_format: ConfigTimeFormat | None = None,
         time_zone: str | None = None,
         unlock: int | None = None,
-        update_channel: Literal["alpha", "beta", "stable"] | None = None,
+        update_channel: ConfigUpdateChannel | None = None,
         utc: str | None = None,
-        zigbee_channel: Literal[11, 15, 20, 25] | None = None,
+        zigbee_channel: ConfigZigbeeChannel | None = None,
         websocket_notify_all: bool | None = None,
     ) -> dict[str, Any]:
         """Modify configuration parameters.
@@ -295,14 +316,17 @@ class Config:
                 "otauactive": otau_active,
                 "permitjoin": permit_join,
                 "rfconnected": rf_connected,
-                "timeformat": time_format,
                 "timezone": time_zone,
                 "unlock": unlock,
-                "updatechannel": update_channel,
                 "utc": utc,
-                "zigbeechannel": zigbee_channel,
                 "websocketnotifyall": websocket_notify_all,
             }.items()
             if value is not None
         }
+        if time_format is not None:
+            data["timeformat"] = time_format.value
+        if update_channel is not None:
+            data["updatechannel"] = update_channel.value
+        if zigbee_channel is not None:
+            data["zigbeechannel"] = zigbee_channel.value
         return await self.request("put", path="/config", json=data)
