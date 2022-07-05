@@ -66,6 +66,28 @@ class ColorCapability(enum.IntFlag):
         return ColorCapability.UNKNOWN
 
 
+class ColorMode(enum.Enum):
+    """Color mode of the light.
+
+    Supported values:
+    - "ct" — color temperature.
+    - "hs" — hue and saturation.
+    - "xy" — CIE xy values.
+    """
+
+    CT = "ct"
+    HS = "hs"
+    XY = "xy"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "ColorMode":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light color mode %s", value)
+        return ColorMode.UNKNOWN
+
+
 class Effect(enum.Enum):
     """Effect of the light.
 

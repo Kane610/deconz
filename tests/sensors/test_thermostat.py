@@ -124,8 +124,8 @@ async def test_handler_thermostat(mock_aioresponse, deconz_session, deconz_calle
         preset=ThermostatPreset.AUTO,
         schedule=[],
         set_valve=True,
-        swing_mode=ThermostatSwingMode.HALFOPEN,
-        temperature_measurement=ThermostatTemperatureMeasurement.FLOORSENSOR,
+        swing_mode=ThermostatSwingMode.HALF_OPEN,
+        temperature_measurement=ThermostatTemperatureMeasurement.FLOOR_SENSOR,
         window_open_detection=True,
     )
     assert deconz_called_with(
@@ -408,7 +408,7 @@ ENUM_PROPERTY_DATA = [
         ("config", "swingmode"),
         ("swing_mode"),
         {
-            "fully open": ThermostatSwingMode.FULLYOPEN,
+            "fully open": ThermostatSwingMode.FULLY_OPEN,
             "unsupported": ThermostatSwingMode.UNKNOWN,
             None: ThermostatSwingMode.UNKNOWN,
         },
@@ -417,7 +417,7 @@ ENUM_PROPERTY_DATA = [
         ("config", "temperaturemeasurement"),
         ("temperature_measurement"),
         {
-            "air sensor": ThermostatTemperatureMeasurement.AIRSENSOR,
+            "air sensor": ThermostatTemperatureMeasurement.AIR_SENSOR,
             "unsupported": ThermostatTemperatureMeasurement.UNKNOWN,
             None: ThermostatTemperatureMeasurement.UNKNOWN,
         },

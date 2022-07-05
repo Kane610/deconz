@@ -3,11 +3,45 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
+import enum
 from typing import Any, Final, Literal
 
 from .utils import normalize_bridge_id
 
 UNINITIALIZED_BRIDGE_ID: Final = "0000000000000000"
+
+
+class DeviceName(enum.Enum):
+    """Valid product names of the gateway."""
+
+    CONBEE = "ConBee"
+    RASPBEE = "RaspBee"
+    CONBEE2 = "ConBee II"
+    RASPBEE2 = "RaspBee II"
+
+
+class TimeFormat(enum.Enum):
+    """Timeformat that can be used by other applications."""
+
+    TWELVE = "12h"
+    TWENTYFOUR = "24h"
+
+
+class UpdateChannel(enum.Enum):
+    """Available update channels to use with the Gateway."""
+
+    ALPHA = "alpha"
+    BETA = "beta"
+    STABLE = "stable"
+
+
+class ZigbeeChannel(enum.IntEnum):
+    """Available wireless frequency channels to use with the Gateway."""
+
+    CHANNEL_11 = 11
+    CHANNEL_15 = 15
+    CHANNEL_20 = 20
+    CHANNEL_25 = 25
 
 
 class Config:

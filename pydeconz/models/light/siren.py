@@ -6,7 +6,8 @@ from typing import Literal, TypedDict
 
 from pydeconz.models import ResourceType
 
-from . import ALERT_KEY, ALERT_LONG, LightBase
+from . import LightBase
+from .light import Alert
 
 
 class TypedSirenState(TypedDict):
@@ -31,4 +32,4 @@ class Siren(LightBase):
     @property
     def is_on(self) -> bool:
         """If device is sounding."""
-        return self.raw["state"][ALERT_KEY] == ALERT_LONG
+        return self.raw["state"]["alert"] == Alert.LONG.value

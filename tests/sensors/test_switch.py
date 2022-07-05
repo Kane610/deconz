@@ -130,7 +130,7 @@ async def test_handler_switch(mock_aioresponse, deconz_session, deconz_called_wi
     switch = deconz_session.sensors.switch
 
     mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await switch.set_config("0", device_mode=SwitchDeviceMode.DUALROCKER)
+    await switch.set_config("0", device_mode=SwitchDeviceMode.DUAL_ROCKER)
     assert deconz_called_with(
         "put",
         path="/sensors/0/config",
@@ -223,7 +223,7 @@ async def test_sensor_switch_hue_wall_switch_module(deconz_sensor):
 
     assert sensor.button_event == 1002
     assert sensor.event_duration == 1
-    assert sensor.device_mode == SwitchDeviceMode.DUALROCKER
+    assert sensor.device_mode == SwitchDeviceMode.DUAL_ROCKER
     assert not sensor.angle
     assert not sensor.gesture
     assert not sensor.mode
