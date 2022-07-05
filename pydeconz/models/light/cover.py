@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from pydeconz.models import ResourceType
-
 from . import LightBase
 
 
@@ -30,12 +28,6 @@ class Cover(LightBase):
 
     Position 0 means open and 100 means closed.
     """
-
-    ZHATYPE = (
-        ResourceType.LEVEL_CONTROLLABLE_OUTPUT.value,
-        ResourceType.WINDOW_COVERING_CONTROLLER.value,
-        ResourceType.WINDOW_COVERING_DEVICE.value,
-    )
 
     raw: TypedCover
 
