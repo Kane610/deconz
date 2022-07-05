@@ -7,8 +7,6 @@ from typing import Final
 from .. import ResourceGroup
 from ..deconz_device import DeconzDevice
 
-RESOURCE_TYPE: Final = ResourceGroup.LIGHT.value
-
 ALERT_KEY: Final = "alert"
 ALERT_LONG: Final = "lselect"
 ALERT_NONE: Final = "none"
@@ -27,12 +25,8 @@ class LightBase(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/lights/
     """
 
+    resource_group = ResourceGroup.LIGHT
     ZHATYPE: tuple[str, ...] = ()
-
-    @property
-    def resource_type(self) -> str:
-        """Resource type."""
-        return RESOURCE_TYPE
 
     @property
     def state(self) -> bool | None:

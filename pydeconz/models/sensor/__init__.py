@@ -2,12 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Final
-
 from .. import ResourceGroup
 from ..deconz_device import DeconzDevice
-
-RESOURCE_TYPE: Final = ResourceGroup.SENSOR.value
 
 
 class SensorBase(DeconzDevice):
@@ -17,12 +13,8 @@ class SensorBase(DeconzDevice):
     http://dresden-elektronik.github.io/deconz-rest-doc/sensors/
     """
 
+    resource_group = ResourceGroup.SENSOR
     ZHATYPE: tuple[str, ...] = ()
-
-    @property
-    def resource_type(self) -> str:
-        """Resource type."""
-        return RESOURCE_TYPE
 
     @property
     def battery(self) -> int | None:

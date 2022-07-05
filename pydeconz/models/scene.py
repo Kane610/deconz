@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Final, TypedDict
+from typing import Any, TypedDict
 
 from . import ResourceGroup
 from .api import APIItem
-
-RESOURCE_TYPE: Final = ResourceGroup.SCENE.value
 
 
 class TypedScene(TypedDict):
@@ -28,6 +26,7 @@ class Scene(APIItem):
     """
 
     raw: TypedScene
+    resource_group = ResourceGroup.SCENE
 
     def __init__(
         self,
@@ -42,11 +41,6 @@ class Scene(APIItem):
         self.group_deconz_id: str = f"/groups/{self.group_id}"
         self.group_name: str = raw["group_name"]
 
-    @property
-    def resource_type(self) -> str:
-        """Resource type."""
-        return RESOURCE_TYPE
-
     async def store(self) -> dict[str, Any]:
         """Store current group state in scene.
 
@@ -57,7 +51,7 @@ class Scene(APIItem):
     @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group_deconz_id}/{self.resource_type}/{self.id}"
+        return f"{self.group_deconz_id}/{self.resource_group.value}/{self.id}"
 
     @property
     def id(self) -> str:

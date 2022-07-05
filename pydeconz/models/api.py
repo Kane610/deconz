@@ -1,10 +1,13 @@
-"""API base classes."""
+"""API base class."""
 
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from . import ResourceGroup
 
 LOGGER = logging.getLogger(__name__)
 
@@ -13,7 +16,9 @@ UnsubscribeType = Callable[[], None]
 
 
 class APIItem:
-    """Base class for an API item."""
+    """Base class for a deCONZ API item."""
+
+    resource_group: ResourceGroup
 
     def __init__(
         self,
@@ -35,6 +40,11 @@ class APIItem:
 
     def post_init(self) -> None:
         """Post init method used by subclasses."""
+
+    @property
+    def deconz_id(self) -> str:
+        """Id to call device over API e.g. /sensors/1."""
+        return f"/{self.resource_group.value}/{self.resource_id}"
 
     def register_callback(self, callback: SubscriptionType) -> None:
         """Register callback for signalling."""

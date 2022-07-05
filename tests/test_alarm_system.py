@@ -8,7 +8,6 @@ from pydeconz.models.alarm_system import (
     AlarmSystemArmMode,
     AlarmSystemArmState,
     AlarmSystemDeviceTrigger,
-    RESOURCE_TYPE,
 )
 
 
@@ -195,7 +194,6 @@ async def test_create_alarm_system(
 
     alarm_system_0 = alarm_systems["0"]
 
-    assert alarm_system_0.resource_type == RESOURCE_TYPE
     assert alarm_system_0.deconz_id == "/alarmsystems/0"
     assert alarm_system_0.arm_state == AlarmSystemArmState.ARMED_AWAY
     assert alarm_system_0.seconds_remaining == 0

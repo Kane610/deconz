@@ -11,15 +11,6 @@ class DeconzDevice(APIItem):
     """
 
     @property
-    def resource_type(self) -> str:
-        """Resource type, e.g. alarmsystems/groups/lights/scenes/sensors."""
-
-    @property
-    def deconz_id(self) -> str:
-        """Id to call device over API e.g. /sensors/1."""
-        return f"/{self.resource_type}/{self.resource_id}"
-
-    @property
     def etag(self) -> str:
         """HTTP etag change on any action to the device."""
         raw: dict[str, str] = self.raw
