@@ -16,7 +16,7 @@ class Scenes(APIItems[Scene]):
     item_cls = Scene
     resource_group = ResourceGroup.SCENE
 
-    def post_init(self) -> None:
+    def _event_subscribe(self) -> None:
         """Register for group data events."""
         self.gateway.groups.subscribe(
             self.group_data_callback,

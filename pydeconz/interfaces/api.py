@@ -30,7 +30,7 @@ class APIItems(Generic[DataResource]):
     resource_types: set[ResourceType] | None = None
     item_cls: Any
 
-    def __init__(self, gateway: DeconzSession) -> None:
+    def __init__(self, gateway: DeconzSession, grouped: bool = False) -> None:
         """Initialize API items."""
         self.gateway = gateway
         self._items: dict[str, DataResource] = {}
@@ -41,7 +41,10 @@ class APIItems(Generic[DataResource]):
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
 
-    def post_init(self) -> None:
+        if not grouped:
+            self._event_subscribe()
+
+    def _event_subscribe(self) -> None:
         """Post initialization method."""
         self.gateway.events.subscribe(
             self.process_event,
@@ -165,7 +168,9 @@ class GroupedAPIItems(Generic[DataResource]):
             for resource_type in handler.resource_types
         }
 
-    def post_init(self) -> None:
+        self._event_subscribe()
+
+    def _event_subscribe(self) -> None:
         """Post initialization method."""
         self.gateway.events.subscribe(
             self.process_event,
