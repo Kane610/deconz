@@ -7,6 +7,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests import lights as light_test_data
+
 from pydeconz.interfaces.lights import FanSpeed
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
 
@@ -125,30 +127,8 @@ async def test_create_all_light_types(deconz_refresh_state):
     """Verify that light types work."""
     deconz_session = await deconz_refresh_state(
         lights={
-            "0": {
-                "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
-                "hascolor": False,
-                "manufacturername": "Heiman",
-                "modelid": "WarningDevice",
-                "name": "alarm_tuin",
-                "state": {"alert": "none", "reachable": True},
-                "swversion": None,
-                "type": "Warning device",
-                "uniqueid": "00:0d:6f:00:0f:ab:12:34-01",
-            },
-            "1": {
-                "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-08-22T15:29:03Z",
-                "manufacturername": "Danalock",
-                "modelid": "V3-BTZB",
-                "name": "Door lock",
-                "state": {"alert": "none", "on": False, "reachable": True},
-                "swversion": "19042019",
-                "type": "Door Lock",
-                "uniqueid": "00:00:00:00:00:00:00:00-00",
-            },
+            "0": light_test_data.test_configuration_tool.DATA,
+            "1": light_test_data.test_cover.DATA,
             "2": {
                 "etag": "432f3de28965052961a99e3c5494daf4",
                 "hascolor": False,
@@ -166,68 +146,19 @@ async def test_create_all_light_types(deconz_refresh_state):
                 "type": "Fan",
                 "uniqueid": "00:22:a3:00:00:27:8b:81-01",
             },
-            "3": {
-                "etag": "87269755b9b3a046485fdae8d96b252c",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-08-01T16:22:05Z",
-                "manufacturername": "AXIS",
-                "modelid": "Gear",
-                "name": "Covering device",
-                "state": {"bri": 0, "on": False, "reachable": True},
-                "swversion": "100-5.3.5.1122",
-                "type": "Window covering device",
-                "uniqueid": "00:24:46:00:00:12:34:56-01",
-            },
-            "4": {
-                "etag": "26839cb118f5bf7ba1f2108256644010",
-                "hascolor": False,
-                "lastannounced": None,
-                "lastseen": "2020-11-22T11:27Z",
-                "manufacturername": "dresden elektronik",
-                "modelid": "ConBee II",
-                "name": "Configuration tool 1",
-                "state": {"reachable": True},
-                "swversion": "0x264a0700",
-                "type": "Configuration tool",
-                "uniqueid": "00:21:2e:ff:ff:05:a7:a3-01",
-            },
-            "5": {
-                "ctmax": 500,
-                "ctmin": 153,
-                "etag": "026bcfe544ad76c7534e5ca8ed39047c",
-                "hascolor": True,
-                "manufacturername": "dresden elektronik",
-                "modelid": "FLS-PP3",
-                "name": "Light 1",
-                "pointsymbol": {},
-                "state": {
-                    "alert": None,
-                    "bri": 111,
-                    "colormode": "ct",
-                    "ct": 307,
-                    "effect": None,
-                    "hascolor": True,
-                    "hue": 7998,
-                    "on": False,
-                    "reachable": True,
-                    "sat": 172,
-                    "xy": [0.421253, 0.39921],
-                },
-                "swversion": "020C.201000A0",
-                "type": "Extended color light",
-                "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
-            },
+            "3": light_test_data.test_light.DATA,
+            "4": light_test_data.test_lock.DATA,
+            "5": light_test_data.test_siren.DATA,
             "6": {"type": "unsupported device"},
         },
     )
 
     lights = deconz_session.lights
     assert len(lights.keys()) == 7
-    assert lights["0"].type == "Warning device"
-    assert lights["1"].type == "Door Lock"
+    assert lights["0"].type == "Configuration tool"
+    assert lights["1"].type == "Window covering device"
     assert lights["2"].type == "Fan"
-    assert lights["3"].type == "Window covering device"
-    assert lights["4"].type == "Configuration tool"
-    assert lights["5"].type == "Extended color light"
+    assert lights["3"].type == "Extended color light"
+    assert lights["4"].type == "Door Lock"
+    assert lights["5"].type == "Warning device"
     assert lights["6"].type == "unsupported device"  # legacy support

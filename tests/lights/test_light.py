@@ -14,8 +14,36 @@ from pydeconz.models.light import (
 )
 from pydeconz.models.light.light import ColorCapability
 
+DATA = {
+    "colorcapabilities": 15,
+    "ctmax": 500,
+    "ctmin": 153,
+    "etag": "026bcfe544ad76c7534e5ca8ed39047c",
+    "hascolor": True,
+    "manufacturername": "dresden elektronik",
+    "modelid": "FLS-PP3",
+    "name": "Light 1",
+    "pointsymbol": {},
+    "state": {
+        "alert": None,
+        "bri": 111,
+        "colormode": "ct",
+        "ct": 307,
+        "effect": None,
+        "hascolor": True,
+        "hue": 7998,
+        "on": False,
+        "reachable": True,
+        "sat": 172,
+        "xy": [0.421253, 0.39921],
+    },
+    "swversion": "020C.201000A0",
+    "type": "Extended color light",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-0A",
+}
 
-async def test_control_light(mock_aioresponse, deconz_session, deconz_called_with):
+
+async def test_handler_light(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that creating a light works."""
     lights = deconz_session.lights.lights
 
@@ -61,37 +89,9 @@ async def test_control_light(mock_aioresponse, deconz_session, deconz_called_wit
     )
 
 
-async def test_create_light(mock_aioresponse, deconz_light, deconz_called_with):
+async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that creating a light works."""
-    light = await deconz_light(
-        {
-            "colorcapabilities": 15,
-            "ctmax": 500,
-            "ctmin": 153,
-            "etag": "026bcfe544ad76c7534e5ca8ed39047c",
-            "hascolor": True,
-            "manufacturername": "dresden elektronik",
-            "modelid": "FLS-PP3",
-            "name": "Light 1",
-            "pointsymbol": {},
-            "state": {
-                "alert": None,
-                "bri": 111,
-                "colormode": "ct",
-                "ct": 307,
-                "effect": None,
-                "hascolor": True,
-                "hue": 7998,
-                "on": False,
-                "reachable": True,
-                "sat": 172,
-                "xy": [0.421253, 0.39921],
-            },
-            "swversion": "020C.201000A0",
-            "type": "Extended color light",
-            "uniqueid": "00:21:2E:FF:FF:00:73:9F-0A",
-        }
-    )
+    light = await deconz_light(DATA)
 
     assert light.state is False
     assert light.on is False
@@ -123,7 +123,7 @@ async def test_create_light(mock_aioresponse, deconz_light, deconz_called_with):
     assert light.name == "Light 1"
     assert light.software_version == "020C.201000A0"
     assert light.type == "Extended color light"
-    assert light.unique_id == "00:21:2E:FF:FF:00:73:9F-0A"
+    assert light.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-0A"
 
     light.register_callback(mock_callback := Mock())
     assert light._callbacks

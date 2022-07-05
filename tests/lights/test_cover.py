@@ -7,8 +7,46 @@ from unittest.mock import Mock
 
 from pydeconz.interfaces.lights import CoverAction
 
+DATA = {
+    "etag": "87269755b9b3a046485fdae8d96b252c",
+    "hascolor": False,
+    "lastannounced": None,
+    "lastseen": "2020-08-01T16:22:05Z",
+    "manufacturername": "AXIS",
+    "modelid": "Gear",
+    "name": "Covering device",
+    "state": {
+        "bri": 0,
+        "lift": 0,
+        "on": False,
+        "open": True,
+        "reachable": True,
+    },
+    "swversion": "100-5.3.5.1122",
+    "type": "Window covering device",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01",
+}
 
-async def test_control_cover(mock_aioresponse, deconz_session, deconz_called_with):
+DATA_LEGACY = {
+    "etag": "87269755b9b3a046485fdae8d96b252c",
+    "hascolor": False,
+    "lastannounced": None,
+    "lastseen": "2020-08-01T16:22:05Z",
+    "manufacturername": "AXIS",
+    "modelid": "Gear",
+    "name": "Covering device",
+    "state": {
+        "bri": 0,
+        "on": False,
+        "reachable": True,
+    },
+    "swversion": "100-5.3.5.1122",
+    "type": "Window covering device",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01",
+}
+
+
+async def test_handler_cover(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that controlling covers work."""
     covers = deconz_session.lights.covers
 
@@ -35,29 +73,9 @@ async def test_control_cover(mock_aioresponse, deconz_session, deconz_called_wit
     assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
 
 
-async def test_create_cover(mock_aioresponse, deconz_light, deconz_called_with):
+async def test_light_cover(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that covers work."""
-    cover = await deconz_light(
-        {
-            "etag": "87269755b9b3a046485fdae8d96b252c",
-            "hascolor": False,
-            "lastannounced": None,
-            "lastseen": "2020-08-01T16:22:05Z",
-            "manufacturername": "AXIS",
-            "modelid": "Gear",
-            "name": "Covering device",
-            "state": {
-                "bri": 0,
-                "lift": 0,
-                "on": False,
-                "open": True,
-                "reachable": True,
-            },
-            "swversion": "100-5.3.5.1122",
-            "type": "Window covering device",
-            "uniqueid": "00:24:46:00:00:12:34:56-01",
-        }
-    )
+    cover = await deconz_light(DATA)
 
     assert cover.state is False
     assert cover.is_open is True
@@ -73,7 +91,7 @@ async def test_create_cover(mock_aioresponse, deconz_light, deconz_called_with):
     assert cover.name == "Covering device"
     assert cover.software_version == "100-5.3.5.1122"
     assert cover.type == "Window covering device"
-    assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
+    assert cover.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-01"
 
     cover.register_callback(mock_callback := Mock())
     assert cover._callbacks
@@ -122,25 +140,9 @@ async def test_create_cover(mock_aioresponse, deconz_light, deconz_called_with):
     assert not cover._callbacks
 
 
-async def test_create_cover_without_lift(
-    mock_aioresponse, deconz_light, deconz_called_with
-):
+async def test_light_cover_legacy(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that covers work with older deconz versions."""
-    cover = await deconz_light(
-        {
-            "etag": "87269755b9b3a046485fdae8d96b252c",
-            "hascolor": False,
-            "lastannounced": None,
-            "lastseen": "2020-08-01T16:22:05Z",
-            "manufacturername": "AXIS",
-            "modelid": "Gear",
-            "name": "Covering device",
-            "state": {"bri": 0, "on": False, "reachable": True},
-            "swversion": "100-5.3.5.1122",
-            "type": "Window covering device",
-            "uniqueid": "00:24:46:00:00:12:34:56-01",
-        }
-    )
+    cover = await deconz_light(DATA_LEGACY)
 
     assert cover.state is False
     assert cover.is_open is True
@@ -156,7 +158,7 @@ async def test_create_cover_without_lift(
     assert cover.name == "Covering device"
     assert cover.software_version == "100-5.3.5.1122"
     assert cover.type == "Window covering device"
-    assert cover.unique_id == "00:24:46:00:00:12:34:56-01"
+    assert cover.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-01"
 
     cover.register_callback(mock_callback := Mock())
     assert cover._callbacks
