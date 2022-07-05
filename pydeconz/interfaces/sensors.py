@@ -156,6 +156,32 @@ class DaylightHandler(APIItems[Daylight]):
     resource_type = ResourceType.DAYLIGHT
     item_cls = Daylight
 
+    async def set_config(
+        self,
+        id: str,
+        sunrise_offset: int | None = None,
+        sunset_offset: int | None = None,
+    ) -> dict[str, Any]:
+        """Set config of the daylight sensor.
+
+        Supported values:
+        - sunrise_offset [int] -120-120
+        - sunset_offset [int] -120-120
+        """
+        data: dict[str, int] = {
+            key: value
+            for key, value in {
+                "sunriseoffset": sunrise_offset,
+                "sunsetoffset": sunset_offset,
+            }.items()
+            if value is not None
+        }
+        return await self.gateway.request_with_retry(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json=data,
+        )
+
 
 class DoorLockHandler(APIItems[DoorLock]):
     """Handler for door lock sensor."""
