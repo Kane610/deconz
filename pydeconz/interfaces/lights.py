@@ -70,9 +70,10 @@ class CoverHandler(APIItems[Cover]):
     ) -> dict[str, Any]:
         """Set state of cover.
 
-        Action [CoverAction] Open, Close, Stop
-        Lift [int] between 0-100.
-        Tilt [int] between 0-100.
+        Supported values:
+        - action [CoverAction] Open, Close, Stop
+        - lift [int] between 0-100
+        - tilt [int] between 0-100
         """
         data: dict[str, bool | int] = {}
 
@@ -210,7 +211,8 @@ class LockHandler(APIItems[Lock]):
     async def set_state(self, id: str, lock: bool) -> dict[str, Any]:
         """Set state of lock.
 
-        Lock [bool] True/False.
+        Supported values:
+        - lock [bool] True/False.
         """
         return await self.gateway.request_with_retry(
             "put",
@@ -242,7 +244,9 @@ class SirenHandler(APIItems[Siren]):
     ) -> dict[str, Any]:
         """Turn on device.
 
-        Duration is counted as 1/10th of a second.
+        Supported values:
+        - on [bool] True/False
+        - duration [int] 1/10th of a second
         """
         data: dict[str, int | str] = {}
 

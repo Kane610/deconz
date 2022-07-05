@@ -48,11 +48,11 @@ class AirPurifierFanMode(enum.Enum):
 
     OFF = "off"
     AUTO = "auto"
-    SPEED1 = "speed_1"
-    SPEED2 = "speed_2"
-    SPEED3 = "speed_3"
-    SPEED4 = "speed_4"
-    SPEED5 = "speed_5"
+    SPEED_1 = "speed_1"
+    SPEED_2 = "speed_2"
+    SPEED_3 = "speed_3"
+    SPEED_4 = "speed_4"
+    SPEED_5 = "speed_5"
 
 
 class AirPurifier(SensorBase):

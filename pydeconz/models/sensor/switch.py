@@ -13,10 +13,10 @@ from . import SensorBase
 class SwitchDeviceMode(enum.Enum):
     """Different modes for the Hue wall switch module."""
 
-    SINGLEROCKER = "singlerocker"
-    SINGLEPUSHBUTTON = "singlepushbutton"
-    DUALROCKER = "dualrocker"
-    DUALPUSHBUTTON = "dualpushbutton"
+    SINGLE_ROCKER = "singlerocker"
+    SINGLE_PUSH_BUTTON = "singlepushbutton"
+    DUAL_ROCKER = "dualrocker"
+    DUAL_PUSH_BUTTON = "dualpushbutton"
 
 
 class SwitchMode(enum.Enum):

@@ -62,9 +62,9 @@ class ThermostatMode(enum.Enum):
     AUTO = "auto"
     COOL = "cool"
     HEAT = "heat"
-    EMERGENCYHEATING = "emergency heating"
-    PRECOOLING = "precooling"
-    FANONLY = "fan only"
+    EMERGENCY_HEATING = "emergency heating"
+    PRE_COOLING = "precooling"
+    FAN_ONLY = "fan only"
     DRY = "dry"
     SLEEP = "sleep"
 
@@ -88,11 +88,11 @@ class ThermostatSwingMode(enum.Enum):
     - "three quarters open"
     """
 
-    FULLYCLOSED = "fully closed"
-    FULLYOPEN = "fully open"
-    QUARTEROPEN = "quarter open"
-    HALFOPEN = "half open"
-    THREEQUARTERSOPEN = "three quarters open"
+    FULLY_CLOSED = "fully closed"
+    FULLY_OPEN = "fully open"
+    QUARTER_OPEN = "quarter open"
+    HALF_OPEN = "half open"
+    THREE_QUARTERS_OPEN = "three quarters open"
 
     UNKNOWN = "unknown"
 
@@ -142,9 +142,9 @@ class ThermostatTemperatureMeasurement(enum.Enum):
     - "floor protection"
     """
 
-    AIRSENSOR = "air sensor"
-    FLOORSENSOR = "floor sensor"
-    FLOORPROTECTION = "floor protection"
+    AIR_SENSOR = "air sensor"
+    FLOOR_SENSOR = "floor sensor"
+    FLOOR_PROTECTION = "floor protection"
 
     UNKNOWN = "unknown"
 

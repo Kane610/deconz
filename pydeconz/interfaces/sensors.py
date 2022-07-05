@@ -167,7 +167,8 @@ class DoorLockHandler(APIItems[DoorLock]):
     async def set_config(self, id: str, lock: bool) -> dict[str, Any]:
         """Set config of the lock.
 
-        Lock [bool] True/False.
+        Supported values:
+        - Lock [bool] True/False.
         """
         return await self.gateway.request_with_retry(
             "put",

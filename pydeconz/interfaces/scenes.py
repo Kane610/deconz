@@ -27,6 +27,9 @@ class Scenes(APIItems[Scene]):
         """Create a new scene.
 
         The current state of each light will become the lights scene state.
+
+        Supported values:
+        - name [str]
         """
         return await self.gateway.request(
             "post",
