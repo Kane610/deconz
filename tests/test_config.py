@@ -3,6 +3,14 @@
 pytest --cov-report term-missing --cov=pydeconz.config tests/test_config.py
 """
 
+from pydeconz.config import (
+    ConfigDeviceName,
+    ConfigNTP,
+    ConfigTimeFormat,
+    ConfigUpdateChannel,
+    ConfigZigbeeChannel,
+)
+
 
 async def test_create_config(
     mock_aioresponse, deconz_refresh_state, deconz_called_with
@@ -13,7 +21,7 @@ async def test_create_config(
 
     assert config.api_version == "1.0.4"
     assert config.bridge_id == "0123456789AB"
-    assert config.device_name == "ConBee II"
+    assert config.device_name == ConfigDeviceName.UNKNOWN
     assert config.dhcp
     assert config.firmware_version == "0x26490700"
     assert config.gateway == "192.168.0.1"
@@ -38,7 +46,7 @@ async def test_create_config(
         "url": "",
     }
     assert config.software_version == "2.4.82"
-    assert config.time_format == "24h"
+    assert config.time_format == ConfigTimeFormat.FORMAT_24H
     assert config.time_zone == "Europe/Stockholm"
     assert not config.utc
     assert config.uuid == "12345678-90AB-CDEF-1234-1234567890AB"
@@ -51,13 +59,16 @@ async def test_create_config(
             "name": "deCONZ WebApp",
         }
     }
-    assert config.zigbee_channel == 11
+    assert config.zigbee_channel == ConfigZigbeeChannel.CHANNEL_11
 
     del config.raw["bridgeid"]
     assert config.bridge_id == "0000000000000000"
 
     config.raw["bridgeid"] = "00212EFFFF012345"
     assert config.bridge_id == "00212E012345"
+
+    config.raw["ntp"] = "synced"
+    assert config.ntp == ConfigNTP.SYNCED
 
     mock_aioresponse.put("http://host:80/api/apikey/config")
     await config.set_config(
@@ -69,12 +80,12 @@ async def test_create_config(
         otau_active=False,
         permit_join=111,
         rf_connected=True,
-        time_format="24h",
+        time_format=ConfigTimeFormat.FORMAT_24H,
         time_zone="Europe/Stockholm",
         unlock=200,
-        update_channel="beta",
+        update_channel=ConfigUpdateChannel.BETA,
         utc="2017-11-04T12:01:19",
-        zigbee_channel=15,
+        zigbee_channel=ConfigZigbeeChannel.CHANNEL_15,
         websocket_notify_all=False,
     )
     assert deconz_called_with(
@@ -106,7 +117,7 @@ FIXTURE_CONFIG = {
     "backup": {"errorcode": 0, "status": "idle"},
     "bridgeid": "0123456789AB",
     "datastoreversion": "60",
-    "devicename": "ConBee II",
+    "devicename": "",
     "dhcp": True,
     "disablePermitJoinAutoOff": False,
     "factorynew": False,
