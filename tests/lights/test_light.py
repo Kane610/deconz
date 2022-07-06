@@ -8,10 +8,10 @@ from unittest.mock import Mock
 import pytest
 
 from pydeconz.models.light.light import (
-    FanSpeed,
     LightAlert,
     LightColorCapability,
     LightEffect,
+    LightFanSpeed,
 )
 
 DATA = {
@@ -56,7 +56,7 @@ async def test_handler_light(mock_aioresponse, deconz_session, deconz_called_wit
         color_loop_speed=10,
         color_temperature=400,
         effect=LightEffect.COLOR_LOOP,
-        fan_speed=FanSpeed.OFF,
+        fan_speed=LightFanSpeed.OFF,
         hue=1000,
         on=True,
         on_time=100,
@@ -97,31 +97,31 @@ async def test_handler_fan(mock_aioresponse, deconz_session, deconz_called_with)
     lights = deconz_session.lights.lights
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.OFF)
+    await lights.set_state("0", fan_speed=LightFanSpeed.OFF)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 0})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.PERCENT_25)
+    await lights.set_state("0", fan_speed=LightFanSpeed.PERCENT_25)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 1})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.PERCENT_50)
+    await lights.set_state("0", fan_speed=LightFanSpeed.PERCENT_50)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 2})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.PERCENT_75)
+    await lights.set_state("0", fan_speed=LightFanSpeed.PERCENT_75)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 3})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.PERCENT_100)
+    await lights.set_state("0", fan_speed=LightFanSpeed.PERCENT_100)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 4})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.AUTO)
+    await lights.set_state("0", fan_speed=LightFanSpeed.AUTO)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 5})
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await lights.set_state("0", fan_speed=FanSpeed.COMFORT_BREEZE)
+    await lights.set_state("0", fan_speed=LightFanSpeed.COMFORT_BREEZE)
     assert deconz_called_with("put", path="/lights/0/state", json={"speed": 6})
 
 
@@ -142,7 +142,7 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
     assert light.max_color_temp == 500
     assert light.min_color_temp == 153
     assert light.effect is None
-    assert light.fan_speed == FanSpeed.PERCENT_75
+    assert light.fan_speed == LightFanSpeed.PERCENT_75
     assert light.supports_fan_speed is True
     assert (
         light.color_capabilities

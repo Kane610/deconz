@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Union
 from ..models import ResourceGroup, ResourceType
 from ..models.light.configuration_tool import ConfigurationTool
 from ..models.light.cover import Cover, CoverAction
-from ..models.light.light import FanSpeed, Light, LightAlert, LightEffect
+from ..models.light.light import Light, LightAlert, LightEffect, LightFanSpeed
 from ..models.light.lock import Lock
 from ..models.light.range_extender import RangeExtender
 from ..models.light.siren import Siren
@@ -104,7 +104,7 @@ class LightHandler(APIItems[Light]):
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
         effect: LightEffect | None = None,
-        fan_speed: FanSpeed | None = None,
+        fan_speed: LightFanSpeed | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

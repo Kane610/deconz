@@ -51,6 +51,7 @@ class TypedLightState(TypedDict):
     hue: int
     on: bool
     sat: int
+    speed: Literal[0, 1, 2, 3, 4, 5, 6]
     xy: tuple[float, float]
 
 
@@ -195,7 +196,7 @@ class LightEffect(enum.Enum):
         return LightEffect.UNKNOWN
 
 
-class FanSpeed(enum.IntEnum):
+class LightFanSpeed(enum.IntEnum):
     """Possible fan speeds.
 
     Supported values:
@@ -365,9 +366,9 @@ class Light(LightBase):
         return self.raw["state"].get("effect")
 
     @property
-    def fan_speed(self) -> FanSpeed:
+    def fan_speed(self) -> LightFanSpeed:
         """Speed of the fan."""
-        return FanSpeed(self.raw["state"]["speed"])
+        return LightFanSpeed(self.raw["state"]["speed"])
 
     @property
     def supports_fan_speed(self) -> bool:
