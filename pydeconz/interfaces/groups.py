@@ -2,36 +2,12 @@
 
 from __future__ import annotations
 
-import enum
 from typing import Any
 
 from ..models import ResourceGroup, ResourceType
 from ..models.group import Group
+from ..models.light.light import LightAlert, LightEffect
 from .api import APIItems
-
-
-class Alert(enum.Enum):
-    """Temporary alert effect.
-
-    "none" — group is not performing an alert.
-    "lselect" — group is blinking a longer time.
-    "select" — group is blinking a short time.
-    """
-
-    NONE = "none"
-    LONG = "lselect"
-    SHORT = "select"
-
-
-class Effect(enum.Enum):
-    """Continuous effect of the group.
-
-    "colorloop" — cycle through hue values 0–360.
-    "none" — no effect.
-    """
-
-    COLORLOOP = "colorloop"
-    NONE = "none"
 
 
 class Groups(APIItems[Group]):
@@ -79,11 +55,11 @@ class Groups(APIItems[Group]):
     async def set_state(
         self,
         id: str,
-        alert: Alert | None = None,
+        alert: LightAlert | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Effect | None = None,
+        effect: LightEffect | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,

@@ -4,11 +4,12 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.events tests/test_eve
 """
 
 from unittest.mock import Mock
+
 import pytest
 
 from pydeconz.interfaces.events import EventHandler
-from pydeconz.models.event import Event, EventType
 from pydeconz.models import ResourceGroup
+from pydeconz.models.event import Event, EventType
 
 RAW_EVENT = {
     "id": "1",

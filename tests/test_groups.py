@@ -7,8 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.models.light import ALERT_SHORT, EFFECT_COLOR_LOOP
-from pydeconz.interfaces.groups import Alert, Effect
+from pydeconz.models.light.light import LightAlert, LightEffect
 
 
 async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh_state):
@@ -85,11 +84,11 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
     mock_aioresponse.put("http://host:80/api/apikey/groups/0/action")
     await groups.set_state(
         id="0",
-        alert=Alert.SHORT,
+        alert=LightAlert.SHORT,
         brightness=200,
         color_loop_speed=10,
         color_temperature=400,
-        effect=Effect.COLORLOOP,
+        effect=LightEffect.COLOR_LOOP,
         hue=1000,
         on=True,
         on_time=100,
@@ -211,11 +210,11 @@ async def test_create_group(mock_aioresponse, deconz_called_with, deconz_refresh
 
     mock_aioresponse.put("http://host:80/api/apikey/groups/0/action")
     await group.set_state(
-        alert=ALERT_SHORT,
+        alert=LightAlert.SHORT.value,
         brightness=200,
         color_loop_speed=10,
         color_temperature=400,
-        effect=EFFECT_COLOR_LOOP,
+        effect=LightEffect.COLOR_LOOP.value,
         hue=1000,
         on=True,
         on_time=100,

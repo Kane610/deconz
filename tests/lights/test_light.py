@@ -7,12 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.interfaces.lights import Alert, Effect
-from pydeconz.models.light import (
-    ALERT_SHORT,
-    EFFECT_COLOR_LOOP,
-)
-from pydeconz.models.light.light import ColorCapability
+from pydeconz.models.light.light import LightAlert, LightColorCapability, LightEffect
 
 DATA = {
     "colorcapabilities": 15,
@@ -50,11 +45,11 @@ async def test_handler_light(mock_aioresponse, deconz_session, deconz_called_wit
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await lights.set_state(
         id="0",
-        alert=Alert.SHORT,
+        alert=LightAlert.SHORT,
         brightness=200,
         color_loop_speed=10,
         color_temperature=400,
-        effect=Effect.COLORLOOP,
+        effect=LightEffect.COLOR_LOOP,
         hue=1000,
         on=True,
         on_time=100,
@@ -108,11 +103,11 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
     assert light.effect is None
     assert (
         light.color_capabilities
-        == ColorCapability.HUE_SATURATION
-        | ColorCapability.ENHANCED_HUE
-        | ColorCapability.COLOR_LOOP
-        | ColorCapability.XY_ATTRIBUTES
-        | ColorCapability.COLOR_TEMPERATURE
+        == LightColorCapability.HUE_SATURATION
+        | LightColorCapability.ENHANCED_HUE
+        | LightColorCapability.COLOR_LOOP
+        | LightColorCapability.XY_ATTRIBUTES
+        | LightColorCapability.COLOR_TEMPERATURE
     )
     assert light.reachable is True
 
@@ -167,11 +162,11 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
     await light.set_state(
-        alert=ALERT_SHORT,
+        alert=LightAlert.SHORT.value,
         brightness=200,
         color_loop_speed=10,
         color_temperature=400,
-        effect=EFFECT_COLOR_LOOP,
+        effect=LightEffect.COLOR_LOOP.value,
         hue=1000,
         on=True,
         on_time=100,
@@ -214,9 +209,9 @@ ENUM_PROPERTY_DATA = [
         ("colorcapabilities"),
         ("color_capabilities"),
         {
-            0: ColorCapability.HUE_SATURATION,
-            9: ColorCapability.UNKNOWN,
-            None: ColorCapability.UNKNOWN,
+            0: LightColorCapability.HUE_SATURATION,
+            9: LightColorCapability.UNKNOWN,
+            None: LightColorCapability.UNKNOWN,
         },
     ),
 ]

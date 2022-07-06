@@ -5,7 +5,6 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydecon
 
 import pytest
 
-
 DATA = {
     "config": {
         "on": True,

@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
 from ..models.light.configuration_tool import ConfigurationTool
-from ..models.light.cover import Cover
+from ..models.light.cover import Cover, CoverAction
 from ..models.light.fan import Fan
-from ..models.light.light import Alert, Effect, Light
+from ..models.light.light import Light, LightAlert, LightEffect
 from ..models.light.lock import Lock
 from ..models.light.range_extender import RangeExtender
 from ..models.light.siren import Siren
@@ -20,14 +20,6 @@ if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
 LOGGER = logging.getLogger(__name__)
-
-
-class CoverAction(enum.Enum):
-    """Possible cover actions."""
-
-    CLOSE = enum.auto()
-    OPEN = enum.auto()
-    STOP = enum.auto()
 
 
 class FanSpeed(enum.Enum):
@@ -139,11 +131,11 @@ class LightHandler(APIItems[Light]):
     async def set_state(
         self,
         id: str,
-        alert: Alert | None = None,
+        alert: LightAlert | None = None,
         brightness: int | None = None,
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
-        effect: Effect | None = None,
+        effect: LightEffect | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,
@@ -250,7 +242,7 @@ class SirenHandler(APIItems[Siren]):
         """
         data: dict[str, int | str] = {}
 
-        data["alert"] = (Alert.LONG if on else Alert.NONE).value
+        data["alert"] = (LightAlert.LONG if on else LightAlert.NONE).value
         if on and duration is not None:
             data["ontime"] = duration
 
