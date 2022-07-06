@@ -3,6 +3,8 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.daylight tests/sensors/test_daylight.py
 """
 
+from pydeconz.models.sensor.daylight import DayLightStatus
+
 DATA = {
     "config": {
         "configured": True,
@@ -47,6 +49,7 @@ async def test_sensor_daylight(deconz_sensor):
 
     assert sensor.configured is True
     assert sensor.daylight is True
+    assert sensor.daylight_status == DayLightStatus.SOLAR_NOON
     assert sensor.status == "solar_noon"
     assert sensor.sunrise_offset == 30
     assert sensor.sunset_offset == -30
@@ -70,27 +73,11 @@ async def test_sensor_daylight(deconz_sensor):
     assert sensor.type == "Daylight"
     assert sensor.unique_id == ""
 
-    statuses = {
-        100: "nadir",
-        110: "night_end",
-        120: "nautical_dawn",
-        130: "dawn",
-        140: "sunrise_start",
-        150: "sunrise_end",
-        160: "golden_hour_1",
-        170: "solar_noon",
-        180: "golden_hour_2",
-        190: "sunset_start",
-        200: "sunset_end",
-        210: "dusk",
-        220: "nautical_dusk",
-        230: "night_start",
-        0: "unknown",
-    }
+    statuses = (100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 0)
 
-    for k, v in statuses.items():
-        event = {"state": {"status": k}}
+    for status in statuses:
+        event = {"state": {"status": status}}
         sensor.update(event)
 
         assert sensor.changed_keys == {"state", "status"}
-        assert sensor.status == v
+        assert sensor.daylight_status == DayLightStatus(status)

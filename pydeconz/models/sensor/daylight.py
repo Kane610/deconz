@@ -93,6 +93,11 @@ class Daylight(SensorBase):
         return self.raw["state"]["daylight"]
 
     @property
+    def daylight_status(self) -> DayLightStatus:
+        """Return the daylight status string."""
+        return DayLightStatus(self.raw["state"]["status"])
+
+    @property
     def status(self) -> str:
         """Return the daylight status string."""
         return DAYLIGHT_STATUS[DayLightStatus(self.raw["state"]["status"])]
