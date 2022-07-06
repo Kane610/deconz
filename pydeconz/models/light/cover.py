@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 from typing import Any, TypedDict
 
 from . import LightBase
@@ -21,6 +22,14 @@ class TypedCover(TypedDict):
     """Cover type definition."""
 
     state: TypedCoverState
+
+
+class CoverAction(enum.Enum):
+    """Possible cover actions."""
+
+    CLOSE = enum.auto()
+    OPEN = enum.auto()
+    STOP = enum.auto()
 
 
 class Cover(LightBase):

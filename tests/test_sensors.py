@@ -3,9 +3,9 @@
 pytest --cov-report term-missing --cov=pydeconz.sensor tests/test_sensors.py
 """
 
-from tests import sensors as sensor_test_data
-
 from pydeconz.models import ResourceType
+
+from tests import sensors as sensor_test_data
 
 
 async def test_create_all_sensors(deconz_refresh_state):

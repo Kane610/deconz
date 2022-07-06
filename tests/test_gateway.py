@@ -5,14 +5,14 @@ pytest --cov-report term-missing --cov=pydeconz.gateway tests/test_gateway.py
 
 from asyncio import gather
 from unittest.mock import AsyncMock, Mock, patch
+
+import aiohttp
 import pytest
 
-from pydeconz import BridgeBusy, RequestError, ResponseError, ERRORS, pydeconzException
+from pydeconz import ERRORS, BridgeBusy, RequestError, ResponseError, pydeconzException
 from pydeconz.models.alarm_system import AlarmSystemArmState
 from pydeconz.models.event import EventType
 from pydeconz.websocket import STATE_RUNNING, STATE_STOPPED
-
-import aiohttp
 
 
 @pytest.fixture

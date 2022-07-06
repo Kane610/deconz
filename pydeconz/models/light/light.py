@@ -11,138 +11,6 @@ from . import LightBase
 LOGGER = logging.getLogger(__name__)
 
 
-class Alert(enum.Enum):
-    """Temporary alert effect.
-
-    Supported values:
-    - "none" — light is not performing an alert.
-    - "lselect" — light is blinking a longer time.
-    - "select" — light is blinking a short time.
-    - "blink"
-    - "breathe"
-    - "channelchange"
-    - "finish"
-    - "okay"
-    - "stop"
-    """
-
-    NONE = "none"
-    LONG = "lselect"
-    SHORT = "select"
-
-    # Specific to Hue color bulbs
-
-    BLINK = "blink"
-    BREATHE = "breathe"
-    CHANNEL_CHANGE = "channelchange"
-    FINISH = "finish"
-    OKAY = "okay"
-    STOP = "stop"
-
-    UNKNOWN = "unknown"
-
-    @classmethod
-    def _missing_(cls, value: object) -> "Alert":
-        """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unexpected light alert type %s", value)
-        return Alert.UNKNOWN
-
-
-class ColorCapability(enum.IntFlag):
-    """Bit field of features supported by a light device."""
-
-    HUE_SATURATION = 0
-    ENHANCED_HUE = 1
-    COLOR_LOOP = 2
-    XY_ATTRIBUTES = 4
-    COLOR_TEMPERATURE = 8
-
-    UNKNOWN = 1111
-
-    @classmethod
-    def _missing_(cls, value: object) -> "ColorCapability":
-        """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unexpected light color capability %s", value)
-        return ColorCapability.UNKNOWN
-
-
-class ColorMode(enum.Enum):
-    """Color mode of the light.
-
-    Supported values:
-    - "ct" — color temperature.
-    - "hs" — hue and saturation.
-    - "xy" — CIE xy values.
-    """
-
-    CT = "ct"
-    HS = "hs"
-    XY = "xy"
-
-    UNKNOWN = "unknown"
-
-    @classmethod
-    def _missing_(cls, value: object) -> "ColorMode":
-        """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unexpected light color mode %s", value)
-        return ColorMode.UNKNOWN
-
-
-class Effect(enum.Enum):
-    """Effect of the light.
-
-    Supported values:
-    - "colorloop" — cycle through hue values 0-360
-    - "none" — no effect
-    - "carnival"
-    - "collide"
-    - "fading"
-    - "fireworks"
-    - "flag"
-    - "glow"
-    - "rainbow"
-    - "snake"
-    - "snow"
-    - "sparkles"
-    - "steady"
-    - "strobe"
-    - "twinkle"
-    - "updown"
-    - "vintage"
-    - "waves"
-    """
-
-    COLORLOOP = "colorloop"
-    NONE = "none"
-
-    # Specific to Lidl christmas light
-
-    CARNIVAL = "carnival"
-    COLLIDE = "collide"
-    FADING = "fading"
-    FIREWORKS = "fireworks"
-    FLAG = "flag"
-    GLOW = "glow"
-    RAINBOW = "rainbow"
-    SNAKE = "snake"
-    SNOW = "snow"
-    SPARKLES = "sparkles"
-    STEADY = "steady"
-    STROBE = "strobe"
-    TWINKLE = "twinkle"
-    UPDOWN = "updown"
-    VINTAGE = "vintage"
-    WAVES = "waves"
-
-    UNKNOWN = "unknown"
-
-    @classmethod
-    def _missing_(cls, value: object) -> "Effect":
-        """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unexpected light effect type %s", value)
-        return Effect.UNKNOWN
-
-
 class TypedLightState(TypedDict):
     """Light state type definition."""
 
@@ -195,6 +63,138 @@ class TypedLight(TypedDict):
     state: TypedLightState
 
 
+class LightAlert(enum.Enum):
+    """Temporary alert effect.
+
+    Supported values:
+    - "none" — light is not performing an alert.
+    - "lselect" — light is blinking a longer time.
+    - "select" — light is blinking a short time.
+    - "blink"
+    - "breathe"
+    - "channelchange"
+    - "finish"
+    - "okay"
+    - "stop"
+    """
+
+    NONE = "none"
+    LONG = "lselect"
+    SHORT = "select"
+
+    # Specific to Hue color bulbs
+
+    BLINK = "blink"
+    BREATHE = "breathe"
+    CHANNEL_CHANGE = "channelchange"
+    FINISH = "finish"
+    OKAY = "okay"
+    STOP = "stop"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "LightAlert":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light alert type %s", value)
+        return LightAlert.UNKNOWN
+
+
+class LightColorCapability(enum.IntFlag):
+    """Bit field of features supported by a light device."""
+
+    HUE_SATURATION = 0
+    ENHANCED_HUE = 1
+    COLOR_LOOP = 2
+    XY_ATTRIBUTES = 4
+    COLOR_TEMPERATURE = 8
+
+    UNKNOWN = 1111
+
+    @classmethod
+    def _missing_(cls, value: object) -> "LightColorCapability":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light color capability %s", value)
+        return LightColorCapability.UNKNOWN
+
+
+class LightColorMode(enum.Enum):
+    """Color mode of the light.
+
+    Supported values:
+    - "ct" — color temperature.
+    - "hs" — hue and saturation.
+    - "xy" — CIE xy values.
+    """
+
+    CT = "ct"
+    HS = "hs"
+    XY = "xy"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "LightColorMode":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light color mode %s", value)
+        return LightColorMode.UNKNOWN
+
+
+class LightEffect(enum.Enum):
+    """Effect of the light.
+
+    Supported values:
+    - "colorloop" — cycle through hue values 0-360
+    - "none" — no effect
+    - "carnival"
+    - "collide"
+    - "fading"
+    - "fireworks"
+    - "flag"
+    - "glow"
+    - "rainbow"
+    - "snake"
+    - "snow"
+    - "sparkles"
+    - "steady"
+    - "strobe"
+    - "twinkle"
+    - "updown"
+    - "vintage"
+    - "waves"
+    """
+
+    COLOR_LOOP = "colorloop"
+    NONE = "none"
+
+    # Specific to Lidl christmas light
+
+    CARNIVAL = "carnival"
+    COLLIDE = "collide"
+    FADING = "fading"
+    FIREWORKS = "fireworks"
+    FLAG = "flag"
+    GLOW = "glow"
+    RAINBOW = "rainbow"
+    SNAKE = "snake"
+    SNOW = "snow"
+    SPARKLES = "sparkles"
+    STEADY = "steady"
+    STROBE = "strobe"
+    TWINKLE = "twinkle"
+    UPDOWN = "updown"
+    VINTAGE = "vintage"
+    WAVES = "waves"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "LightEffect":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected light effect type %s", value)
+        return LightEffect.UNKNOWN
+
+
 class Light(LightBase):
     """deCONZ light representation.
 
@@ -237,10 +237,10 @@ class Light(LightBase):
         return self.raw["state"].get("bri")
 
     @property
-    def color_capabilities(self) -> ColorCapability | None:
+    def color_capabilities(self) -> LightColorCapability | None:
         """Bit field to specify color capabilities of light."""
         if "colorcapabilities" in self.raw:
-            return ColorCapability(self.raw["colorcapabilities"])
+            return LightColorCapability(self.raw["colorcapabilities"])
         return None
 
     @property

@@ -5,7 +5,6 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz
 
 from unittest.mock import Mock
 
-
 DATA = {
     "etag": "5c2ec06cde4bd654aef3a555fcd8ad12",
     "hascolor": False,

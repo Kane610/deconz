@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Literal, TypedDict
 
 from . import LightBase
-from .light import Alert
+from .light import LightAlert
 
 
 class TypedSirenState(TypedDict):
@@ -28,4 +28,4 @@ class Siren(LightBase):
     @property
     def is_on(self) -> bool:
         """If device is sounding."""
-        return self.raw["state"]["alert"] == Alert.LONG.value
+        return self.raw["state"]["alert"] == LightAlert.LONG.value

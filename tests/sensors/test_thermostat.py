@@ -13,7 +13,6 @@ from pydeconz.models.sensor.thermostat import (
     ThermostatTemperatureMeasurement,
 )
 
-
 DATA = {
     "config": {
         "battery": 59,

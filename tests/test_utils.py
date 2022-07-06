@@ -5,11 +5,10 @@
 
 from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
 import aiohttp
+import pytest
 
 from pydeconz import errors, utils
-
 
 API_KEY = "1234567890"
 IP = "127.0.0.1"

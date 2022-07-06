@@ -7,10 +7,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from tests import lights as light_test_data
-
 from pydeconz.interfaces.lights import FanSpeed
 from pydeconz.models.light.fan import FAN_SPEED_100_PERCENT
+
+from tests import lights as light_test_data
 
 
 @pytest.fixture
