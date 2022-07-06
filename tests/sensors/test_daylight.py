@@ -50,6 +50,7 @@ async def test_sensor_daylight(deconz_sensor):
     assert sensor.configured is True
     assert sensor.daylight is True
     assert sensor.daylight_status == DayLightStatus.SOLAR_NOON
+    assert sensor.status == "solar_noon"
     assert sensor.sunrise_offset == 30
     assert sensor.sunset_offset == -30
 

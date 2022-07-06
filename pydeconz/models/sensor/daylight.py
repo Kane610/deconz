@@ -2,7 +2,7 @@
 
 import enum
 import logging
-from typing import TypedDict
+from typing import Final, TypedDict
 
 from . import SensorBase
 
@@ -34,6 +34,25 @@ class DayLightStatus(enum.IntEnum):
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected day light value %s", value)
         return DayLightStatus.UNKNOWN
+
+
+DAYLIGHT_STATUS: Final = {
+    DayLightStatus.NADIR: "nadir",
+    DayLightStatus.NIGHT_END: "night_end",
+    DayLightStatus.NAUTICAL_DAWN: "nautical_dawn",
+    DayLightStatus.DAWN: "dawn",
+    DayLightStatus.SUNRISE_START: "sunrise_start",
+    DayLightStatus.SUNRISE_END: "sunrise_end",
+    DayLightStatus.GOLDEN_HOUR_1: "golden_hour_1",
+    DayLightStatus.SOLAR_NOON: "solar_noon",
+    DayLightStatus.GOLDEN_HOUR_2: "golden_hour_2",
+    DayLightStatus.SUNSET_START: "sunset_start",
+    DayLightStatus.SUNSET_END: "sunset_end",
+    DayLightStatus.DUSK: "dusk",
+    DayLightStatus.NAUTICAL_DUSK: "nautical_dusk",
+    DayLightStatus.NIGHT_START: "night_start",
+    DayLightStatus.UNKNOWN: "unknown",
+}
 
 
 class TypedDaylightConfig(TypedDict):
@@ -77,6 +96,11 @@ class Daylight(SensorBase):
     def daylight_status(self) -> DayLightStatus:
         """Return the daylight status string."""
         return DayLightStatus(self.raw["state"]["status"])
+
+    @property
+    def status(self) -> str:
+        """Return the daylight status string."""
+        return DAYLIGHT_STATUS[DayLightStatus(self.raw["state"]["status"])]
 
     @property
     def sunrise_offset(self) -> int:
