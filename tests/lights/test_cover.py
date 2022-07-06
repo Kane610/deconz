@@ -27,24 +27,6 @@ DATA = {
     "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01",
 }
 
-DATA_LEGACY = {
-    "etag": "87269755b9b3a046485fdae8d96b252c",
-    "hascolor": False,
-    "lastannounced": None,
-    "lastseen": "2020-08-01T16:22:05Z",
-    "manufacturername": "AXIS",
-    "modelid": "Gear",
-    "name": "Covering device",
-    "state": {
-        "bri": 0,
-        "on": False,
-        "reachable": True,
-    },
-    "swversion": "100-5.3.5.1122",
-    "type": "Window covering device",
-    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01",
-}
-
 
 async def test_handler_cover(mock_aioresponse, deconz_session, deconz_called_with):
     """Verify that controlling covers work."""
@@ -110,55 +92,6 @@ async def test_light_cover(deconz_light):
     cover.update({"state": {"bri": 30, "on": False}})
     assert cover.is_open is True
     assert cover.lift == 50
-
-    cover.remove_callback(mock_callback)
-    assert not cover._callbacks
-
-
-async def test_light_cover_legacy(deconz_light):
-    """Verify that covers work with older deconz versions."""
-    cover = await deconz_light(DATA_LEGACY)
-
-    assert cover.state is False
-    assert cover.is_open is True
-    assert cover.lift == 0
-    assert cover.tilt is None
-
-    assert cover.reachable is True
-
-    assert cover.deconz_id == "/lights/0"
-    assert cover.etag == "87269755b9b3a046485fdae8d96b252c"
-    assert cover.manufacturer == "AXIS"
-    assert cover.model_id == "Gear"
-    assert cover.name == "Covering device"
-    assert cover.software_version == "100-5.3.5.1122"
-    assert cover.type == "Window covering device"
-    assert cover.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-01"
-
-    cover.register_callback(mock_callback := Mock())
-    assert cover._callbacks
-
-    event = {"state": {"bri": 50, "on": True}}
-    cover.update(event)
-    assert cover.is_open is False
-    assert cover.lift == 19
-    mock_callback.assert_called_once()
-    assert cover.changed_keys == {"state", "bri", "on"}
-
-    event = {"state": {"bri": 30, "on": False}}
-    cover.update(event)
-    assert cover.is_open is True
-    assert cover.lift == 11
-
-    # Verify sat (for tilt) works as well
-    cover.raw["state"]["sat"] = 40
-    assert cover.tilt == 15
-
-    cover.raw["state"]["lift"] = 0
-    cover.raw["state"]["tilt"] = 0
-    cover.raw["state"]["open"] = True
-
-    assert cover.tilt == 0
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
