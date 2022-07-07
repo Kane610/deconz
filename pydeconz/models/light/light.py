@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import enum
 import logging
-from typing import Any, Literal, TypedDict
+from typing import Literal, TypedDict
 
 from . import LightBase
 
@@ -331,69 +331,3 @@ class Light(LightBase):
     def supports_fan_speed(self) -> bool:
         """Speed of the fan."""
         return True if "speed" in self.raw["state"] else False
-
-    async def set_attributes(self, name: str) -> dict[str, Any]:
-        """Change attributes of a light.
-
-        Supported values:
-        - name [str] The name of the light
-        """
-        data = {"name": name}
-        return await self.request(field=f"{self.deconz_id}", data=data)
-
-    async def set_state(
-        self,
-        alert: Literal["none", "select", "lselect"] | str | None = None,
-        brightness: int | None = None,
-        color_loop_speed: int | None = None,
-        color_temperature: int | None = None,
-        effect: Literal["colorloop", "none"] | str | None = None,
-        hue: int | None = None,
-        on: bool | None = None,
-        on_time: int | None = None,
-        saturation: int | None = None,
-        transition_time: int | None = None,
-        xy: tuple[float, float] | None = None,
-    ) -> dict[str, Any]:
-        """Change state of a light.
-
-        Supported values:
-        - alert [str]
-          - "none" light is not performing an alert
-          - "select" light is blinking a short time
-          - "lselect" light is blinking a longer time
-        - brightness [int] 0-255
-        - color_loop_speed [int] 1-255
-          - 1 = very fast
-          - 15 is default
-          - 255 very slow
-        - color_temperature [int] between ctmin-ctmax
-        - effect [str]
-          - "none" no effect
-          - "colorloop" the light will cycle continuously through all
-                        colors with the speed specified by colorloopspeed
-        - hue [int] 0-65535
-        - on [bool] True/False
-        - on_time [int] 0-65535 1/10 seconds resolution
-        - saturation [int] 0-255
-        - transition_time [int] 0-65535 1/10 seconds resolution
-        - xy [tuple] 0-1
-        """
-        data = {
-            key: value
-            for key, value in {
-                "alert": alert,
-                "bri": brightness,
-                "colorloopspeed": color_loop_speed,
-                "ct": color_temperature,
-                "effect": effect,
-                "hue": hue,
-                "on": on,
-                "ontime": on_time,
-                "sat": saturation,
-                "transitiontime": transition_time,
-                "xy": xy,
-            }.items()
-            if value is not None
-        }
-        return await self.request(field=f"{self.deconz_id}/state", data=data)

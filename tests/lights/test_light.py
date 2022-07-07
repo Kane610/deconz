@@ -196,54 +196,6 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
     del light.raw["ctmin"]
     assert light.min_color_temp is None
 
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0")
-    await light.set_attributes(name="light")
-    assert deconz_called_with(
-        "put",
-        path="/lights/0",
-        json={"name": "light"},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await light.set_state(
-        alert=LightAlert.SHORT.value,
-        brightness=200,
-        color_loop_speed=10,
-        color_temperature=400,
-        effect=LightEffect.COLOR_LOOP.value,
-        hue=1000,
-        on=True,
-        on_time=100,
-        saturation=150,
-        transition_time=250,
-        xy=(0.1, 0.1),
-    )
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={
-            "alert": "select",
-            "bri": 200,
-            "colorloopspeed": 10,
-            "ct": 400,
-            "effect": "colorloop",
-            "hue": 1000,
-            "on": True,
-            "ontime": 100,
-            "sat": 150,
-            "transitiontime": 250,
-            "xy": (0.1, 0.1),
-        },
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await light.set_state(on=False)
-    assert deconz_called_with(
-        "put",
-        path="/lights/0/state",
-        json={"on": False},
-    )
-
     light.update({"state": {"bri": 2}})
     assert light.brightness == 2
 
