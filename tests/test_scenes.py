@@ -45,7 +45,7 @@ async def test_handler_scene(mock_aioresponse, deconz_called_with, deconz_sessio
     )
 
 
-async def test_scene(mock_aioresponse, deconz_called_with, deconz_refresh_state):
+async def test_scene(deconz_refresh_state):
     """Verify that groups works."""
     deconz_session = await deconz_refresh_state(
         groups={
@@ -135,13 +135,3 @@ async def test_scene(mock_aioresponse, deconz_called_with, deconz_refresh_state)
     assert scene2.deconz_id == "/groups/0/scenes/2"
     assert scene2.id == "2"
     assert scene2.name == "New scene"
-
-    # Legacy controls
-
-    mock_aioresponse.put("http://host:80/api/apikey/groups/0/scenes/1/store")
-    await scene.store()
-    assert deconz_called_with(
-        "put",
-        path="/groups/0/scenes/1/store",
-        json={},
-    )
