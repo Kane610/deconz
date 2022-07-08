@@ -155,15 +155,15 @@ class GroupedAPIItems(Generic[DataResource]):
     resource_group: ResourceGroup
 
     def __init__(
-        self, gateway: DeconzSession, api_items: list[APIItems[DataResource]]
+        self, gateway: DeconzSession, handlers: list[APIItems[DataResource]]
     ) -> None:
         """Initialize sensor manager."""
         self.gateway = gateway
-        self._handlers = api_items
+        self._handlers = handlers
 
-        self._type_to_handler: dict[ResourceType, APIItems[DataResource]] = {
+        self._resource_type_to_handler: dict[ResourceType, APIItems[DataResource]] = {
             resource_type: handler
-            for handler in api_items
+            for handler in handlers
             if handler.resource_types is not None
             for resource_type in handler.resource_types
         }
@@ -198,7 +198,11 @@ class GroupedAPIItems(Generic[DataResource]):
                 handler.process_item(id, raw)
                 return
 
-        handler = self._type_to_handler[ResourceType(raw.get("type"))]
+        if (
+            resource_type := ResourceType(raw.get("type"))
+        ) not in self._resource_type_to_handler:
+            return
+        handler = self._resource_type_to_handler[resource_type]
         handler.process_item(id, raw)
 
     def subscribe(
