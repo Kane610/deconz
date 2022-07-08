@@ -88,7 +88,6 @@ async def test_scene(mock_aioresponse, deconz_called_with, deconz_refresh_state)
     assert scene.light_count == 3
     assert scene.transition_time == 10
     assert scene.name == "warmlight"
-    assert scene.full_name == "Hall warmlight"
 
     await deconz_refresh_state(
         groups={

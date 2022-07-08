@@ -88,5 +88,5 @@ class Scenes(APIItems[Scene]):
         for scene in group.raw["scenes"]:
             super().process_item(
                 f'{id}_{scene["id"]}',
-                scene | {"group_id": id, "group_name": group.name},
+                scene | {"group": group},
             )

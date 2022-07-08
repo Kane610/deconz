@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from . import ResourceGroup
 from .api import APIItem
+
+if TYPE_CHECKING:
+    from .group import Group
 
 
 class TypedScene(TypedDict):
@@ -37,9 +40,7 @@ class Scene(APIItem):
         """Set initial information about scene."""
         super().__init__(resource_id, raw, request)
 
-        self.group_id: str = raw["group_id"]
-        self.group_deconz_id: str = f"/groups/{self.group_id}"
-        self.group_name: str = raw["group_name"]
+        self.group: Group = raw["group"]
 
     async def store(self) -> dict[str, Any]:
         """Store current group state in scene.
@@ -51,7 +52,7 @@ class Scene(APIItem):
     @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group_deconz_id}/{self.resource_group.value}/{self.id}"
+        return f"{self.group.deconz_id}/{self.resource_group.value}/{self.id}"
 
     @property
     def id(self) -> str:
@@ -72,8 +73,3 @@ class Scene(APIItem):
     def name(self) -> str:
         """Scene name."""
         return self.raw["name"]
-
-    @property
-    def full_name(self) -> str:
-        """Full name."""
-        return f"{self.group_name} {self.name}"
