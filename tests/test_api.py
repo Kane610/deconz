@@ -124,6 +124,21 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     unsub_apiitems_4()
 
 
+async def test_unsupported_resource_type(deconz_refresh_state):
+    """Verify that creation of APIItems works as expected."""
+    session = await deconz_refresh_state(
+        alarm_systems={"1": {"type": "unknown_type"}},
+        groups={"1": {"type": "unknown_type", "scenes": []}},
+        lights={"1": {"type": "unknown_type"}},
+        sensors={"1": {"type": "unknown_type"}},
+    )
+
+    assert len(session.alarmsystems.keys()) == 1
+    assert len(session.groups.keys()) == 1
+    assert len(session.lights.keys()) == 1  # Legacy support
+    assert len(session.sensors.keys()) == 0
+
+
 @patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
 async def test_retry_on_bridge_busy(_, deconz_refresh_state):
     """Verify a max count of 4 bridge busy messages."""
