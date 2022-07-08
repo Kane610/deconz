@@ -1,5 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 import enum
 from typing import Literal, TypedDict
 
@@ -58,14 +60,14 @@ class AirQuality(SensorBase):
         return AirQualityValue(self.raw["state"]["airquality"]).value
 
     @property
-    def air_quality_ppb(self) -> int:
+    def air_quality_ppb(self) -> int | None:
         """Air quality PPB TVOC."""
-        return self.raw["state"]["airqualityppb"]
+        return self.raw["state"].get("airqualityppb")
 
     @property
-    def pm_2_5(self) -> int:
+    def pm_2_5(self) -> int | None:
         """Air quality PM2.5 (µg/m³)."""
-        return self.raw["state"]["pm2_5"]
+        return self.raw["state"].get("pm2_5")
 
     @property
     def supports_air_quality_ppb(self) -> bool:
