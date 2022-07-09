@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import enum
+import logging
 from typing import Literal, TypedDict
 
 from . import SensorBase
+
+LOGGER = logging.getLogger(__name__)
 
 
 class TypedAirQualityState(TypedDict):
@@ -47,6 +50,14 @@ class AirQualityValue(enum.Enum):
     POOR = "poor"
     UNHEALTHY = "unhealthy"
     OUT_OF_SCALE = "out of scale"
+
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "AirQualityValue":
+        """Set default enum member if an unknown value is provided."""
+        LOGGER.warning("Unexpected panel mode %s", value)
+        return AirQualityValue.UNKNOWN
 
 
 class AirQuality(SensorBase):
