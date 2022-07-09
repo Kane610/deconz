@@ -19,6 +19,7 @@ from ..models.sensor.generic_flag import GenericFlag
 from ..models.sensor.generic_status import GenericStatus
 from ..models.sensor.humidity import Humidity
 from ..models.sensor.light_level import LightLevel
+from ..models.sensor.moisture import Moisture
 from ..models.sensor.open_close import OpenClose
 from ..models.sensor.power import Power
 from ..models.sensor.presence import (
@@ -285,6 +286,14 @@ class LightLevelHandler(APIItems[LightLevel]):
             path=f"{self.path}/{id}/config",
             json=data,
         )
+
+
+class MoistureHandler(APIItems[Moisture]):
+    """Handler for moisture sensor."""
+
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_MOISTURE
+    item_cls = Moisture
 
 
 class OpenCloseHandler(APIItems[OpenClose]):
@@ -594,6 +603,7 @@ SensorResources = Union[
     GenericStatus,
     Humidity,
     LightLevel,
+    Moisture,
     OpenClose,
     Power,
     Presence,
@@ -631,6 +641,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
         self.humidity = HumidityHandler(gateway, grouped=True)
         self.light_level = LightLevelHandler(gateway, grouped=True)
         self.open_close = OpenCloseHandler(gateway, grouped=True)
+        self.moisture = MoistureHandler(gateway, grouped=True)
         self.power = PowerHandler(gateway, grouped=True)
         self.presence = PresenceHandler(gateway, grouped=True)
         self.pressure = PressureHandler(gateway, grouped=True)
@@ -657,6 +668,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
             self.generic_status,
             self.humidity,
             self.light_level,
+            self.moisture,
             self.open_close,
             self.power,
             self.presence,

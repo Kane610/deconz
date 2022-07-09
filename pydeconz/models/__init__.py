@@ -110,6 +110,9 @@ class ResourceType(Enum):
     ZHA_LIGHT_LEVEL = "ZHALightLevel"
     CLIP_LIGHT_LEVEL = "CLIPLightLevel"
 
+    # Moisture
+    ZHA_MOISTURE = "ZHAMoisture"
+
     # Open close
     ZHA_OPEN_CLOSE = "ZHAOpenClose"
     CLIP_OPEN_CLOSE = "CLIPOpenClose"
