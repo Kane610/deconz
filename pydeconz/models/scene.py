@@ -1,15 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from __future__ import annotations
-
-from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import Any, TypedDict
 
 from . import ResourceGroup
 from .api import APIItem
-
-if TYPE_CHECKING:
-    from .group import Group
 
 
 class TypedScene(TypedDict):
@@ -31,16 +25,8 @@ class Scene(APIItem):
     raw: TypedScene
     resource_group = ResourceGroup.SCENE
 
-    def __init__(
-        self,
-        resource_id: str,
-        raw: Any,
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Set initial information about scene."""
-        super().__init__(resource_id, raw, request)
-
-        self.group: Group = raw["group"]
+    _group_resource_id: str = ""
+    _group_deconz_id: str = ""
 
     async def store(self) -> dict[str, Any]:
         """Store current group state in scene.
@@ -50,9 +36,26 @@ class Scene(APIItem):
         return await self.request(field=f"{self.deconz_id}/store", data={})
 
     @property
+    def group_id(self) -> str:
+        """Group ID representation.
+
+        Scene resource ID is a string combined of group ID and scene ID; "gid_scid".
+        """
+        if self._group_resource_id == "":
+            self._group_resource_id = self.resource_id.split("_")[0]
+        return self._group_resource_id
+
+    @property
+    def group_deconz_id(self) -> str:
+        """Group deCONZ ID representation."""
+        if self._group_deconz_id == "":
+            self._group_deconz_id = f"/{ResourceGroup.GROUP.value}/{self.group_id}"
+        return self._group_deconz_id
+
+    @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group.deconz_id}/{self.resource_group.value}/{self.id}"
+        return f"{self.group_deconz_id}/{self.resource_group.value}/{self.id}"
 
     @property
     def id(self) -> str:

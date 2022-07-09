@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from ..models import ResourceGroup
 from ..models.event import EventType
@@ -86,7 +86,4 @@ class Scenes(APIItems[Scene]):
         group = self.gateway.groups[id]
 
         for scene in group.raw["scenes"]:
-            super().process_item(
-                f'{id}_{scene["id"]}',
-                scene | {"group": group},
-            )
+            super().process_item(f'{id}_{scene["id"]}', cast(dict[str, Any], scene))
