@@ -3,6 +3,9 @@
 pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.air_quality tests/sensors/test_air_quality.py
 """
 
+import pytest
+
+from pydeconz.models import ResourceType
 from pydeconz.models.sensor.air_quality import AirQualityValue
 
 DATA = {
@@ -88,3 +91,35 @@ async def test_sensor_air_quality_with_pm2_5(deconz_sensor):
     assert sensor.air_quality_ppb is None
     assert sensor.supports_pm_2_5 is True
     assert sensor.pm_2_5 == 8
+
+
+ENUM_PROPERTY_DATA = [
+    (
+        ("airquality"),
+        ("air_quality"),
+        {
+            "excellent": AirQualityValue.EXCELLENT.value,
+            "unsupported": AirQualityValue.UNKNOWN.value,
+            None: AirQualityValue.UNKNOWN.value,
+        },
+    ),
+]
+
+
+@pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
+async def test_enum_airquality_properties(deconz_sensor, path, property, data):
+    """Verify enum properties return expected values or None."""
+    sensor = await deconz_sensor(
+        {
+            "config": {},
+            "state": {},
+            "type": ResourceType.ZHA_AIR_QUALITY.value,
+        }
+    )
+
+    with pytest.raises(KeyError):
+        assert getattr(sensor, property)
+
+    for input, output in data.items():
+        sensor.update({"state": {path: input}})
+        assert getattr(sensor, property) == output
