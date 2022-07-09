@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from pydeconz.errors import BridgeBusy
-from pydeconz.interfaces.api import ID_FILTER_ALL
+from pydeconz.interfaces.api_handlers import ID_FILTER_ALL
 from pydeconz.interfaces.events import EventType
 
 

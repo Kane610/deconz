@@ -7,10 +7,10 @@ from typing import Any, cast
 from ..models import ResourceGroup
 from ..models.event import EventType
 from ..models.scene import Scene
-from .api import APIItems
+from .api_handlers import APIHandler
 
 
-class Scenes(APIItems[Scene]):
+class Scenes(APIHandler[Scene]):
     """Represent scenes of a deCONZ group."""
 
     item_cls = Scene

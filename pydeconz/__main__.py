@@ -11,7 +11,7 @@ import async_timeout
 
 from pydeconz import errors
 from pydeconz.gateway import DeconzSession
-from pydeconz.interfaces.api import CallbackType
+from pydeconz.interfaces.api_handlers import CallbackType
 from pydeconz.models.event import EventType
 
 LOGGER = logging.getLogger(__name__)

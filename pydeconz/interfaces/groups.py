@@ -7,10 +7,10 @@ from typing import Any
 from ..models import ResourceGroup, ResourceType
 from ..models.group import Group
 from ..models.light.light import LightAlert, LightEffect
-from .api import APIItems
+from .api_handlers import APIHandler
 
 
-class Groups(APIItems[Group]):
+class Groups(APIHandler[Group]):
     """Represent deCONZ groups."""
 
     resource_group = ResourceGroup.GROUP
