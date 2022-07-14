@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Final, Literal, TypedDict
+from typing import Final, Literal, TypedDict
 
 from . import SensorBase
 
@@ -181,27 +181,3 @@ class Presence(SensorBase):
         if "triggerdistance" in self.raw["config"]:
             return PresenceConfigTriggerDistance(self.raw["config"]["triggerdistance"])
         return None
-
-    async def set_config(
-        self,
-        delay: int | None = None,
-        duration: int | None = None,
-        sensitivity: int | None = None,
-    ) -> dict[str, Any]:
-        """Change config of presence sensor.
-
-        Supported values:
-        - delay [int] 0-65535 (in seconds)
-        - duration [int] 0-65535 (in seconds)
-        - sensitivity [int] 0-[sensitivitymax]
-        """
-        data = {
-            key: value
-            for key, value in {
-                "delay": delay,
-                "duration": duration,
-                "sensitivity": sensitivity,
-            }.items()
-            if value is not None
-        }
-        return await self.request(field=f"{self.deconz_id}/config", data=data)

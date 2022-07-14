@@ -122,7 +122,7 @@ async def test_handler_presence(mock_aioresponse, deconz_session, deconz_called_
     )
 
 
-async def test_sensor_presence(mock_aioresponse, deconz_sensor, deconz_called_with):
+async def test_sensor_presence(deconz_sensor):
     """Verify that presence sensor works."""
     sensor = await deconz_sensor(DATA)
 
@@ -155,40 +155,8 @@ async def test_sensor_presence(mock_aioresponse, deconz_sensor, deconz_called_wi
     assert sensor.type == "ZHAPresence"
     assert sensor.unique_id == "xx:xx:xx:xx:xx:xx:xx:xx-02-0406"
 
-    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await sensor.set_config(delay=10, duration=20, sensitivity=1)
-    assert deconz_called_with(
-        "put",
-        path="/sensors/0/config",
-        json={"delay": 10, "duration": 20, "sensitivity": 1},
-    )
 
-    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await sensor.set_config(delay=1)
-    assert deconz_called_with(
-        "put",
-        path="/sensors/0/config",
-        json={"delay": 1},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await sensor.set_config(duration=2)
-    assert deconz_called_with(
-        "put",
-        path="/sensors/0/config",
-        json={"duration": 2},
-    )
-
-    mock_aioresponse.put("http://host:80/api/apikey/sensors/0/config")
-    await sensor.set_config(sensitivity=3)
-    assert deconz_called_with(
-        "put",
-        path="/sensors/0/config",
-        json={"sensitivity": 3},
-    )
-
-
-async def test_presence_event_sensor(deconz_sensor):
+async def test_sensor_presence_event(deconz_sensor):
     """Verify that presence event sensor works."""
     sensor = await deconz_sensor(DATA_PRESENCE_EVENT)
 
