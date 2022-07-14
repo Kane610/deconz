@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-import enum
 import logging
 from typing import TYPE_CHECKING, Any, Union
 
 from ..models import ResourceGroup, ResourceType
 from ..models.light.configuration_tool import ConfigurationTool
 from ..models.light.cover import Cover, CoverAction
-from ..models.light.fan import Fan
-from ..models.light.light import Light, LightAlert, LightEffect
+from ..models.light.light import Light, LightAlert, LightEffect, LightFanSpeed
 from ..models.light.lock import Lock
 from ..models.light.range_extender import RangeExtender
 from ..models.light.siren import Siren
@@ -20,18 +18,6 @@ if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
 LOGGER = logging.getLogger(__name__)
-
-
-class FanSpeed(enum.Enum):
-    """Possible fan speeds."""
-
-    OFF = 0
-    PERCENT_25 = 1
-    PERCENT_50 = 2
-    PERCENT_75 = 3
-    PERCENT_100 = 4
-    AUTO = 5
-    COMFORT_BREEZE = 6
 
 
 class ConfigurationToolHandler(APIItems[ConfigurationTool]):
@@ -89,25 +75,6 @@ class CoverHandler(APIItems[Cover]):
         )
 
 
-class FanHandler(APIItems[Fan]):
-    """Handler for locks."""
-
-    resource_group = ResourceGroup.LIGHT
-    resource_type = ResourceType.FAN
-    item_cls = Fan
-
-    async def set_state(self, id: str, speed: FanSpeed) -> dict[str, Any]:
-        """Set speed of fans/ventilators.
-
-        Speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze.
-        """
-        return await self.gateway.request_with_retry(
-            "put",
-            path=f"{self.path}/{id}/state",
-            json={"speed": speed.value},
-        )
-
-
 class LightHandler(APIItems[Light]):
     """Handler for lights."""
 
@@ -120,6 +87,7 @@ class LightHandler(APIItems[Light]):
         ResourceType.DIMMABLE_LIGHT,
         ResourceType.DIMMABLE_PLUGIN_UNIT,
         ResourceType.DIMMER_SWITCH,
+        ResourceType.FAN,
         ResourceType.ON_OFF_LIGHT,
         ResourceType.ON_OFF_OUTPUT,
         ResourceType.ON_OFF_PLUGIN_UNIT,
@@ -136,6 +104,7 @@ class LightHandler(APIItems[Light]):
         color_loop_speed: int | None = None,
         color_temperature: int | None = None,
         effect: LightEffect | None = None,
+        fan_speed: LightFanSpeed | None = None,
         hue: int | None = None,
         on: bool | None = None,
         on_time: int | None = None,
@@ -160,6 +129,7 @@ class LightHandler(APIItems[Light]):
           - "none" no effect
           - "colorloop" the light will cycle continuously through all
                         colors with the speed specified by colorloopspeed
+        - fan_speed [FanSpeed] Off, 25%, 50%, 75%, 100%, Auto, ComfortBreeze
         - hue [int] 0-65535
         - on [bool] True/False
         - on_time [int] 0-65535 1/10 seconds resolution
@@ -186,6 +156,8 @@ class LightHandler(APIItems[Light]):
             data["alert"] = alert.value
         if effect is not None:
             data["effect"] = effect.value
+        if fan_speed is not None:
+            data["speed"] = fan_speed.value
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
@@ -256,7 +228,6 @@ class SirenHandler(APIItems[Siren]):
 LightResources = Union[
     ConfigurationTool,
     Cover,
-    Fan,
     Light,
     Lock,
     Siren,
@@ -272,7 +243,6 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
         """Initialize light manager."""
         self.configuration_tool = ConfigurationToolHandler(gateway, grouped=True)
         self.covers = CoverHandler(gateway, grouped=True)
-        self.fans = FanHandler(gateway, grouped=True)
         self.lights = LightHandler(gateway, grouped=True)
         self.locks = LockHandler(gateway, grouped=True)
         self.range_extender = RangeExtenderHandler(gateway, grouped=True)
@@ -281,7 +251,6 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
         handlers: list[APIItems[Any]] = [
             self.configuration_tool,
             self.covers,
-            self.fans,
             self.lights,
             self.locks,
             self.range_extender,
