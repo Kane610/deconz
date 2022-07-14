@@ -56,7 +56,7 @@ class AirQualityValue(enum.Enum):
     @classmethod
     def _missing_(cls, value: object) -> "AirQualityValue":
         """Set default enum member if an unknown value is provided."""
-        LOGGER.warning("Unexpected panel mode %s", value)
+        LOGGER.warning("Unexpected air quality value %s", value)
         return AirQualityValue.UNKNOWN
 
 
