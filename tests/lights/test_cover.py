@@ -73,7 +73,7 @@ async def test_handler_cover(mock_aioresponse, deconz_session, deconz_called_wit
     assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
 
 
-async def test_light_cover(mock_aioresponse, deconz_light, deconz_called_with):
+async def test_light_cover(deconz_light):
     """Verify that covers work."""
     cover = await deconz_light(DATA)
 
@@ -81,6 +81,7 @@ async def test_light_cover(mock_aioresponse, deconz_light, deconz_called_with):
     assert cover.is_open is True
     assert cover.lift == 0
     assert cover.tilt is None
+    assert cover.supports_tilt is False
 
     assert cover.reachable is True
 
@@ -96,51 +97,25 @@ async def test_light_cover(mock_aioresponse, deconz_light, deconz_called_with):
     cover.register_callback(mock_callback := Mock())
     assert cover._callbacks
 
-    event = {"state": {"lift": 50, "open": True}}
-    cover.update(event)
+    cover.update({"state": {"lift": 50, "open": True}})
     assert cover.is_open is True
     assert cover.lift == 50
     mock_callback.assert_called_once()
     assert cover.changed_keys == {"state", "lift", "open"}
 
-    event = {"state": {"bri": 30, "on": False}}
-    cover.update(event)
+    cover.update({"state": {"tilt": 25, "open": True}})
+    assert cover.tilt == 25
+    assert cover.supports_tilt is True
+
+    cover.update({"state": {"bri": 30, "on": False}})
     assert cover.is_open is True
     assert cover.lift == 50
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.open()
-    assert deconz_called_with("put", path="/lights/0/state", json={"open": True})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.close()
-    assert deconz_called_with("put", path="/lights/0/state", json={"open": False})
-
-    # Tilt not supported
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.set_position(lift=30, tilt=60)
-    assert deconz_called_with("put", path="/lights/0/state", json={"lift": 30})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.stop()
-    assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
-
-    # Verify tilt works as well
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    cover.raw["state"]["tilt"] = 40
-    assert cover.tilt == 40
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.set_position(lift=20, tilt=60)
-    assert deconz_called_with(
-        "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
-    )
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
 
 
-async def test_light_cover_legacy(mock_aioresponse, deconz_light, deconz_called_with):
+async def test_light_cover_legacy(deconz_light):
     """Verify that covers work with older deconz versions."""
     cover = await deconz_light(DATA_LEGACY)
 
@@ -175,51 +150,15 @@ async def test_light_cover_legacy(mock_aioresponse, deconz_light, deconz_called_
     assert cover.is_open is True
     assert cover.lift == 11
 
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.open()
-    assert deconz_called_with("put", path="/lights/0/state", json={"on": False})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.close()
-    assert deconz_called_with("put", path="/lights/0/state", json={"on": True})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.set_position(lift=30)
-    assert deconz_called_with("put", path="/lights/0/state", json={"bri": 76})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.stop()
-    assert deconz_called_with("put", path="/lights/0/state", json={"bri_inc": 0})
-
     # Verify sat (for tilt) works as well
     cover.raw["state"]["sat"] = 40
     assert cover.tilt == 15
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.set_position(lift=20, tilt=60)
-    assert deconz_called_with(
-        "put", path="/lights/0/state", json={"bri": 50, "sat": 152}
-    )
 
     cover.raw["state"]["lift"] = 0
     cover.raw["state"]["tilt"] = 0
     cover.raw["state"]["open"] = True
 
     assert cover.tilt == 0
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.open()
-    assert deconz_called_with("put", path="/lights/0/state", json={"open": True})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.close()
-    assert deconz_called_with("put", path="/lights/0/state", json={"open": False})
-
-    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
-    await cover.set_position(lift=20, tilt=60)
-    assert deconz_called_with(
-        "put", path="/lights/0/state", json={"lift": 20, "tilt": 60}
-    )
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
