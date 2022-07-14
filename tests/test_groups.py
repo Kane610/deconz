@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from pydeconz.models.light.light import LightAlert, LightEffect
+from pydeconz.models.light.light import LightAlert, LightColorMode, LightEffect
 
 
 async def test_handler_group(mock_aioresponse, deconz_called_with, deconz_session):
@@ -143,8 +143,8 @@ async def test_group(mock_aioresponse, deconz_called_with, deconz_refresh_state)
     assert group.saturation == 127
     assert group.color_temp == 0
     assert group.xy == (0, 0)
-    assert group.color_mode == "hs"
-    assert group.effect == "none"
+    assert group.color_mode == LightColorMode.HS
+    assert group.effect == LightEffect.NONE
     assert group.reachable is True
 
     assert group.deconz_id == "/groups/0"
@@ -310,8 +310,8 @@ async def test_legacy_group(mock_aioresponse, deconz_called_with, deconz_refresh
                 "hue": 1,
                 "sat": 1,
                 "xy": (0.1, 0.1),
-                "colormode": "xy",
-                "effect": None,
+                "colormode": LightColorMode.XY,
+                "effect": LightEffect.UNKNOWN,
             },
         ),
         (
@@ -327,8 +327,8 @@ async def test_legacy_group(mock_aioresponse, deconz_called_with, deconz_refresh
                 "hue": None,
                 "sat": None,
                 "xy": None,
-                "colormode": "ct",
-                "effect": None,
+                "colormode": LightColorMode.CT,
+                "effect": LightEffect.UNKNOWN,
             },
         ),
     ],
