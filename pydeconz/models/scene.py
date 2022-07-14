@@ -1,8 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from __future__ import annotations
-
-from collections.abc import Awaitable, Callable
 from typing import Any, TypedDict
 
 from . import ResourceGroup
@@ -28,18 +25,8 @@ class Scene(APIItem):
     raw: TypedScene
     resource_group = ResourceGroup.SCENE
 
-    def __init__(
-        self,
-        resource_id: str,
-        raw: Any,
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
-        """Set initial information about scene."""
-        super().__init__(resource_id, raw, request)
-
-        self.group_id: str = raw["group_id"]
-        self.group_deconz_id: str = f"/groups/{self.group_id}"
-        self.group_name: str = raw["group_name"]
+    _group_resource_id: str = ""
+    _group_deconz_id: str = ""
 
     async def store(self) -> dict[str, Any]:
         """Store current group state in scene.
@@ -47,6 +34,23 @@ class Scene(APIItem):
         The actual state of each light in the group will become the lights scene state.
         """
         return await self.request(field=f"{self.deconz_id}/store", data={})
+
+    @property
+    def group_id(self) -> str:
+        """Group ID representation.
+
+        Scene resource ID is a string combined of group ID and scene ID; "gid_scid".
+        """
+        if self._group_resource_id == "":
+            self._group_resource_id = self.resource_id.split("_")[0]
+        return self._group_resource_id
+
+    @property
+    def group_deconz_id(self) -> str:
+        """Group deCONZ ID representation."""
+        if self._group_deconz_id == "":
+            self._group_deconz_id = f"/{ResourceGroup.GROUP.value}/{self.group_id}"
+        return self._group_deconz_id
 
     @property
     def deconz_id(self) -> str:
@@ -72,8 +76,3 @@ class Scene(APIItem):
     def name(self) -> str:
         """Scene name."""
         return self.raw["name"]
-
-    @property
-    def full_name(self) -> str:
-        """Full name."""
-        return f"{self.group_name} {self.name}"
