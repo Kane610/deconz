@@ -228,27 +228,11 @@ class Light(LightBase):
     raw: TypedLight
 
     @property
-    def alert(
-        self,
-    ) -> Literal[
-        "none",
-        "select",
-        "lselect",
-        "blink",
-        "breathe",
-        "channelchange",
-        "finish",
-        "okay",
-        "stop",
-    ] | None:
-        """Temporary alert effect.
-
-        Following values are possible:
-        none - light is not performing an alert
-        select - light is blinking a short time
-        lselect - light is blinking a longer time
-        """
-        return self.raw["state"].get("alert")
+    def alert(self) -> LightAlert | None:
+        """Temporary alert effect."""
+        if "alert" in self.raw["state"]:
+            return LightAlert(self.raw["state"]["alert"])
+        return None
 
     @property
     def brightness(self) -> int | None:
@@ -306,14 +290,11 @@ class Light(LightBase):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
-        """Color mode of light.
-
-        ct - color temperature
-        hs - hue and saturation
-        xy - CIE xy values
-        """
-        return self.raw["state"].get("colormode")
+    def color_mode(self) -> LightColorMode | None:
+        """Color mode of light."""
+        if "colormode" in self.raw["state"]:
+            return LightColorMode(self.raw["state"]["colormode"])
+        return None
 
     @property
     def on(self) -> bool:
@@ -335,35 +316,11 @@ class Light(LightBase):
         return ctmin
 
     @property
-    def effect(
-        self,
-    ) -> Literal[
-        "colorloop",
-        "none",
-        "carnival",
-        "collide",
-        "fading",
-        "fireworks",
-        "flag",
-        "glow",
-        "rainbow",
-        "snake",
-        "snow",
-        "sparkles",
-        "steady",
-        "strobe",
-        "twinkle",
-        "updown",
-        "vintage",
-        "waves",
-    ] | None:
-        """Effect of the light.
-
-        colorloop — the light will cycle continuously through all colors
-                    with the speed specified by colorloopspeed.
-        none — no effect.
-        """
-        return self.raw["state"].get("effect")
+    def effect(self) -> LightEffect | None:
+        """Effect of the light."""
+        if "effect" in self.raw["state"]:
+            return LightEffect(self.raw["state"]["effect"])
+        return None
 
     @property
     def fan_speed(self) -> LightFanSpeed:

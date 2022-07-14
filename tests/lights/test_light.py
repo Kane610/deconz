@@ -10,6 +10,7 @@ import pytest
 from pydeconz.models.light.light import (
     LightAlert,
     LightColorCapability,
+    LightColorMode,
     LightEffect,
     LightFanSpeed,
 )
@@ -131,17 +132,17 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
 
     assert light.state is False
     assert light.on is False
-    assert light.alert is None
+    assert light.alert == LightAlert.UNKNOWN
 
     assert light.brightness == 111
     assert light.hue == 7998
     assert light.saturation == 172
     assert light.color_temp == 307
     assert light.xy == (0.421253, 0.39921)
-    assert light.color_mode == "ct"
+    assert light.color_mode == LightColorMode.CT
     assert light.max_color_temp == 500
     assert light.min_color_temp == 153
-    assert light.effect is None
+    assert light.effect == LightEffect.UNKNOWN
     assert light.fan_speed == LightFanSpeed.PERCENT_75
     assert light.supports_fan_speed is True
     assert (

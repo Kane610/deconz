@@ -6,7 +6,7 @@ from typing import Any, Final, Literal, TypedDict
 
 from . import ResourceGroup
 from .deconz_device import DeconzDevice
-from .light.light import Light
+from .light.light import Light, LightColorMode, LightEffect
 from .scene import TypedScene
 
 COLOR_STATE_ATTRIBUTES: Final = {
@@ -120,23 +120,18 @@ class Group(DeconzDevice):
         return (x, y)
 
     @property
-    def color_mode(self) -> Literal["ct", "hs", "xy"] | None:
-        """Color mode of the light.
-
-        ct - color temperature
-        hs - hue and saturation
-        xy - CIE xy values
-        """
-        return self.raw["action"].get("colormode")
+    def color_mode(self) -> LightColorMode | None:
+        """Color mode of group."""
+        if "colormode" in self.raw["action"]:
+            return LightColorMode(self.raw["action"]["colormode"])
+        return None
 
     @property
-    def effect(self) -> Literal["colorloop", "none"] | None:
-        """Effect of the group.
-
-        colorloop
-        none - no effect
-        """
-        return self.raw["action"].get("effect")
+    def effect(self) -> LightEffect | None:
+        """Effect of the group."""
+        if "effect" in self.raw["action"]:
+            return LightEffect(self.raw["action"]["effect"])
+        return None
 
     @property
     def reachable(self) -> bool:
