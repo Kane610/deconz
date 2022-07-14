@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Any, TypedDict
+from typing import TypedDict
 
 from . import ResourceGroup
 from .api import APIItem
@@ -27,13 +27,6 @@ class Scene(APIItem):
 
     _group_resource_id: str = ""
     _group_deconz_id: str = ""
-
-    async def store(self) -> dict[str, Any]:
-        """Store current group state in scene.
-
-        The actual state of each light in the group will become the lights scene state.
-        """
-        return await self.request(field=f"{self.deconz_id}/store", data={})
 
     @property
     def group_id(self) -> str:
