@@ -1,4 +1,4 @@
-"""API base classes."""
+"""API handler base classes."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ UnsubscribeType = Callable[[], None]
 ID_FILTER_ALL = "*"
 
 
-class APIItems(Generic[DataResource]):
+class APIHandler(Generic[DataResource]):
     """Base class for a map of API Items."""
 
     resource_group: ResourceGroup
@@ -31,7 +31,7 @@ class APIItems(Generic[DataResource]):
     item_cls: Any
 
     def __init__(self, gateway: DeconzSession, grouped: bool = False) -> None:
-        """Initialize API items."""
+        """Initialize API handler."""
         self.gateway = gateway
         self._items: dict[str, DataResource] = {}
         self._subscribers: dict[str, list[SubscriptionType]] = {ID_FILTER_ALL: []}
@@ -125,43 +125,43 @@ class APIItems(Generic[DataResource]):
         return unsubscribe
 
     def items(self) -> ItemsView[str, DataResource]:
-        """Return items."""
+        """Return dictionary of IDs and API items."""
         return self._items.items()
 
     def keys(self) -> KeysView[str]:
-        """Return item keys."""
+        """Return item IDs."""
         return self._items.keys()
 
     def values(self) -> ValuesView[DataResource]:
-        """Return item values."""
+        """Return API items."""
         return self._items.values()
 
     def get(self, id: str, default: Any = None) -> DataResource | None:
-        """Get item value based on key, if no match return default."""
+        """Get API item based on key, if no match return default."""
         return self._items.get(id, default)
 
     def __getitem__(self, obj_id: str) -> DataResource:
-        """Get item value based on key."""
+        """Get API item based on ID."""
         return self._items[obj_id]
 
     def __iter__(self) -> Iterator[str]:
-        """Allow iterate over items."""
+        """Allow iterate over item IDs."""
         return iter(self._items)
 
 
-class GroupedAPIItems(Generic[DataResource]):
+class GroupedAPIHandler(Generic[DataResource]):
     """Represent a group of deCONZ API items."""
 
     resource_group: ResourceGroup
 
     def __init__(
-        self, gateway: DeconzSession, handlers: list[APIItems[DataResource]]
+        self, gateway: DeconzSession, handlers: list[APIHandler[DataResource]]
     ) -> None:
-        """Initialize sensor manager."""
+        """Initialize grouped API handler."""
         self.gateway = gateway
         self._handlers = handlers
 
-        self._resource_type_to_handler: dict[ResourceType, APIItems[DataResource]] = {
+        self._resource_type_to_handler: dict[ResourceType, APIHandler[DataResource]] = {
             resource_type: handler
             for handler in handlers
             if handler.resource_types is not None
@@ -202,6 +202,7 @@ class GroupedAPIItems(Generic[DataResource]):
             resource_type := ResourceType(raw.get("type"))
         ) not in self._resource_type_to_handler:
             return
+
         handler = self._resource_type_to_handler[resource_type]
         handler.process_item(id, raw)
 
@@ -211,7 +212,7 @@ class GroupedAPIItems(Generic[DataResource]):
         event_filter: tuple[EventType, ...] | EventType | None = None,
         id_filter: tuple[str] | str | None = None,
     ) -> UnsubscribeType:
-        """Subscribe to state changes for all grouped resources."""
+        """Subscribe to state changes for all grouped handler resources."""
         subscribers = [
             h.subscribe(callback, event_filter=event_filter, id_filter=id_filter)
             for h in self._handlers
@@ -224,27 +225,27 @@ class GroupedAPIItems(Generic[DataResource]):
         return unsubscribe
 
     def items(self) -> Iterable[tuple[str, DataResource]]:
-        """Return items."""
+        """Return dictionary of IDs and API items."""
         return itertools.chain.from_iterable(h.items() for h in self._handlers)
 
     def keys(self) -> list[str]:
-        """Return item keys."""
+        """Return item IDs."""
         return [id for h in self._handlers for id in h]
 
     def values(self) -> list[DataResource]:
-        """Return item values."""
+        """Return API items."""
         return [item for h in self._handlers for item in h.values()]
 
     def get(self, id: str, default: Any = None) -> DataResource | None:
-        """Get item value based on key, if no match return default."""
+        """Get API item based on key, if no match return default."""
         return next((h[id] for h in self._handlers if id in h), default)
 
     def __getitem__(self, id: str) -> DataResource:
-        """Get item value based on key."""
+        """Get API item based on ID."""
         if item := self.get(id):
             return item
         raise KeyError
 
     def __iter__(self) -> Iterator[str]:
-        """Allow iterate over items."""
+        """Allow iterate over item IDs."""
         return iter(self.keys())

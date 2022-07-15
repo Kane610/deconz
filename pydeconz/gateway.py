@@ -12,7 +12,7 @@ import aiohttp
 from .config import Config
 from .errors import BridgeBusy, RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
-from .interfaces.api import CallbackType, UnsubscribeType
+from .interfaces.api_handlers import CallbackType, UnsubscribeType
 from .interfaces.events import EventHandler
 from .interfaces.groups import Groups
 from .interfaces.lights import LightResourceManager

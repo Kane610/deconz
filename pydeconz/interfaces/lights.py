@@ -12,7 +12,7 @@ from ..models.light.light import Light, LightAlert, LightEffect, LightFanSpeed
 from ..models.light.lock import Lock
 from ..models.light.range_extender import RangeExtender
 from ..models.light.siren import Siren
-from .api import APIItems, GroupedAPIItems
+from .api_handlers import APIHandler, GroupedAPIHandler
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
-class ConfigurationToolHandler(APIItems[ConfigurationTool]):
+class ConfigurationToolHandler(APIHandler[ConfigurationTool]):
     """Handler for configuration tool."""
 
     resource_group = ResourceGroup.LIGHT
@@ -28,7 +28,7 @@ class ConfigurationToolHandler(APIItems[ConfigurationTool]):
     item_cls = ConfigurationTool
 
 
-class CoverHandler(APIItems[Cover]):
+class CoverHandler(APIHandler[Cover]):
     """Handler for covers."""
 
     resource_group = ResourceGroup.LIGHT
@@ -75,7 +75,7 @@ class CoverHandler(APIItems[Cover]):
         )
 
 
-class LightHandler(APIItems[Light]):
+class LightHandler(APIHandler[Light]):
     """Handler for lights."""
 
     resource_group = ResourceGroup.LIGHT
@@ -165,7 +165,7 @@ class LightHandler(APIItems[Light]):
         )
 
 
-class LockHandler(APIItems[Lock]):
+class LockHandler(APIHandler[Lock]):
     """Handler for fans."""
 
     resource_group = ResourceGroup.LIGHT
@@ -185,7 +185,7 @@ class LockHandler(APIItems[Lock]):
         )
 
 
-class RangeExtenderHandler(APIItems[ConfigurationTool]):
+class RangeExtenderHandler(APIHandler[ConfigurationTool]):
     """Handler for range extender."""
 
     resource_group = ResourceGroup.LIGHT
@@ -193,7 +193,7 @@ class RangeExtenderHandler(APIItems[ConfigurationTool]):
     item_cls = RangeExtender
 
 
-class SirenHandler(APIItems[Siren]):
+class SirenHandler(APIHandler[Siren]):
     """Handler for sirens."""
 
     resource_group = ResourceGroup.LIGHT
@@ -234,7 +234,7 @@ LightResources = Union[
 ]
 
 
-class LightResourceManager(GroupedAPIItems[LightResources]):
+class LightResourceManager(GroupedAPIHandler[LightResources]):
     """Represent deCONZ lights."""
 
     resource_group = ResourceGroup.LIGHT
@@ -248,7 +248,7 @@ class LightResourceManager(GroupedAPIItems[LightResources]):
         self.range_extender = RangeExtenderHandler(gateway, grouped=True)
         self.sirens = SirenHandler(gateway, grouped=True)
 
-        handlers: list[APIItems[Any]] = [
+        handlers: list[APIHandler[Any]] = [
             self.configuration_tool,
             self.covers,
             self.lights,

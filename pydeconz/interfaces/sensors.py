@@ -47,13 +47,13 @@ from ..models.sensor.thermostat import (
 from ..models.sensor.time import Time
 from ..models.sensor.vibration import Vibration
 from ..models.sensor.water import Water
-from .api import APIItems, GroupedAPIItems
+from .api_handlers import APIHandler, GroupedAPIHandler
 
 if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
 
-class AirPurifierHandler(APIItems[AirPurifier]):
+class AirPurifierHandler(APIHandler[AirPurifier]):
     """Handler for air purifier sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -102,7 +102,7 @@ class AirPurifierHandler(APIItems[AirPurifier]):
         )
 
 
-class AirQualityHandler(APIItems[AirQuality]):
+class AirQualityHandler(APIHandler[AirQuality]):
     """Handler for air quality sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -110,7 +110,7 @@ class AirQualityHandler(APIItems[AirQuality]):
     item_cls = AirQuality
 
 
-class AlarmHandler(APIItems[Alarm]):
+class AlarmHandler(APIHandler[Alarm]):
     """Handler for alarm sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -118,7 +118,7 @@ class AlarmHandler(APIItems[Alarm]):
     item_cls = Alarm
 
 
-class AncillaryControlHandler(APIItems[AncillaryControl]):
+class AncillaryControlHandler(APIHandler[AncillaryControl]):
     """Handler for ancillary control sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -126,7 +126,7 @@ class AncillaryControlHandler(APIItems[AncillaryControl]):
     item_cls = AncillaryControl
 
 
-class BatteryHandler(APIItems[Battery]):
+class BatteryHandler(APIHandler[Battery]):
     """Handler for battery sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -134,7 +134,7 @@ class BatteryHandler(APIItems[Battery]):
     item_cls = Battery
 
 
-class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
+class CarbonMonoxideHandler(APIHandler[CarbonMonoxide]):
     """Handler for carbon monoxide sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -142,7 +142,7 @@ class CarbonMonoxideHandler(APIItems[CarbonMonoxide]):
     item_cls = CarbonMonoxide
 
 
-class ConsumptionHandler(APIItems[Consumption]):
+class ConsumptionHandler(APIHandler[Consumption]):
     """Handler for consumption sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -150,7 +150,7 @@ class ConsumptionHandler(APIItems[Consumption]):
     item_cls = Consumption
 
 
-class DaylightHandler(APIItems[Daylight]):
+class DaylightHandler(APIHandler[Daylight]):
     """Handler for daylight sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -184,7 +184,7 @@ class DaylightHandler(APIItems[Daylight]):
         )
 
 
-class DoorLockHandler(APIItems[DoorLock]):
+class DoorLockHandler(APIHandler[DoorLock]):
     """Handler for door lock sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -204,7 +204,7 @@ class DoorLockHandler(APIItems[DoorLock]):
         )
 
 
-class FireHandler(APIItems[Fire]):
+class FireHandler(APIHandler[Fire]):
     """Handler for fire sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -212,7 +212,7 @@ class FireHandler(APIItems[Fire]):
     item_cls = Fire
 
 
-class GenericFlagHandler(APIItems[GenericFlag]):
+class GenericFlagHandler(APIHandler[GenericFlag]):
     """Handler for generic flag sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -220,7 +220,7 @@ class GenericFlagHandler(APIItems[GenericFlag]):
     item_cls = GenericFlag
 
 
-class GenericStatusHandler(APIItems[GenericStatus]):
+class GenericStatusHandler(APIHandler[GenericStatus]):
     """Handler for generic status sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -228,7 +228,7 @@ class GenericStatusHandler(APIItems[GenericStatus]):
     item_cls = GenericStatus
 
 
-class HumidityHandler(APIItems[Humidity]):
+class HumidityHandler(APIHandler[Humidity]):
     """Handler for humidity sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -251,7 +251,7 @@ class HumidityHandler(APIItems[Humidity]):
         )
 
 
-class LightLevelHandler(APIItems[LightLevel]):
+class LightLevelHandler(APIHandler[LightLevel]):
     """Handler for light level sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -288,7 +288,7 @@ class LightLevelHandler(APIItems[LightLevel]):
         )
 
 
-class MoistureHandler(APIItems[Moisture]):
+class MoistureHandler(APIHandler[Moisture]):
     """Handler for moisture sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -296,7 +296,7 @@ class MoistureHandler(APIItems[Moisture]):
     item_cls = Moisture
 
 
-class OpenCloseHandler(APIItems[OpenClose]):
+class OpenCloseHandler(APIHandler[OpenClose]):
     """Handler for open/close sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -307,7 +307,7 @@ class OpenCloseHandler(APIItems[OpenClose]):
     item_cls = OpenClose
 
 
-class PowerHandler(APIItems[Power]):
+class PowerHandler(APIHandler[Power]):
     """Handler for power sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -315,7 +315,7 @@ class PowerHandler(APIItems[Power]):
     item_cls = Power
 
 
-class PresenceHandler(APIItems[Presence]):
+class PresenceHandler(APIHandler[Presence]):
     """Handler for presence sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -371,7 +371,7 @@ class PresenceHandler(APIItems[Presence]):
         )
 
 
-class PressureHandler(APIItems[Pressure]):
+class PressureHandler(APIHandler[Pressure]):
     """Handler for pressure sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -382,7 +382,7 @@ class PressureHandler(APIItems[Pressure]):
     item_cls = Pressure
 
 
-class RelativeRotaryHandler(APIItems[RelativeRotary]):
+class RelativeRotaryHandler(APIHandler[RelativeRotary]):
     """Handler for relative rotary sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -390,7 +390,7 @@ class RelativeRotaryHandler(APIItems[RelativeRotary]):
     item_cls = RelativeRotary
 
 
-class SwitchHandler(APIItems[Switch]):
+class SwitchHandler(APIHandler[Switch]):
     """Handler for switch sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -435,7 +435,7 @@ class SwitchHandler(APIItems[Switch]):
         )
 
 
-class TemperatureHandler(APIItems[Temperature]):
+class TemperatureHandler(APIHandler[Temperature]):
     """Handler for temperature sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -446,7 +446,7 @@ class TemperatureHandler(APIItems[Temperature]):
     item_cls = Temperature
 
 
-class ThermostatHandler(APIItems[Thermostat]):
+class ThermostatHandler(APIHandler[Thermostat]):
     """Handler for thermostat sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -564,7 +564,7 @@ class ThermostatHandler(APIItems[Thermostat]):
         )
 
 
-class TimeHandler(APIItems[Time]):
+class TimeHandler(APIHandler[Time]):
     """Handler for time sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -572,7 +572,7 @@ class TimeHandler(APIItems[Time]):
     item_cls = Time
 
 
-class VibrationHandler(APIItems[Vibration]):
+class VibrationHandler(APIHandler[Vibration]):
     """Handler for vibration sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -580,7 +580,7 @@ class VibrationHandler(APIItems[Vibration]):
     item_cls = Vibration
 
 
-class WaterHandler(APIItems[Water]):
+class WaterHandler(APIHandler[Water]):
     """Handler for water sensor."""
 
     resource_group = ResourceGroup.SENSOR
@@ -618,7 +618,7 @@ SensorResources = Union[
 ]
 
 
-class SensorResourceManager(GroupedAPIItems[SensorResources]):
+class SensorResourceManager(GroupedAPIHandler[SensorResources]):
     """Represent deCONZ sensors."""
 
     resource_group = ResourceGroup.SENSOR
@@ -653,7 +653,7 @@ class SensorResourceManager(GroupedAPIItems[SensorResources]):
         self.vibration = VibrationHandler(gateway, grouped=True)
         self.water = WaterHandler(gateway, grouped=True)
 
-        handlers: list[APIItems[Any]] = [
+        handlers: list[APIHandler[Any]] = [
             self.air_purifier,
             self.air_quality,
             self.alarm,

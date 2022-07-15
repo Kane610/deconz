@@ -10,10 +10,10 @@ from ..models.alarm_system import (
     AlarmSystemArmAction,
     AlarmSystemDeviceTrigger,
 )
-from .api import APIItems
+from .api_handlers import APIHandler
 
 
-class AlarmSystems(APIItems[AlarmSystem]):
+class AlarmSystems(APIHandler[AlarmSystem]):
     """Manager of deCONZ alarm systems."""
 
     item_cls = AlarmSystem
