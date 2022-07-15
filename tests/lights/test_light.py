@@ -250,24 +250,79 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
 
 ENUM_PROPERTY_DATA = [
     (
-        ("colorcapabilities"),
-        ("color_capabilities"),
+        ("state", "alert"),
+        "alert",
+        {
+            "none": LightAlert.NONE,
+            "lselect": LightAlert.LONG,
+            "select": LightAlert.SHORT,
+            None: LightAlert.UNKNOWN,
+        },
+    ),
+    (
+        ("colorcapabilities",),
+        "color_capabilities",
         {
             0: LightColorCapability.HUE_SATURATION,
             9: LightColorCapability.UNKNOWN,
             None: LightColorCapability.UNKNOWN,
         },
     ),
+    (
+        ("state", "colormode"),
+        "color_mode",
+        {
+            "ct": LightColorMode.CT,
+            "hs": LightColorMode.HS,
+            "xy": LightColorMode.XY,
+            None: LightColorMode.UNKNOWN,
+        },
+    ),
+    (
+        ("state", "effect"),
+        "effect",
+        {
+            "colorloop": LightEffect.COLOR_LOOP,
+            "none": LightEffect.NONE,
+            None: LightEffect.UNKNOWN,
+        },
+    ),
+    (
+        ("state", "speed"),
+        "fan_speed",
+        {
+            0: LightFanSpeed.OFF,
+            1: LightFanSpeed.PERCENT_25,
+            2: LightFanSpeed.PERCENT_50,
+            3: LightFanSpeed.PERCENT_75,
+            4: LightFanSpeed.PERCENT_100,
+            5: LightFanSpeed.AUTO,
+            6: LightFanSpeed.COMFORT_BREEZE,
+        },
+    ),
 ]
 
 
 @pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
-async def test_enum_thermostat_properties(deconz_light, path, property, data):
+async def test_enum_light_properties(deconz_light, path, property, data):
     """Verify enum properties return expected values or None."""
     light = await deconz_light({"config": {}, "state": {}, "type": "Color light"})
 
-    assert getattr(light, property) is None
-
     for input, output in data.items():
-        light.update({path: input})
+        data = {path[0]: input}
+        if len(path) == 2:
+            data = {path[0]: {path[1]: input}}
+        light.update(data)
         assert getattr(light, property) == output
+
+
+async def test_enum_light_properties_no_key(deconz_light):
+    """Verify enum properties return expected values or None."""
+    light = await deconz_light({"config": {}, "state": {}, "type": "Color light"})
+
+    assert light.alert is None
+    assert light.color_capabilities is None
+    assert light.color_mode is None
+    assert light.effect is None
+    with pytest.raises(KeyError):
+        assert light.fan_speed

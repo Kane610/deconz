@@ -95,8 +95,8 @@ async def test_sensor_air_quality_with_pm2_5(deconz_sensor):
 
 ENUM_PROPERTY_DATA = [
     (
-        ("airquality"),
-        ("air_quality"),
+        ("state", "airquality"),
+        "air_quality",
         {
             "excellent": AirQualityValue.EXCELLENT.value,
             "unsupported": AirQualityValue.UNKNOWN.value,
@@ -121,5 +121,5 @@ async def test_enum_airquality_properties(deconz_sensor, path, property, data):
         assert getattr(sensor, property)
 
     for input, output in data.items():
-        sensor.update({"state": {path: input}})
+        sensor.update({path[0]: {path[1]: input}})
         assert getattr(sensor, property) == output

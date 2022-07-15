@@ -307,52 +307,52 @@ async def test_sensor_tuya_thermostat(deconz_sensor):
 PROPERTY_DATA = [
     (
         ("config", "displayflipped"),
-        ("display_flipped"),
+        "display_flipped",
         {True: True, False: False, None: None},
     ),
     (
         ("state", "errorcode"),
-        ("error_code"),
+        "error_code",
         {True: True, False: False, None: None},
     ),
     (
         ("config", "externalwindowopen"),
-        ("external_window_open"),
+        "external_window_open",
         {True: True, False: False, None: None},
     ),
     (
         ("state", "heating"),
-        ("heating"),
+        "heating",
         {True: True, False: False, None: None},
     ),
     (
         ("config", "locked"),
-        ("locked"),
+        "locked",
         {True: True, False: False, None: None},
     ),
     (
         ("state", "mountingmodeactive"),
-        ("mounting_mode_active"),
+        "mounting_mode_active",
         {True: True, False: False, None: None},
     ),
     (
         ("config", "offset"),
-        ("offset"),
+        "offset",
         {1: 1, 0: 0, None: None},
     ),
     (
         ("config", "schedule_on"),
-        ("schedule_enabled"),
+        "schedule_enabled",
         {True: True, False: False, None: None},
     ),
     (
         ("state", "valve"),
-        ("valve"),
+        "valve",
         {1: 1, 0: 0, None: None},
     ),
     (
         ("config", "windowopen_set"),
-        ("window_open_detection"),
+        "window_open_detection",
         {True: True, False: False, None: None},
     ),
 ]
@@ -371,7 +371,7 @@ async def test_thermostat_properties(deconz_sensor, path, property, data):
 ENUM_PROPERTY_DATA = [
     (
         ("config", "fanmode"),
-        ("fan_mode"),
+        "fan_mode",
         {
             "auto": ThermostatFanMode.AUTO,
             "unsupported": ThermostatFanMode.UNKNOWN,
@@ -380,7 +380,7 @@ ENUM_PROPERTY_DATA = [
     ),
     (
         ("config", "mode"),
-        ("mode"),
+        "mode",
         {
             "auto": ThermostatMode.AUTO,
             "unsupported": ThermostatMode.UNKNOWN,
@@ -389,7 +389,7 @@ ENUM_PROPERTY_DATA = [
     ),
     (
         ("config", "preset"),
-        ("preset"),
+        "preset",
         {
             "auto": ThermostatPreset.AUTO,
             "unsupported": ThermostatPreset.UNKNOWN,
@@ -398,7 +398,7 @@ ENUM_PROPERTY_DATA = [
     ),
     (
         ("config", "swingmode"),
-        ("swing_mode"),
+        "swing_mode",
         {
             "fully open": ThermostatSwingMode.FULLY_OPEN,
             "unsupported": ThermostatSwingMode.UNKNOWN,
@@ -407,7 +407,7 @@ ENUM_PROPERTY_DATA = [
     ),
     (
         ("config", "temperaturemeasurement"),
-        ("temperature_measurement"),
+        "temperature_measurement",
         {
             "air sensor": ThermostatTemperatureMeasurement.AIR_SENSOR,
             "unsupported": ThermostatTemperatureMeasurement.UNKNOWN,
@@ -432,27 +432,27 @@ async def test_enum_thermostat_properties(deconz_sensor, path, property, data):
 SCALED_PROPERTY_DATA = [
     (
         ("config", "coolsetpoint"),
-        ("cooling_setpoint"),
+        "cooling_setpoint",
         {1000: (1000, 10), 0: (0, None), None: (None, None)},
     ),
     (
         ("config", "externalsensortemp"),
-        ("external_sensor_temperature"),
+        "external_sensor_temperature",
         {2000: (2000, 20), 0: (0, None), None: (None, None)},
     ),
     (
         ("state", "floortemperature"),
-        ("floor_temperature"),
+        "floor_temperature",
         {3000: (3000, 30), 0: (0, None), None: (None, None)},
     ),
     (
         ("config", "heatsetpoint"),
-        ("heating_setpoint"),
+        "heating_setpoint",
         {4000: (4000, 40), 0: (0, None), None: (None, None)},
     ),
     (
         ("state", "temperature"),
-        ("temperature"),
+        "temperature",
         {5000: (5000, 50), 0: (0, 0.0)},
     ),
 ]
