@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -20,16 +20,10 @@ class APIItem:
 
     resource_group: ResourceGroup
 
-    def __init__(
-        self,
-        resource_id: str,
-        raw: Any,
-        request: Callable[..., Awaitable[dict[str, Any]]],
-    ) -> None:
+    def __init__(self, resource_id: str, raw: Any) -> None:
         """Initialize API item."""
         self.resource_id = resource_id
         self.raw = raw
-        self._request = request
 
         self.changed_keys: set[str] = set()
 
@@ -84,7 +78,3 @@ class APIItem:
 
         for callback in self._callbacks + self._subscribers:
             callback()
-
-    async def request(self, field: str, data: dict[str, Any]) -> dict[str, Any]:
-        """Set state of device."""
-        return await self._request("put", path=field, json=data)
