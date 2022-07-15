@@ -91,7 +91,7 @@ async def test_handler_group(mock_aioresponse, deconz_called_with, deconz_sessio
     )
 
 
-async def test_group(mock_aioresponse, deconz_called_with, deconz_refresh_state):
+async def test_group(deconz_refresh_state):
     """Verify that groups works."""
     deconz_session = await deconz_refresh_state(
         groups={
@@ -175,6 +175,47 @@ async def test_group(mock_aioresponse, deconz_called_with, deconz_refresh_state)
 
     del group.raw["action"]["xy"]
     assert group.xy is None
+
+
+ENUM_PROPERTY_DATA = [
+    (
+        ("action", "colormode"),
+        "color_mode",
+        {
+            "ct": LightColorMode.CT,
+            "hs": LightColorMode.HS,
+            "xy": LightColorMode.XY,
+            None: LightColorMode.UNKNOWN,
+        },
+    ),
+    (
+        ("action", "effect"),
+        "effect",
+        {
+            "colorloop": LightEffect.COLOR_LOOP,
+            "none": LightEffect.NONE,
+            None: LightEffect.UNKNOWN,
+        },
+    ),
+]
+
+
+@pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
+async def test_enum_group_properties(deconz_refresh_state, path, property, data):
+    """Verify enum properties return expected values or None."""
+    deconz_session = await deconz_refresh_state(
+        groups={"0": {"action": {}, "scenes": []}}
+    )
+    group = deconz_session.groups["0"]
+
+    assert getattr(group, property) is None
+
+    for input, output in data.items():
+        data = {path[0]: input}
+        if len(path) == 2:
+            data = {path[0]: {path[1]: input}}
+        group.update(data)
+        assert getattr(group, property) == output
 
 
 async def test_legacy_group(mock_aioresponse, deconz_called_with, deconz_refresh_state):
