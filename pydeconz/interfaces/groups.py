@@ -10,7 +10,7 @@ from ..models.light.light import LightAlert, LightEffect
 from .api_handlers import APIHandler
 
 
-class Groups(APIHandler[Group]):
+class GroupHandler(APIHandler[Group]):
     """Represent deCONZ groups."""
 
     resource_group = ResourceGroup.GROUP

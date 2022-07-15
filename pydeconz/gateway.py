@@ -14,7 +14,7 @@ from .errors import BridgeBusy, RequestError, ResponseError, raise_error
 from .interfaces.alarm_systems import AlarmSystems
 from .interfaces.api_handlers import CallbackType, UnsubscribeType
 from .interfaces.events import EventHandler
-from .interfaces.groups import Groups
+from .interfaces.groups import GroupHandler
 from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
@@ -50,7 +50,7 @@ class DeconzSession:
         self.websocket: WSClient | None = None
 
         self.alarmsystems = AlarmSystems(self)
-        self.groups = Groups(self)
+        self.groups = GroupHandler(self)
         self.lights = LightResourceManager(self)
         self.scenes = Scenes(self)
         self.sensors = SensorResourceManager(self)
