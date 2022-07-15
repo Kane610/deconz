@@ -69,7 +69,7 @@ async def test_sensor_ancillary_control(deconz_sensor):
 ENUM_PROPERTY_DATA = [
     (
         ("state", "panel"),
-        ("panel"),
+        "panel",
         {
             "armed_away": AncillaryControlPanel.ARMED_AWAY,
             "unsupported": AncillaryControlPanel.UNKNOWN,
