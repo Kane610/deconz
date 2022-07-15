@@ -79,7 +79,7 @@ class APIHandler(Generic[DataResource]):
             event = EventType.CHANGED
 
         else:
-            self._items[id] = self.item_cls(id, raw, self.gateway.request_with_retry)
+            self._items[id] = self.item_cls(id, raw)
             event = EventType.ADDED
 
         subscribers: list[SubscriptionType] = (
