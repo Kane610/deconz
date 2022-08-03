@@ -52,7 +52,7 @@ class SensorBase(DeconzDevice):
         return raw.get("tampered")
 
     @property
-    def secondary_temperature(self) -> float | None:
+    def device_temperature(self) -> float | None:
         """Extra temperature available on some Xiaomi devices."""
         raw: dict[str, int] = self.raw["config"]
         if temperature := raw.get("temperature"):
