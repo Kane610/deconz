@@ -41,7 +41,7 @@ class DeconzSession:
         self.port = port
         self.api_key = api_key
 
-        self._sleep_tasks: dict[str, Task[Callable[..., Any]]] = {}
+        self._sleep_tasks: dict[str, Task[None]] = {}
 
         self.connection_status_callback = connection_status
 
@@ -145,7 +145,7 @@ class DeconzSession:
             LOGGER.debug("Bridge is busy, schedule retry %s %s", path, str(json))
 
             if (tries := tries + 1) < 3:
-                self._sleep_tasks[path] = sleep_task = create_task(sleep(2 ** (tries)))  # type: ignore[arg-type]
+                self._sleep_tasks[path] = sleep_task = create_task(sleep(2 ** (tries)))
 
                 try:
                     await sleep_task
