@@ -145,7 +145,7 @@ class DeconzSession:
             LOGGER.debug("Bridge is busy, schedule retry %s %s", path, str(json))
 
             if (tries := tries + 1) < 3:
-                self._sleep_tasks[path] = sleep_task = create_task(sleep(2 ** (tries)))
+                self._sleep_tasks[path] = sleep_task = create_task(sleep(2 ** (tries)))  # type: ignore[arg-type]
 
                 try:
                     await sleep_task
