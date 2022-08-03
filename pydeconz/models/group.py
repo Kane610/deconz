@@ -208,6 +208,11 @@ class Group(DeconzDevice):
                 continue
 
             if update_all_attributes:
-                data[attribute] = None if attribute != "xy" else (None, None)
+                if attribute == "xy":
+                    data[attribute] = (None, None)
+                elif attribute == "effect":
+                    data[attribute] = LightEffect.NONE.value
+                else:
+                    data[attribute] = None
 
         self.update({"action": data})

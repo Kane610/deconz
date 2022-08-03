@@ -238,7 +238,7 @@ async def test_enum_group_properties(deconz_refresh_state, path, property, data)
                 "sat": 1,
                 "xy": (0.1, 0.1),
                 "colormode": LightColorMode.XY,
-                "effect": LightEffect.UNKNOWN,
+                "effect": LightEffect.NONE,
             },
         ),
         (
@@ -255,7 +255,7 @@ async def test_enum_group_properties(deconz_refresh_state, path, property, data)
                 "sat": None,
                 "xy": None,
                 "colormode": LightColorMode.CT,
-                "effect": LightEffect.UNKNOWN,
+                "effect": LightEffect.NONE,
             },
         ),
     ],
