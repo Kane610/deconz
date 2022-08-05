@@ -35,7 +35,7 @@ async def test_sensor_open_close(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature == 33
+    assert sensor.internal_temperature == 33
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"

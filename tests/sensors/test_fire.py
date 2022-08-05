@@ -58,7 +58,7 @@ async def test_sensor_fire(deconz_sensor):
     assert sensor.reachable is True
     assert sensor.tampered is None
     assert sensor.in_test_mode is False
-    assert sensor.secondary_temperature is None
+    assert sensor.internal_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
@@ -85,7 +85,7 @@ async def test_sensor_fire_develco(deconz_sensor):
     assert sensor.reachable is True
     assert sensor.tampered is None
     assert sensor.in_test_mode is True
-    assert sensor.secondary_temperature is None
+    assert sensor.internal_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"

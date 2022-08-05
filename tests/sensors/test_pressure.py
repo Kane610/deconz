@@ -37,7 +37,7 @@ async def test_sensor_pressure(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
+    assert sensor.internal_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"

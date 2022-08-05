@@ -171,7 +171,7 @@ async def test_sensor_switch(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
+    assert sensor.internal_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
@@ -198,7 +198,7 @@ async def test_sensor_switch_sensor_cube(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature == 11.0
+    assert sensor.internal_temperature == 11.0
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
@@ -231,7 +231,7 @@ async def test_sensor_switch_hue_wall_switch_module(deconz_sensor):
     assert sensor.on
     assert sensor.reachable
     assert not sensor.tampered
-    assert not sensor.secondary_temperature
+    assert not sensor.internal_temperature
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
