@@ -12,7 +12,7 @@ import pytest
 from pydeconz import ERRORS, BridgeBusy, RequestError, ResponseError, pydeconzException
 from pydeconz.models.alarm_system import AlarmSystemArmState
 from pydeconz.models.event import EventType
-from pydeconz.websocket import STATE_RUNNING, STATE_STOPPED
+from pydeconz.websocket import Signal, State
 
 
 @pytest.fixture
@@ -237,7 +237,7 @@ async def test_session_handler_on_uninitialized_websocket(deconz_session):
     with patch.object(
         deconz_session.events, "handler", return_value=True
     ) as event_handler:
-        await deconz_session.session_handler(signal="data")
+        await deconz_session.session_handler(signal=Signal.DATA)
         event_handler.assert_not_called()
 
 
@@ -253,12 +253,12 @@ async def test_session_handler(deconz_session):
     with patch.object(
         deconz_session.events, "handler", return_value=True
     ) as event_handler:
-        await deconz_session.session_handler(signal="data")
+        await deconz_session.session_handler(signal=Signal.DATA)
         event_handler.assert_called()
 
 
 @pytest.mark.parametrize(
-    "state, value", [(STATE_RUNNING, True), (STATE_STOPPED, False)]
+    "state, value", [(State.RUNNING, True), (State.STOPPED, False)]
 )
 async def test_session_handler_state_change(
     deconz_session, mock_websocket_state_change, state, value

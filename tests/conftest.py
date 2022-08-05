@@ -10,7 +10,7 @@ from aioresponses import aioresponses
 import pytest
 
 from pydeconz import DeconzSession
-from pydeconz.websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA
+from pydeconz.websocket import Signal
 
 
 @pytest.fixture
@@ -127,7 +127,7 @@ def mock_websocket_event(deconz_session, mock_wsclient):
 
         mock_wsclient.return_value.data = event_data
         gateway_session_handler = mock_wsclient.call_args[0][3]
-        await gateway_session_handler(signal=SIGNAL_DATA)
+        await gateway_session_handler(signal=Signal.DATA)
 
     yield signal_new_event
 
@@ -143,6 +143,6 @@ def mock_websocket_state_change(deconz_session, mock_wsclient):
         """Emit a websocket state change signal."""
         mock_wsclient.return_value.state = state
         gateway_session_handler = mock_wsclient.call_args[0][3]
-        await gateway_session_handler(signal=SIGNAL_CONNECTION_STATE)
+        await gateway_session_handler(signal=Signal.CONNECTION_STATE)
 
     yield signal_state_change
