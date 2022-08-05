@@ -49,7 +49,7 @@ class DeconzSession:
         self.events = EventHandler(self)
         self.websocket: WSClient | None = None
 
-        self.alarmsystems = AlarmSystems(self)
+        self.alarm_systems = AlarmSystems(self)
         self.groups = GroupHandler(self)
         self.lights = LightResourceManager(self)
         self.scenes = Scenes(self)
@@ -107,7 +107,7 @@ class DeconzSession:
 
         self.config.raw.update(data[ResourceGroup.CONFIG.value])
 
-        self.alarmsystems.process_raw(data.get(ResourceGroup.ALARM.value, {}))
+        self.alarm_systems.process_raw(data.get(ResourceGroup.ALARM.value, {}))
         self.groups.process_raw(data[ResourceGroup.GROUP.value])
         self.lights.process_raw(data[ResourceGroup.LIGHT.value])
         self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
@@ -115,7 +115,7 @@ class DeconzSession:
     def subscribe(self, callback: CallbackType) -> UnsubscribeType:
         """Subscribe to status changes for all resources."""
         subscribers = [
-            self.alarmsystems.subscribe(callback),
+            self.alarm_systems.subscribe(callback),
             self.groups.subscribe(callback),
             self.lights.subscribe(callback),
             self.sensors.subscribe(callback),

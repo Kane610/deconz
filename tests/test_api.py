@@ -128,7 +128,7 @@ async def test_unsupported_resource_type(deconz_refresh_state):
         sensors={"1": {"type": "unknown_type"}},
     )
 
-    assert len(session.alarmsystems.keys()) == 1
+    assert len(session.alarm_systems.keys()) == 1
     assert len(session.groups.keys()) == 1
     assert len(session.lights.keys()) == 1  # Legacy support
     assert len(session.sensors.keys()) == 0

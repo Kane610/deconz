@@ -47,7 +47,7 @@ async def test_create_alarm_system(
         }
     )
 
-    alarm_systems = deconz_session.alarmsystems
+    alarm_systems = deconz_session.alarm_systems
 
     assert len(alarm_systems.keys()) == 1
 
