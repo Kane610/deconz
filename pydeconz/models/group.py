@@ -210,6 +210,8 @@ class Group(DeconzDevice):
             if update_all_attributes:
                 if attribute == "xy":
                     data[attribute] = (None, None)
+                elif attribute == "colormode":
+                    continue
                 elif attribute == "effect":
                     data[attribute] = LightEffect.NONE.value
                 else:
