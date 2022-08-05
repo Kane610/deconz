@@ -51,7 +51,7 @@ async def test_sensor_vibration(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.device_temperature == 32
+    assert sensor.secondary_temperature == 32
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
