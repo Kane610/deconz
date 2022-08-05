@@ -30,7 +30,7 @@ def count_subscribers(deconz_session) -> int:
                 count += len(filter)
             return count
 
-        subscribers += calc(deconz_session.alarmsystems._subscribers)
+        subscribers += calc(deconz_session.alarm_systems._subscribers)
         subscribers += calc(deconz_session.groups._subscribers)
         subscribers += calc(deconz_session.scenes._subscribers)
 
@@ -101,7 +101,7 @@ async def test_initial_state(deconz_session, deconz_refresh_state, count_subscri
 
     assert deconz_session.config.bridge_id == "012345"
 
-    assert "0" in deconz_session.alarmsystems
+    assert "0" in deconz_session.alarm_systems
     assert "g1" in deconz_session.groups
     assert "l1" in deconz_session.lights
     assert "g1_sc1" in deconz_session.scenes
@@ -133,7 +133,7 @@ async def test_refresh_state(deconz_refresh_state):
     session = await deconz_refresh_state()
 
     assert session.config.bridge_id == "0000000000000000"
-    assert len(session.alarmsystems.values()) == 0
+    assert len(session.alarm_systems.values()) == 0
     assert len(session.groups.values()) == 0
     assert len(session.lights.values()) == 0
     assert len(session.sensors.values()) == 0
@@ -155,13 +155,13 @@ async def test_refresh_state(deconz_refresh_state):
 
     assert session.config.bridge_id == "012345"
 
-    assert "0" in session.alarmsystems
+    assert "0" in session.alarm_systems
     assert "g1" in session.groups
     assert "l1" in session.lights
     assert "g1_sc1" in session.scenes
     assert "s1" in session.sensors
 
-    assert session.alarmsystems["0"].deconz_id == "/alarmsystems/0"
+    assert session.alarm_systems["0"].deconz_id == "/alarmsystems/0"
     assert session.groups["g1"].id == "gid"
     assert session.groups["g1"].deconz_id == "/groups/g1"
     assert session.lights["l1"].deconz_id == "/lights/l1"
@@ -324,13 +324,13 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
         },
     )
 
-    assert "1" in deconz_session.alarmsystems
-    assert deconz_session.alarmsystems["1"].arm_state == AlarmSystemArmState.DISARMED
+    assert "1" in deconz_session.alarm_systems
+    assert deconz_session.alarm_systems["1"].arm_state == AlarmSystemArmState.DISARMED
     session_subscription.assert_called_once_with(EventType.ADDED, "1")
 
     # Update alarmsystem
 
-    deconz_session.alarmsystems["1"].register_callback(
+    deconz_session.alarm_systems["1"].register_callback(
         mock_alarmsystem_callback := Mock()
     )
     await mock_websocket_event(
@@ -340,8 +340,8 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     )
 
     mock_alarmsystem_callback.assert_called()
-    assert deconz_session.alarmsystems["1"].changed_keys == {"state", "armstate"}
-    assert deconz_session.alarmsystems["1"].arm_state == AlarmSystemArmState.ARMED_AWAY
+    assert deconz_session.alarm_systems["1"].changed_keys == {"state", "armstate"}
+    assert deconz_session.alarm_systems["1"].arm_state == AlarmSystemArmState.ARMED_AWAY
 
 
 async def test_light_events(deconz_session, mock_websocket_event):
