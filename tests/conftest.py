@@ -10,6 +10,8 @@ from aioresponses import aioresponses
 import pytest
 
 from pydeconz import DeconzSession
+from pydeconz.models import ResourceGroup
+from pydeconz.models.event import EventType
 from pydeconz.websocket import Signal
 
 
@@ -93,8 +95,8 @@ def mock_websocket_event(deconz_session, mock_wsclient):
     deconz_session.start(websocketport=443)
 
     async def signal_new_event(
-        resource: str,
-        event: str = "changed",
+        resource: ResourceGroup,
+        event: EventType = EventType.CHANGED,
         id: str | None = None,
         data: dict | None = None,
         unique_id: str | None = None,
@@ -104,10 +106,10 @@ def mock_websocket_event(deconz_session, mock_wsclient):
         """Emit a websocket event signal."""
         event_data = {
             "t": "event",
-            "e": event,  # added, changed, deleted, scene-called
-            "r": resource,  # alarmsystems, lights, groups, sensors, scenes
+            "e": event.value,
+            "r": resource.value,
         }
-        if resource == "scenes":
+        if resource == ResourceGroup.SCENE:
             assert gid
             assert scid
             event_data |= {
@@ -121,7 +123,7 @@ def mock_websocket_event(deconz_session, mock_wsclient):
                 "id": id,
                 **data,
             }
-            if resource in ("lights", "sensors"):
+            if resource in (ResourceGroup.LIGHT, ResourceGroup.SENSOR):
                 assert unique_id
                 event_data |= {"uniqueid": unique_id}
 

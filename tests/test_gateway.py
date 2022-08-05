@@ -10,6 +10,7 @@ import aiohttp
 import pytest
 
 from pydeconz import ERRORS, BridgeBusy, RequestError, ResponseError, pydeconzException
+from pydeconz.models import ResourceGroup
 from pydeconz.models.alarm_system import AlarmSystemArmState
 from pydeconz.models.event import EventType
 from pydeconz.websocket import Signal, State
@@ -294,8 +295,8 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
     # Add alarmsystem
 
     await mock_websocket_event(
-        event="added",
-        resource="alarmsystems",
+        event=EventType.ADDED,
+        resource=ResourceGroup.ALARM,
         id="1",
         data={
             "alarmsystem": {
@@ -334,7 +335,7 @@ async def test_alarmsystem_events(deconz_session, mock_websocket_event):
         mock_alarmsystem_callback := Mock()
     )
     await mock_websocket_event(
-        resource="alarmsystems",
+        resource=ResourceGroup.ALARM,
         id="1",
         data={"state": {"armstate": "armed_away"}},
     )
@@ -351,8 +352,8 @@ async def test_light_events(deconz_session, mock_websocket_event):
     # Add light
 
     await mock_websocket_event(
-        event="added",
-        resource="lights",
+        event=EventType.ADDED,
+        resource=ResourceGroup.LIGHT,
         id="1",
         unique_id="1",
         data={
@@ -374,7 +375,7 @@ async def test_light_events(deconz_session, mock_websocket_event):
 
     deconz_session.lights["1"].register_callback(mock_light_callback := Mock())
     await mock_websocket_event(
-        resource="lights",
+        resource=ResourceGroup.LIGHT,
         id="1",
         unique_id="1",
         data={"state": {"bri": 2}},
@@ -404,8 +405,8 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
     # Add group
 
     await mock_websocket_event(
-        event="added",
-        resource="groups",
+        event=EventType.ADDED,
+        resource=ResourceGroup.GROUP,
         id="1",
         data={
             "group": {
@@ -427,7 +428,7 @@ async def test_group_events(deconz_session, deconz_refresh_state, mock_websocket
 
     deconz_session.groups["1"].register_callback(mock_group_callback := Mock())
     await mock_websocket_event(
-        resource="groups",
+        resource=ResourceGroup.GROUP,
         id="1",
         data={"state": {"any_on": True}},
     )
@@ -445,8 +446,8 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
     # Add sensor
 
     await mock_websocket_event(
-        event="added",
-        resource="sensors",
+        event=EventType.ADDED,
+        resource=ResourceGroup.SENSOR,
         id="1",
         unique_id="1",
         data={
@@ -469,7 +470,7 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
 
     deconz_session.sensors["1"].register_callback(mock_sensor_callback := Mock())
     await mock_websocket_event(
-        resource="sensors",
+        resource=ResourceGroup.SENSOR,
         id="1",
         unique_id="1",
         data={
