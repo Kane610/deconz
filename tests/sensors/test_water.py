@@ -40,7 +40,7 @@ async def test_sensor_water(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is False
-    assert sensor.device_temperature == 25
+    assert sensor.internal_temperature == 25
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
