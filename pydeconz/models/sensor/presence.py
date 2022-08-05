@@ -3,16 +3,9 @@
 from __future__ import annotations
 
 import enum
-from typing import Final, Literal, TypedDict
+from typing import Literal, TypedDict
 
 from . import SensorBase
-
-PRESENCE_DELAY: Final = "delay"
-PRESENCE_DURATION: Final = "duration"
-PRESENCE_SENSITIVITY: Final = "sensitivity"
-PRESENCE_SENSITIVITY_MAX: Final = "sensitivitymax"
-PRESENCE_DARK: Final = "dark"
-PRESENCE_PRESENCE: Final = "presence"
 
 
 class TypedPresenceConfig(TypedDict):

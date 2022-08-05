@@ -5,8 +5,6 @@ pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz
 
 from unittest.mock import Mock
 
-from pydeconz.models.light import ALERT_KEY, ALERT_LONG, ALERT_NONE, ON_TIME_KEY
-
 DATA = {
     "etag": "0667cb8fff2adc1bf22be0e6eece2a18",
     "hascolor": False,
@@ -32,7 +30,7 @@ async def test_handler_siren(mock_aioresponse, deconz_session, deconz_called_wit
     assert deconz_called_with(
         "put",
         path="/lights/0/state",
-        json={ALERT_KEY: ALERT_LONG},
+        json={"alert": "lselect"},
     )
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
@@ -40,7 +38,7 @@ async def test_handler_siren(mock_aioresponse, deconz_session, deconz_called_wit
     assert deconz_called_with(
         "put",
         path="/lights/0/state",
-        json={ALERT_KEY: ALERT_LONG, ON_TIME_KEY: 10},
+        json={"alert": "lselect", "ontime": 10},
     )
 
     mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
@@ -48,7 +46,7 @@ async def test_handler_siren(mock_aioresponse, deconz_session, deconz_called_wit
     assert deconz_called_with(
         "put",
         path="/lights/0/state",
-        json={ALERT_KEY: ALERT_NONE},
+        json={"alert": "none"},
     )
 
 
@@ -73,11 +71,11 @@ async def test_light_siren(deconz_light):
     siren.register_callback(mock_callback := Mock())
     assert siren._callbacks
 
-    event = {"state": {ALERT_KEY: ALERT_LONG}}
+    event = {"state": {"alert": "lselect"}}
     siren.update(event)
     assert siren.is_on is True
     mock_callback.assert_called_once()
-    assert siren.changed_keys == {"state", ALERT_KEY}
+    assert siren.changed_keys == {"state", "alert"}
 
     siren.remove_callback(mock_callback)
     assert not siren._callbacks
