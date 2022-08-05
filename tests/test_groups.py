@@ -258,6 +258,21 @@ async def test_enum_group_properties(deconz_refresh_state, path, property, data)
                 "effect": LightEffect.NONE,
             },
         ),
+        (
+            {
+                "bri": 1,
+                "reachable": True,
+            },
+            {
+                "brightness": 1,
+                "ct": None,
+                "hue": None,
+                "sat": None,
+                "xy": None,
+                "colormode": LightColorMode.HS,
+                "effect": LightEffect.NONE,
+            },
+        ),
     ],
 )
 async def test_update_color_state(
@@ -290,7 +305,7 @@ async def test_update_color_state(
                 "type": "LightGroup",
             }
         },
-        lights={"14": {"type": "light", "state": light_state}},
+        lights={"14": {"type": "Dimmable light", "state": light_state}},
     )
 
     group = deconz_session.groups["0"]
