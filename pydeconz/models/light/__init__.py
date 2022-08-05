@@ -2,20 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Final
-
 from .. import ResourceGroup
 from ..deconz_device import DeconzDevice
-
-ALERT_KEY: Final = "alert"
-ALERT_LONG: Final = "lselect"
-ALERT_NONE: Final = "none"
-ALERT_SHORT: Final = "select"
-
-EFFECT_NONE: Final = "none"
-EFFECT_COLOR_LOOP: Final = "colorloop"
-
-ON_TIME_KEY: Final = "ontime"
 
 
 class LightBase(DeconzDevice):
