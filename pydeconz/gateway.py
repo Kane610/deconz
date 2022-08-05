@@ -5,7 +5,7 @@ from __future__ import annotations
 from asyncio import CancelledError, Task, create_task, sleep
 import logging
 from pprint import pformat
-from typing import Any, Callable, Literal
+from typing import Any, Callable
 
 import aiohttp
 
@@ -19,7 +19,7 @@ from .interfaces.lights import LightResourceManager
 from .interfaces.scenes import Scenes
 from .interfaces.sensors import SensorResourceManager
 from .models import ResourceGroup
-from .websocket import SIGNAL_CONNECTION_STATE, SIGNAL_DATA, STATE_RUNNING, WSClient
+from .websocket import Signal, State, WSClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -200,7 +200,7 @@ class DeconzSession:
                 "Error requesting data from {}: {}".format(self.host, err)
             ) from None
 
-    async def session_handler(self, signal: Literal["data", "state"]) -> None:
+    async def session_handler(self, signal: Signal) -> None:
         """Signalling from websocket.
 
         data - new data available for processing.
@@ -209,11 +209,11 @@ class DeconzSession:
         if not self.websocket:
             return
 
-        if signal == SIGNAL_DATA:
+        if signal == Signal.DATA:
             self.events.handler(self.websocket.data)
 
-        elif signal == SIGNAL_CONNECTION_STATE and self.connection_status_callback:
-            self.connection_status_callback(self.websocket.state == STATE_RUNNING)
+        elif signal == Signal.CONNECTION_STATE and self.connection_status_callback:
+            self.connection_status_callback(self.websocket.state == State.RUNNING)
 
 
 def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:

@@ -5,7 +5,7 @@ from collections import deque
 from collections.abc import Callable, Coroutine
 import enum
 import logging
-from typing import Any, Final, Literal
+from typing import Any, Final
 
 import aiohttp
 import orjson
@@ -29,13 +29,6 @@ class State(enum.Enum):
     STOPPED = "stopped"
 
 
-SIGNAL_CONNECTION_STATE: Final = Signal.CONNECTION_STATE.value
-SIGNAL_DATA: Final = Signal.DATA.value
-
-STATE_RETRYING: Final = State.RETRYING.value
-STATE_RUNNING: Final = State.RUNNING.value
-STATE_STOPPED: Final = State.STOPPED.value
-
 RETRY_TIMER: Final = 15
 
 
@@ -47,7 +40,7 @@ class WSClient:
         session: aiohttp.ClientSession,
         host: str,
         port: int,
-        callback: Callable[[Literal["data", "state"]], Coroutine[Any, Any, None]],
+        callback: Callable[[Signal], Coroutine[Any, Any, None]],
     ) -> None:
         """Create resources for websocket communication."""
         self.session = session
@@ -69,9 +62,9 @@ class WSClient:
             return {}
 
     @property
-    def state(self) -> str:
+    def state(self) -> State:
         """State of websocket."""
-        return self._state.value
+        return self._state
 
     def set_state(self, value: State) -> None:
         """Set state of websocket and store previous state."""
@@ -80,7 +73,7 @@ class WSClient:
 
     def state_changed(self) -> None:
         """Signal state change."""
-        create_task(self.session_handler_callback(Signal.CONNECTION_STATE.value))
+        create_task(self.session_handler_callback(Signal.CONNECTION_STATE))
 
     def start(self) -> None:
         """Start websocket and update its state."""
@@ -107,7 +100,7 @@ class WSClient:
 
                     if msg.type == aiohttp.WSMsgType.TEXT:
                         self._data.append(orjson.loads(msg.data))
-                        create_task(self.session_handler_callback(Signal.DATA.value))
+                        create_task(self.session_handler_callback(Signal.DATA))
                         LOGGER.debug(msg.data)
                         continue
 
