@@ -189,7 +189,7 @@ async def test_sensor_danfoss_thermostat(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
+    assert sensor.device_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
@@ -234,7 +234,7 @@ async def test_sensor_eurotronic_thermostat(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
+    assert sensor.device_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
@@ -269,7 +269,7 @@ async def test_sensor_tuya_thermostat(deconz_sensor):
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
-    assert sensor.secondary_temperature is None
+    assert sensor.device_temperature is None
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"

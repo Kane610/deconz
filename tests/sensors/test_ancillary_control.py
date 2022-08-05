@@ -53,7 +53,7 @@ async def test_sensor_ancillary_control(deconz_sensor):
     assert sensor.on
     assert sensor.reachable
     assert not sensor.tampered
-    assert not sensor.secondary_temperature
+    assert not sensor.device_temperature
 
     # DeconzDevice
     assert sensor.deconz_id == "/sensors/0"
