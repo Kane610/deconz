@@ -17,12 +17,16 @@ DATA = {
     "modelid": "PHDL00",
     "name": "Daylight",
     "state": {
+        "dark": False,
         "daylight": True,
-        "lastupdated": "2018-03-24T17:26:12",
+        "lastupdated": "2022-08-07T10:54:55.021",
         "status": 170,
+        "sunrise": "2022-08-07T02:47:23",
+        "sunset": "2022-08-07T19:02:23",
     },
     "swversion": "1.0",
     "type": "Daylight",
+    "uniqueid": "xx:xx:xx:FF:FF:xx:xx:xx-01",
 }
 
 
@@ -48,10 +52,13 @@ async def test_sensor_daylight(deconz_sensor):
     sensor = await deconz_sensor(DATA)
 
     assert sensor.configured is True
+    assert sensor.dark is False
     assert sensor.daylight is True
     assert sensor.daylight_status == DayLightStatus.SOLAR_NOON
     assert sensor.status == "solar_noon"
+    assert sensor.sunrise == "2022-08-07T02:47:23"
     assert sensor.sunrise_offset == 30
+    assert sensor.sunset == "2022-08-07T19:02:23"
     assert sensor.sunset_offset == -30
 
     # DeconzSensor
@@ -71,7 +78,7 @@ async def test_sensor_daylight(deconz_sensor):
     assert sensor.name == "Daylight"
     assert sensor.software_version == "1.0"
     assert sensor.type == "Daylight"
-    assert sensor.unique_id == ""
+    assert sensor.unique_id == "xx:xx:xx:FF:FF:xx:xx:xx-01"
 
     statuses = (100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 0)
 
@@ -81,3 +88,6 @@ async def test_sensor_daylight(deconz_sensor):
 
         assert sensor.changed_keys == {"state", "status"}
         assert sensor.daylight_status == DayLightStatus(status)
+
+    sensor.update({"state": {"status": status}})
+    assert sensor.daylight_status == DayLightStatus.UNKNOWN
