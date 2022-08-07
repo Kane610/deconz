@@ -66,8 +66,11 @@ class TypedDaylightConfig(TypedDict):
 class TypedDaylightState(TypedDict):
     """Daylight state type definition."""
 
+    dark: bool
     daylight: bool
     status: int
+    sunrise: str
+    sunset: str
 
 
 class TypedDaylight(TypedDict):
@@ -88,6 +91,11 @@ class Daylight(SensorBase):
         return self.raw["config"]["configured"]
 
     @property
+    def dark(self) -> bool:
+        """Is dark."""
+        return self.raw["state"]["dark"]
+
+    @property
     def daylight(self) -> bool:
         """Is daylight."""
         return self.raw["state"]["daylight"]
@@ -103,12 +111,22 @@ class Daylight(SensorBase):
         return DAYLIGHT_STATUS[DayLightStatus(self.raw["state"]["status"])]
 
     @property
+    def sunrise(self) -> str:
+        """Sunrise."""
+        return self.raw["state"]["sunrise"]
+
+    @property
     def sunrise_offset(self) -> int:
         """Sunrise offset.
 
         -120 to 120.
         """
         return self.raw["config"]["sunriseoffset"]
+
+    @property
+    def sunset(self) -> str:
+        """Sunset."""
+        return self.raw["state"]["sunset"]
 
     @property
     def sunset_offset(self) -> int:
