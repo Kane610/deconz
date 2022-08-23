@@ -73,6 +73,35 @@ async def test_handler_cover(mock_aioresponse, deconz_session, deconz_called_wit
     assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
 
 
+async def test_handler_cover_legacy(
+    mock_aioresponse, deconz_session, deconz_called_with
+):
+    """Verify that controlling covers work."""
+    covers = deconz_session.lights.covers
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.OPEN, legacy_mode=True)
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": False})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.CLOSE, legacy_mode=True)
+    assert deconz_called_with("put", path="/lights/0/state", json={"on": True})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.STOP, legacy_mode=True)
+    assert deconz_called_with("put", path="/lights/0/state", json={"bri_inc": 0})
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", lift=30, tilt=60, legacy_mode=True)
+    assert deconz_called_with(
+        "put", path="/lights/0/state", json={"bri": 76, "sat": 152}
+    )
+
+    mock_aioresponse.put("http://host:80/api/apikey/lights/0/state")
+    await covers.set_state("0", action=CoverAction.STOP, lift=20)
+    assert deconz_called_with("put", path="/lights/0/state", json={"stop": True})
+
+
 async def test_light_cover(deconz_light):
     """Verify that covers work."""
     cover = await deconz_light(DATA)
