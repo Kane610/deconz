@@ -45,6 +45,7 @@ class CoverHandler(APIHandler[Cover]):
         action: CoverAction | None = None,
         lift: int | None = None,
         tilt: int | None = None,
+        legacy_mode: bool = False,
     ) -> dict[str, Any]:
         """Set state of cover.
 
@@ -55,18 +56,30 @@ class CoverHandler(APIHandler[Cover]):
         """
         data: dict[str, bool | int] = {}
 
-        if action is not None:
+        if action is not None and not legacy_mode:
             if action is CoverAction.OPEN:
                 data["open"] = True
             elif action is CoverAction.CLOSE:
                 data["open"] = False
             elif action is CoverAction.STOP:
                 data["stop"] = True
-        else:
+        elif action is not None and legacy_mode:
+            if action is CoverAction.OPEN:
+                data["on"] = False
+            elif action is CoverAction.CLOSE:
+                data["on"] = True
+            elif action is CoverAction.STOP:
+                data["bri_inc"] = 0
+        elif not legacy_mode:
             if lift is not None:
                 data["lift"] = lift
             if tilt is not None:
                 data["tilt"] = tilt
+        else:
+            if lift is not None:
+                data["bri"] = int(lift * 2.54)
+            if tilt is not None:
+                data["sat"] = int(tilt * 2.54)
 
         return await self.gateway.request_with_retry(
             "put",
