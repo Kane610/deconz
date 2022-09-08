@@ -16,8 +16,8 @@ class AlarmSystemArmAction(enum.Enum):
     """Explicit url path to arm and disarm."""
 
     AWAY = "arm_away"
-    NIGHT = "arm_night"
-    STAY = "arm_stay"
+    NIGHT = "yes"
+    STAY = "no "
     DISARM = "disarm"
 
 
