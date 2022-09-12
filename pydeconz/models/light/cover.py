@@ -11,10 +11,8 @@ from . import LightBase
 class TypedCoverState(TypedDict):
     """Cover state type definition."""
 
-    bri: int
     lift: int
     open: bool
-    sat: int
     tilt: int
 
 
@@ -40,8 +38,6 @@ class Cover(LightBase):
     @property
     def is_open(self) -> bool:
         """Is cover open."""
-        if "open" not in self.raw["state"]:  # Legacy support
-            return self.state is False
         return self.raw["state"]["open"]
 
     @property
@@ -51,8 +47,6 @@ class Cover(LightBase):
         Supported values:
           0-100 - 0 is open / 100 is closed
         """
-        if "lift" not in self.raw["state"]:  # Legacy support
-            return int(self.raw["state"]["bri"] / 2.54)
         return self.raw["state"]["lift"]
 
     @property
@@ -64,8 +58,6 @@ class Cover(LightBase):
         """
         if "tilt" in self.raw["state"]:
             return self.raw["state"]["tilt"]
-        elif "sat" in self.raw["state"]:  # Legacy support
-            return int(self.raw["state"]["sat"] / 2.54)
         return None
 
     @property
