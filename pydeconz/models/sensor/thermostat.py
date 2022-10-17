@@ -105,22 +105,24 @@ class ThermostatPreset(enum.Enum):
     """Set the current operating mode for Tuya thermostats.
 
     Supported values:
-    - "holiday"
     - "auto"
-    - "manual"
-    - "comfort"
-    - "eco"
     - "boost"
+    - "comfort"
     - "complex"
+    - "eco"
+    - "holiday"
+    - "manual"
+    - "program"
     """
 
-    HOLIDAY = "holiday"
     AUTO = "auto"
-    MANUAL = "manual"
-    COMFORT = "comfort"
-    ECO = "eco"
     BOOST = "boost"
+    COMFORT = "comfort"
     COMPLEX = "complex"
+    ECO = "eco"
+    HOLIDAY = "holiday"
+    MANUAL = "manual"
+    PROGRAM = "program"
 
     UNKNOWN = "unknown"
 
@@ -176,7 +178,9 @@ class TypedThermostatConfig(TypedDict):
     ]
     mountingmode: bool
     offset: int
-    preset: Literal["holiday", "auto", "manual", "comfort", "eco", "boost", "complex"]
+    preset: Literal[
+        "auto", "boost", "comfort", "complex", "eco", "holiday", "manual", "program"
+    ]
     schedule_on: bool
     swingmode: Literal[
         "fully closed", "fully open", "quarter open", "half open", "three quarters open"
