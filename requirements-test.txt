@@ -1,5 +1,5 @@
 aioresponses==0.7.3
-black==22.10.0
+black==22.12.0
 pytest-cov==4.0.0
 flake8==6.0.0
 flake8-docstrings==1.6.0
