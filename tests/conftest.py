@@ -37,7 +37,7 @@ def deconz_called_with(mock_aioresponse):
                 continue
 
             for call in call_list:
-                if kwargs == call[1]:
+                if kwargs.get("json") == call[1]["json"]:
                     return True
 
         return False
