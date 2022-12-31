@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 MIN_PY_VERSION = "3.9"
 PACKAGES = find_packages(exclude=["tests", "tests.*"])
-VERSION = "105"
+VERSION = "106"
 
 setup(
     name="pydeconz",
