@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 from ..models import ResourceGroup, ResourceType
 from ..models.sensor.air_purifier import AirPurifier, AirPurifierFanMode
@@ -586,34 +586,34 @@ class WaterHandler(APIHandler[Water]):
     item_cls = Water
 
 
-SensorResources = Union[
-    AirPurifier,
-    AirQuality,
-    Alarm,
-    AncillaryControl,
-    Battery,
-    CarbonMonoxide,
-    Consumption,
-    Daylight,
-    DoorLock,
-    Fire,
-    GenericFlag,
-    GenericStatus,
-    Humidity,
-    LightLevel,
-    Moisture,
-    OpenClose,
-    Power,
-    Presence,
-    Pressure,
-    RelativeRotary,
-    Switch,
-    Temperature,
-    Thermostat,
-    Time,
-    Vibration,
-    Water,
-]
+SensorResources = (
+    AirPurifier
+    | AirQuality
+    | Alarm
+    | AncillaryControl
+    | Battery
+    | CarbonMonoxide
+    | Consumption
+    | Daylight
+    | DoorLock
+    | Fire
+    | GenericFlag
+    | GenericStatus
+    | Humidity
+    | LightLevel
+    | Moisture
+    | OpenClose
+    | Power
+    | Presence
+    | Pressure
+    | RelativeRotary
+    | Switch
+    | Temperature
+    | Thermostat
+    | Time
+    | Vibration
+    | Water
+)
 
 
 class SensorResourceManager(GroupedAPIHandler[SensorResources]):
