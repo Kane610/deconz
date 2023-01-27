@@ -1,7 +1,5 @@
 """API handler base classes."""
 
-from __future__ import annotations
-
 from collections.abc import Callable, ItemsView, ValuesView
 import itertools
 from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView, Optional

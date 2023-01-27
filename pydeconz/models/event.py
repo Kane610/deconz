@@ -1,7 +1,5 @@
 """Event data from deCONZ websocket."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 import enum
 from typing import Any

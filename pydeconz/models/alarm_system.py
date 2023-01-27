@@ -1,7 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from __future__ import annotations
-
 import enum
 import logging
 from typing import Any, Literal, TypedDict

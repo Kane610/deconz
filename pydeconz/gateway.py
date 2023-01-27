@@ -1,7 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from __future__ import annotations
-
 from asyncio import CancelledError, Task, create_task, sleep
 import logging
 from pprint import pformat

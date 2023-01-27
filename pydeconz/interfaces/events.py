@@ -1,7 +1,5 @@
 """Mange events from deCONZ."""
 
-from __future__ import annotations
-
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
