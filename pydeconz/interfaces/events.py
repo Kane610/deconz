@@ -23,7 +23,7 @@ UnsubscribeType = Callable[[], None]
 class EventHandler:
     """Event handler class."""
 
-    def __init__(self, gateway: DeconzSession) -> None:
+    def __init__(self, gateway: "DeconzSession") -> None:
         """Initialize API items."""
         self.gateway = gateway
         self._subscribers: list[SubscriptionType] = []

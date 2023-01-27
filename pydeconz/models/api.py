@@ -16,7 +16,7 @@ UnsubscribeType = Callable[[], None]
 class APIItem:
     """Base class for a deCONZ API item."""
 
-    resource_group: ResourceGroup
+    resource_group: "ResourceGroup"
 
     def __init__(self, resource_id: str, raw: Any) -> None:
         """Initialize API item."""
