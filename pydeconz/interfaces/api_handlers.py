@@ -2,7 +2,7 @@
 
 from collections.abc import Callable, ItemsView, ValuesView
 import itertools
-from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView, Optional
+from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView
 
 from ..models import DataResource, ResourceGroup, ResourceType
 from ..models.event import Event, EventType
@@ -11,10 +11,7 @@ if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
 CallbackType = Callable[[EventType, str], None]
-SubscriptionType = tuple[
-    Callable[[EventType, str], None],
-    Optional[tuple[EventType, ...]],
-]
+SubscriptionType = tuple[Callable[[EventType, str], None], tuple[EventType, ...] | None]
 UnsubscribeType = Callable[[], None]
 
 ID_FILTER_ALL = "*"

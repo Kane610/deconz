@@ -1,7 +1,7 @@
 """Mange events from deCONZ."""
 
 import logging
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable
 
 from ..models import ResourceGroup
 from ..models.event import Event, EventType
@@ -14,8 +14,8 @@ LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = tuple[
     Callable[[Event], None],
-    Optional[tuple[EventType, ...]],
-    Optional[tuple[ResourceGroup, ...]],
+    tuple[EventType, ...] | None,
+    tuple[ResourceGroup, ...] | None,
 ]
 UnsubscribeType = Callable[[], None]
 
