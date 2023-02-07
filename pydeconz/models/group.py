@@ -200,7 +200,6 @@ class Group(DeconzDevice):
         data = {}
 
         for attribute in COLOR_STATE_ATTRIBUTES:
-
             if (light_attribute := light.raw["state"].get(attribute)) is not None:
                 data[attribute] = light_attribute
                 continue

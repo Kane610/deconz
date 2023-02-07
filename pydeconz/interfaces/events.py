@@ -57,7 +57,6 @@ class EventHandler:
         event = Event.from_dict(raw)
 
         for callback, event_filter, resource_filter in self._subscribers:
-
             if event_filter is not None and event.type not in event_filter:
                 continue
 
