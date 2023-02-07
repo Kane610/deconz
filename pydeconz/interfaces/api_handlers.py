@@ -1,10 +1,8 @@
 """API handler base classes."""
 
-from __future__ import annotations
-
 from collections.abc import Callable, ItemsView, ValuesView
 import itertools
-from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView, Optional
+from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView
 
 from ..models import DataResource, ResourceGroup, ResourceType
 from ..models.event import Event, EventType
@@ -13,10 +11,7 @@ if TYPE_CHECKING:
     from ..gateway import DeconzSession
 
 CallbackType = Callable[[EventType, str], None]
-SubscriptionType = tuple[
-    Callable[[EventType, str], None],
-    Optional[tuple[EventType, ...]],
-]
+SubscriptionType = tuple[Callable[[EventType, str], None], tuple[EventType, ...] | None]
 UnsubscribeType = Callable[[], None]
 
 ID_FILTER_ALL = "*"
@@ -30,7 +25,7 @@ class APIHandler(Generic[DataResource]):
     resource_types: set[ResourceType] | None = None
     item_cls: Any
 
-    def __init__(self, gateway: DeconzSession, grouped: bool = False) -> None:
+    def __init__(self, gateway: "DeconzSession", grouped: bool = False) -> None:
         """Initialize API handler."""
         self.gateway = gateway
         self._items: dict[str, DataResource] = {}
@@ -155,7 +150,7 @@ class GroupedAPIHandler(Generic[DataResource]):
     resource_group: ResourceGroup
 
     def __init__(
-        self, gateway: DeconzSession, handlers: list[APIHandler[DataResource]]
+        self, gateway: "DeconzSession", handlers: list[APIHandler[DataResource]]
     ) -> None:
         """Initialize grouped API handler."""
         self.gateway = gateway

@@ -1,9 +1,7 @@
 """Mange events from deCONZ."""
 
-from __future__ import annotations
-
 import logging
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable
 
 from ..models import ResourceGroup
 from ..models.event import Event, EventType
@@ -16,8 +14,8 @@ LOGGER = logging.getLogger(__name__)
 
 SubscriptionType = tuple[
     Callable[[Event], None],
-    Optional[tuple[EventType, ...]],
-    Optional[tuple[ResourceGroup, ...]],
+    tuple[EventType, ...] | None,
+    tuple[ResourceGroup, ...] | None,
 ]
 UnsubscribeType = Callable[[], None]
 
@@ -25,7 +23,7 @@ UnsubscribeType = Callable[[], None]
 class EventHandler:
     """Event handler class."""
 
-    def __init__(self, gateway: DeconzSession) -> None:
+    def __init__(self, gateway: "DeconzSession") -> None:
         """Initialize API items."""
         self.gateway = gateway
         self._subscribers: list[SubscriptionType] = []

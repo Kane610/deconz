@@ -1,9 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from __future__ import annotations
-
 import logging
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 from ..models import ResourceGroup, ResourceType
 from ..models.light.configuration_tool import ConfigurationTool
@@ -238,13 +236,7 @@ class SirenHandler(APIHandler[Siren]):
         )
 
 
-LightResources = Union[
-    ConfigurationTool,
-    Cover,
-    Light,
-    Lock,
-    Siren,
-]
+LightResources = ConfigurationTool | Cover | Light | Lock | Siren
 
 
 class LightResourceManager(GroupedAPIHandler[LightResources]):
@@ -252,7 +244,7 @@ class LightResourceManager(GroupedAPIHandler[LightResources]):
 
     resource_group = ResourceGroup.LIGHT
 
-    def __init__(self, gateway: DeconzSession) -> None:
+    def __init__(self, gateway: "DeconzSession") -> None:
         """Initialize light manager."""
         self.configuration_tool = ConfigurationToolHandler(gateway, grouped=True)
         self.covers = CoverHandler(gateway, grouped=True)
