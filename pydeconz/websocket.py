@@ -93,7 +93,6 @@ class WSClient:
                 self.state_changed()
 
                 async for msg in ws:
-
                     if self._state == State.STOPPED:
                         await ws.close()
                         break
