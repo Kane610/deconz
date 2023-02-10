@@ -22,6 +22,8 @@ class TypedAirQualityState(TypedDict):
     ]
     airqualityppb: int
     pm2_5: int
+    airqualityformaldehyd: int
+    airqualityco2: int
 
 
 class TypedAirQuality(TypedDict):
@@ -77,6 +79,16 @@ class AirQuality(SensorBase):
     def pm_2_5(self) -> int | None:
         """Air quality PM2.5 (µg/m³)."""
         return self.raw["state"].get("pm2_5")
+
+    @property
+    def air_quality_formaldehyd(self) -> int | None:
+        """Chemical compound gas formaldehyde / methanal (CH2O) (µg/m³)."""
+        return self.raw["state"].get("airqualityformaldehyd")
+
+    @property
+    def air_quality_co2(self) -> int | None:
+        """Chemical compound gas carbon dioxid (CO2) (ppb)."""
+        return self.raw["state"].get("airqualityco2")
 
     @property
     def supports_air_quality_ppb(self) -> bool:
