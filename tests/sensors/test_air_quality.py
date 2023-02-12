@@ -67,7 +67,7 @@ DATA_6_in_1_no_aq = {
         "airqualityformaldehyd": 4,
         "airqualityppb": 15,
         "lastupdated": "2023-01-29T19:05:41.903",
-        "pm2_5": 9
+        "pm2_5": 9,
     },
     "type": "ZHAAirQuality",
     "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0c7d",
