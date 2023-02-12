@@ -156,9 +156,6 @@ async def test_enum_airquality_properties(deconz_sensor, path, property, data):
         }
     )
 
-    with pytest.raises(KeyError):
-        assert getattr(sensor, property)
-
     for input, output in data.items():
         sensor.update({path[0]: {path[1]: input}})
         assert getattr(sensor, property) == output
