@@ -2,7 +2,9 @@
 
 import enum
 import logging
-from typing import Literal, TypedDict
+from typing import Literal
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import LightBase
 
@@ -12,39 +14,43 @@ LOGGER = logging.getLogger(__name__)
 class TypedLightState(TypedDict):
     """Light state type definition."""
 
-    alert: Literal[
-        "none",
-        "select",
-        "lselect",
-        "blink",
-        "breathe",
-        "channelchange",
-        "finish",
-        "okay",
-        "stop",
+    alert: NotRequired[
+        Literal[
+            "none",
+            "select",
+            "lselect",
+            "blink",
+            "breathe",
+            "channelchange",
+            "finish",
+            "okay",
+            "stop",
+        ]
     ]
     bri: int
-    colormode: Literal["ct", "hs", "xy"]
+    colormode: NotRequired[Literal["ct", "hs", "xy"]]
     ct: int
-    effect: Literal[
-        "colorloop",
-        "none",
-        "carnival",
-        "collide",
-        "fading",
-        "fireworks",
-        "flag",
-        "glow",
-        "rainbow",
-        "snake",
-        "snow",
-        "sparkles",
-        "steady",
-        "strobe",
-        "twinkle",
-        "updown",
-        "vintage",
-        "waves",
+    effect: NotRequired[
+        Literal[
+            "colorloop",
+            "none",
+            "carnival",
+            "collide",
+            "fading",
+            "fireworks",
+            "flag",
+            "glow",
+            "rainbow",
+            "snake",
+            "snow",
+            "sparkles",
+            "steady",
+            "strobe",
+            "twinkle",
+            "updown",
+            "vintage",
+            "waves",
+        ]
     ]
     hue: int
     on: bool
@@ -56,7 +62,7 @@ class TypedLightState(TypedDict):
 class TypedLight(TypedDict):
     """Light type definition."""
 
-    colorcapabilities: int
+    colorcapabilities: NotRequired[int]
     ctmax: int
     ctmin: int
     state: TypedLightState
