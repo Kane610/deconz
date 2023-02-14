@@ -43,7 +43,7 @@ class AlarmSystemArmState(enum.Enum):
     IN_ALARM = "in_alarm"
 
 
-class AlarmSystemArmMask(enum.Flag):
+class AlarmSystemArmMask(enum.Enum):
     """The target arm mode."""
 
     ARMED_AWAY = "A"
