@@ -1,7 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import enum
-from typing import Literal, TypedDict
+from typing import Literal
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import SensorBase
 
@@ -40,11 +42,11 @@ class SwitchWindowCoveringType(enum.IntEnum):
 class TypedSwitchConfig(TypedDict):
     """Switch config type definition."""
 
-    devicemode: Literal[
-        "dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"
+    devicemode: NotRequired[
+        Literal["dualpushbutton", "dualrocker", "singlepushbutton", "singlerocker"]
     ]
-    mode: Literal["momentary", "rocker"]
-    windowcoveringtype: Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    mode: NotRequired[Literal["momentary", "rocker"]]
+    windowcoveringtype: NotRequired[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
 
 class TypedSwitchState(TypedDict):

@@ -2,7 +2,9 @@
 
 import enum
 import logging
-from typing import Literal, TypedDict
+from typing import Literal
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import SensorBase
 
@@ -160,30 +162,42 @@ class TypedThermostatConfig(TypedDict):
     displayflipped: bool
     externalsensortemp: int
     externalwindowopen: bool
-    fanmode: Literal["off", "low", "medium", "high", "on", "auto", "smart"]
+    fanmode: NotRequired[Literal["off", "low", "medium", "high", "on", "auto", "smart"]]
     heatsetpoint: int
     locked: bool
-    mode: Literal[
-        "off",
-        "auto",
-        "cool",
-        "heat",
-        "emergency heating",
-        "precooling",
-        "fan only",
-        "dry",
-        "sleep",
+    mode: NotRequired[
+        Literal[
+            "off",
+            "auto",
+            "cool",
+            "heat",
+            "emergency heating",
+            "precooling",
+            "fan only",
+            "dry",
+            "sleep",
+        ]
     ]
     mountingmode: bool
     offset: int
-    preset: Literal[
-        "auto", "boost", "comfort", "complex", "eco", "holiday", "manual", "program"
+    preset: NotRequired[
+        Literal[
+            "auto", "boost", "comfort", "complex", "eco", "holiday", "manual", "program"
+        ]
     ]
     schedule_on: bool
-    swingmode: Literal[
-        "fully closed", "fully open", "quarter open", "half open", "three quarters open"
+    swingmode: NotRequired[
+        Literal[
+            "fully closed",
+            "fully open",
+            "quarter open",
+            "half open",
+            "three quarters open",
+        ]
     ]
-    temperaturemeasurement: Literal["air sensor", "floor sensor", "floor protection"]
+    temperaturemeasurement: NotRequired[
+        Literal["air sensor", "floor sensor", "floor protection"]
+    ]
     windowopen_set: bool
 
 

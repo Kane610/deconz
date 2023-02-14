@@ -1,7 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import enum
-from typing import TypedDict
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import LightBase
 
@@ -10,10 +11,10 @@ class TypedCoverState(TypedDict):
     """Cover state type definition."""
 
     bri: int
-    lift: int
-    open: bool
-    sat: int
-    tilt: int
+    lift: NotRequired[int]
+    open: NotRequired[bool]
+    sat: NotRequired[int]
+    tilt: NotRequired[int]
 
 
 class TypedCover(TypedDict):
