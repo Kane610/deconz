@@ -32,20 +32,24 @@ class TypedLightState(TypedDict):
     ct: int
     effect: NotRequired[
         Literal[
-            "colorloop",
-            "none",
+            "candle",
             "carnival",
+            "colorloop",
             "collide",
             "fading",
+            "fireplace",
             "fireworks",
             "flag",
             "glow",
+            "none",
             "rainbow",
             "snake",
             "snow",
+            "sparkle",
             "sparkles",
             "steady",
             "strobe",
+            "sunrise",
             "twinkle",
             "updown",
             "vintage",
@@ -151,18 +155,22 @@ class LightEffect(enum.Enum):
     Supported values:
     - "colorloop" — cycle through hue values 0-360
     - "none" — no effect
+    - "candle"
     - "carnival"
     - "collide"
     - "fading"
+    - "fireplace"
     - "fireworks"
     - "flag"
     - "glow"
     - "rainbow"
     - "snake"
     - "snow"
+    - "sparkle"
     - "sparkles"
     - "steady"
     - "strobe"
+    - "sunrise"
     - "twinkle"
     - "updown"
     - "vintage"
@@ -171,6 +179,13 @@ class LightEffect(enum.Enum):
 
     COLOR_LOOP = "colorloop"
     NONE = "none"
+
+    # Specific to Hue lights
+
+    CANDLE = "candle"
+    FIREPLACE = "fireplace"
+    SPARKLE = "sparkle"
+    SUNRISE = "sunrise"
 
     # Specific to Lidl christmas light
 
