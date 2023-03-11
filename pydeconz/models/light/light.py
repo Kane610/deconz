@@ -142,6 +142,8 @@ class LightColorMode(enum.Enum):
     - "ct" — color temperature.
     - "hs" — hue and saturation.
     - "xy" — CIE xy values.
+    - "effect"
+    - "gradient"
     """
 
     CT = "ct"
