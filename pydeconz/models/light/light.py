@@ -28,7 +28,15 @@ class TypedLightState(TypedDict):
         ]
     ]
     bri: int
-    colormode: NotRequired[Literal["ct", "hs", "xy"]]
+    colormode: NotRequired[
+        Literal[
+            "ct",
+            "effect",
+            "gradient",
+            "hs",
+            "xy",
+        ]
+    ]
     ct: int
     effect: NotRequired[
         Literal[
@@ -139,6 +147,10 @@ class LightColorMode(enum.Enum):
     CT = "ct"
     HS = "hs"
     XY = "xy"
+
+    # Specific to Hue gradient lights
+    EFFECT = "effect"
+    GRADIENT = "gradient"
 
     UNKNOWN = "unknown"
 
