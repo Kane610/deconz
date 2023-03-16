@@ -71,6 +71,16 @@ class AirQuality(SensorBase):
         return AirQualityValue(self.raw["state"].get("airquality", "unknown")).value
 
     @property
+    def air_quality_co2(self) -> int | None:
+        """Chemical compound gas carbon dioxid (CO2) (ppb)."""
+        return self.raw["state"].get("airqualityco2")
+
+    @property
+    def air_quality_formaldehyd(self) -> int | None:
+        """Chemical compound gas formaldehyde / methanal (CH2O) (µg/m³)."""
+        return self.raw["state"].get("airqualityformaldehyd")
+
+    @property
     def air_quality_ppb(self) -> int | None:
         """Air quality PPB TVOC."""
         return self.raw["state"].get("airqualityppb")
@@ -81,14 +91,9 @@ class AirQuality(SensorBase):
         return self.raw["state"].get("pm2_5")
 
     @property
-    def air_quality_formaldehyd(self) -> int | None:
-        """Chemical compound gas formaldehyde / methanal (CH2O) (µg/m³)."""
-        return self.raw["state"].get("airqualityformaldehyd")
-
-    @property
-    def air_quality_co2(self) -> int | None:
-        """Chemical compound gas carbon dioxid (CO2) (ppb)."""
-        return self.raw["state"].get("airqualityco2")
+    def supports_air_quality(self) -> bool:
+        """Support Air quality reporting."""
+        return "airquality" in self.raw["state"]
 
     @property
     def supports_air_quality_ppb(self) -> bool:
@@ -100,7 +105,4 @@ class AirQuality(SensorBase):
         """Support Air quality PM2.5 reporting."""
         return "pm2_5" in self.raw["state"]
 
-    @property
-    def supports_air_quality(self) -> bool:
-        """Support Air quality reporting."""
-        return "airquality" in self.raw["state"]
+
