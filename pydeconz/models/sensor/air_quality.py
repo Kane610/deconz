@@ -96,6 +96,16 @@ class AirQuality(SensorBase):
         return "airquality" in self.raw["state"]
 
     @property
+    def supports_air_quality_co2(self) -> bool:
+        """Support Air quality CO2 reporting."""
+        return "airqualityco2" in self.raw["state"]
+
+    @property
+    def supports_air_quality_formaldehyd(self) -> bool:
+        """Support Air quality formaldehyde reporting."""
+        return "airqualityformaldehyd" in self.raw["state"]
+
+    @property
     def supports_air_quality_ppb(self) -> bool:
         """Support Air quality PPB reporting."""
         return "airqualityppb" in self.raw["state"]
