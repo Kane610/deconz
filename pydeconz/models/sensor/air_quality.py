@@ -20,10 +20,10 @@ class TypedAirQualityState(TypedDict):
         "unhealthy",
         "out of scale",
     ]
+    airqualityco2: int
+    airqualityformaldehyd: int
     airqualityppb: int
     pm2_5: int
-    airqualityformaldehyd: int
-    airqualityco2: int
 
 
 class TypedAirQuality(TypedDict):
