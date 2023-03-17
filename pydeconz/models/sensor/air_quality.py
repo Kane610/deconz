@@ -114,5 +114,3 @@ class AirQuality(SensorBase):
     def supports_pm_2_5(self) -> bool:
         """Support Air quality PM2.5 reporting."""
         return "pm2_5" in self.raw["state"]
-
-
