@@ -1,6 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from asyncio import create_task, get_running_loop
+from asyncio import Task, create_task, get_running_loop
 from collections import deque
 from collections.abc import Callable, Coroutine
 import enum
@@ -49,9 +49,22 @@ class WSClient:
         self.session_handler_callback = callback
 
         self.loop = get_running_loop()
+        self._background_tasks: set[Task[Any]] = set()
 
         self._data: deque[dict[str, Any]] = deque()
         self._state = self._previous_state = State.NONE
+
+    def create_background_task(self, target: Coroutine[Any, Any, Any]) -> None:
+        """Save a reference to the result of target.
+
+        To avoid a task disappearing mid-execution.
+        The event loop only keeps weak references to tasks.
+        A task that isn’t referenced elsewhere may get
+        garbage collected at any time, even before it’s done.
+        """
+        task = create_task(target)
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
 
     @property
     def data(self) -> dict[str, Any]:
@@ -73,11 +86,13 @@ class WSClient:
 
     def state_changed(self) -> None:
         """Signal state change."""
-        create_task(self.session_handler_callback(Signal.CONNECTION_STATE))
+        self.create_background_task(
+            self.session_handler_callback(Signal.CONNECTION_STATE)
+        )
 
     def start(self) -> None:
         """Start websocket and update its state."""
-        create_task(self.running())
+        self.create_background_task(self.running())
 
     async def running(self) -> None:
         """Start websocket connection."""
@@ -99,7 +114,9 @@ class WSClient:
 
                     if msg.type == aiohttp.WSMsgType.TEXT:
                         self._data.append(orjson.loads(msg.data))
-                        create_task(self.session_handler_callback(Signal.DATA))
+                        self.create_background_task(
+                            self.session_handler_callback(Signal.DATA)
+                        )
                         LOGGER.debug(msg.data)
                         continue
 

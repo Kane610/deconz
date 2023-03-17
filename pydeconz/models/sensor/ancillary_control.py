@@ -2,7 +2,9 @@
 
 import enum
 import logging
-from typing import Literal, TypedDict
+from typing import Literal
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import SensorBase
 
@@ -59,18 +61,20 @@ class TypedAncillaryControlState(TypedDict):
         "invalid_code",
         "panic",
     ]
-    panel: Literal[
-        "armed_away",
-        "armed_night",
-        "armed_stay",
-        "arming_away",
-        "arming_night",
-        "arming_stay",
-        "disarmed",
-        "entry_delay",
-        "exit_delay",
-        "in_alarm",
-        "not_ready",
+    panel: NotRequired[
+        Literal[
+            "armed_away",
+            "armed_night",
+            "armed_stay",
+            "arming_away",
+            "arming_night",
+            "arming_stay",
+            "disarmed",
+            "entry_delay",
+            "exit_delay",
+            "in_alarm",
+            "not_ready",
+        ]
     ]
     seconds_remaining: int
 

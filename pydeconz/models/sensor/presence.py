@@ -1,7 +1,9 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import enum
-from typing import Literal, TypedDict
+from typing import Literal
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import SensorBase
 
@@ -11,12 +13,12 @@ class TypedPresenceConfig(TypedDict):
 
     delay: int
     detectionarea: str
-    devicemode: Literal["leftright", "undirected"]
+    devicemode: NotRequired[Literal["leftright", "undirected"]]
     duration: int
     resetpresence: bool
     sensitivity: int
     sensitivitymax: int
-    triggerdistance: Literal["far", "medium", "near"]
+    triggerdistance: NotRequired[Literal["far", "medium", "near"]]
 
 
 class TypedPresenceState(TypedDict):
@@ -24,17 +26,19 @@ class TypedPresenceState(TypedDict):
 
     dark: bool
     presence: bool
-    presenceevent: Literal[
-        "enter",
-        "leave",
-        "enterleft",
-        "rightleave",
-        "enterright",
-        "leftleave",
-        "approaching",
-        "absenting",
-        "8",
-        "9",
+    presenceevent: NotRequired[
+        Literal[
+            "enter",
+            "leave",
+            "enterleft",
+            "rightleave",
+            "enterright",
+            "leftleave",
+            "approaching",
+            "absenting",
+            "8",
+            "9",
+        ]
     ]
 
 

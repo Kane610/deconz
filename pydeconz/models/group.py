@@ -1,6 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Final, Literal, TypedDict
+from typing import Final, Literal
+
+from typing_extensions import NotRequired, TypedDict
 
 from . import ResourceGroup
 from .deconz_device import DeconzDevice
@@ -22,9 +24,9 @@ class TypedGroupAction(TypedDict):
     """Group action type definition."""
 
     bri: int
-    colormode: Literal["ct", "hs", "xy"]
+    colormode: NotRequired[Literal["ct", "hs", "xy"]]
     ct: int
-    effect: Literal["colorloop", "none"]
+    effect: NotRequired[Literal["colorloop", "none"]]
     hue: int
     on: bool
     sat: int
