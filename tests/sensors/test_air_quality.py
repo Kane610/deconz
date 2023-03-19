@@ -63,8 +63,8 @@ DATA_6_in_1_no_aq = {
     "modelid": "TS0601",
     "name": "Tuya Smart Air House Keeper 6in1",
     "state": {
-        "airqualityco2": 325,
-        "airqualityformaldehyd": 4,
+        "airquality_co2_density": 325,
+        "airquality_formaldehyde_density": 4,
         "airqualityppb": 15,
         "lastupdated": "2023-01-29T19:05:41.903",
         "pm2_5": 9,
