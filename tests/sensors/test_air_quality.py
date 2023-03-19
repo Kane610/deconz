@@ -121,12 +121,12 @@ async def test_sensor_air_quality_6_in_1_no_aq(deconz_sensor):
 
     assert sensor.air_quality == AirQualityValue.UNKNOWN.value
     assert sensor.air_quality_co2 == 325
-    assert sensor.air_quality_formaldehyd == 4
+    assert sensor.air_quality_formaldehyde == 4
     assert sensor.air_quality_ppb == 15
     assert sensor.pm_2_5 == 9
     assert sensor.supports_air_quality is False
     assert sensor.supports_air_quality_co2 is True
-    assert sensor.supports_air_quality_formaldehyd is True
+    assert sensor.supports_air_quality_formaldehyde is True
     assert sensor.supports_air_quality_ppb is True
     assert sensor.supports_pm_2_5 is True
 
