@@ -20,8 +20,8 @@ class TypedAirQualityState(TypedDict):
         "unhealthy",
         "out of scale",
     ]
-    airqualityco2: int
-    airqualityformaldehyd: int
+    airquality_co2_density: int
+    airquality_formaldehyde_density: int
     airqualityppb: int
     pm2_5: int
 
@@ -73,12 +73,12 @@ class AirQuality(SensorBase):
     @property
     def air_quality_co2(self) -> int | None:
         """Chemical compound gas carbon dioxid (CO2) (ppb)."""
-        return self.raw["state"].get("airqualityco2")
+        return self.raw["state"].get("airquality_co2_density")
 
     @property
-    def air_quality_formaldehyd(self) -> int | None:
+    def air_quality_formaldehyde(self) -> int | None:
         """Chemical compound gas formaldehyde / methanal (CH2O) (µg/m³)."""
-        return self.raw["state"].get("airqualityformaldehyd")
+        return self.raw["state"].get("airquality_formaldehyde_density")
 
     @property
     def air_quality_ppb(self) -> int | None:
@@ -98,12 +98,12 @@ class AirQuality(SensorBase):
     @property
     def supports_air_quality_co2(self) -> bool:
         """Support Air quality CO2 reporting."""
-        return "airqualityco2" in self.raw["state"]
+        return "airquality_co2_density" in self.raw["state"]
 
     @property
     def supports_air_quality_formaldehyde(self) -> bool:
         """Support Air quality formaldehyde reporting."""
-        return "airqualityformaldehyd" in self.raw["state"]
+        return "airquality_formaldehyde_density" in self.raw["state"]
 
     @property
     def supports_air_quality_ppb(self) -> bool:
