@@ -49,6 +49,7 @@ class TypedLightState(TypedDict):
             "fireworks",
             "flag",
             "glow",
+            "loop",
             "none",
             "rainbow",
             "snake",
@@ -177,6 +178,7 @@ class LightEffect(enum.Enum):
     - "fireworks"
     - "flag"
     - "glow"
+    - "loop"
     - "rainbow"
     - "snake"
     - "snow"
@@ -198,6 +200,7 @@ class LightEffect(enum.Enum):
 
     CANDLE = "candle"
     FIREPLACE = "fireplace"
+    LOOP = "loop"
     SPARKLE = "sparkle"
     SUNRISE = "sunrise"
 
