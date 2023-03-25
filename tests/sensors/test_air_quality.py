@@ -124,6 +124,7 @@ async def test_sensor_air_quality_6_in_1_no_aq(deconz_sensor):
     assert sensor.pm_2_5 == 9
     assert sensor.supports_air_quality is False
 
+
 ENUM_PROPERTY_DATA = [
     (
         ("state", "airquality"),
