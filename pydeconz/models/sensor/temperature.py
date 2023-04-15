@@ -30,4 +30,4 @@ class Temperature(SensorBase):
     @property
     def scaled_temperature(self) -> float:
         """Scaled temperature."""
-        return round(self.temperature / 100, 1)
+        return self.temperature / 100

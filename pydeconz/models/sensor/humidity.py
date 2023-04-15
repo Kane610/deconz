@@ -37,7 +37,7 @@ class Humidity(SensorBase):
     @property
     def scaled_humidity(self) -> float:
         """Scaled humidity level."""
-        return round(self.humidity / 100, 1)
+        return self.humidity / 100
 
     @property
     def offset(self) -> int | None:

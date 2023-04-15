@@ -40,7 +40,7 @@ async def test_sensor_humidity(deconz_sensor):
 
     assert sensor.humidity == 3555
     assert sensor.offset == 0
-    assert sensor.scaled_humidity == 35.5
+    assert sensor.scaled_humidity == 35.55
 
     # DeconzSensor
     assert sensor.battery == 100
