@@ -30,7 +30,7 @@ async def test_sensor_temperature(deconz_sensor):
     sensor = await deconz_sensor(DATA)
 
     assert sensor.temperature == 2182
-    assert sensor.scaled_temperature == 21.8
+    assert sensor.scaled_temperature == 21.82
 
     # DeconzSensor
     assert sensor.battery == 100
