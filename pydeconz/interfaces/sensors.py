@@ -293,6 +293,18 @@ class MoistureHandler(APIHandler[Moisture]):
     resource_type = ResourceType.ZHA_MOISTURE
     item_cls = Moisture
 
+    async def set_config(self, id: str, offset: int) -> dict[str, Any]:
+        """Change config of moisture sensor.
+
+        Supported values:
+        - offset [int] -32768–32767
+        """
+        return await self.gateway.request_with_retry(
+            "put",
+            path=f"{self.path}/{id}/config",
+            json={"offset": offset},
+        )
+
 
 class OpenCloseHandler(APIHandler[OpenClose]):
     """Handler for open/close sensor."""

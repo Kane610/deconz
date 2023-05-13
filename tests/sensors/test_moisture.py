@@ -23,7 +23,7 @@ DATA = {
     },
     "swversion": "1.0.8",
     "type": "ZHAMoisture",
-    "uniqueid": "a4:c1:38:fe:86:8f:07:a3-01-0408",
+    "uniqueid": "xx:xx:xx:xx:xx:xx:xx:xx-01-0408",
 }
 
 
@@ -42,12 +42,11 @@ async def test_sensor_moisture(deconz_sensor):
 
     assert sensor.moisture == 9000
     assert sensor.offset == 0
-    assert sensor.scaled_mositure == 90
+    assert sensor.scaled_moisture == 90
 
     # DeconzSensor
     assert sensor.battery == 100
-    assert sensor.ep == 1
-    assert sensor.low_battery is None
+    assert sensor.low_battery is False
     assert sensor.on is True
     assert sensor.reachable is True
     assert sensor.tampered is None
