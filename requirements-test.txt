@@ -9,5 +9,5 @@ mypy==1.2.0
 pydocstyle==6.3.0
 pytest==7.3.1
 pytest-aiohttp==1.0.4
-ruff==0.0.265
+ruff==0.0.267
 types-orjson==3.6.2
