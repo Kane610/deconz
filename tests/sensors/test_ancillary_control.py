@@ -79,7 +79,7 @@ ENUM_PROPERTY_DATA = [
 ]
 
 
-@pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
+@pytest.mark.parametrize(("path", "property", "data"), ENUM_PROPERTY_DATA)
 async def test_enum_ancillary_control_properties(deconz_sensor, path, property, data):
     """Verify enum properties return expected values or None."""
     sensor = await deconz_sensor(

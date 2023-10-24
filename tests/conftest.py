@@ -13,14 +13,14 @@ from pydeconz.models.event import EventType
 from pydeconz.websocket import Signal
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_aioresponse():
     """Mock a web request and provide a response."""
     with aioresponses() as m:
         yield m
 
 
-@pytest.fixture
+@pytest.fixture()
 def deconz_called_with(mock_aioresponse):
     """Verify deCONZ call was made with the expected parameters."""
 
@@ -39,10 +39,10 @@ def deconz_called_with(mock_aioresponse):
 
         return False
 
-    yield verify_call
+    return verify_call
 
 
-@pytest.fixture
+@pytest.fixture()
 async def deconz_session() -> Iterator[DeconzSession]:
     """Return deCONZ gateway session.
 
@@ -54,7 +54,7 @@ async def deconz_session() -> Iterator[DeconzSession]:
     await session.close()
 
 
-@pytest.fixture
+@pytest.fixture()
 def deconz_refresh_state(mock_aioresponse, deconz_session) -> Iterator[DeconzSession]:
     """Comfort fixture to initialize deCONZ session."""
 
@@ -74,7 +74,7 @@ def deconz_refresh_state(mock_aioresponse, deconz_session) -> Iterator[DeconzSes
         await deconz_session.refresh_state()
         return deconz_session
 
-    yield data_to_deconz_session
+    return data_to_deconz_session
 
 
 @pytest.fixture()
@@ -128,7 +128,7 @@ def mock_websocket_event(deconz_session, mock_wsclient):
         gateway_session_handler = mock_wsclient.call_args[0][3]
         await gateway_session_handler(signal=Signal.DATA)
 
-    yield signal_new_event
+    return signal_new_event
 
 
 @pytest.fixture()
@@ -144,4 +144,4 @@ def mock_websocket_state_change(deconz_session, mock_wsclient):
         gateway_session_handler = mock_wsclient.call_args[0][3]
         await gateway_session_handler(signal=Signal.CONNECTION_STATE)
 
-    yield signal_state_change
+    return signal_state_change

@@ -28,7 +28,9 @@ EVENT_HANDLER_DATA = [
 ]
 
 
-@pytest.mark.parametrize("event_filter, resource_filter, expected", EVENT_HANDLER_DATA)
+@pytest.mark.parametrize(
+    ("event_filter", "resource_filter", "expected"), EVENT_HANDLER_DATA
+)
 async def test_event_handler(event_filter, resource_filter, expected):
     """Verify event handler behaves according to configured filters."""
     event_handler = EventHandler(gateway=Mock())
@@ -59,7 +61,7 @@ EVENT_ADDED_DATA = [
 ]
 
 
-@pytest.mark.parametrize("resource, event_type, resource_key", EVENT_ADDED_DATA)
+@pytest.mark.parametrize(("resource", "event_type", "resource_key"), EVENT_ADDED_DATA)
 async def test_event_added(resource, event_type, resource_key):
     """Verify added event content."""
     data = {
@@ -88,7 +90,7 @@ EVENT_CHANGED_DATA = [
 ]
 
 
-@pytest.mark.parametrize("resource, event_type, test_data", EVENT_CHANGED_DATA)
+@pytest.mark.parametrize(("resource", "event_type", "test_data"), EVENT_CHANGED_DATA)
 async def test_event_changed(resource, event_type, test_data):
     """Verify changed event content."""
     data = {
@@ -117,7 +119,7 @@ EVENT_DELETED_DATA = [
 ]
 
 
-@pytest.mark.parametrize("resource, event_type", EVENT_DELETED_DATA)
+@pytest.mark.parametrize(("resource", "event_type"), EVENT_DELETED_DATA)
 async def test_event_deleted(resource, event_type):
     """Verify deleted event content."""
     data = {
