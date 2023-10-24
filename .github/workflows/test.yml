@@ -26,9 +26,6 @@ jobs:
       - name: Check lint with Ruff
         run: |
           ruff check pydeconz tests
-      - name: Lint with Flake8
-        run: |
-          flake8 pydeconz
       - name: Check formatting with Black
         run: |
           black pydeconz --check
