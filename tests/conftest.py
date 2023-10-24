@@ -1,6 +1,6 @@
 """Setup common test helpers."""
 
-from typing import Iterator
+from collections.abc import Iterator
 from unittest.mock import Mock, patch
 
 import aiohttp
@@ -27,7 +27,6 @@ def deconz_called_with(mock_aioresponse):
     def verify_call(method: str, path: str, **kwargs: dict) -> bool:
         """Verify expected data was provided with a request to aioresponse."""
         for req, call_list in mock_aioresponse.requests.items():
-
             if method != req[0]:
                 continue
 
