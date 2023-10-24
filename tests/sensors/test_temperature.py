@@ -1,7 +1,4 @@
-"""Test pydeCONZ temperature sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.temperature tests/sensors/test_temperature.py
-"""
+"""Test pydeCONZ temperature sensor."""
 
 DATA = {
     "config": {

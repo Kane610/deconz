@@ -1,7 +1,4 @@
-"""Test pydeCONZ configuration tool.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz.models.light.configuration_tool tests/lights/test_configuration_tool.py
-"""
+"""Test pydeCONZ configuration tool."""
 
 DATA = {
     "etag": "26839cb118f5bf7ba1f2108256644010",

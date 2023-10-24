@@ -99,7 +99,8 @@ class AncillaryControl(SensorBase):
     def panel(self) -> AncillaryControlPanel | None:
         """Mirror of alarm system state.armstate attribute.
 
-        It reflects what is shown on the panel (when activated by the keypad’s proximity sensor).
+        It reflects what is shown on the panel
+        (when activated by the keypad’s proximity sensor).
         """
         if "panel" in self.raw["state"]:
             return AncillaryControlPanel(self.raw["state"]["panel"])

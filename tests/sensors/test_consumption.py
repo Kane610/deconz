@@ -1,7 +1,4 @@
-"""Test pydeCONZ consumption sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.consumption tests/sensors/test_consumption.py
-"""
+"""Test pydeCONZ consumption sensor."""
 
 DATA = {
     "config": {

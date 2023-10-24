@@ -1,7 +1,4 @@
-"""Test pydeCONZ range extender.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz.models.light.range_extender tests/lights/test_range_extender.py
-"""
+"""Test pydeCONZ range extender."""
 
 DATA = {
     "etag": "62a220a6141a5956a6916633cad0d56f",

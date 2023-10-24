@@ -402,7 +402,7 @@ class Thermostat(SensorBase):
 
     @property
     def window_open_detection(self) -> bool | None:
-        """Set if window open detection shall be active or inactive for Tuya thermostats.
+        """Set window open detection should be active or inactive for Tuya thermostats.
 
         Device dependent and only exposed for devices supporting it.
         """

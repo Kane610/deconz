@@ -635,7 +635,6 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
 
     def __init__(self, gateway: "DeconzSession") -> None:
         """Initialize sensor manager."""
-
         self.air_purifier = AirPurifierHandler(gateway, grouped=True)
         self.air_quality = AirQualityHandler(gateway, grouped=True)
         self.alarm = AlarmHandler(gateway, grouped=True)

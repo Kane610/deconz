@@ -1,7 +1,4 @@
-"""Test pydeCONZ moisture.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.moisture tests/sensors/test_moisture.py
-"""
+"""Test pydeCONZ moisture."""
 
 DATA = {
     "config": {

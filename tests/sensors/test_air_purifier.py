@@ -1,7 +1,4 @@
-"""Test pydeCONZ air purifier.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.air_purifier tests/sensors/test_air_purifier.py
-"""
+"""Test pydeCONZ air purifier."""
 
 from pydeconz.models.sensor.air_purifier import AirPurifierFanMode
 

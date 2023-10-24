@@ -1,7 +1,4 @@
-"""Test pydeCONZ air quality sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.air_quality tests/sensors/test_air_quality.py
-"""
+"""Test pydeCONZ air quality sensor."""
 
 import pytest
 

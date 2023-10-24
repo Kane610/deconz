@@ -1,7 +1,4 @@
-"""Test pydeCONZ alarm.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.alarm tests/sensors/test_alarm.py
-"""
+"""Test pydeCONZ alarm."""
 
 DATA = {
     "config": {

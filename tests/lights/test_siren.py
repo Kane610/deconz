@@ -1,7 +1,4 @@
-"""Test pydeCONZ siren.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz.models.light.siren tests/lights/test_siren.py
-"""
+"""Test pydeCONZ siren."""
 
 from unittest.mock import Mock
 

@@ -1,7 +1,4 @@
-"""Test pydeCONZ pressure sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.pressure tests/sensors/test_pressure.py
-"""
+"""Test pydeCONZ pressure sensor."""
 
 DATA = {
     "config": {

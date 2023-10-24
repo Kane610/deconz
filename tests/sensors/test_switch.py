@@ -1,7 +1,4 @@
-"""Test pydeCONZ switch.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.switch tests/sensors/test_switch.py
-"""
+"""Test pydeCONZ switch."""
 
 from pydeconz.models.sensor.switch import (
     SwitchDeviceMode,

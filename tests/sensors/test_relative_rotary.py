@@ -1,7 +1,4 @@
-"""Test pydeCONZ relative rotary sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.relative_rotary tests/sensors/test_relative_rotary.py
-"""
+"""Test pydeCONZ relative rotary sensor."""
 
 from pydeconz.models.sensor.relative_rotary import RelativeRotaryEvent
 

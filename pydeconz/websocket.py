@@ -152,7 +152,7 @@ class WSClient:
         """
         if self._state == State.RETRYING and self._previous_state == State.RUNNING:
             LOGGER.info(
-                "Reconnecting to deCONZ (%s) failed, scheduling retry at an interval of %i seconds",
+                "Reconnecting to deCONZ (%s) failed, retrying in %i seconds",
                 self.host,
                 RETRY_TIMER,
             )

@@ -1,7 +1,4 @@
-"""Test pydeCONZ generic flag sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.generic_flag tests/sensors/test_generic_flag.py
-"""
+"""Test pydeCONZ generic flag sensor."""
 
 DATA = {
     "config": {

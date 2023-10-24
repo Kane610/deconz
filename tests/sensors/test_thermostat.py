@@ -1,7 +1,4 @@
-"""Test pydeCONZ thermostat.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.thermostat tests/sensors/test_thermostat.py
-"""
+"""Test pydeCONZ thermostat."""
 
 import pytest
 
@@ -154,7 +151,8 @@ async def test_handler_thermostat(mock_aioresponse, deconz_session, deconz_calle
 async def test_sensor_danfoss_thermostat(deconz_sensor):
     """Verify that Danfoss thermostat works.
 
-    Danfoss thermostat is the simplest kind with only control over temperaturdeconz_sensore.
+    Danfoss thermostat is the simplest kind with
+    only control over temperaturdeconz_sensor.
     """
     sensor = await deconz_sensor(DATA)
 

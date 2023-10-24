@@ -1,7 +1,4 @@
-"""Test pydeCONZ light level.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.light_level tests/sensors/test_light_level.py
-"""
+"""Test pydeCONZ light level."""
 
 DATA = {
     "config": {

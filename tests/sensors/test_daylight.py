@@ -1,7 +1,4 @@
-"""Test pydeCONZ daylight sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.daylight tests/sensors/test_daylight.py
-"""
+"""Test pydeCONZ daylight sensor."""
 
 from pydeconz.models.sensor.daylight import DayLightStatus
 
