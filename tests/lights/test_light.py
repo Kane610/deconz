@@ -255,7 +255,7 @@ ENUM_PROPERTY_DATA = [
 ]
 
 
-@pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
+@pytest.mark.parametrize(("path", "property", "data"), ENUM_PROPERTY_DATA)
 async def test_enum_light_properties(deconz_light, path, property, data):
     """Verify enum properties return expected values or None."""
     light = await deconz_light({"config": {}, "state": {}, "type": "Color light"})

@@ -358,7 +358,7 @@ PROPERTY_DATA = [
 ]
 
 
-@pytest.mark.parametrize("path, property, data", PROPERTY_DATA)
+@pytest.mark.parametrize(("path", "property", "data"), PROPERTY_DATA)
 async def test_thermostat_properties(deconz_sensor, path, property, data):
     """Verify normal thermostat properties."""
     sensor = await deconz_sensor({"config": {}, "state": {}, "type": "ZHAThermostat"})
@@ -417,7 +417,7 @@ ENUM_PROPERTY_DATA = [
 ]
 
 
-@pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
+@pytest.mark.parametrize(("path", "property", "data"), ENUM_PROPERTY_DATA)
 async def test_enum_thermostat_properties(deconz_sensor, path, property, data):
     """Verify enum properties return expected values or None."""
     sensor = await deconz_sensor({"config": {}, "state": {}, "type": "ZHAThermostat"})
@@ -458,7 +458,7 @@ SCALED_PROPERTY_DATA = [
 ]
 
 
-@pytest.mark.parametrize("path, property, data", SCALED_PROPERTY_DATA)
+@pytest.mark.parametrize(("path", "property", "data"), SCALED_PROPERTY_DATA)
 async def test_scaled_thermostat_properties(deconz_sensor, path, property, data):
     """Verify the scaling properties of thermostat."""
     sensor = await deconz_sensor({"config": {}, "state": {}, "type": "ZHAThermostat"})

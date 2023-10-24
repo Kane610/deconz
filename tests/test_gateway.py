@@ -16,7 +16,7 @@ from pydeconz.models.event import EventType
 from pydeconz.websocket import Signal, State
 
 
-@pytest.fixture
+@pytest.fixture()
 def count_subscribers(deconz_session) -> int:
     """Count the amount of subscribers in all handlers."""
 
@@ -43,7 +43,7 @@ def count_subscribers(deconz_session) -> int:
 
         return subscribers
 
-    yield calculate
+    return calculate
 
 
 async def test_websocket_not_setup(deconz_session, mock_wsclient):
@@ -259,7 +259,7 @@ async def test_session_handler(deconz_session):
 
 
 @pytest.mark.parametrize(
-    "state, value", [(State.RUNNING, True), (State.STOPPED, False)]
+    ("state", "value"), [(State.RUNNING, True), (State.STOPPED, False)]
 )
 async def test_session_handler_state_change(
     deconz_session, mock_websocket_state_change, state, value

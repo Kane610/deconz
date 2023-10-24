@@ -48,7 +48,7 @@ DATA_ONLY_POWER = {
 
 
 @pytest.mark.parametrize(
-    "input, expected",
+    ("input", "expected"),
     [
         (
             DATA,

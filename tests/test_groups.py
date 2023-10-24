@@ -200,7 +200,7 @@ ENUM_PROPERTY_DATA = [
 ]
 
 
-@pytest.mark.parametrize("path, property, data", ENUM_PROPERTY_DATA)
+@pytest.mark.parametrize(("path", "property", "data"), ENUM_PROPERTY_DATA)
 async def test_enum_group_properties(deconz_refresh_state, path, property, data):
     """Verify enum properties return expected values or None."""
     deconz_session = await deconz_refresh_state(
@@ -219,7 +219,7 @@ async def test_enum_group_properties(deconz_refresh_state, path, property, data)
 
 
 @pytest.mark.parametrize(
-    "light_state, expected_group_state",
+    ("light_state", "expected_group_state"),
     [
         (
             {
