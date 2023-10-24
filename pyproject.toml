@@ -8,6 +8,8 @@ target-version = "py310"
 select = [
     "I",  # isort
     "RUF006", # Store a reference to the return value of asyncio.create_task
+    "UP",  # pyupgrade
+    "W",   # pycodestyle
 ]
 
 [tool.ruff.isort]

@@ -1,8 +1,15 @@
 """API handler base classes."""
 
-from collections.abc import Callable, ItemsView, ValuesView
+from collections.abc import (
+    Callable,
+    ItemsView,
+    Iterable,
+    Iterator,
+    KeysView,
+    ValuesView,
+)
 import itertools
-from typing import TYPE_CHECKING, Any, Generic, Iterable, Iterator, KeysView
+from typing import TYPE_CHECKING, Any, Generic
 
 from ..models import DataResource, ResourceGroup, ResourceType
 from ..models.event import Event, EventType

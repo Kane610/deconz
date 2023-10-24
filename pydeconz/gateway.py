@@ -1,9 +1,10 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 from asyncio import CancelledError, Task, create_task, sleep
+from collections.abc import Callable
 import logging
 from pprint import pformat
-from typing import Any, Callable
+from typing import Any
 
 import aiohttp
 
@@ -182,7 +183,7 @@ class DeconzSession:
             async with self.session.request(method, url, json=json) as res:
                 if res.content_type != "application/json":
                     raise ResponseError(
-                        "Invalid content type: {} ({})".format(res.content_type, res)
+                        f"Invalid content type: {res.content_type} ({res})"
                     )
 
                 response = await res.json()
@@ -194,7 +195,7 @@ class DeconzSession:
 
         except aiohttp.client_exceptions.ClientError as err:
             raise RequestError(
-                "Error requesting data from {}: {}".format(self.host, err)
+                f"Error requesting data from {self.host}: {err}"
             ) from None
 
     async def session_handler(self, signal: Signal) -> None:
