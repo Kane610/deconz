@@ -23,9 +23,9 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r requirements-test.txt
-      - name: Lint with Ruff
+      - name: Check lint with Ruff
         run: |
-          ruff check pydeconz
+          ruff check pydeconz tests
       - name: Lint with Flake8
         run: |
           flake8 pydeconz
