@@ -47,7 +47,7 @@ async def delete_all_keys(
     response = await request(session.get, url)
 
     api_keys.append(api_key)
-    for key in response["whitelist"].keys():
+    for key in response["whitelist"]:
         if key not in api_keys:
             await delete_api_key(session, host, port, key)
 
