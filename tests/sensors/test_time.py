@@ -1,7 +1,4 @@
-"""Test pydeCONZ time sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.time tests/sensors/test_time.py
-"""
+"""Test pydeCONZ time sensor."""
 
 DATA = {
     "config": {

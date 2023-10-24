@@ -15,7 +15,6 @@ async def test_create_alarm_system(
     mock_aioresponse, deconz_refresh_state, deconz_called_with
 ):
     """Verify that alarm system works."""
-
     deconz_session = await deconz_refresh_state(
         alarm_systems={
             "0": {

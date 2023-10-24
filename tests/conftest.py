@@ -87,7 +87,6 @@ def mock_wsclient():
 @pytest.fixture()
 def mock_websocket_event(deconz_session, mock_wsclient):
     """No real websocket allowed."""
-
     deconz_session.connection_status_callback = Mock()
     deconz_session.start(websocketport=443)
 
@@ -134,7 +133,6 @@ def mock_websocket_event(deconz_session, mock_wsclient):
 @pytest.fixture()
 def mock_websocket_state_change(deconz_session, mock_wsclient):
     """No real websocket allowed."""
-
     deconz_session.connection_status_callback = Mock()
     deconz_session.start(websocketport=443)
 

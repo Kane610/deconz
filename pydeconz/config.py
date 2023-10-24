@@ -301,7 +301,7 @@ class Config:
             Set the zigbeechannel of the gateway.
             Notify other Zigbee devices also to change their channel.
         - websocket_notify_all [bool] default True
-            When true all state changes will be signalled through the websocket connection.
+            When true all state changes will be sent over the websocket connection.
         """
         data = {
             key: value

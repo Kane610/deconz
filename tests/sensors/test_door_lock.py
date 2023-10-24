@@ -1,7 +1,4 @@
-"""Test pydeCONZ door lock.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.door_lock tests/sensors/test_door_lock.py
-"""
+"""Test pydeCONZ door lock."""
 
 from pydeconz.models.sensor.door_lock import DoorLockLockState
 

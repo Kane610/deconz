@@ -1,6 +1,6 @@
 """Test pydeCONZ utilities.
 
- pytest --cov-report term-missing --cov=pydeconz.utils tests/test_utils.py
+pytest --cov-report term-missing --cov=pydeconz.utils tests/test_utils.py
 """
 
 from unittest.mock import AsyncMock, Mock, patch

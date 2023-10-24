@@ -1,7 +1,4 @@
-"""Test pydeCONZ generic status sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.generic_status tests/sensors/test_generic_status.py
-"""
+"""Test pydeCONZ generic status sensor."""
 
 DATA = {
     "config": {

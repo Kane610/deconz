@@ -232,7 +232,6 @@ async def test_request(mock_aioresponse, deconz_session):
 
 async def test_session_handler_on_uninitialized_websocket(deconz_session):
     """Test session_handler is not called when self.websocket is None."""
-
     # Event handler not called when self.websocket is None
 
     with patch.object(
@@ -244,7 +243,6 @@ async def test_session_handler_on_uninitialized_websocket(deconz_session):
 
 async def test_session_handler(deconz_session):
     """Test session_handler works."""
-
     # Mock websocket
 
     deconz_session.websocket = Mock()

@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 def new_device_callback(event: EventType, id: str) -> None:
     """Signal new device is available."""
-    LOGGER.info(f"{event}, {id}")
+    LOGGER.info("%s, %s", event, id)
 
 
 async def deconz_gateway(
@@ -92,7 +92,7 @@ if __name__ == "__main__":
         loglevel = logging.DEBUG
     logging.basicConfig(format="%(message)s", level=loglevel)
 
-    LOGGER.info(f"{args.host}, {args.port}, {args.api_key}")
+    LOGGER.info("%s, %s, %s", args.host, args.port, args.api_key)
 
     try:
         asyncio.run(

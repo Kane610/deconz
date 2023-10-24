@@ -1,7 +1,4 @@
-"""Test pydeCONZ power sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.power tests/sensors/test_power.py
-"""
+"""Test pydeCONZ power sensor."""
 
 import pytest
 

@@ -1,7 +1,4 @@
-"""Test pydeCONZ vibration sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.vibration tests/sensors/test_vibration.py
-"""
+"""Test pydeCONZ vibration sensor."""
 
 from unittest.mock import Mock
 

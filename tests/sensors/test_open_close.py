@@ -1,7 +1,4 @@
-"""Test pydeCONZ open close sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.open_close tests/sensors/test_open_close.py
-"""
+"""Test pydeCONZ open close sensor."""
 
 DATA = {
     "config": {

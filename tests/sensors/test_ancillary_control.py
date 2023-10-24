@@ -1,7 +1,4 @@
-"""Test pydeCONZ ancillary control.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.ancillary_control tests/sensors/test_ancillary_control.py
-"""
+"""Test pydeCONZ ancillary control."""
 
 import pytest
 

@@ -1,7 +1,4 @@
-"""Test pydeCONZ carbon monoxide sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.carbon_monoxide tests/sensors/test_carbon_monoxide.py
-"""
+"""Test pydeCONZ carbon monoxide sensor."""
 
 DATA = {
     "config": {

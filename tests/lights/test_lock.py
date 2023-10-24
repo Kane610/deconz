@@ -1,7 +1,4 @@
-"""Test pydeCONZ lock.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.lights --cov=pydeconz.models.light.lock tests/lights/test_lock.py
-"""
+"""Test pydeCONZ lock."""
 
 from unittest.mock import Mock
 

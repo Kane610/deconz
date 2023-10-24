@@ -1,7 +1,4 @@
-"""Test pydeCONZ battery.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.battery tests/sensors/test_battery.py
-"""
+"""Test pydeCONZ battery."""
 
 DATA = {
     "config": {

@@ -1,7 +1,4 @@
-"""Test pydeCONZ water sensor.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.water tests/sensors/test_water.py
-"""
+"""Test pydeCONZ water sensor."""
 
 DATA = {
     "config": {

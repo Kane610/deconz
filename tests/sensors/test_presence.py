@@ -1,7 +1,4 @@
-"""Test pydeCONZ presence.
-
-pytest --cov-report term-missing --cov=pydeconz.interfaces.sensors --cov=pydeconz.models.sensor.presence tests/sensors/test_presence.py
-"""
+"""Test pydeCONZ presence."""
 
 from pydeconz.models.sensor.presence import (
     PresenceConfigDeviceMode,
