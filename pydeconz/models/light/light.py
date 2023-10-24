@@ -204,7 +204,7 @@ class LightEffect(enum.Enum):
     SPARKLE = "sparkle"
     SUNRISE = "sunrise"
 
-    # Specific to Lidl christmas light
+    # Specific to Lidl christmas light (TS0601)
 
     CARNIVAL = "carnival"
     COLLIDE = "collide"
