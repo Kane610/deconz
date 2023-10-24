@@ -131,7 +131,7 @@ class APIHandler(Generic[DataResource]):
         """Return API items."""
         return self._items.values()
 
-    def get(self, id: str, default: Any = None) -> DataResource | None:
+    def get(self, id: str, default: Any = None) -> DataResource | Any | None:
         """Get API item based on key, if no match return default."""
         return self._items.get(id, default)
 

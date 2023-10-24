@@ -3,7 +3,7 @@
 from collections.abc import Awaitable, Callable
 import enum
 import logging
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from .utils import normalize_bridge_id
 
@@ -235,7 +235,7 @@ class Config:
     @property
     def whitelist(self) -> dict[str, Any]:
         """Array of whitelisted API keys."""
-        return self.raw.get("whitelist", {})
+        return cast(dict[str, Any], self.raw.get("whitelist", {}))
 
     @property
     def zigbee_channel(self) -> ConfigZigbeeChannel:
