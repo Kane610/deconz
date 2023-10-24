@@ -1,7 +1,8 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from collections.abc import Callable
 import logging
-from typing import Any, Callable, Final, TypedDict
+from typing import Any, Final, TypedDict
 
 import aiohttp
 
@@ -95,7 +96,7 @@ async def request(
         res = await session(url, **kwargs)
 
         if res.content_type != "application/json":
-            raise ResponseError("Invalid content type: {}".format(res.content_type))
+            raise ResponseError(f"Invalid content type: {res.content_type}")
 
         response = await res.json()
         LOGGER.debug("HTTP request response: %s", response)
@@ -105,9 +106,7 @@ async def request(
         return response
 
     except aiohttp.client_exceptions.ClientError as err:
-        raise RequestError(
-            "Error requesting data from {}: {}".format(url, err)
-        ) from None
+        raise RequestError(f"Error requesting data from {url}: {err}") from None
 
 
 def _raise_on_error(data: list[dict[str, Any]] | dict[str, Any]) -> None:

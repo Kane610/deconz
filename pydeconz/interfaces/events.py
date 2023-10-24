@@ -1,7 +1,8 @@
 """Mange events from deCONZ."""
 
+from collections.abc import Callable
 import logging
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from ..models import ResourceGroup
 from ..models.event import Event, EventType
