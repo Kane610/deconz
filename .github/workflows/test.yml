@@ -25,9 +25,9 @@ jobs:
       - name: Check lint with Ruff
         run: |
           ruff check pydeconz tests
-      - name: Check formatting with Black
+      - name: Check formatting with ruff
         run: |
-          black pydeconz --check
+          ruff format --check pydeconz tests
       - name: Check typing with mypy
         run: |
           mypy pydeconz
