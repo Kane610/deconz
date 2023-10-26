@@ -21,8 +21,7 @@ jobs:
           python-version: "3.10"
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install -r requirements-test.txt
+          pip install .[requirements] .[requirements_test]
       - name: Check lint with Ruff
         run: |
           ruff check pydeconz tests
