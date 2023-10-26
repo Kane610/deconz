@@ -16,7 +16,7 @@ from pydeconz.models.event import EventType
 from pydeconz.websocket import Signal, State
 
 
-@pytest.fixture()
+@pytest.fixture
 def count_subscribers(deconz_session) -> int:
     """Count the amount of subscribers in all handlers."""
 

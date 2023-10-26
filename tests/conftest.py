@@ -13,14 +13,14 @@ from pydeconz.models.event import EventType
 from pydeconz.websocket import Signal
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_aioresponse():
     """Mock a web request and provide a response."""
     with aioresponses() as m:
         yield m
 
 
-@pytest.fixture()
+@pytest.fixture
 def deconz_called_with(mock_aioresponse):
     """Verify deCONZ call was made with the expected parameters."""
 
@@ -42,7 +42,7 @@ def deconz_called_with(mock_aioresponse):
     return verify_call
 
 
-@pytest.fixture()
+@pytest.fixture
 async def deconz_session() -> Iterator[DeconzSession]:
     """Return deCONZ gateway session.
 
@@ -54,7 +54,7 @@ async def deconz_session() -> Iterator[DeconzSession]:
     await session.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def deconz_refresh_state(mock_aioresponse, deconz_session) -> Iterator[DeconzSession]:
     """Comfort fixture to initialize deCONZ session."""
 
@@ -77,14 +77,14 @@ def deconz_refresh_state(mock_aioresponse, deconz_session) -> Iterator[DeconzSes
     return data_to_deconz_session
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_wsclient():
     """No real websocket allowed."""
     with patch("pydeconz.gateway.WSClient") as mock:
         yield mock
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_websocket_event(deconz_session, mock_wsclient):
     """No real websocket allowed."""
     deconz_session.connection_status_callback = Mock()
@@ -130,7 +130,7 @@ def mock_websocket_event(deconz_session, mock_wsclient):
     return signal_new_event
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_websocket_state_change(deconz_session, mock_wsclient):
     """No real websocket allowed."""
     deconz_session.connection_status_callback = Mock()
