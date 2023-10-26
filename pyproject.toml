@@ -1,3 +1,9 @@
+[tool.coverage.report]
+fail_under = 95
+exclude_also = [
+    "if TYPE_CHECKING:"
+]
+
 [tool.mypy]
 python_version = "3.10"
 check_untyped_defs = true
@@ -17,7 +23,10 @@ warn_unused_configs = true
 warn_unused_ignores = true
 
 [tool.pytest.ini_options]
+addopts = "--cov=pydeconz --cov-report term-missing"
 asyncio_mode = "auto"
+log_cli = false
+log_cli_level = "DEBUG"
 testpaths = ["tests"]
 
 [tool.ruff]
@@ -75,6 +84,9 @@ ignore = [
     "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
     # "W191",  # Checks for indentation that uses tabs
 ]
+
+[tool.ruff.flake8-pytest-style]
+fixture-parentheses = false
 
 [tool.ruff.isort]
  force-sort-within-sections = true
