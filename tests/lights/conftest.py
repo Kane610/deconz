@@ -3,7 +3,7 @@
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def deconz_light(deconz_refresh_state):
     """Comfort fixture to initialize deCONZ light."""
 
