@@ -1,3 +1,64 @@
+[build-system]
+requires = ["setuptools==68.0.0", "wheel==0.40.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name        = "pydeconz"
+version     = "113"
+license     = {text = "MIT"}
+description = "Python library for communicating with deCONZ REST-API"
+readme      = "README.rst"
+authors     = [{name = "Robert Svensson", email = "Kane610@users.noreply.github.com"}]
+keywords    = ["deconz", "zigbee", "homeassistant"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Home Automation",
+]
+requires-python = ">=3.10.0"
+dependencies    = [
+    "aiohttp>3.8",
+    "orjson>3.9",
+    "segno>=1.5.2",
+]
+
+[project.optional-dependencies]
+requirements = [
+    "aiohttp~=3.8.5",
+    "orjson~=3.9.5",
+    "segno==1.5.2",
+]
+requirements_test = [
+    "aioresponses==0.7.4",
+    "black==23.10.0",
+    "mypy==1.6.1",
+    "pytest==7.4.2",
+    "pytest-aiohttp==1.0.5",
+    "pytest-cov==4.1.0",
+    "ruff==0.1.2",
+    "types-orjson==3.6.2",
+]
+requirements_dev = [
+    "pre-commit==3.5.0"
+]
+
+[project.urls]
+"Source Code" = "https://github.com/Kane610/deconz"
+"Bug Reports" = "https://github.com/Kane610/deconz/issues"
+"Forum" = "https://community.home-assistant.io/t/deconz-official-thread/"
+
+[project.scripts]
+pydeconz = "pydeconz.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["pydeconz*"]
+
+[tool.setuptools.package-data]
+"aiounifi" = ["py.typed"]
+
 [tool.coverage.report]
 fail_under = 95
 exclude_also = [

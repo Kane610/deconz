@@ -9,5 +9,5 @@ cd "$(dirname "$0")"
 python3 -m venv venv
 source venv/bin/activate
 
-python3 -m pip install -r requirements.txt -r requirements-test.txt -r requirements-dev.txt
+python3 -m pip install .[requirements] .[requirements_test] .[requirements_dev]
 pre-commit install
