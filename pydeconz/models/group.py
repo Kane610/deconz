@@ -1,8 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import Final, Literal
-
-from typing_extensions import NotRequired, TypedDict
+from typing import Final, Literal, NotRequired, TypedDict
 
 from . import ResourceGroup
 from .deconz_device import DeconzDevice
