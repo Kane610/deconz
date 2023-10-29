@@ -1,5 +1,6 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from dataclasses import dataclass
 import logging
 from typing import Literal, TypedDict
 
@@ -31,6 +32,17 @@ class TypedParticulateMatter(TypedDict):
     state: TypedParticulateMatterState
 
 
+@dataclass
+class Capabilities:
+    """Capabilities description."""
+
+    max: int
+    min: int
+    quantity: Literal["density"]
+    substance: Literal["PM2.5"]
+    unit: Literal["ug/m^3"]
+
+
 class ParticulateMatter(SensorBase):
     """Particulate matter sensor."""
 
@@ -42,31 +54,6 @@ class ParticulateMatter(SensorBase):
         return self.raw["state"]["measured_value"]
 
     @property
-    def max(self) -> int:
-        """Capability max value."""
-        return self.capabilities["max"]
-
-    @property
-    def min(self) -> int:
-        """Capability min value."""
-        return self.capabilities["min"]
-
-    @property
-    def quantity(self) -> str:
-        """Capability quantity value."""
-        return self.capabilities["quantity"]
-
-    @property
-    def substance(self) -> str:
-        """Capability substance value."""
-        return self.capabilities["substance"]
-
-    @property
-    def unit(self) -> str:
-        """Capability unit value."""
-        return self.capabilities["unit"]
-
-    @property
-    def capabilities(self) -> TypedParticulateMatterCapabilities:
+    def capabilities(self) -> Capabilities:
         """Sensor capabilities."""
-        return self.raw["capabilities"]["measured_value"]
+        return Capabilities(**self.raw["capabilities"]["measured_value"])
