@@ -1,8 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
 import enum
-
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from . import LightBase
 
