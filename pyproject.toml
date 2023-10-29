@@ -54,7 +54,7 @@ pydeconz = "pydeconz.__main__:main"
 include = ["pydeconz*"]
 
 [tool.setuptools.package-data]
-"aiounifi" = ["py.typed"]
+"pydeconz" = ["py.typed"]
 
 [tool.coverage.report]
 fail_under = 95
