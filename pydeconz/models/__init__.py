@@ -115,6 +115,9 @@ class ResourceType(Enum):
     ZHA_OPEN_CLOSE = "ZHAOpenClose"
     CLIP_OPEN_CLOSE = "CLIPOpenClose"
 
+    # Particulate matter
+    ZHA_PARTICULATE_MATTER = "ZHAParticulateMatter"
+
     # Power
     ZHA_POWER = "ZHAPower"
 
