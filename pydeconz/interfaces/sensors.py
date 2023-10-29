@@ -19,6 +19,7 @@ from ..models.sensor.humidity import Humidity
 from ..models.sensor.light_level import LightLevel
 from ..models.sensor.moisture import Moisture
 from ..models.sensor.open_close import OpenClose
+from ..models.sensor.particulate_matter import ParticulateMatter
 from ..models.sensor.power import Power
 from ..models.sensor.presence import (
     Presence,
@@ -315,6 +316,14 @@ class OpenCloseHandler(APIHandler[OpenClose]):
         ResourceType.CLIP_OPEN_CLOSE,
     }
     item_cls = OpenClose
+
+
+class ParticulateMatterHandler(APIHandler[ParticulateMatter]):
+    """Handler for particulate matter sensor."""
+
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_PARTICULATE_MATTER
+    item_cls = ParticulateMatter
 
 
 class PowerHandler(APIHandler[Power]):
@@ -615,6 +624,7 @@ SensorResources = (
     | LightLevel
     | Moisture
     | OpenClose
+    | ParticulateMatter
     | Power
     | Presence
     | Pressure
@@ -651,6 +661,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
         self.light_level = LightLevelHandler(gateway, grouped=True)
         self.open_close = OpenCloseHandler(gateway, grouped=True)
         self.moisture = MoistureHandler(gateway, grouped=True)
+        self.particulate_matter = ParticulateMatterHandler(gateway, grouped=True)
         self.power = PowerHandler(gateway, grouped=True)
         self.presence = PresenceHandler(gateway, grouped=True)
         self.pressure = PressureHandler(gateway, grouped=True)
@@ -679,6 +690,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
             self.light_level,
             self.moisture,
             self.open_close,
+            self.particulate_matter,
             self.power,
             self.presence,
             self.pressure,

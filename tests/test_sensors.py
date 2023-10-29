@@ -41,7 +41,7 @@ async def test_create_all_sensors(deconz_refresh_state):
         },
     )
     sensors = deconz_session.sensors
-    assert len(sensors._handlers) == 26
+    assert len(sensors._handlers) == 27
     assert sensors["0"].type == ResourceType.ZHA_AIR_PURIFIER.value
     assert sensors["1"].type == ResourceType.ZHA_AIR_QUALITY.value
     assert sensors["2"].type == ResourceType.ZHA_ALARM.value
