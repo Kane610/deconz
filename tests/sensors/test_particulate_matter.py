@@ -37,6 +37,11 @@ async def test_sensor_particulate_matter(deconz_sensor):
     sensor = await deconz_sensor(DATA)
 
     assert sensor.measured_value == 1
+    assert sensor.max == 999
+    assert sensor.min == 0
+    assert sensor.quantity == "density"
+    assert sensor.substance == "PM2.5"
+    assert sensor.unit == "ug/m^3"
     assert sensor.capabilities == {
         "max": 999,
         "min": 0,

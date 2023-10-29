@@ -42,6 +42,31 @@ class ParticulateMatter(SensorBase):
         return self.raw["state"]["measured_value"]
 
     @property
+    def max(self) -> int:
+        """Capability max value."""
+        return self.capabilities["max"]
+
+    @property
+    def min(self) -> int:
+        """Capability min value."""
+        return self.capabilities["min"]
+
+    @property
+    def quantity(self) -> str:
+        """Capability quantity value."""
+        return self.capabilities["quantity"]
+
+    @property
+    def substance(self) -> str:
+        """Capability substance value."""
+        return self.capabilities["substance"]
+
+    @property
+    def unit(self) -> str:
+        """Capability unit value."""
+        return self.capabilities["unit"]
+
+    @property
     def capabilities(self) -> TypedParticulateMatterCapabilities:
         """Sensor capabilities."""
         return self.raw["capabilities"]["measured_value"]
