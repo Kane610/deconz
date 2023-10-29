@@ -1,0 +1,11 @@
+{
+  "editor.defaultFormatter": "charliermarsh.ruff",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/venv",
+  "python.testing.pytestEnabled": true,
+  "python.terminal.activateEnvironment": true
+ }

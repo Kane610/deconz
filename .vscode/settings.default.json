@@ -7,8 +7,5 @@
   "files.defaultLanguage": "python",
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
-  "files.trimTrailingWhitespace": true,
-  "python.formatting.provider": "black",
-  "python.linting.flake8Enabled": true,
-  "python.testing.pytestEnabled": true
+  "files.trimTrailingWhitespace": true
 }
