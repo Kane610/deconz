@@ -43,7 +43,7 @@ class AncillaryControlPanel(enum.Enum):
     def _missing_(cls, value: object) -> "AncillaryControlPanel":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected panel mode %s", value)
-        return AncillaryControlPanel.UNKNOWN
+        return cls.UNKNOWN
 
 
 class TypedAncillaryControlState(TypedDict):

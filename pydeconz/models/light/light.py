@@ -113,7 +113,7 @@ class LightAlert(enum.Enum):
     def _missing_(cls, value: object) -> "LightAlert":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light alert type %s", value)
-        return LightAlert.UNKNOWN
+        return cls.UNKNOWN
 
 
 class LightColorCapability(enum.IntFlag):
@@ -131,7 +131,7 @@ class LightColorCapability(enum.IntFlag):
     def _missing_(cls, value: object) -> "LightColorCapability":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light color capability %s", value)
-        return LightColorCapability.UNKNOWN
+        return cls.UNKNOWN
 
 
 class LightColorMode(enum.Enum):
@@ -159,7 +159,7 @@ class LightColorMode(enum.Enum):
     def _missing_(cls, value: object) -> "LightColorMode":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light color mode %s", value)
-        return LightColorMode.UNKNOWN
+        return cls.UNKNOWN
 
 
 class LightEffect(enum.Enum):
@@ -227,7 +227,7 @@ class LightEffect(enum.Enum):
     def _missing_(cls, value: object) -> "LightEffect":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light effect type %s", value)
-        return LightEffect.UNKNOWN
+        return cls.UNKNOWN
 
 
 class LightFanSpeed(enum.IntEnum):

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 import enum
-from typing import Any
+from typing import Any, Self
 
 from . import ResourceGroup
 
@@ -92,7 +92,7 @@ class Event:
         return data
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Event":
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create event instance from dict."""
         return cls(
             id=data.get(EventKey.ID.value, ""),

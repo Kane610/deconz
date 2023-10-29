@@ -36,7 +36,7 @@ class ThermostatFanMode(enum.Enum):
     def _missing_(cls, value: object) -> "ThermostatFanMode":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat fan mode %s", value)
-        return ThermostatFanMode.UNKNOWN
+        return cls.UNKNOWN
 
 
 class ThermostatMode(enum.Enum):
@@ -70,7 +70,7 @@ class ThermostatMode(enum.Enum):
     def _missing_(cls, value: object) -> "ThermostatMode":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat mode %s", value)
-        return ThermostatMode.UNKNOWN
+        return cls.UNKNOWN
 
 
 class ThermostatSwingMode(enum.Enum):
@@ -96,7 +96,7 @@ class ThermostatSwingMode(enum.Enum):
     def _missing_(cls, value: object) -> "ThermostatSwingMode":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat swing mode %s", value)
-        return ThermostatSwingMode.UNKNOWN
+        return cls.UNKNOWN
 
 
 class ThermostatPreset(enum.Enum):
@@ -128,7 +128,7 @@ class ThermostatPreset(enum.Enum):
     def _missing_(cls, value: object) -> "ThermostatPreset":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat preset %s", value)
-        return ThermostatPreset.UNKNOWN
+        return cls.UNKNOWN
 
 
 class ThermostatTemperatureMeasurement(enum.Enum):
@@ -150,7 +150,7 @@ class ThermostatTemperatureMeasurement(enum.Enum):
     def _missing_(cls, value: object) -> "ThermostatTemperatureMeasurement":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat temperature measurement %s", value)
-        return ThermostatTemperatureMeasurement.UNKNOWN
+        return cls.UNKNOWN
 
 
 class TypedThermostatConfig(TypedDict):
