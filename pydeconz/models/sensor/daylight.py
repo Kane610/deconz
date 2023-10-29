@@ -33,7 +33,7 @@ class DayLightStatus(enum.IntEnum):
     def _missing_(cls, value: object) -> "DayLightStatus":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected day light value %s", value)
-        return DayLightStatus.UNKNOWN
+        return cls.UNKNOWN
 
 
 DAYLIGHT_STATUS: Final = {

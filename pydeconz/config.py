@@ -27,7 +27,7 @@ class ConfigDeviceName(enum.Enum):
     def _missing_(cls, value: object) -> "ConfigDeviceName":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected config device name %s", value)
-        return ConfigDeviceName.UNKNOWN
+        return cls.UNKNOWN
 
 
 class ConfigNTP(enum.Enum):

@@ -160,4 +160,4 @@ class ResourceType(Enum):
     def _missing_(cls, value: object) -> "ResourceType":
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unsupported device type %s", value)
-        return ResourceType.UNKNOWN
+        return cls.UNKNOWN
