@@ -15,10 +15,10 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Home Automation",
 ]
-requires-python = ">=3.10.0"
+requires-python = ">=3.11.0"
 dependencies    = [
     "aiohttp>3.8",
     "orjson>3.9",
@@ -63,7 +63,7 @@ exclude_also = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -89,7 +89,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 src = ["pydeconz", "tests"]
-target-version = "py310"
+target-version = "py311"
 select = [
     "B002", # Python does not support the unary prefix increment
     "B007", # Loop control variable {name} not used within loop body
