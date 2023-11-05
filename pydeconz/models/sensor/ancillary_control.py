@@ -15,6 +15,7 @@ class AncillaryControlAction(enum.Enum):
     ARMED_AWAY = "armed_away"
     ARMED_NIGHT = "armed_night"
     ARMED_STAY = "armed_stay"
+    ALREADY_DISARMED = "already_disarmed"
     DISARMED = "disarmed"
     EMERGENCY = "emergency"
     FIRE = "fire"
