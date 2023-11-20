@@ -30,7 +30,7 @@ requirements = [
     "orjson~=3.9.5",
 ]
 requirements_test = [
-    "aioresponses==0.7.4",
+    "aioresponses==0.7.5",
     "mypy==1.7.0",
     "pytest==7.4.3",
     "pytest-aiohttp==1.0.5",
