@@ -2,10 +2,10 @@
 
 import argparse
 import asyncio
+from asyncio.timeouts import timeout
 import logging
 
 import aiohttp
-import async_timeout
 
 from pydeconz import errors
 from pydeconz.gateway import DeconzSession
@@ -32,7 +32,7 @@ async def deconz_gateway(
     deconz.subscribe(callback)
 
     try:
-        async with async_timeout.timeout(5):
+        async with timeout(5):
             await deconz.refresh_state()
         return deconz
 
