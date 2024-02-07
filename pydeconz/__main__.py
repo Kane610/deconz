@@ -39,7 +39,7 @@ async def deconz_gateway(
     except errors.Unauthorized:
         LOGGER.exception("Invalid API key for deCONZ gateway")
 
-    except (asyncio.TimeoutError, errors.RequestError):
+    except (TimeoutError, errors.RequestError):
         LOGGER.error("Error connecting to deCONZ gateway")
 
     return None
