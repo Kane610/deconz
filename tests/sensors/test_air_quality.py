@@ -75,7 +75,7 @@ async def test_sensor_air_quality(deconz_sensor):
     """Verify that air quality sensor works."""
     sensor = await deconz_sensor(DATA)
 
-    assert sensor.air_quality == AirQualityValue.POOR.value
+    assert sensor.air_quality == AirQualityValue.POOR
     assert sensor.supports_air_quality is True
     assert sensor.air_quality_ppb == 809
     assert sensor.pm_2_5 is None
@@ -104,7 +104,7 @@ async def test_sensor_air_quality_with_pm2_5(deconz_sensor):
     """Verify that air quality with PM 2.5 sensor works."""
     sensor = await deconz_sensor(DATA_WITH_PM25)
 
-    assert sensor.air_quality == AirQualityValue.EXCELLENT.value
+    assert sensor.air_quality == AirQualityValue.EXCELLENT
     assert sensor.supports_air_quality is True
     assert sensor.air_quality_ppb is None
     assert sensor.pm_2_5 == 8
@@ -114,7 +114,7 @@ async def test_sensor_air_quality_6_in_1_no_aq(deconz_sensor):
     """Verify that air quality 6 in 1 sensor works."""
     sensor = await deconz_sensor(DATA_6_in_1_no_aq)
 
-    assert sensor.air_quality == AirQualityValue.UNKNOWN.value
+    assert sensor.air_quality == AirQualityValue.UNKNOWN
     assert sensor.air_quality_co2 == 325
     assert sensor.air_quality_formaldehyde == 4
     assert sensor.air_quality_ppb == 15
@@ -127,9 +127,9 @@ ENUM_PROPERTY_DATA = [
         ("state", "airquality"),
         "air_quality",
         {
-            "excellent": AirQualityValue.EXCELLENT.value,
-            "unsupported": AirQualityValue.UNKNOWN.value,
-            None: AirQualityValue.UNKNOWN.value,
+            "excellent": AirQualityValue.EXCELLENT,
+            "unsupported": AirQualityValue.UNKNOWN,
+            None: AirQualityValue.UNKNOWN,
         },
     ),
 ]
@@ -142,7 +142,7 @@ async def test_enum_airquality_properties(deconz_sensor, path, property, data):
         {
             "config": {},
             "state": {},
-            "type": ResourceType.ZHA_AIR_QUALITY.value,
+            "type": ResourceType.ZHA_AIR_QUALITY,
         }
     )
 
