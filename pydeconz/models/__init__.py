@@ -1,6 +1,6 @@
 """Data models."""
 
-from enum import Enum
+from enum import StrEnum
 import logging
 from typing import TypeVar
 
@@ -11,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 DataResource = TypeVar("DataResource", bound=APIItem)
 
 
-class ResourceGroup(Enum):
+class ResourceGroup(StrEnum):
     """Primary endpoints resources are exposed from."""
 
     ALARM = "alarmsystems"
@@ -22,7 +22,7 @@ class ResourceGroup(Enum):
     SENSOR = "sensors"
 
 
-class ResourceType(Enum):
+class ResourceType(StrEnum):
     """Resource types."""
 
     # Group resources

@@ -7,7 +7,7 @@ from typing import Any, Self
 from . import ResourceGroup
 
 
-class EventKey(enum.Enum):
+class EventKey(enum.StrEnum):
     """Event keys."""
 
     TYPE = "t"
@@ -30,7 +30,7 @@ class EventKey(enum.Enum):
     SENSOR = "sensor"
 
 
-class EventType(enum.Enum):
+class EventType(enum.StrEnum):
     """The event type of the message."""
 
     ADDED = "added"

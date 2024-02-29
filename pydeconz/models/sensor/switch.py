@@ -6,7 +6,7 @@ from typing import Literal, NotRequired, TypedDict
 from . import SensorBase
 
 
-class SwitchDeviceMode(enum.Enum):
+class SwitchDeviceMode(enum.StrEnum):
     """Different modes for the Hue wall switch module."""
 
     SINGLE_ROCKER = "singlerocker"
@@ -15,7 +15,7 @@ class SwitchDeviceMode(enum.Enum):
     DUAL_PUSH_BUTTON = "dualpushbutton"
 
 
-class SwitchMode(enum.Enum):
+class SwitchMode(enum.StrEnum):
     """For Ubisys S1/S2, operation mode of the switch."""
 
     MOMENTARY = "momentary"

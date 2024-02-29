@@ -22,7 +22,7 @@ class TypedCover(TypedDict):
     state: TypedCoverState
 
 
-class CoverAction(enum.Enum):
+class CoverAction(enum.StrEnum):
     """Possible cover actions."""
 
     CLOSE = enum.auto()

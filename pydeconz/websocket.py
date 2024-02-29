@@ -13,14 +13,14 @@ import orjson
 LOGGER = logging.getLogger(__name__)
 
 
-class Signal(enum.Enum):
+class Signal(enum.StrEnum):
     """What is the content of the callback."""
 
     CONNECTION_STATE = "state"
     DATA = "data"
 
 
-class State(enum.Enum):
+class State(enum.StrEnum):
     """State of the connection."""
 
     NONE = ""

@@ -32,7 +32,7 @@ class TypedAirQuality(TypedDict):
     state: TypedAirQualityState
 
 
-class AirQualityValue(enum.Enum):
+class AirQualityValue(enum.StrEnum):
     """Air quality.
 
     Supported values:

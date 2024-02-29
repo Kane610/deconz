@@ -41,7 +41,7 @@ class TypedAirPurifier(TypedDict):
     state: TypedAirPurifierState
 
 
-class AirPurifierFanMode(enum.Enum):
+class AirPurifierFanMode(enum.StrEnum):
     """Air purifier supported fan modes."""
 
     OFF = "off"

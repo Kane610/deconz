@@ -201,7 +201,7 @@ class GroupedAPIHandler(Generic[DataResource]):
                 return
 
         if (
-            resource_type := ResourceType(raw.get("type"))
+            resource_type := ResourceType(raw.get("type") or "")
         ) not in self._resource_type_to_handler:
             return
 

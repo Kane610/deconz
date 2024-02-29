@@ -79,7 +79,7 @@ class TypedLight(TypedDict):
     state: TypedLightState
 
 
-class LightAlert(enum.Enum):
+class LightAlert(enum.StrEnum):
     """Temporary alert effect.
 
     Supported values:
@@ -134,7 +134,7 @@ class LightColorCapability(enum.IntFlag):
         return cls.UNKNOWN
 
 
-class LightColorMode(enum.Enum):
+class LightColorMode(enum.StrEnum):
     """Color mode of the light.
 
     Supported values:
@@ -162,7 +162,7 @@ class LightColorMode(enum.Enum):
         return cls.UNKNOWN
 
 
-class LightEffect(enum.Enum):
+class LightEffect(enum.StrEnum):
     """Effect of the light.
 
     Supported values:

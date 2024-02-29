@@ -10,7 +10,7 @@ from .api import APIItem
 LOGGER = logging.getLogger(__name__)
 
 
-class AlarmSystemArmAction(enum.Enum):
+class AlarmSystemArmAction(enum.StrEnum):
     """Explicit url path to arm and disarm."""
 
     AWAY = "arm_away"
@@ -19,7 +19,7 @@ class AlarmSystemArmAction(enum.Enum):
     DISARM = "disarm"
 
 
-class AlarmSystemArmMode(enum.Enum):
+class AlarmSystemArmMode(enum.StrEnum):
     """The target arm mode."""
 
     ARMED_AWAY = "armed_away"
@@ -28,7 +28,7 @@ class AlarmSystemArmMode(enum.Enum):
     DISARMED = "disarmed"
 
 
-class AlarmSystemArmState(enum.Enum):
+class AlarmSystemArmState(enum.StrEnum):
     """The current alarm system state."""
 
     ARMED_AWAY = "armed_away"
@@ -43,7 +43,7 @@ class AlarmSystemArmState(enum.Enum):
     IN_ALARM = "in_alarm"
 
 
-class AlarmSystemArmMask(enum.Enum):
+class AlarmSystemArmMask(enum.StrEnum):
     """The target arm mode."""
 
     ARMED_AWAY = "A"
@@ -52,7 +52,7 @@ class AlarmSystemArmMask(enum.Enum):
     NONE = "none"
 
 
-class AlarmSystemDeviceTrigger(enum.Enum):
+class AlarmSystemDeviceTrigger(enum.StrEnum):
     """Specifies arm modes in which the device triggers alarms."""
 
     ACTION = "state/action"
