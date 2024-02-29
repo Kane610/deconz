@@ -47,7 +47,7 @@ class TypedPresence(TypedDict):
     state: TypedPresenceState
 
 
-class PresenceConfigDeviceMode(enum.Enum):
+class PresenceConfigDeviceMode(enum.StrEnum):
     """Device mode.
 
     Supported values:
@@ -73,7 +73,7 @@ class PresenceConfigSensitivity(enum.IntEnum):
     HIGH = 3
 
 
-class PresenceConfigTriggerDistance(enum.Enum):
+class PresenceConfigTriggerDistance(enum.StrEnum):
     """Trigger distance.
 
     Supported values:
@@ -87,7 +87,7 @@ class PresenceConfigTriggerDistance(enum.Enum):
     NEAR = "near"
 
 
-class PresenceStatePresenceEvent(enum.Enum):
+class PresenceStatePresenceEvent(enum.StrEnum):
     """Current activity associated with current presence state.
 
     Supported values:

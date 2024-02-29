@@ -7,7 +7,7 @@ from typing import Any, Self
 from . import ResourceGroup
 
 
-class EventKey(enum.Enum):
+class EventKey(enum.StrEnum):
     """Event keys."""
 
     TYPE = "t"
@@ -30,7 +30,7 @@ class EventKey(enum.Enum):
     SENSOR = "sensor"
 
 
-class EventType(enum.Enum):
+class EventType(enum.StrEnum):
     """The event type of the message."""
 
     ADDED = "added"
@@ -60,12 +60,7 @@ class Event:
         """
         data: dict[str, Any] = {}
 
-        for key in (
-            EventKey.SENSOR.value,
-            EventKey.LIGHT.value,
-            EventKey.ALARM.value,
-            EventKey.GROUP.value,
-        ):
+        for key in (EventKey.SENSOR, EventKey.LIGHT, EventKey.ALARM, EventKey.GROUP):
             if key in self.data:
                 data = self.data[key]
                 break
@@ -81,11 +76,7 @@ class Event:
         """
         data: dict[str, Any] = {}
 
-        for key in (
-            EventKey.STATE.value,
-            EventKey.CONFIG.value,
-            EventKey.NAME.value,
-        ):
+        for key in (EventKey.STATE, EventKey.CONFIG, EventKey.NAME):
             if (value := self.data.get(key)) is not None:
                 data[key] = value
 
@@ -95,10 +86,10 @@ class Event:
     def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create event instance from dict."""
         return cls(
-            id=data.get(EventKey.ID.value, ""),
-            group_id=data.get(EventKey.GROUP_ID.value, ""),
-            scene_id=data.get(EventKey.SCENE_ID.value, ""),
-            resource=ResourceGroup(data[EventKey.RESOURCE.value]),
-            type=EventType(data[EventKey.EVENT.value]),
+            id=data.get(EventKey.ID, ""),
+            group_id=data.get(EventKey.GROUP_ID, ""),
+            scene_id=data.get(EventKey.SCENE_ID, ""),
+            resource=ResourceGroup(data[EventKey.RESOURCE]),
+            type=EventType(data[EventKey.EVENT]),
             data=data,
         )

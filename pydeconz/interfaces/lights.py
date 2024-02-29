@@ -164,11 +164,11 @@ class LightHandler(APIHandler[Light]):
             if value is not None
         }
         if alert is not None:
-            data["alert"] = alert.value
+            data["alert"] = alert
         if effect is not None:
-            data["effect"] = effect.value
+            data["effect"] = effect
         if fan_speed is not None:
-            data["speed"] = fan_speed.value
+            data["speed"] = fan_speed
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/state",
@@ -225,7 +225,7 @@ class SirenHandler(APIHandler[Siren]):
         """
         data: dict[str, int | str] = {}
 
-        data["alert"] = (LightAlert.LONG if on else LightAlert.NONE).value
+        data["alert"] = LightAlert.LONG if on else LightAlert.NONE
         if on and duration is not None:
             data["ontime"] = duration
 

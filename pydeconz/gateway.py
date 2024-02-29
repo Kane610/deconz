@@ -104,12 +104,12 @@ class DeconzSession:
         """Read deCONZ parameters."""
         data = await self.request("get", "")
 
-        self.config.raw.update(data[ResourceGroup.CONFIG.value])
+        self.config.raw.update(data[ResourceGroup.CONFIG])
 
-        self.alarm_systems.process_raw(data.get(ResourceGroup.ALARM.value, {}))
-        self.groups.process_raw(data[ResourceGroup.GROUP.value])
-        self.lights.process_raw(data[ResourceGroup.LIGHT.value])
-        self.sensors.process_raw(data[ResourceGroup.SENSOR.value])
+        self.alarm_systems.process_raw(data.get(ResourceGroup.ALARM, {}))
+        self.groups.process_raw(data[ResourceGroup.GROUP])
+        self.lights.process_raw(data[ResourceGroup.LIGHT])
+        self.sensors.process_raw(data[ResourceGroup.SENSOR])
 
     def subscribe(self, callback: CallbackType) -> UnsubscribeType:
         """Subscribe to status changes for all resources."""

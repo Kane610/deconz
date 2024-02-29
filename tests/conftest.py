@@ -102,8 +102,8 @@ def mock_websocket_event(deconz_session, mock_wsclient):
         """Emit a websocket event signal."""
         event_data = {
             "t": "event",
-            "e": event.value,
-            "r": resource.value,
+            "e": event,
+            "r": resource,
         }
         if resource == ResourceGroup.SCENE:
             assert gid

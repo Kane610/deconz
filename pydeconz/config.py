@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 UNINITIALIZED_BRIDGE_ID: Final = "0000000000000000"
 
 
-class ConfigDeviceName(enum.Enum):
+class ConfigDeviceName(enum.StrEnum):
     """Valid product names of the gateway."""
 
     CONBEE = "ConBee"
@@ -30,21 +30,21 @@ class ConfigDeviceName(enum.Enum):
         return cls.UNKNOWN
 
 
-class ConfigNTP(enum.Enum):
+class ConfigNTP(enum.StrEnum):
     """Timeformat that can be used by other applications."""
 
     SYNCED = "synced"
     UNSYNCED = "unsynced"
 
 
-class ConfigTimeFormat(enum.Enum):
+class ConfigTimeFormat(enum.StrEnum):
     """Tells if the NTP time is "synced" or "unsynced"."""
 
     FORMAT_12H = "12h"
     FORMAT_24H = "24h"
 
 
-class ConfigUpdateChannel(enum.Enum):
+class ConfigUpdateChannel(enum.StrEnum):
     """Available update channels to use with the Gateway."""
 
     ALPHA = "alpha"
@@ -93,7 +93,7 @@ class Config:
 
         Valid values are "ConBee", "RaspBee", "ConBee II" and "RaspBee II".
         """
-        return ConfigDeviceName(self.raw.get("devicename"))
+        return ConfigDeviceName(self.raw.get("devicename") or "")
 
     @property
     def dhcp(self) -> bool | None:
@@ -322,9 +322,9 @@ class Config:
             if value is not None
         }
         if time_format is not None:
-            data["timeformat"] = time_format.value
+            data["timeformat"] = time_format
         if update_channel is not None:
-            data["updatechannel"] = update_channel.value
+            data["updatechannel"] = update_channel
         if zigbee_channel is not None:
-            data["zigbeechannel"] = zigbee_channel.value
+            data["zigbeechannel"] = zigbee_channel
         return await self.request("put", path="/config", json=data)

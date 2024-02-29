@@ -13,8 +13,8 @@ from pydeconz.models.event import Event, EventType
 
 RAW_EVENT = {
     "id": "1",
-    "r": ResourceGroup.LIGHT.value,
-    "e": EventType.ADDED.value,
+    "r": ResourceGroup.LIGHT,
+    "e": EventType.ADDED,
 }
 
 EVENT_HANDLER_DATA = [
@@ -66,8 +66,8 @@ async def test_event_added(resource, event_type, resource_key):
     """Verify added event content."""
     data = {
         "id": "1",
-        "r": resource.value,
-        "e": event_type.value,
+        "r": resource,
+        "e": event_type,
         resource_key: {"k": "v"},
     }
     event = Event.from_dict(data)
@@ -95,8 +95,8 @@ async def test_event_changed(resource, event_type, test_data):
     """Verify changed event content."""
     data = {
         "id": "1",
-        "r": resource.value,
-        "e": event_type.value,
+        "r": resource,
+        "e": event_type,
         **test_data,
     }
     event = Event.from_dict(data)
@@ -124,8 +124,8 @@ async def test_event_deleted(resource, event_type):
     """Verify deleted event content."""
     data = {
         "id": "1",
-        "r": resource.value,
-        "e": event_type.value,
+        "r": resource,
+        "e": event_type,
     }
     event = Event.from_dict(data)
 
@@ -144,8 +144,8 @@ async def test_event_scene_called():
     data = {
         "gid": "1",
         "scid": "2",
-        "r": ResourceGroup.SCENE.value,
-        "e": EventType.SCENE_CALLED.value,
+        "r": ResourceGroup.SCENE,
+        "e": EventType.SCENE_CALLED,
     }
     event = Event.from_dict(data)
 

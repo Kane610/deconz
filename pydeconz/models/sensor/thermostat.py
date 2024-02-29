@@ -9,7 +9,7 @@ from . import SensorBase
 LOGGER = logging.getLogger(__name__)
 
 
-class ThermostatFanMode(enum.Enum):
+class ThermostatFanMode(enum.StrEnum):
     """Fan mode.
 
     Supported values:
@@ -39,7 +39,7 @@ class ThermostatFanMode(enum.Enum):
         return cls.UNKNOWN
 
 
-class ThermostatMode(enum.Enum):
+class ThermostatMode(enum.StrEnum):
     """Set the current operating mode of a thermostat.
 
     Supported values:
@@ -73,7 +73,7 @@ class ThermostatMode(enum.Enum):
         return cls.UNKNOWN
 
 
-class ThermostatSwingMode(enum.Enum):
+class ThermostatSwingMode(enum.StrEnum):
     """Set the AC louvers position.
 
     Supported values:
@@ -99,7 +99,7 @@ class ThermostatSwingMode(enum.Enum):
         return cls.UNKNOWN
 
 
-class ThermostatPreset(enum.Enum):
+class ThermostatPreset(enum.StrEnum):
     """Set the current operating mode for Tuya thermostats.
 
     Supported values:
@@ -131,7 +131,7 @@ class ThermostatPreset(enum.Enum):
         return cls.UNKNOWN
 
 
-class ThermostatTemperatureMeasurement(enum.Enum):
+class ThermostatTemperatureMeasurement(enum.StrEnum):
     """Set the mode of operation for Elko Super TR thermostat.
 
     Supported values:

@@ -9,7 +9,7 @@ from . import SensorBase
 LOGGER = logging.getLogger(__name__)
 
 
-class AncillaryControlAction(enum.Enum):
+class AncillaryControlAction(enum.StrEnum):
     """Last action a user invoked on the keypad."""
 
     ARMED_AWAY = "armed_away"
@@ -23,7 +23,7 @@ class AncillaryControlAction(enum.Enum):
     PANIC = "panic"
 
 
-class AncillaryControlPanel(enum.Enum):
+class AncillaryControlPanel(enum.StrEnum):
     """Mirror of alarm system state.armstate attribute."""
 
     ARMED_AWAY = "armed_away"
