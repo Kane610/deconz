@@ -87,6 +87,7 @@ class ResourceType(Enum):
 
     # Daylight
     DAYLIGHT = "Daylight"
+    CLIP_DAYLIGHT_OFFSET = "CLIPDaylightOffset"
 
     # Door lock
     ZHA_DOOR_LOCK = "ZHADoorLock"
