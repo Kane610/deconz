@@ -1,5 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 import enum
 import logging
 from typing import Literal, NotRequired, TypedDict
@@ -110,7 +112,7 @@ class LightAlert(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "LightAlert":
+    def _missing_(cls, value: object) -> LightAlert:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light alert type %s", value)
         return cls.UNKNOWN
@@ -128,7 +130,7 @@ class LightColorCapability(enum.IntFlag):
     UNKNOWN = 1111
 
     @classmethod
-    def _missing_(cls, value: object) -> "LightColorCapability":
+    def _missing_(cls, value: object) -> LightColorCapability:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light color capability %s", value)
         return cls.UNKNOWN
@@ -156,7 +158,7 @@ class LightColorMode(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "LightColorMode":
+    def _missing_(cls, value: object) -> LightColorMode:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light color mode %s", value)
         return cls.UNKNOWN
@@ -224,7 +226,7 @@ class LightEffect(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "LightEffect":
+    def _missing_(cls, value: object) -> LightEffect:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected light effect type %s", value)
         return cls.UNKNOWN

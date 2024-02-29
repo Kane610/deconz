@@ -1,4 +1,5 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
+from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 import enum
@@ -24,7 +25,7 @@ class ConfigDeviceName(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ConfigDeviceName":
+    def _missing_(cls, value: object) -> ConfigDeviceName:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected config device name %s", value)
         return cls.UNKNOWN

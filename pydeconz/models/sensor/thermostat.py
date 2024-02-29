@@ -1,5 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 import enum
 import logging
 from typing import Literal, NotRequired, TypedDict
@@ -33,7 +35,7 @@ class ThermostatFanMode(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ThermostatFanMode":
+    def _missing_(cls, value: object) -> ThermostatFanMode:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat fan mode %s", value)
         return cls.UNKNOWN
@@ -67,7 +69,7 @@ class ThermostatMode(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ThermostatMode":
+    def _missing_(cls, value: object) -> ThermostatMode:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat mode %s", value)
         return cls.UNKNOWN
@@ -93,7 +95,7 @@ class ThermostatSwingMode(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ThermostatSwingMode":
+    def _missing_(cls, value: object) -> ThermostatSwingMode:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat swing mode %s", value)
         return cls.UNKNOWN
@@ -125,7 +127,7 @@ class ThermostatPreset(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ThermostatPreset":
+    def _missing_(cls, value: object) -> ThermostatPreset:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat preset %s", value)
         return cls.UNKNOWN
@@ -147,7 +149,7 @@ class ThermostatTemperatureMeasurement(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ThermostatTemperatureMeasurement":
+    def _missing_(cls, value: object) -> ThermostatTemperatureMeasurement:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected thermostat temperature measurement %s", value)
         return cls.UNKNOWN

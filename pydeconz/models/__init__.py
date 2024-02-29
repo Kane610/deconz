@@ -1,5 +1,7 @@
 """Data models."""
 
+from __future__ import annotations
+
 import enum
 import logging
 from typing import TypeVar
@@ -158,7 +160,7 @@ class ResourceType(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "ResourceType":
+    def _missing_(cls, value: object) -> ResourceType:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unsupported device type %s", value)
         return cls.UNKNOWN

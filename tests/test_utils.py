@@ -3,6 +3,8 @@
 pytest --cov-report term-missing --cov=pydeconz.utils tests/test_utils.py
 """
 
+from __future__ import annotations
+
 from unittest.mock import AsyncMock, Mock, patch
 
 import aiohttp
