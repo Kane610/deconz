@@ -1,5 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 import enum
 import logging
 from typing import Literal, NotRequired, TypedDict
@@ -41,7 +43,7 @@ class AncillaryControlPanel(enum.StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "AncillaryControlPanel":
+    def _missing_(cls, value: object) -> AncillaryControlPanel:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected panel mode %s", value)
         return cls.UNKNOWN

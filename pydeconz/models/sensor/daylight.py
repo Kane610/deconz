@@ -1,5 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 import enum
 import logging
 from typing import Final, TypedDict
@@ -30,7 +32,7 @@ class DayLightStatus(enum.IntEnum):
     UNKNOWN = 666
 
     @classmethod
-    def _missing_(cls, value: object) -> "DayLightStatus":
+    def _missing_(cls, value: object) -> DayLightStatus:
         """Set default enum member if an unknown value is provided."""
         LOGGER.warning("Unexpected day light value %s", value)
         return cls.UNKNOWN
