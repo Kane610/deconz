@@ -28,6 +28,20 @@ DATA = {
         "colormode": "ct",
         "ct": 307,
         "effect": None,
+        "gradient": {
+            "color_adjustment": 0,
+            "offset": 0,
+            "offset_adjustment": 0,
+            "points": [
+                [0.2728, 0.6226],
+                [0.163, 0.4262],
+                [0.1563, 0.1699],
+                [0.1551, 0.1147],
+                [0.1534, 0.0579],
+            ],
+            "segments": 5,
+            "style": "linear",
+        },
         "hascolor": True,
         "hue": 7998,
         "on": False,
@@ -136,6 +150,20 @@ async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
     assert light.saturation == 172
     assert light.color_temp == 307
     assert light.xy == (0.421253, 0.39921)
+    assert light.gradient == {
+        "color_adjustment": 0,
+        "offset": 0,
+        "offset_adjustment": 0,
+        "points": [
+            [0.2728, 0.6226],
+            [0.163, 0.4262],
+            [0.1563, 0.1699],
+            [0.1551, 0.1147],
+            [0.1534, 0.0579],
+        ],
+        "segments": 5,
+        "style": "linear",
+    }
     assert light.color_mode == LightColorMode.CT
     assert light.max_color_temp == 500
     assert light.min_color_temp == 153
@@ -222,6 +250,7 @@ ENUM_PROPERTY_DATA = [
         "color_mode",
         {
             "ct": LightColorMode.CT,
+            "gradient": LightColorMode.GRADIENT,
             "hs": LightColorMode.HS,
             "xy": LightColorMode.XY,
             None: LightColorMode.UNKNOWN,

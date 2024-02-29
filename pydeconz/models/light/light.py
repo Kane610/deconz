@@ -19,7 +19,10 @@ class TypedLightStateGradient(TypedDict):
     offset_adjustment: int
     points: list[list[int]]
     segments: int
-    style: Literal["linear", "mirrored"]
+    style: Literal[
+        "linear",
+        "mirrored",
+    ]
 
 
 class TypedLightState(TypedDict):
