@@ -68,7 +68,7 @@ class AirQuality(SensorBase):
     @property
     def air_quality(self) -> str:  # AirQualityValue:
         """Air quality."""
-        return AirQualityValue(self.raw["state"].get("airquality", "unknown")).value
+        return AirQualityValue(self.raw["state"].get("airquality", "unknown"))
 
     @property
     def air_quality_co2(self) -> int | None:

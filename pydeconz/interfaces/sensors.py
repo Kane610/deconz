@@ -92,7 +92,7 @@ class AirPurifierHandler(APIHandler[AirPurifier]):
             if value is not None
         }
         if fan_mode is not None:
-            data["mode"] = fan_mode.value
+            data["mode"] = fan_mode
 
         return await self.gateway.request_with_retry(
             "put",
@@ -380,9 +380,9 @@ class PresenceHandler(APIHandler[Presence]):
             if value is not None
         }
         if device_mode is not None:
-            data["devicemode"] = device_mode.value
+            data["devicemode"] = device_mode
         if trigger_distance is not None:
-            data["triggerdistance"] = trigger_distance.value
+            data["triggerdistance"] = trigger_distance
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
@@ -442,11 +442,11 @@ class SwitchHandler(APIHandler[Switch]):
         """
         data: dict[str, int | str] = {}
         if device_mode is not None:
-            data["devicemode"] = device_mode.value
+            data["devicemode"] = device_mode
         if mode is not None:
-            data["mode"] = mode.value
+            data["mode"] = mode
         if window_covering_type is not None:
-            data["windowcoveringtype"] = window_covering_type.value
+            data["windowcoveringtype"] = window_covering_type
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",
@@ -567,15 +567,15 @@ class ThermostatHandler(APIHandler[Thermostat]):
             if value is not None
         }
         if fan_mode is not None:
-            data["fanmode"] = fan_mode.value
+            data["fanmode"] = fan_mode
         if mode is not None:
-            data["mode"] = mode.value
+            data["mode"] = mode
         if preset is not None:
-            data["preset"] = preset.value
+            data["preset"] = preset
         if swing_mode is not None:
-            data["swingmode"] = swing_mode.value
+            data["swingmode"] = swing_mode
         if temperature_measurement is not None:
-            data["temperaturemeasurement"] = temperature_measurement.value
+            data["temperaturemeasurement"] = temperature_measurement
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/config",

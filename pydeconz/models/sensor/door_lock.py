@@ -6,7 +6,7 @@ from typing import Literal, TypedDict
 from . import SensorBase
 
 
-class DoorLockLockState(enum.Enum):
+class DoorLockLockState(enum.StrEnum):
     """State the lock is in."""
 
     LOCKED = "locked"

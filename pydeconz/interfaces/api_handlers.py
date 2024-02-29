@@ -38,7 +38,7 @@ class APIHandler(Generic[DataResource]):
         self._items: dict[str, DataResource] = {}
         self._subscribers: dict[str, list[SubscriptionType]] = {ID_FILTER_ALL: []}
 
-        self.path = f"/{self.resource_group.value}"
+        self.path = f"/{self.resource_group}"
 
         if self.resource_types is None:
             self.resource_types = {self.resource_type}
@@ -56,7 +56,7 @@ class APIHandler(Generic[DataResource]):
 
     async def update(self) -> None:
         """Refresh data."""
-        raw = await self.gateway.request("get", f"/{self.resource_group.value}")
+        raw = await self.gateway.request("get", f"/{self.resource_group}")
         self.process_raw(raw)
 
     def process_raw(self, raw: dict[str, dict[str, Any]]) -> None:

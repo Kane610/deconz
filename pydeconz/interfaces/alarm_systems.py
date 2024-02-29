@@ -78,7 +78,7 @@ class AlarmSystems(APIHandler[AlarmSystem]):
         """Set the alarm to away."""
         return await self.gateway.request(
             "put",
-            path=f"{self.path}/{id}/{action.value}",
+            path=f"{self.path}/{id}/{action}",
             json={"code0": pin_code},
         )
 
@@ -109,7 +109,7 @@ class AlarmSystems(APIHandler[AlarmSystem]):
         data["armmask"] += "S" if armed_stay else ""
 
         if trigger:
-            data["trigger"] = trigger.value
+            data["trigger"] = trigger
 
         if is_keypad:
             data = {}

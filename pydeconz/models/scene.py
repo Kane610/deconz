@@ -42,13 +42,13 @@ class Scene(APIItem):
     def group_deconz_id(self) -> str:
         """Group deCONZ ID representation."""
         if self._group_deconz_id == "":
-            self._group_deconz_id = f"/{ResourceGroup.GROUP.value}/{self.group_id}"
+            self._group_deconz_id = f"/{ResourceGroup.GROUP}/{self.group_id}"
         return self._group_deconz_id
 
     @property
     def deconz_id(self) -> str:
         """Id to call scene over API e.g. /groups/1/scenes/1."""
-        return f"{self.group_deconz_id}/{self.resource_group.value}/{self.id}"
+        return f"{self.group_deconz_id}/{self.resource_group}/{self.id}"
 
     @property
     def id(self) -> str:

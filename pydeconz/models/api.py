@@ -31,7 +31,7 @@ class APIItem:
     @property
     def deconz_id(self) -> str:
         """Id to call device over API e.g. /sensors/1."""
-        return f"/{self.resource_group.value}/{self.resource_id}"
+        return f"/{self.resource_group}/{self.resource_id}"
 
     def register_callback(self, callback: SubscriptionType) -> None:
         """Register callback for signalling."""

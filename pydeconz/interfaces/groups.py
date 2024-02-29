@@ -109,9 +109,9 @@ class GroupHandler(APIHandler[Group]):
             if value is not None
         }
         if alert is not None:
-            data["alert"] = alert.value
+            data["alert"] = alert
         if effect is not None:
-            data["effect"] = effect.value
+            data["effect"] = effect
         return await self.gateway.request_with_retry(
             "put",
             path=f"{self.path}/{id}/action",

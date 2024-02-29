@@ -322,9 +322,9 @@ class Config:
             if value is not None
         }
         if time_format is not None:
-            data["timeformat"] = time_format.value
+            data["timeformat"] = time_format
         if update_channel is not None:
-            data["updatechannel"] = update_channel.value
+            data["updatechannel"] = update_channel
         if zigbee_channel is not None:
-            data["zigbeechannel"] = zigbee_channel.value
+            data["zigbeechannel"] = zigbee_channel
         return await self.request("put", path="/config", json=data)
