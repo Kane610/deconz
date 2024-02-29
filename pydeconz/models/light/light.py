@@ -11,6 +11,20 @@ from . import LightBase
 LOGGER = logging.getLogger(__name__)
 
 
+class TypedLightStateGradient(TypedDict):
+    """Light state gradient definition."""
+
+    color_adjustment: int
+    offset: int
+    offset_adjustment: int
+    points: list[list[int]]
+    segments: int
+    style: Literal[
+        "linear",
+        "mirrored",
+    ]
+
+
 class TypedLightState(TypedDict):
     """Light state type definition."""
 
@@ -65,6 +79,7 @@ class TypedLightState(TypedDict):
             "waves",
         ]
     ]
+    gradient: NotRequired[TypedLightStateGradient]
     hue: int
     on: bool
     sat: int
@@ -290,6 +305,11 @@ class Light(LightBase):
     def color_temp(self) -> int | None:
         """Mired color temperature of the light. (2000K - 6500K)."""
         return self.raw["state"].get("ct")
+
+    @property
+    def gradient(self) -> TypedLightStateGradient | None:
+        """The currently active gradient (for Hue Gradient lights)."""
+        return self.raw["state"].get("gradient")
 
     @property
     def hue(self) -> int | None:
