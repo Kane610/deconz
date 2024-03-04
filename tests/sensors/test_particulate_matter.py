@@ -1,6 +1,5 @@
 """Test pydeCONZ particulate matter sensor."""
 
-
 DATA = {
     "capabilities": {
         "measured_value": {

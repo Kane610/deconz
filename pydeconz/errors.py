@@ -1,6 +1,5 @@
 """deCONZ errors."""
 
-
 from typing import Any
 
 
