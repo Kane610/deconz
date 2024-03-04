@@ -190,11 +190,14 @@ async def test_request(mock_aioresponse, deconz_session):
 
     # Client error
 
-    with patch.object(
-        deconz_session.session,
-        "request",
-        side_effect=aiohttp.client_exceptions.ClientError,
-    ), pytest.raises(RequestError):
+    with (
+        patch.object(
+            deconz_session.session,
+            "request",
+            side_effect=aiohttp.client_exceptions.ClientError,
+        ),
+        pytest.raises(RequestError),
+    ):
         await deconz_session.request("get", "/client_error")
 
     # Raise on error
@@ -222,9 +225,10 @@ async def test_request(mock_aioresponse, deconz_session):
 
     # Generic exception
 
-    with patch.object(
-        deconz_session.session, "request", side_effect=Exception
-    ), pytest.raises(Exception):
+    with (
+        patch.object(deconz_session.session, "request", side_effect=Exception),
+        pytest.raises(Exception),
+    ):
         await deconz_session.request("get", "")
 
     await deconz_session.session.close()
