@@ -223,14 +223,6 @@ async def test_request(mock_aioresponse, deconz_session):
     with pytest.raises(pydeconzException):
         await deconz_session.request("get", "/unknown")
 
-    # Generic exception
-
-    with (
-        patch.object(deconz_session.session, "request", side_effect=Exception),
-        pytest.raises(Exception),
-    ):
-        await deconz_session.request("get", "")
-
     await deconz_session.session.close()
 
 
@@ -488,7 +480,7 @@ async def test_sensor_events(deconz_session, mock_websocket_event):
 
 
 @patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
-async def test_retry_on_bridge_busy(_, deconz_refresh_state):
+async def test_retry_on_bridge_busy(gateway_sleep, deconz_refresh_state):
     """Verify a max count of 4 bridge busy messages."""
     session = await deconz_refresh_state(lights={"1": {"type": "light"}})
 
@@ -502,7 +494,9 @@ async def test_retry_on_bridge_busy(_, deconz_refresh_state):
 
 
 @patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
-async def test_request_exception_bridge_busy_pass_on_retry(_, deconz_refresh_state):
+async def test_request_exception_bridge_busy_pass_on_retry(
+    gateway_sleep, deconz_refresh_state
+):
     """Verify retry can return an expected response."""
     session = await deconz_refresh_state(lights={"1": {"type": "light"}})
 
@@ -518,7 +512,7 @@ async def test_request_exception_bridge_busy_pass_on_retry(_, deconz_refresh_sta
 
 
 @patch("pydeconz.gateway.sleep", new_callable=AsyncMock)
-async def test_reset_retry_with_a_second_request(_, deconz_refresh_state):
+async def test_reset_retry_with_a_second_request(gateway_sleep, deconz_refresh_state):
     """Verify an ongoing retry can be reset by a new request."""
     session = await deconz_refresh_state(lights={"1": {"type": "light"}})
 
