@@ -118,6 +118,7 @@ lint.select = [
     "PIE",  # flake8-pie
     "PL",   # pylint
     "PT",   # pytest
+    "RSE",  # flake8-raise
     "RUF006", # Store a reference to the return value of asyncio.create_task
     "S307",   # No builtin eval() allowed
     "SIM105", # Use contextlib.suppress({exception}) instead of try-except-pass
