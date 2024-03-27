@@ -116,7 +116,8 @@ lint.select = [
     "PERF",   # A Linter for performance anti-patterns
     "PGH004",  # Use specific rule codes when using noqa
     "PIE",  # flake8-pie
-    "PL", # pylint
+    "PL",   # pylint
+    "PT",   # pytest
     "RUF006", # Store a reference to the return value of asyncio.create_task
     "S307",   # No builtin eval() allowed
     "SIM105", # Use contextlib.suppress({exception}) instead of try-except-pass
