@@ -386,4 +386,4 @@ class Light(LightBase):
     @property
     def supports_fan_speed(self) -> bool:
         """Speed of the fan."""
-        return True if "speed" in self.raw["state"] else False
+        return "speed" in self.raw["state"]
