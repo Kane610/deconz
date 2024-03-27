@@ -83,7 +83,7 @@ async def test_api_items(mock_aioresponse, deconz_refresh_state):
     apiitems_1_mock_subscribe_update.assert_called_with(EventType.CHANGED, "1")
     item_1_mock_callback.assert_called()
     item_1_mock_subscribe.assert_called()
-    item_1.changed_keys == ("key1")
+    assert item_1.changed_keys == {"key1"}
 
     # item 3 is created
     assert "3" in apiitems
