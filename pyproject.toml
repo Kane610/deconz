@@ -20,14 +20,14 @@ classifiers = [
 ]
 requires-python = ">=3.11.0"
 dependencies    = [
-    "aiohttp>3.8",
+    "aiohttp>3.9",
     "orjson>3.9",
 ]
 
 [project.optional-dependencies]
 requirements = [
-    "aiohttp~=3.9.0",
-    "orjson~=3.9.5",
+    "aiohttp==3.9.3",
+    "orjson==3.10.0",
 ]
 requirements_test = [
     "aioresponses==0.7.6",
