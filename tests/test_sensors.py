@@ -23,27 +23,28 @@ async def test_create_all_sensors(deconz_refresh_state):
             "8": sensor_test_data.test_daylight.DATA,
             "9": sensor_test_data.test_door_lock.DATA,
             "10": sensor_test_data.test_fire.DATA,
-            "11": sensor_test_data.test_generic_flag.DATA,
-            "12": sensor_test_data.test_generic_status.DATA,
-            "13": sensor_test_data.test_humidity.DATA,
-            "14": sensor_test_data.test_light_level.DATA,
-            "15": sensor_test_data.test_moisture.DATA,
-            "16": sensor_test_data.test_open_close.DATA,
-            "17": sensor_test_data.test_particulate_matter.DATA,
-            "18": sensor_test_data.test_power.DATA,
-            "19": sensor_test_data.test_presence.DATA,
-            "20": sensor_test_data.test_pressure.DATA,
-            "21": sensor_test_data.test_relative_rotary.DATA,
-            "22": sensor_test_data.test_switch.DATA,
-            "23": sensor_test_data.test_temperature.DATA,
-            "24": sensor_test_data.test_thermostat.DATA,
-            "25": sensor_test_data.test_time.DATA,
-            "26": sensor_test_data.test_vibration.DATA,
-            "27": sensor_test_data.test_water.DATA,
+            "11": sensor_test_data.test_formaldehyde.DATA,
+            "12": sensor_test_data.test_generic_flag.DATA,
+            "13": sensor_test_data.test_generic_status.DATA,
+            "14": sensor_test_data.test_humidity.DATA,
+            "15": sensor_test_data.test_light_level.DATA,
+            "16": sensor_test_data.test_moisture.DATA,
+            "17": sensor_test_data.test_open_close.DATA,
+            "18": sensor_test_data.test_particulate_matter.DATA,
+            "19": sensor_test_data.test_power.DATA,
+            "20": sensor_test_data.test_presence.DATA,
+            "21": sensor_test_data.test_pressure.DATA,
+            "22": sensor_test_data.test_relative_rotary.DATA,
+            "23": sensor_test_data.test_switch.DATA,
+            "24": sensor_test_data.test_temperature.DATA,
+            "25": sensor_test_data.test_thermostat.DATA,
+            "26": sensor_test_data.test_time.DATA,
+            "27": sensor_test_data.test_vibration.DATA,
+            "28": sensor_test_data.test_water.DATA,
         },
     )
     sensors = deconz_session.sensors
-    assert len(sensors._handlers) == 28
+    assert len(sensors._handlers) == 29
     assert sensors["0"].type == ResourceType.ZHA_AIR_PURIFIER
     assert sensors["1"].type == ResourceType.ZHA_AIR_QUALITY
     assert sensors["2"].type == ResourceType.ZHA_ALARM
@@ -55,20 +56,21 @@ async def test_create_all_sensors(deconz_refresh_state):
     assert sensors["8"].type == ResourceType.DAYLIGHT
     assert sensors["9"].type == ResourceType.ZHA_DOOR_LOCK
     assert sensors["10"].type == ResourceType.ZHA_FIRE
-    assert sensors["11"].type == ResourceType.CLIP_GENERIC_FLAG
-    assert sensors["12"].type == ResourceType.CLIP_GENERIC_STATUS
-    assert sensors["13"].type == ResourceType.ZHA_HUMIDITY
-    assert sensors["14"].type == ResourceType.ZHA_LIGHT_LEVEL
-    assert sensors["15"].type == ResourceType.ZHA_MOISTURE
-    assert sensors["16"].type == ResourceType.ZHA_OPEN_CLOSE
-    assert sensors["17"].type == ResourceType.ZHA_PARTICULATE_MATTER
-    assert sensors["18"].type == ResourceType.ZHA_POWER
-    assert sensors["19"].type == ResourceType.ZHA_PRESENCE
-    assert sensors["20"].type == ResourceType.ZHA_PRESSURE
-    assert sensors["21"].type == ResourceType.ZHA_RELATIVE_ROTARY
-    assert sensors["22"].type == ResourceType.ZHA_SWITCH
-    assert sensors["23"].type == ResourceType.ZHA_TEMPERATURE
-    assert sensors["24"].type == ResourceType.ZHA_THERMOSTAT
-    assert sensors["25"].type == ResourceType.ZHA_TIME
-    assert sensors["26"].type == ResourceType.ZHA_VIBRATION
-    assert sensors["27"].type == ResourceType.ZHA_WATER
+    assert sensors["11"].type == ResourceType.ZHA_FORMALDEHYDE
+    assert sensors["12"].type == ResourceType.CLIP_GENERIC_FLAG
+    assert sensors["13"].type == ResourceType.CLIP_GENERIC_STATUS
+    assert sensors["14"].type == ResourceType.ZHA_HUMIDITY
+    assert sensors["15"].type == ResourceType.ZHA_LIGHT_LEVEL
+    assert sensors["16"].type == ResourceType.ZHA_MOISTURE
+    assert sensors["17"].type == ResourceType.ZHA_OPEN_CLOSE
+    assert sensors["18"].type == ResourceType.ZHA_PARTICULATE_MATTER
+    assert sensors["19"].type == ResourceType.ZHA_POWER
+    assert sensors["20"].type == ResourceType.ZHA_PRESENCE
+    assert sensors["21"].type == ResourceType.ZHA_PRESSURE
+    assert sensors["22"].type == ResourceType.ZHA_RELATIVE_ROTARY
+    assert sensors["23"].type == ResourceType.ZHA_SWITCH
+    assert sensors["24"].type == ResourceType.ZHA_TEMPERATURE
+    assert sensors["25"].type == ResourceType.ZHA_THERMOSTAT
+    assert sensors["26"].type == ResourceType.ZHA_TIME
+    assert sensors["27"].type == ResourceType.ZHA_VIBRATION
+    assert sensors["28"].type == ResourceType.ZHA_WATER

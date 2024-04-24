@@ -100,6 +100,9 @@ class ResourceType(enum.StrEnum):
     # Fire
     ZHA_FIRE = "ZHAFire"
 
+    # Formaldehyde
+    ZHA_FORMALDEHYDE = "ZHAFormaldehyde"
+
     # Generic flag
     CLIP_GENERIC_FLAG = "CLIPGenericFlag"
 
