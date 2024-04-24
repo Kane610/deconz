@@ -81,6 +81,9 @@ class ResourceType(enum.StrEnum):
     # Battery
     ZHA_BATTERY = "ZHABattery"
 
+    # Carbon dioxide
+    ZHA_CARBON_DIOXIDE = "ZHACarbonDioxide"
+
     # Carbon monoxide
     ZHA_CARBON_MONOXIDE = "ZHACarbonMonoxide"
 

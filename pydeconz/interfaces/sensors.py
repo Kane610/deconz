@@ -8,6 +8,7 @@ from ..models.sensor.air_quality import AirQuality
 from ..models.sensor.alarm import Alarm
 from ..models.sensor.ancillary_control import AncillaryControl
 from ..models.sensor.battery import Battery
+from ..models.sensor.carbon_dioxide import CarbonDioxide
 from ..models.sensor.carbon_monoxide import CarbonMonoxide
 from ..models.sensor.consumption import Consumption
 from ..models.sensor.daylight import Daylight
@@ -131,6 +132,14 @@ class BatteryHandler(APIHandler[Battery]):
     resource_group = ResourceGroup.SENSOR
     resource_type = ResourceType.ZHA_BATTERY
     item_cls = Battery
+
+
+class CarbonDioxideHandler(APIHandler[CarbonDioxide]):
+    """Handler for carbon dioxide sensor."""
+
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_CARBON_DIOXIDE
+    item_cls = CarbonDioxide
 
 
 class CarbonMonoxideHandler(APIHandler[CarbonMonoxide]):
@@ -650,6 +659,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
         self.alarm = AlarmHandler(gateway, grouped=True)
         self.ancillary_control = AncillaryControlHandler(gateway, grouped=True)
         self.battery = BatteryHandler(gateway, grouped=True)
+        self.carbon_dioxide = CarbonDioxideHandler(gateway, grouped=True)
         self.carbon_monoxide = CarbonMonoxideHandler(gateway, grouped=True)
         self.consumption = ConsumptionHandler(gateway, grouped=True)
         self.daylight = DaylightHandler(gateway, grouped=True)
@@ -679,6 +689,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
             self.alarm,
             self.ancillary_control,
             self.battery,
+            self.carbon_dioxide,
             self.carbon_monoxide,
             self.consumption,
             self.daylight,
