@@ -14,6 +14,7 @@ from ..models.sensor.consumption import Consumption
 from ..models.sensor.daylight import Daylight
 from ..models.sensor.door_lock import DoorLock
 from ..models.sensor.fire import Fire
+from ..models.sensor.formaldehyde import Formaldehyde
 from ..models.sensor.generic_flag import GenericFlag
 from ..models.sensor.generic_status import GenericStatus
 from ..models.sensor.humidity import Humidity
@@ -218,6 +219,14 @@ class FireHandler(APIHandler[Fire]):
     resource_group = ResourceGroup.SENSOR
     resource_type = ResourceType.ZHA_FIRE
     item_cls = Fire
+
+
+class FormaldehydeHandler(APIHandler[Formaldehyde]):
+    """Handler for formaldehyde sensor."""
+
+    resource_group = ResourceGroup.SENSOR
+    resource_type = ResourceType.ZHA_FORMALDEHYDE
+    item_cls = Formaldehyde
 
 
 class GenericFlagHandler(APIHandler[GenericFlag]):
@@ -665,6 +674,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
         self.daylight = DaylightHandler(gateway, grouped=True)
         self.door_lock = DoorLockHandler(gateway, grouped=True)
         self.fire = FireHandler(gateway, grouped=True)
+        self.formaldehyde = FormaldehydeHandler(gateway, grouped=True)
         self.generic_flag = GenericFlagHandler(gateway, grouped=True)
         self.generic_status = GenericStatusHandler(gateway, grouped=True)
         self.humidity = HumidityHandler(gateway, grouped=True)
@@ -695,6 +705,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
             self.daylight,
             self.door_lock,
             self.fire,
+            self.formaldehyde,
             self.generic_flag,
             self.generic_status,
             self.humidity,
