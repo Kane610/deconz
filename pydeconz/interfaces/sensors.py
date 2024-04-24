@@ -1,5 +1,7 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from ..models import ResourceGroup, ResourceType
@@ -661,7 +663,7 @@ class SensorResourceManager(GroupedAPIHandler[SensorResources]):
 
     resource_group = ResourceGroup.SENSOR
 
-    def __init__(self, gateway: "DeconzSession") -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize sensor manager."""
         self.air_purifier = AirPurifierHandler(gateway, grouped=True)
         self.air_quality = AirQualityHandler(gateway, grouped=True)
