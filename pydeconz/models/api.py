@@ -1,5 +1,7 @@
 """API base class."""
 
+from __future__ import annotations
+
 from collections.abc import Callable
 import logging
 from typing import TYPE_CHECKING, Any
@@ -16,7 +18,7 @@ UnsubscribeType = Callable[[], None]
 class APIItem:
     """Base class for a deCONZ API item."""
 
-    resource_group: "ResourceGroup"
+    resource_group: ResourceGroup
 
     def __init__(self, resource_id: str, raw: Any) -> None:
         """Initialize API item."""

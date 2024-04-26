@@ -1,4 +1,6 @@
-"""Mange events from deCONZ."""
+"""Manage events from deCONZ."""
+
+from __future__ import annotations
 
 from collections.abc import Callable
 import logging
@@ -24,7 +26,7 @@ UnsubscribeType = Callable[[], None]
 class EventHandler:
     """Event handler class."""
 
-    def __init__(self, gateway: "DeconzSession") -> None:
+    def __init__(self, gateway: DeconzSession) -> None:
         """Initialize API items."""
         self.gateway = gateway
         self._subscribers: list[SubscriptionType] = []
