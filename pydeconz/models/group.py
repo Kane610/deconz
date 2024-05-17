@@ -4,7 +4,7 @@ from typing import Final, Literal, NotRequired, TypedDict
 
 from . import ResourceGroup
 from .deconz_device import DeconzDevice
-from .light.light import Light, LightColorMode, LightEffect
+from .light.light import LightColorMode, LightEffect
 from .scene import TypedScene
 
 COLOR_STATE_ATTRIBUTES: Final = {
@@ -187,31 +187,3 @@ class Group(DeconzDevice):
         Subsequent ids from multidevices with multiple endpoints.
         """
         return self.raw.get("multideviceids")
-
-    def update_color_state(
-        self, light: Light, update_all_attributes: bool = False
-    ) -> None:
-        """Sync color state with light.
-
-          update_all_attributes is used to control whether or not to
-        write light attributes with the value None to the group.
-        This is used to not keep any bad values from the group.
-        """
-        data = {}
-
-        for attribute in COLOR_STATE_ATTRIBUTES:
-            if (light_attribute := light.raw["state"].get(attribute)) is not None:
-                data[attribute] = light_attribute
-                continue
-
-            if update_all_attributes:
-                if attribute == "xy":
-                    data[attribute] = (None, None)
-                elif attribute == "colormode":
-                    continue
-                elif attribute == "effect":
-                    data[attribute] = LightEffect.NONE
-                else:
-                    data[attribute] = None
-
-        self.update({"action": data})
