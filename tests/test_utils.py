@@ -77,7 +77,7 @@ async def test_discovery() -> None:
     ):
         response = await utils.discovery(session)
 
-    assert [
+    assert response == [
         {
             "id": "123456ABCDEF",
             "host": "host1",
@@ -92,7 +92,7 @@ async def test_discovery() -> None:
             "mac": "",
             "name": "",
         },
-    ] == response
+    ]
 
 
 async def test_discovery_response_empty() -> None:
