@@ -25,6 +25,18 @@ class TypedLightStateGradient(TypedDict):
     ]
 
 
+class TypedLightCapabilitiesColor(TypedDict):
+    """Light capabilities color type definition."""
+
+    effects: NotRequired[list[str]]
+
+
+class TypedLightCapabilities(TypedDict):
+    """Light capabilities type definition."""
+
+    color: NotRequired[TypedLightCapabilitiesColor]
+
+
 class TypedLightState(TypedDict):
     """Light state type definition."""
 
@@ -94,6 +106,7 @@ class TypedLightState(TypedDict):
 class TypedLight(TypedDict):
     """Light type definition."""
 
+    capabilities: NotRequired[TypedLightCapabilities]
     colorcapabilities: NotRequired[int]
     ctmax: int
     ctmin: int
@@ -308,6 +321,17 @@ class Light(LightBase):
         but minimum brightness.
         """
         return self.raw["state"].get("bri")
+
+    @property
+    def supported_effects(self) -> list[LightEffect] | None:
+        """List of effects supported by a light."""
+        if (
+            "capabilities" in self.raw
+            and "color" in self.raw["capabilities"]
+            and "effects" in self.raw["capabilities"]["color"]
+        ):
+            return list(map(LightEffect, self.raw["capabilities"]["color"]["effects"]))
+        return None
 
     @property
     def color_capabilities(self) -> LightColorCapability | None:
