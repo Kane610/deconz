@@ -62,9 +62,12 @@ class TypedLightState(TypedDict):
             "fireplace",
             "fireworks",
             "flag",
+            "glisten",
             "glow",
             "loop",
             "none",
+            "opal",
+            "prism",
             "rainbow",
             "snake",
             "snow",
@@ -73,6 +76,7 @@ class TypedLightState(TypedDict):
             "steady",
             "strobe",
             "sunrise",
+            "sunset",
             "twinkle",
             "updown",
             "vintage",
@@ -192,8 +196,11 @@ class LightEffect(enum.StrEnum):
     - "fireplace"
     - "fireworks"
     - "flag"
+    - "glisten"
     - "glow"
     - "loop"
+    - "opal"
+    - "prism"
     - "rainbow"
     - "snake"
     - "snow"
@@ -202,6 +209,7 @@ class LightEffect(enum.StrEnum):
     - "steady"
     - "strobe"
     - "sunrise"
+    - "sunset"
     - "twinkle"
     - "updown"
     - "vintage"
@@ -215,9 +223,16 @@ class LightEffect(enum.StrEnum):
 
     CANDLE = "candle"
     FIREPLACE = "fireplace"
+    # 'loop' has been renamed 'prism' in deCONZ since Sept. 2023.
+    # https://github.com/dresden-elektronik/deconz-rest-plugin/pull/7206/commits/9be934389e62583bc7f17b1bb2c7dff718f5f938
+    # Keeping it to remain compatible with older versions of deCONZ.
     LOOP = "loop"
+    GLISTEN = "glisten"
+    OPAL = "opal"
+    PRISM = "prism"
     SPARKLE = "sparkle"
     SUNRISE = "sunrise"
+    SUNSET = "sunset"
 
     # Specific to Lidl christmas light (TS0601)
 
