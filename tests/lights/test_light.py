@@ -13,6 +13,42 @@ from pydeconz.models.light.light import (
 )
 
 DATA = {
+    "capabilities": {
+        "alerts": [
+            "none",
+            "select",
+            "lselect",
+            "blink",
+            "breathe",
+            "okay",
+            "channelchange",
+            "finish",
+            "stop",
+        ],
+        "bri": {"min_dim_level": 0.2},
+        "color": {
+            "ct": {"computes_xy": True, "max": 500, "min": 153},
+            "effects": [
+                "none",
+                "colorloop",
+                "candle",
+                "fireplace",
+                "prism",
+                "sunrise",
+                "sunset",
+                "sparkle",
+                "opal",
+                "glisten",
+            ],
+            "gamut_type": "C",
+            "modes": ["ct", "effect", "hs", "xy"],
+            "xy": {
+                "blue": [0.1532, 0.0475],
+                "green": [0.17, 0.7],
+                "red": [0.6915, 0.3083],
+            },
+        },
+    },
     "colorcapabilities": 15,
     "ctmax": 500,
     "ctmin": 153,
@@ -140,6 +176,19 @@ async def test_handler_fan(mock_aioresponse, deconz_session, deconz_called_with)
 async def test_light_light(mock_aioresponse, deconz_light, deconz_called_with):
     """Verify that creating a light works."""
     light = await deconz_light(DATA)
+
+    assert light.supported_effects == [
+        LightEffect.NONE,
+        LightEffect.COLOR_LOOP,
+        LightEffect.CANDLE,
+        LightEffect.FIREPLACE,
+        LightEffect.PRISM,
+        LightEffect.SUNRISE,
+        LightEffect.SUNSET,
+        LightEffect.SPARKLE,
+        LightEffect.OPAL,
+        LightEffect.GLISTEN,
+    ]
 
     assert light.state is False
     assert light.on is False
@@ -298,9 +347,26 @@ async def test_enum_light_properties_no_key(deconz_light):
     """Verify enum properties return expected values or None."""
     light = await deconz_light({"config": {}, "state": {}, "type": "Color light"})
 
+    assert light.supported_effects is None
     assert light.alert is None
     assert light.color_capabilities is None
     assert light.color_mode is None
     assert light.effect is None
     with pytest.raises(KeyError):
         assert light.fan_speed
+
+
+ENUM_CAPABILITIES_DATA = [
+    ({"capabilities": {}}),
+    ({"capabilities": {"color": {}}}),
+]
+
+
+@pytest.mark.parametrize(("data"), ENUM_CAPABILITIES_DATA)
+async def test_enum_light_properties_no_capabilities(deconz_light, data):
+    """Verify enum properties return expected values or None."""
+    light = await deconz_light(
+        {"config": {}, "state": {}, "type": "Color light"} | data
+    )
+
+    assert light.supported_effects is None
