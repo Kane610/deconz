@@ -25,6 +25,18 @@ class TypedLightStateGradient(TypedDict):
     ]
 
 
+class TypedLightCapabilitiesColor(TypedDict):
+    """Light capabilities color type definition."""
+
+    effects: NotRequired[list[str]]
+
+
+class TypedLightCapabilities(TypedDict):
+    """Light capabilities type definition."""
+
+    color: NotRequired[TypedLightCapabilitiesColor]
+
+
 class TypedLightState(TypedDict):
     """Light state type definition."""
 
@@ -62,9 +74,12 @@ class TypedLightState(TypedDict):
             "fireplace",
             "fireworks",
             "flag",
+            "glisten",
             "glow",
             "loop",
             "none",
+            "opal",
+            "prism",
             "rainbow",
             "snake",
             "snow",
@@ -73,6 +88,7 @@ class TypedLightState(TypedDict):
             "steady",
             "strobe",
             "sunrise",
+            "sunset",
             "twinkle",
             "updown",
             "vintage",
@@ -90,6 +106,7 @@ class TypedLightState(TypedDict):
 class TypedLight(TypedDict):
     """Light type definition."""
 
+    capabilities: NotRequired[TypedLightCapabilities]
     colorcapabilities: NotRequired[int]
     ctmax: int
     ctmin: int
@@ -192,8 +209,11 @@ class LightEffect(enum.StrEnum):
     - "fireplace"
     - "fireworks"
     - "flag"
+    - "glisten"
     - "glow"
     - "loop"
+    - "opal"
+    - "prism"
     - "rainbow"
     - "snake"
     - "snow"
@@ -202,6 +222,7 @@ class LightEffect(enum.StrEnum):
     - "steady"
     - "strobe"
     - "sunrise"
+    - "sunset"
     - "twinkle"
     - "updown"
     - "vintage"
@@ -215,9 +236,16 @@ class LightEffect(enum.StrEnum):
 
     CANDLE = "candle"
     FIREPLACE = "fireplace"
+    # 'loop' has been renamed 'prism' in deCONZ since Sept. 2023.
+    # https://github.com/dresden-elektronik/deconz-rest-plugin/pull/7206/commits/9be934389e62583bc7f17b1bb2c7dff718f5f938
+    # Keeping it to remain compatible with older versions of deCONZ.
     LOOP = "loop"
+    GLISTEN = "glisten"
+    OPAL = "opal"
+    PRISM = "prism"
     SPARKLE = "sparkle"
     SUNRISE = "sunrise"
+    SUNSET = "sunset"
 
     # Specific to Lidl christmas light (TS0601)
 
@@ -293,6 +321,17 @@ class Light(LightBase):
         but minimum brightness.
         """
         return self.raw["state"].get("bri")
+
+    @property
+    def supported_effects(self) -> list[LightEffect] | None:
+        """List of effects supported by a light."""
+        if (
+            "capabilities" in self.raw
+            and "color" in self.raw["capabilities"]
+            and "effects" in self.raw["capabilities"]["color"]
+        ):
+            return list(map(LightEffect, self.raw["capabilities"]["color"]["effects"]))
+        return None
 
     @property
     def color_capabilities(self) -> LightColorCapability | None:
