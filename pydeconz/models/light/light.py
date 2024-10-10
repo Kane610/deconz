@@ -70,7 +70,10 @@ class TypedLightState(TypedDict):
             "carnival",
             "colorloop",
             "collide",
+            "cosmos",
+            "enchant",
             "fading",
+            "fire",
             "fireplace",
             "fireworks",
             "flag",
@@ -87,9 +90,11 @@ class TypedLightState(TypedDict):
             "sparkles",
             "steady",
             "strobe",
+            "sunbeam",
             "sunrise",
             "sunset",
             "twinkle",
+            "underwater",
             "updown",
             "vintage",
             "waves",
@@ -205,7 +210,10 @@ class LightEffect(enum.StrEnum):
     - "candle"
     - "carnival"
     - "collide"
+    - "cosmos"
+    - "enchant"
     - "fading"
+    - "fire"
     - "fireplace"
     - "fireworks"
     - "flag"
@@ -221,9 +229,11 @@ class LightEffect(enum.StrEnum):
     - "sparkles"
     - "steady"
     - "strobe"
+    - "sunbeam"
     - "sunrise"
     - "sunset"
     - "twinkle"
+    - "underwater"
     - "updown"
     - "vintage"
     - "waves"
@@ -235,6 +245,12 @@ class LightEffect(enum.StrEnum):
     # Specific to Hue lights
 
     CANDLE = "candle"
+    COSMOS = "cosmos"
+    ENCHANT = "enchant"
+    FIRE = "fire"
+    # 'fireplace' has been renamed 'fire' in deCONZ since Oct. 2024.
+    # https://github.com/dresden-elektronik/deconz-rest-plugin/pull/7956/commits/893777970ff7e25a7352ddf4fd11a82c1e5bbc5b
+    # Keeping it to remain compatible with older versions of deCONZ.
     FIREPLACE = "fireplace"
     # 'loop' has been renamed 'prism' in deCONZ since Sept. 2023.
     # https://github.com/dresden-elektronik/deconz-rest-plugin/pull/7206/commits/9be934389e62583bc7f17b1bb2c7dff718f5f938
@@ -244,8 +260,10 @@ class LightEffect(enum.StrEnum):
     OPAL = "opal"
     PRISM = "prism"
     SPARKLE = "sparkle"
+    SUNBEAM = "sunbeam"
     SUNRISE = "sunrise"
     SUNSET = "sunset"
+    UNDERWATER = "underwater"
 
     # Specific to Lidl christmas light (TS0601)
 
