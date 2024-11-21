@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Generic, TypedDict, TypeVar
 
 if TYPE_CHECKING:
     from . import ResourceGroup
@@ -15,12 +15,19 @@ SubscriptionType = Callable[..., None]
 UnsubscribeType = Callable[[], None]
 
 
-class APIItem:
+class ApiData(TypedDict):
+    """API data class."""
+
+
+ApiDataT = TypeVar("ApiDataT", bound=ApiData)
+
+
+class APIItem(Generic[ApiDataT]):
     """Base class for a deCONZ API item."""
 
     resource_group: ResourceGroup
 
-    def __init__(self, resource_id: str, raw: Any) -> None:
+    def __init__(self, resource_id: str, raw: ApiDataT) -> None:
         """Initialize API item."""
         self.resource_id = resource_id
         self.raw = raw
@@ -57,7 +64,8 @@ class APIItem:
 
         return unsubscribe
 
-    def update(self, raw: dict[str, dict[str, Any]]) -> None:
+    def update(self, raw: ApiDataT) -> None:
+        # def update(self, raw: dict[str, dict[str, Any]]) -> None:
         """Update input attr in self.
 
         Store a set of keys with changed values.
