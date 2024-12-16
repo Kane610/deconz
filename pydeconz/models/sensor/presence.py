@@ -85,6 +85,8 @@ class PresenceConfigTriggerDistance(enum.StrEnum):
     FAR = "far"
     MEDIUM = "medium"
     NEAR = "near"
+
+    # Trigger distance in meters
     ONE = "1"                                                     
     TWO = "2"                                                     
     THREE = "3"                                                   
