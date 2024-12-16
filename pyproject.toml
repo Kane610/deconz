@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name        = "pydeconz"
-version     = "118"
+version     = "119"
 license     = {text = "MIT"}
 description = "Python library for communicating with deCONZ REST-API"
 readme      = "README.rst"
