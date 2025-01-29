@@ -84,4 +84,4 @@ class Scenes(APIHandler[Scene]):
         group = self.gateway.groups[id]
 
         for scene in group.raw["scenes"]:
-            super().process_item(f'{id}_{scene["id"]}', cast(dict[str, Any], scene))
+            super().process_item(f"{id}_{scene['id']}", cast(dict[str, Any], scene))
