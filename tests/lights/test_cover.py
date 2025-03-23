@@ -1,5 +1,6 @@
 """Test pydeCONZ cover."""
 
+from copy import deepcopy
 from unittest.mock import Mock
 
 from pydeconz.interfaces.lights import CoverAction
@@ -188,3 +189,12 @@ async def test_light_cover_legacy(deconz_light):
 
     cover.remove_callback(mock_callback)
     assert not cover._callbacks
+
+
+async def test_cover_tilt_value_limit(deconz_light):
+    """Verify that value limit of tilt property work."""
+    data = deepcopy(DATA)
+    data["state"]["tilt"] = 101
+    cover = await deconz_light(data)
+
+    assert cover.tilt is None
