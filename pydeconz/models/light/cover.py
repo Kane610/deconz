@@ -61,7 +61,8 @@ class Cover(LightBase):
           0-100 - 0 is open / 100 is closed
         """
         if "tilt" in self.raw["state"]:
-            return self.raw["state"]["tilt"]
+            if 0 <= (tilt := self.raw["state"]["tilt"]) <= 100:
+                return tilt
         elif "sat" in self.raw["state"]:  # Legacy support
             return int(self.raw["state"]["sat"] / 2.54)
         return None
