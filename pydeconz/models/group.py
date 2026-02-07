@@ -3,7 +3,7 @@
 from typing import Final, Literal, NotRequired, TypedDict
 
 from . import ResourceGroup
-from .deconz_device import DeconzDevice
+from .deconz_device import DeconzDevice, TypedData
 from .light.light import LightColorMode, LightEffect
 from .scene import TypedScene
 
@@ -21,14 +21,25 @@ COLOR_STATE_ATTRIBUTES: Final = {
 class TypedGroupAction(TypedDict):
     """Group action type definition."""
 
-    bri: int
-    colormode: NotRequired[Literal["ct", "hs", "xy"]]
-    ct: int
-    effect: NotRequired[Literal["colorloop", "none"]]
-    hue: int
+    bri: NotRequired[int]
+    colormode: NotRequired[
+        Literal[
+            LightColorMode.CT,
+            LightColorMode.HS,
+            LightColorMode.XY,
+        ]
+    ]
+    ct: NotRequired[int]
+    effect: NotRequired[
+        Literal[
+            LightEffect.COLOR_LOOP,
+            LightEffect.NONE,
+        ]
+    ]
+    hue: NotRequired[int]
     on: bool
-    sat: int
-    xy: tuple[float, float]
+    sat: NotRequired[int]
+    xy: tuple[float, float] | tuple[None, None]
 
 
 class TypedGroupState(TypedDict):
@@ -38,7 +49,7 @@ class TypedGroupState(TypedDict):
     any_on: bool
 
 
-class TypedGroup(TypedDict):
+class TypedGroup(TypedData):
     """Group type definition."""
 
     action: TypedGroupAction
@@ -48,13 +59,11 @@ class TypedGroup(TypedDict):
     lights: list[str]
     lightsequence: list[str]
     multideviceids: list[str]
-    name: str
     scenes: list[TypedScene]
     state: TypedGroupState
-    type: str
 
 
-class Group(DeconzDevice):
+class Group(DeconzDevice[TypedGroup]):
     """deCONZ light group representation.
 
     Dresden Elektroniks documentation of light groups in deCONZ

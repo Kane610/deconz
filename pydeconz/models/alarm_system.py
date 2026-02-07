@@ -5,7 +5,7 @@ import logging
 from typing import Any, Literal, TypedDict
 
 from . import ResourceGroup
-from .api import APIItem
+from .api import ApiData, APIItem
 
 LOGGER = logging.getLogger(__name__)
 
@@ -106,7 +106,7 @@ class TypedAlarmSystemDevices(TypedDict):
     trigger: str
 
 
-class TypedAlarmSystem(TypedDict):
+class TypedAlarmSystem(ApiData):
     """Alarm system type definition."""
 
     name: str
@@ -115,7 +115,7 @@ class TypedAlarmSystem(TypedDict):
     devices: dict[str, TypedAlarmSystemDevices]
 
 
-class AlarmSystem(APIItem):
+class AlarmSystem(APIItem[TypedAlarmSystem]):
     """deCONZ alarm system representation.
 
     Dresden Elektroniks documentation of alarm systems in deCONZ
