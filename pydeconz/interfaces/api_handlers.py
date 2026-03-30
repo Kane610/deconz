@@ -26,13 +26,13 @@ UnsubscribeType = Callable[[], None]
 ID_FILTER_ALL = "*"
 
 
-class APIHandler(Generic[DataResource]):
+class APIHandler(Generic[DataResource]):  # noqa: UP046
     """Base class for a map of API Items."""
 
     resource_group: ResourceGroup
     resource_type = ResourceType.UNKNOWN
     resource_types: set[ResourceType] | None = None
-    item_cls: Any
+    item_cls: type[DataResource]
 
     def __init__(self, gateway: DeconzSession, grouped: bool = False) -> None:
         """Initialize API handler."""
@@ -153,7 +153,7 @@ class APIHandler(Generic[DataResource]):
         return iter(self._items)
 
 
-class GroupedAPIHandler(Generic[DataResource]):
+class GroupedAPIHandler(Generic[DataResource]):  # noqa: UP046
     """Represent a group of deCONZ API items."""
 
     resource_group: ResourceGroup
@@ -240,7 +240,7 @@ class GroupedAPIHandler(Generic[DataResource]):
         """Return API items."""
         return [item for h in self._handlers for item in h.values()]
 
-    def get(self, id: str, default: Any = None) -> DataResource | None:
+    def get(self, id: str, default: Any = None) -> DataResource | Any | None:
         """Get API item based on key, if no match return default."""
         return next((h[id] for h in self._handlers if id in h), default)
 
