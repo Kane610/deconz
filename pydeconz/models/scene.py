@@ -1,12 +1,10 @@
 """Python library to connect deCONZ and Home Assistant to work together."""
 
-from typing import TypedDict
-
 from . import ResourceGroup
-from .api import APIItem
+from .api import ApiData, APIItem
 
 
-class TypedScene(TypedDict):
+class TypedScene(ApiData):
     """Scene type definition."""
 
     id: str
@@ -15,7 +13,7 @@ class TypedScene(TypedDict):
     name: str
 
 
-class Scene(APIItem):
+class Scene(APIItem[ApiData]):
     """deCONZ scene representation.
 
     Dresden Elektroniks documentation of scenes in deCONZ
