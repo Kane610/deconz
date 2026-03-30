@@ -16,3 +16,14 @@ Only host address and API key are necessary for normal operations.
    :target: https://discord.gg/c6pvg8a
 .. _`deCONZ Rest API`: https://dresden-elektronik.github.io/deconz-rest-doc/
 .. _`Snillevilla`: https://snillevilla.se/
+
+Development
+-----------
+
+To set up the repository for development, run:
+
+.. code-block:: bash
+
+   ./setup.sh
+
+The script will install `uv` if missing, use it to create and manage the Python environment, synchronize dependencies (including test and dev extras), and install pre-commit hooks.
