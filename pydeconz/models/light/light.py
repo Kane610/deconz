@@ -105,7 +105,7 @@ class TypedLightState(TypedDict):
     on: bool
     sat: int
     speed: Literal[0, 1, 2, 3, 4, 5, 6]
-    xy: tuple[float, float]
+    xy: NotRequired[tuple[float, float]]
 
 
 class TypedLight(TypedDict):
