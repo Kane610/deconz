@@ -1,0 +1,86 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "uv: sync environment",
+      "type": "shell",
+      "command": "sh",
+      "args": [
+        "-c",
+        "command -v uv >/dev/null 2>&1 && uv sync --all-extras || { echo 'uv is required. Install from https://docs.astral.sh/uv/'; exit 1; }"
+      ],
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "uv: ruff check",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "ruff",
+        "check",
+        "pydeconz",
+        "tests"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "uv: ruff format check",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "pydeconz",
+        "tests"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "uv: mypy",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "mypy",
+        "pydeconz"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "uv: pytest",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "pytest"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "uv: all checks",
+      "type": "shell",
+      "command": "sh",
+      "args": [
+        "-c",
+        "uv run ruff check pydeconz tests && uv run ruff format --check pydeconz tests && uv run mypy pydeconz && uv run pytest"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

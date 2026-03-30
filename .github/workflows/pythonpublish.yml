@@ -17,14 +17,17 @@ jobs:
         uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.12"
-      - name: Install dependencies
+      - name: Install dependencies (uv)
         run: |
-          python -m pip install --upgrade pip
-          pip install build twine
+          bash ./setup.sh
+          UV_BIN="$(command -v uv || echo $HOME/.local/bin/uv)"
+          "$UV_BIN" run python -m pip install --upgrade pip
+          "$UV_BIN" run python -m pip install build twine
       - name: Build and publish
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m build
-          twine upload dist/*
+          UV_BIN="$(command -v uv || echo $HOME/.local/bin/uv)"
+          "$UV_BIN" run python -m build
+          "$UV_BIN" run python -m twine upload dist/*
