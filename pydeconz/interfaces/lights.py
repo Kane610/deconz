@@ -198,7 +198,7 @@ class LockHandler(APIHandler[Lock]):
         )
 
 
-class RangeExtenderHandler(APIHandler[ConfigurationTool]):
+class RangeExtenderHandler(APIHandler[RangeExtender]):
     """Handler for range extender."""
 
     resource_group = ResourceGroup.LIGHT
