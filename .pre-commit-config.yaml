@@ -1,13 +1,20 @@
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.1
+  - repo: local
     hooks:
-      - id: ruff
-        args:
-          - --fix
+      - id: ruff-check
+        name: ruff check
+        entry: sh -c 'if [ ! -x .venv/bin/python ]; then echo "Missing .venv. Run ./setup.sh (or uv sync --all-extras) first."; exit 1; fi; .venv/bin/python -m ruff check --fix'
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
       - id: ruff-format
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
-    hooks:
+        name: ruff format
+        entry: sh -c 'if [ ! -x .venv/bin/python ]; then echo "Missing .venv. Run ./setup.sh (or uv sync --all-extras) first."; exit 1; fi; .venv/bin/python -m ruff format'
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
       - id: mypy
-        exclude: ^tests/
+        name: mypy
+        entry: sh -c 'if [ ! -x .venv/bin/python ]; then echo "Missing .venv. Run ./setup.sh (or uv sync --all-extras) first."; exit 1; fi; .venv/bin/python -m mypy pydeconz'
+        language: system
+        pass_filenames: false
