@@ -15,10 +15,10 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Home Automation",
 ]
-requires-python = ">=3.12.0"
+requires-python = ">=3.14.0"
 dependencies    = [
     "aiohttp>3.9",
     "orjson>3.9",
@@ -62,7 +62,7 @@ exclude_also = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -88,7 +88,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 src = ["pydeconz", "tests"]
-target-version = "py312"
+target-version = "py314"
 lint.select = [
     "B002", # Python does not support the unary prefix increment
     "B005", # Using .strip() with multi-character strings is misleading
