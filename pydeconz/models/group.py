@@ -28,7 +28,7 @@ class TypedGroupAction(TypedDict):
     hue: int
     on: bool
     sat: int
-    xy: tuple[float, float]
+    xy: NotRequired[tuple[float, float]]
 
 
 class TypedGroupState(TypedDict):
