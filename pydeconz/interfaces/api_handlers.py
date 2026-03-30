@@ -26,7 +26,7 @@ UnsubscribeType = Callable[[], None]
 ID_FILTER_ALL = "*"
 
 
-class APIHandler(Generic[DataResource]):
+class APIHandler(Generic[DataResource]):  # noqa: UP046
     """Base class for a map of API Items."""
 
     resource_group: ResourceGroup
@@ -153,7 +153,7 @@ class APIHandler(Generic[DataResource]):
         return iter(self._items)
 
 
-class GroupedAPIHandler(Generic[DataResource]):
+class GroupedAPIHandler(Generic[DataResource]):  # noqa: UP046
     """Represent a group of deCONZ API items."""
 
     resource_group: ResourceGroup
