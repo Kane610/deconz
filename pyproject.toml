@@ -27,7 +27,7 @@ dependencies    = [
 [project.optional-dependencies]
 requirements = [
     "aiohttp==3.13.4",
-    "orjson==3.11.7",
+    "orjson==3.11.8",
 ]
 requirements-test = [
     "aioresponses==0.7.8",
