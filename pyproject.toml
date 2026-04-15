@@ -31,7 +31,7 @@ requirements = [
 ]
 requirements-test = [
     "aioresponses==0.7.8",
-    "mypy==1.20.0",
+    "mypy==1.20.1",
     "pytest==9.0.3",
     "pytest-aiohttp==1.1.0",
     "pytest-cov==7.1.0",
