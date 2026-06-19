@@ -35,7 +35,7 @@ requirements-test = [
     "pytest==9.1.0",
     "pytest-aiohttp==1.1.1",
     "pytest-cov==7.1.0",
-    "ruff==0.15.17",
+    "ruff==0.15.18",
 ]
 requirements-dev = [
     "pre-commit==4.6.0"
