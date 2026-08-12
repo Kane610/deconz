@@ -38,7 +38,7 @@ requirements-test = [
     "ruff==0.15.22",
 ]
 requirements-dev = [
-    "pre-commit==4.6.0"
+    "pre-commit==4.6.1"
 ]
 
 [project.urls]
