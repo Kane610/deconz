@@ -1,11 +1,51 @@
 """Setup common test helpers."""
 
 from collections.abc import Iterator
+import inspect
 from unittest.mock import Mock, patch
 
 import aiohttp
 from aioresponses import aioresponses
 import pytest
+
+if "stream_writer" in inspect.signature(aiohttp.ClientResponse.__init__).parameters:
+    _client_response_init = aiohttp.ClientResponse.__init__
+
+    def _compat_client_response_init(
+        self,
+        method,
+        url,
+        *args,
+        writer=None,
+        continue100=None,
+        timer=None,
+        request_info=None,
+        traces=None,
+        loop=None,
+        session=None,
+        stream_writer=None,
+        **kwargs,
+    ):
+        """Work around aioresponses incompatibility with aiohttp 3.14+."""
+        if stream_writer is None:
+            stream_writer = Mock()
+        _client_response_init(
+            self,
+            method,
+            url,
+            *args,
+            writer=writer,
+            continue100=continue100,
+            timer=timer,
+            request_info=request_info,
+            traces=traces,
+            loop=loop,
+            session=session,
+            stream_writer=stream_writer,
+            **kwargs,
+        )
+
+    aiohttp.ClientResponse.__init__ = _compat_client_response_init
 
 from pydeconz import DeconzSession
 from pydeconz.models import ResourceGroup
