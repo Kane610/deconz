@@ -139,6 +139,7 @@ lint.ignore = [
     "PLR0912",  # Maximum number of branches allowed for a function or method body
     "PLR0913",  # Too many arguments to function call ({c_args} > {max_args})
     "PLR0915",  # Too many statements ({statements} > {max_statements})
+    "PLR0917",  # Too many positional arguments ({c_args} > {max_args})
     "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
     "W191",  # Checks for indentation that uses tabs
 ]
